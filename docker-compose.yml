@@ -1,0 +1,33 @@
+services:
+  handbrake-ui:
+    build: .
+    image: handbrake-ui:latest
+    container_name: handbrake-ui
+    restart: unless-stopped
+    # Run as the owner of your media files so outputs get the right owner.
+    user: "${PUID:-1000}:${PGID:-1000}"
+    ports:
+      - "${PORT:-8095}:8095"
+    environment:
+      TZ: ${TZ:-UTC}
+      # Used only on first start; change them later in the UI (Settings).
+      SOURCE_ROOT: ${SOURCE_ROOT:-/mnt/downloads}
+      TARGET_ROOT: ${TARGET_ROOT:-/mnt/converted}
+    volumes:
+      - ./data:/data
+      # The host folder that holds your sources and targets, at the same path
+      # inside the container. rslave lets NFS/autofs mounts made later on the
+      # host show up inside the container.
+      - type: bind
+        source: ${MEDIA_DIR:-/mnt}
+        target: ${MEDIA_DIR:-/mnt}
+        bind:
+          propagation: rslave
+    group_add:
+      # Extra group for NAS shares that grant access by group (Synology: "users").
+      - "${MEDIA_GID:-100}"
+      # Intel Quick Sync. Remove this line and the "devices" block if the host has no /dev/dri.
+      - "${RENDER_GID:-991}"
+    devices:
+      - /dev/dri:/dev/dri
+    stop_grace_period: 20s

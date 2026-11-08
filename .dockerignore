@@ -1,0 +1,7 @@
+HandBrake
+**/node_modules
+**/dist
+data
+.git
+.env
+*.log
