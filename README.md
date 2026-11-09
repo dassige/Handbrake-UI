@@ -42,6 +42,18 @@ same preset.
 
   Results show as **Checked**, **Check warnings** or **Check failed**, with
   details per job and a **Check again** button.
+- **Merge** view: joins converted files into one MKV with mkvmerge. There is no
+  re-encode, so it takes about as long as copying the files.
+  - Put the parts in order by dragging.
+  - Each part's chapters are kept and moved to where that part starts in the
+    merged file. HandBrake's generic "Chapter N" names are renumbered, and a
+    part without chapters gets one named after its file. You can also choose
+    one chapter per part instead.
+  - A compatibility check first blocks parts with different tracks, and warns
+    about a different picture size or encoder settings.
+  - The merged file is checked like a conversion: its length must be the parts
+    added together.
+  - Optionally, the parts are deleted after a successful merge.
 - **In-app help:** a round **?** next to every page, panel, section and
   setting, plus **Help** search in the top bar. The content lives in
   `web/src/help/help.json`; `server/test/help.test.js` checks that every `?` has
@@ -107,9 +119,9 @@ cd server && npm test
 ```
 
 The server needs `HandBrakeCLI` on the `PATH` (or `HANDBRAKE_CLI=/path/to/it`)
-to scan and encode, and `ffprobe`/`ffmpeg` (`FFPROBE`, `FFMPEG`) for the check
-after conversion. Everything else works without them; the Docker image
-includes all three.
+to scan and encode, `ffprobe`/`ffmpeg` (`FFPROBE`, `FFMPEG`) for the check after
+conversion, and `mkvmerge` (`MKVMERGE`, from MKVToolNix) for merging. Everything
+else works without them; the Docker image includes all of them.
 
 **Stack:** Node 24 + Fastify, built-in `node:sqlite`, Server-Sent Events for
 live updates; React + Vite for the UI. One container, no external database.

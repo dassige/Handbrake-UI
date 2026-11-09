@@ -10,6 +10,7 @@ export const config = {
   handbrakeCli: env.HANDBRAKE_CLI || 'HandBrakeCLI',
   ffprobe: env.FFPROBE || 'ffprobe',
   ffmpeg: env.FFMPEG || 'ffmpeg',
+  mkvmerge: env.MKVMERGE || 'mkvmerge',
   // Only used to seed the settings the first time the app starts.
   initialSourceRoot: env.SOURCE_ROOT || '/mnt/downloads',
   initialTargetRoot: env.TARGET_ROOT || '/mnt/converted',

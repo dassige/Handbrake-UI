@@ -69,7 +69,7 @@ const diffText = (d) => (Math.abs(d) < 60 ? `${Math.abs(d).toFixed(1)} s` : fmtS
  * Turns the measurements into checks. Pure, so it is unit tested.
  * input: { sourceLength, probe, packets: { [index]: { end, count } }, decode, log }
  */
-export function evaluate({ sourceLength, probe, packets, decode, log }) {
+export function evaluate({ sourceLength, probe, packets, decode, log, sourceLabel = 'source' }) {
   const checks = [];
   const add = (id, label, status, detail) => checks.push({ id, label, status, detail });
   const streams = probe?.streams ?? [];
@@ -88,14 +88,14 @@ export function evaluate({ sourceLength, probe, packets, decode, log }) {
   const decodedEnd = decode?.end ?? null;
   const outLength = decodedEnd != null && videoEnd != null ? Math.min(decodedEnd, videoEnd) : decodedEnd ?? videoEnd ?? videoLength(probe);
   if (sourceLength == null || outLength == null) {
-    add('length', 'Length', 'info', `Output ${fmtSec(outLength)}; the source length is unknown`);
+    add('length', 'Length', 'info', `Output ${fmtSec(outLength)}; the ${sourceLabel} length is unknown`);
   } else {
     const d = outLength - sourceLength;
     const status = Math.abs(d) <= okDiff(sourceLength) ? 'ok' : Math.abs(d) <= warnDiff(sourceLength) ? 'warning' : 'error';
-    add('length', 'Length matches the source', status,
+    add('length', `Length matches the ${sourceLabel}`, status,
       status === 'ok'
-        ? `${fmtSec(outLength)} (source ${fmtSec(sourceLength)})`
-        : `Output is ${diffText(d)} ${d < 0 ? 'shorter' : 'longer'} than the source: ${fmtSec(outLength)} vs ${fmtSec(sourceLength)}`);
+        ? `${fmtSec(outLength)} (${sourceLabel} ${fmtSec(sourceLength)})`
+        : `Output is ${diffText(d)} ${d < 0 ? 'shorter' : 'longer'} than the ${sourceLabel}: ${fmtSec(outLength)} vs ${fmtSec(sourceLength)}`);
   }
 
   // Audio tracks: how many HandBrake meant to write, and each one complete.
@@ -244,7 +244,10 @@ export class Verifier {
    * Checks output against source. mode: 'full' | 'quick'.
    * Returns { status, mode, checks, checkedAt, tookMs } — status 'skipped' when stopped.
    */
-  async verify({ output, source, logFile, mode = 'full', nice = 0, onProgress, onChild, isStopped = () => false }) {
+  async verify({
+    output, source, sourceLength: givenLength, logFile, expected, mode = 'full', nice = 0, onProgress, onChild,
+    isStopped = () => false, sourceLabel,
+  }) {
     const started = Date.now();
     const opts = { nice, onChild };
     const done = (r) => ({ ...r, mode, checkedAt: Date.now(), tookMs: Date.now() - started });
@@ -257,8 +260,9 @@ export class Verifier {
         return done({ status: 'error', checks: [{ id: 'readable', label: 'Readable', status: 'error', detail: `Cannot read the file: ${err.message}` }] });
       }
       const sourceProbe = source ? await this.probe(source, opts).catch(() => null) : null;
-      const sourceLength = videoLength(sourceProbe);
-      const log = logFile ? parseHandBrakeLog(await fs.readFile(logFile, 'utf8').catch(() => '')) : null;
+      const sourceLength = givenLength ?? videoLength(sourceProbe);
+      // expected: track counts given by the caller (e.g. a merge), instead of a HandBrake log.
+      const log = expected ?? (logFile ? parseHandBrakeLog(await fs.readFile(logFile, 'utf8').catch(() => '')) : null);
       onProgress?.(0.02);
       const packets = await this.packets(output, opts);
       if (isStopped()) return done({ status: 'skipped', checks: [], note: 'Check stopped' });
@@ -269,7 +273,7 @@ export class Verifier {
         decode = await this.decode(output, len, { ...opts, onProgress: (p) => onProgress?.(0.08 + p * 0.92) });
         if (isStopped()) return done({ status: 'skipped', checks: [], note: 'Check stopped' });
       }
-      const result = evaluate({ sourceLength, probe, packets, decode, log });
+      const result = evaluate({ sourceLength, probe, packets, decode, log, sourceLabel });
       return done({ ...result, checks: [{ id: 'readable', label: 'Readable', status: 'ok', detail: probe.format?.format_long_name ?? 'yes' }, ...result.checks] });
     } catch (err) {
       if (err.code === 'ENOENT') return done({ status: 'skipped', checks: [], note: 'ffmpeg/ffprobe are not installed' });

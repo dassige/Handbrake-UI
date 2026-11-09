@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Trash2, Upload, Wand2 } from 'lucide-react';
+import { Combine, Trash2, Upload, Wand2 } from 'lucide-react';
 import { api } from '../api.js';
 import { DRAG_PATHS } from './SourceBrowser.jsx';
 import { JobRow, DRAG_JOB } from './JobRow.jsx';
@@ -14,7 +14,7 @@ const FILTERS = [
 
 export function QueuePanel({
   jobs, presets, presetId, onPresetChange, position, onPositionChange, settings,
-  onDropPaths, onSelect, selectedId, run, onRename,
+  onDropPaths, onSelect, selectedId, run, onRename, onMerge,
 }) {
   const [filter, setFilter] = useState('all');
   const [dropActive, setDropActive] = useState(false);
@@ -101,6 +101,15 @@ export function QueuePanel({
             onClick={() => onRename(visible.map((j) => j.outputPath))}
           >
             <Wand2 size={14} /> Rename these
+          </button>
+        )}
+        {filter === 'done' && counts.done > 1 && onMerge && (
+          <button
+            className="btn ghost small"
+            title="Open the converted files in the Merge view"
+            onClick={() => onMerge(visible.map((j) => j.outputPath))}
+          >
+            <Combine size={14} /> Merge these
           </button>
         )}
         <button

@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Clapperboard, Pause, Play, Settings as SettingsIcon, SlidersHorizontal, WifiOff } from 'lucide-react';
 import { RenameView } from './rename/RenameView.jsx';
+import { MergeView } from './merge/MergeView.jsx';
 import { Help, HelpProvider, HelpSearchButton } from './help/Help.jsx';
 import { api } from './api.js';
 import { useLiveData } from './useLiveData.js';
@@ -22,12 +23,13 @@ export default function App() {
   const [dialog, setDialog] = useState(null); // 'presets' | 'settings'
   const [presetId, setPresetId] = useState(null);
   const [position, setPosition] = useState('end');
-  const [view, setView] = useState(() => (location.hash === '#rename' ? 'rename' : 'convert'));
+  const [view, setView] = useState(() => ({ '#rename': 'rename', '#merge': 'merge' })[location.hash] ?? 'convert');
   const [renamePaths, setRenamePaths] = useState([]);
+  const [mergePaths, setMergePaths] = useState([]);
 
   const switchView = useCallback((v) => {
     setView(v);
-    history.replaceState(null, '', v === 'rename' ? '#rename' : '#');
+    history.replaceState(null, '', v === 'convert' ? '#' : `#${v}`);
   }, []);
 
   /** Opens the rename view with these files added. */
@@ -36,6 +38,16 @@ export default function App() {
       setRenamePaths((p) => [...new Set([...p, ...paths])]);
       setSelectedJobId(null);
       switchView('rename');
+    },
+    [switchView],
+  );
+
+  /** Opens the merge view with these files added (in this order). */
+  const openMerge = useCallback(
+    (paths) => {
+      setMergePaths((p) => [...new Set([...p, ...paths])]);
+      setSelectedJobId(null);
+      switchView('merge');
     },
     [switchView],
   );
@@ -94,6 +106,9 @@ export default function App() {
           <button className={view === 'rename' ? 'active' : ''} onClick={() => switchView('rename')}>
             Rename{renamePaths.length ? <span className="chip-count"> {renamePaths.length}</span> : null}
           </button>
+          <button className={view === 'merge' ? 'active' : ''} onClick={() => switchView('merge')}>
+            Merge{mergePaths.length ? <span className="chip-count"> {mergePaths.length}</span> : null}
+          </button>
         </nav>
         <div className="queue-state">
           <span className={`dot ${running ? 'on' : 'off'}`} />
@@ -138,7 +153,17 @@ export default function App() {
         </div>
       )}
 
-      {view === 'rename' ? (
+      {view === 'merge' ? (
+        <MergeView
+          settings={settings}
+          merges={data.merges}
+          paths={mergePaths}
+          setPaths={setMergePaths}
+          changeTick={data.changeTick}
+          run={run}
+          onError={onError}
+        />
+      ) : view === 'rename' ? (
         <RenameView
           settings={settings}
           rules={data.renameRules}
@@ -164,6 +189,7 @@ export default function App() {
           selectedId={selectedJobId}
           run={run}
           onRename={openRename}
+          onMerge={openMerge}
         />
       </main>
       )}

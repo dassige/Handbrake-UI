@@ -12,6 +12,8 @@ import { Events } from './events.js';
 import { registerRoutes } from './routes.js';
 import { Renamer } from './rename/renamer.js';
 import { Verifier } from './verify.js';
+import { Merger } from './merge.js';
+import { registerMergeRoutes } from './mergeRoutes.js';
 import { registerRenameRoutes } from './rename/routes.js';
 
 const { version } = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '../package.json'), 'utf8'));
@@ -32,6 +34,10 @@ const verifier = new Verifier({ ffprobe: config.ffprobe, ffmpeg: config.ffmpeg }
 const queue = new Queue({ db, settings, presets, handbrake, verifier, events, dataDir: config.dataDir, log: app.log });
 const renamer = new Renamer({ db, settings, events, log: app.log });
 queue.renamer = renamer;
+const merger = new Merger({
+  db, settings, events, verifier, log: app.log, tmpDir: path.join(config.dataDir, 'tmp'),
+  mkvmerge: config.mkvmerge, ffprobe: config.ffprobe,
+});
 
 app.setErrorHandler((err, req, reply) => {
   const status = err.statusCode ?? (err.code === 'ENOENT' ? 404 : 500);
@@ -44,6 +50,7 @@ await app.register(
   async (api) => {
     registerRoutes(api, { settings, presets, queue, events, handbrake, renamer, version });
     registerRenameRoutes(api, { renamer });
+    registerMergeRoutes(api, { merger });
   },
   {
     logLevel: 'warn',
@@ -76,4 +83,5 @@ process.on('SIGINT', () => stop('SIGINT'));
 
 await app.listen({ port: config.port, host: config.host });
 app.log.info(`Data: ${config.dataDir}  HandBrakeCLI: ${config.handbrakeCli}`);
+await merger.recover();
 await queue.recover();

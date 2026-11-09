@@ -11,6 +11,7 @@ export function useLiveData(onError, onNotice) {
   const [queue, setQueue] = useState(null);
   const [presets, setPresets] = useState([]);
   const [renameRules, setRenameRules] = useState([]);
+  const [merges, setMerges] = useState([]);
   const [settings, setSettings] = useState(null);
   const [info, setInfo] = useState(null);
   const [connected, setConnected] = useState(false);
@@ -31,6 +32,7 @@ export function useLiveData(onError, onNotice) {
   }, []);
   const loadPresets = useCallback(() => api.presets().then(setPresets, (e) => errRef.current?.(e)), []);
   const loadRenameRules = useCallback(() => api.renameRules().then(setRenameRules, (e) => errRef.current?.(e)), []);
+  const loadMerges = useCallback(() => api.merges().then(setMerges, (e) => errRef.current?.(e)), []);
   const loadSettings = useCallback(() => api.settings().then(setSettings, (e) => errRef.current?.(e)), []);
   const loadInfo = useCallback(() => api.info().then(setInfo, () => {}), []);
 
@@ -44,6 +46,7 @@ export function useLiveData(onError, onNotice) {
       loadJobs();
       loadPresets();
       loadRenameRules();
+      loadMerges();
       loadSettings();
       loadInfo();
     };
@@ -76,6 +79,10 @@ export function useLiveData(onError, onNotice) {
     });
     es.addEventListener('progress', (e) => {
       const p = JSON.parse(e.data);
+      if (p.mergeId != null) {
+        setMerges((list) => list.map((m) => (m.id === p.mergeId ? { ...m, progress: p.progress, phase: p.phase ?? m.phase } : m)));
+        return;
+      }
       setJobs((list) => list.map((j) => (j.id === p.id ? { ...j, ...p } : j)));
     });
     es.addEventListener('jobs', () => {
@@ -89,6 +96,18 @@ export function useLiveData(onError, onNotice) {
     });
     es.addEventListener('presets', () => loadPresets());
     es.addEventListener('renameRules', () => loadRenameRules());
+    es.addEventListener('merges', () => loadMerges());
+    es.addEventListener('merge', (e) => {
+      const m = JSON.parse(e.data);
+      setMerges((list) => {
+        const i = list.findIndex((x) => x.id === m.id);
+        if (i < 0) return [m, ...list];
+        if (list[i].status !== m.status) bump();
+        const next = list.slice();
+        next[i] = m;
+        return next;
+      });
+    });
     es.addEventListener('settings', (e) => {
       setSettings(JSON.parse(e.data));
       bump();
@@ -97,10 +116,10 @@ export function useLiveData(onError, onNotice) {
       es.close();
       clearTimeout(tickTimer);
     };
-  }, [loadJobs, loadPresets, loadRenameRules, loadSettings, loadInfo]);
+  }, [loadJobs, loadPresets, loadRenameRules, loadMerges, loadSettings, loadInfo]);
 
   return {
-    jobs, queue, presets, renameRules, settings, info, connected, changeTick,
+    jobs, queue, presets, renameRules, merges, settings, info, connected, changeTick,
     reloadJobs: loadJobs, reloadPresets: loadPresets, setSettings,
   };
 }

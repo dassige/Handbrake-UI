@@ -71,6 +71,26 @@ CREATE TABLE IF NOT EXISTS rename_history (
   items      TEXT NOT NULL,      -- JSON [{ from, to }]
   undone_at  INTEGER
 );
+
+CREATE TABLE IF NOT EXISTS merges (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  status        TEXT NOT NULL,     -- queued | running | done | failed | cancelled
+  phase         TEXT,              -- reading | merging | verifying
+  created_at    INTEGER NOT NULL,
+  finished_at   INTEGER,
+  parts         TEXT NOT NULL,     -- JSON list of input paths, in order
+  output        TEXT NOT NULL,
+  options       TEXT NOT NULL,     -- JSON { chapterMode, removeParts }
+  progress      REAL NOT NULL DEFAULT 0,
+  warnings      TEXT,              -- JSON list
+  error         TEXT,
+  chapters      INTEGER,
+  duration      REAL,
+  output_size   INTEGER,
+  verify        TEXT,
+  verify_status TEXT,
+  parts_removed INTEGER NOT NULL DEFAULT 0
+);
 `;
 
 /** Columns added after the first release. */

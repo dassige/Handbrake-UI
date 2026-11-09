@@ -6,7 +6,9 @@
         "Type one or more words: a topic is listed when its title or text has **every** word. Case and accents don't matter, and words in the title rank first.",
         "With nothing typed, every topic is listed from A to Z. Every round **?** in the app opens the topic for the thing next to it."
       ],
-      "see": ["app.overview"]
+      "see": [
+        "app.overview"
+      ]
     },
     "app.overview": {
       "title": "How HandBrake Queue works",
@@ -18,9 +20,18 @@
         "1. Press **Start**: see [Starting and stopping the queue](#queue.state).",
         "1. Each converted file is [checked](#verify.overview) for errors, missing audio or subtitles and the right length.",
         "1. In **Rename**, give the converted files clean names: see [Renaming files](#rename.overview).",
+        "Optionally, join several converted files into one (e.g. a film split in two parts) in **Merge**: see [Merging files](#merge.overview).",
         "Source files are never changed or deleted, so downloads can keep seeding."
       ],
-      "see": ["convert.sources", "convert.queue", "queue.state", "verify.overview", "rename.overview", "presets"]
+      "see": [
+        "convert.sources",
+        "convert.queue",
+        "queue.state",
+        "verify.overview",
+        "rename.overview",
+        "presets",
+        "merge.overview"
+      ]
     },
     "convert.sources": {
       "title": "Sources",
@@ -33,7 +44,11 @@
         "Badges show what happened to each file: **Queued**, **Converting**, **Converted**, **Failed**. On folders they count the files inside.",
         "Adding files never starts converting: press **Start** when you are ready ([why](#queue.state))."
       ],
-      "see": ["convert.queue", "settings.adding", "queue.state"]
+      "see": [
+        "convert.queue",
+        "settings.adding",
+        "queue.state"
+      ]
     },
     "convert.queue": {
       "title": "Queue",
@@ -42,11 +57,16 @@
         "- **Preset**: the [preset](#presets) used for the files you add next. A queued job's preset can be changed in its details.",
         "- **Add**: put new files **at the end** of the queue or **next**, before the other waiting jobs.",
         "- **Drag** a queued job by its handle (⋮⋮) to change the order, or use **Move to top**.",
-        "- The filters show all jobs, the active ones, the converted ones or the failed and cancelled ones. **Rename these** (under Converted) opens their files in the Rename view.",
+        "- The filters show all jobs, the active ones, the converted ones or the failed and cancelled ones. **Rename these** (under Converted) opens their files in the Rename view, **Merge these** in the Merge view.",
         "- **Clear finished** removes converted, failed and cancelled jobs from the list. Files are not touched.",
         "Click a job to see its [details](#job.details)."
       ],
-      "see": ["queue.state", "job.statuses", "job.actions", "job.details"]
+      "see": [
+        "queue.state",
+        "job.statuses",
+        "job.actions",
+        "job.details"
+      ]
     },
     "queue.state": {
       "title": "Starting and stopping the queue",
@@ -57,7 +77,10 @@
         "- **Stop after current** lets the job being converted finish, then stops. To stop at once, pause or cancel that job.",
         "- If the server restarts during a run, the run continues after the restart. The job that was converting starts again from 0%, because HandBrake cannot resume an encode halfway."
       ],
-      "see": ["convert.queue", "job.actions"]
+      "see": [
+        "convert.queue",
+        "job.actions"
+      ]
     },
     "job.statuses": {
       "title": "Job statuses",
@@ -72,7 +95,10 @@
         "- **Failed**: HandBrake stopped with an error; the details show why and the log has more.",
         "- **Cancelled**: you cancelled it."
       ],
-      "see": ["job.actions", "verify.results"]
+      "see": [
+        "job.actions",
+        "verify.results"
+      ]
     },
     "job.actions": {
       "title": "Job actions",
@@ -86,7 +112,10 @@
         "- **Check again**: runs the [check](#verify.overview) on a converted file again.",
         "- **Remove**: takes the job off the list. Files are never deleted."
       ],
-      "see": ["job.statuses", "job.details"]
+      "see": [
+        "job.statuses",
+        "job.details"
+      ]
     },
     "job.details": {
       "title": "Job details",
@@ -94,7 +123,12 @@
         "Everything about one job: [progress](#job.statuses), the [check](#verify.results), [files](#job.files), preset, [source](#job.source), [timing](#job.timing) and the [HandBrake log](#job.log). The buttons at the top are the [job actions](#job.actions).",
         "The details follow the job live while it converts. Close them with ✕ or Escape."
       ],
-      "see": ["job.actions", "job.files", "verify.results", "job.log"]
+      "see": [
+        "job.actions",
+        "job.files",
+        "verify.results",
+        "job.log"
+      ]
     },
     "job.files": {
       "title": "Source and output files",
@@ -105,7 +139,10 @@
         "- While converting, the output is written as `name.mkv.part` and renamed when HandBrake finishes, so media servers never pick up half-written files.",
         "- **Sizes** compares the source with the output."
       ],
-      "see": ["settings.layout", "job.details"]
+      "see": [
+        "settings.layout",
+        "job.details"
+      ]
     },
     "job.source": {
       "title": "Source details",
@@ -113,7 +150,10 @@
         "What HandBrake found in the source when the job was added: length, video format and size, frame rate, and the audio and subtitle tracks with their languages.",
         "The [preset](#presets) decides which of these tracks go into the output. The [check](#verify.overview) compares the output with what HandBrake meant to write."
       ],
-      "see": ["presets", "verify.overview"]
+      "see": [
+        "presets",
+        "verify.overview"
+      ]
     },
     "job.timing": {
       "title": "Timing",
@@ -127,7 +167,9 @@
         "Everything HandBrakeCLI printed while converting: the settings it used, the tracks it picked, warnings and errors. It updates live while the job runs.",
         "When a job fails, the error shown in its details comes from the last error lines of this log. The [check](#verify.overview) also reads it, to know which audio and subtitle tracks HandBrake wrote and whether it found errors in the source."
       ],
-      "see": ["verify.overview"]
+      "see": [
+        "verify.overview"
+      ]
     },
     "verify.overview": {
       "title": "Checking converted files",
@@ -142,7 +184,11 @@
         "- **Source**: if HandBrake found decoding errors in the source, the damage may be visible in the output too (a warning).",
         "Choose **Full**, **Quick** (everything except the full decode) or **Off** in [Settings](#settings.encoding)."
       ],
-      "see": ["verify.results", "settings.encoding", "rename.auto"]
+      "see": [
+        "verify.results",
+        "settings.encoding",
+        "rename.auto"
+      ]
     },
     "verify.results": {
       "title": "Check results",
@@ -154,7 +200,10 @@
         "Each line in the job details says what was found. **Check again** repeats the check, e.g. after copying the file back.",
         "Files that fail the check are never [renamed automatically](#rename.auto)."
       ],
-      "see": ["verify.overview", "job.actions"]
+      "see": [
+        "verify.overview",
+        "job.actions"
+      ]
     },
     "presets": {
       "title": "Presets",
@@ -168,7 +217,10 @@
         "- Each job keeps a copy of its preset, so changing or deleting a preset never changes jobs already in the queue.",
         "The encoder always comes from the preset. Hardware encoders (`qsv_h264`, `qsv_h265`) only work on Intel CPUs from 11th generation on; the encoders available on this server are listed in Settings → About."
       ],
-      "see": ["convert.queue", "job.source"]
+      "see": [
+        "convert.queue",
+        "job.source"
+      ]
     },
     "settings.folders": {
       "title": "Sources and target folders",
@@ -178,7 +230,10 @@
         "- **Target folder**: where converted files are written. The Rename view works only here.",
         "Both must exist, and the target cannot be inside the sources folder. In Docker they must be inside the folder mounted into the container (`MEDIA_DIR`, usually `/mnt`)."
       ],
-      "see": ["settings.layout", "convert.sources"]
+      "see": [
+        "settings.layout",
+        "convert.sources"
+      ]
     },
     "settings.layout": {
       "title": "Output folder layout",
@@ -189,7 +244,9 @@
         "- **All in the target folder**: `target/episode.mkv`.",
         "If the file already exists, the new one gets a suffix (`episode (1).mkv`). The layout applies to files added after the change; queued jobs keep their output path."
       ],
-      "see": ["job.files"]
+      "see": [
+        "job.files"
+      ]
     },
     "settings.adding": {
       "title": "Adding folders",
@@ -199,7 +256,9 @@
         "- **Video file extensions**: which files count as videos, separated by commas.",
         "- **Skip files and folders containing these words**: whole words, any case, e.g. `sample` skips `show-sample.mkv` and a `Sample` folder but not `samples.mkv`."
       ],
-      "see": ["convert.sources"]
+      "see": [
+        "convert.sources"
+      ]
     },
     "settings.encoding": {
       "title": "Encoding settings",
@@ -207,7 +266,9 @@
         "- **CPU priority**: how politely conversions share the CPU with other services on the server (Linux `nice`, 0–19). Higher is gentler and slower only when the server is busy.",
         "- **Check after conversion**: **Full** (every check, with a complete decode), **Quick** (lengths, tracks and readability without decoding) or **Off**. See [Checking converted files](#verify.overview)."
       ],
-      "see": ["verify.overview"]
+      "see": [
+        "verify.overview"
+      ]
     },
     "settings.renaming": {
       "title": "Renaming settings",
@@ -216,7 +277,10 @@
         "- **Rule set for automatic renaming**: which [rule set](#rename.rules) is used.",
         "- **Separator**: when the new name is taken, a number is added after it: with `_` you get `name_1.mkv`, `name_2.mkv`."
       ],
-      "see": ["rename.auto", "rename.rules"]
+      "see": [
+        "rename.auto",
+        "rename.rules"
+      ]
     },
     "rename.overview": {
       "title": "Renaming files",
@@ -228,7 +292,13 @@
         "1. Press **Rename**. Every batch can be undone from [History](#rename.history).",
         "Only files in the target folder can be renamed, never the sources (downloads may still be seeding)."
       ],
-      "see": ["rename.preview", "rename.showName", "rename.rules", "rename.history", "rename.auto"]
+      "see": [
+        "rename.preview",
+        "rename.showName",
+        "rename.rules",
+        "rename.history",
+        "rename.auto"
+      ]
     },
     "rename.preview": {
       "title": "Rename preview",
@@ -241,7 +311,10 @@
         "- If two files would get the same name, or the name is taken by another file in the folder, a number is added: `name_1.mkv` (see [Renaming settings](#settings.renaming)).",
         "Files in different folders are grouped under their folder."
       ],
-      "see": ["rename.showName", "rename.rules"]
+      "see": [
+        "rename.showName",
+        "rename.rules"
+      ]
     },
     "rename.showName": {
       "title": "Show name",
@@ -250,7 +323,10 @@
         "- **only where missing** (default): only rows where no show name was found get it. Other shows in the same list keep theirs.",
         "- **for all rows**: every TV row gets this show name, e.g. to shorten a long one or to add a year for a remake: `Silo (2023)`."
       ],
-      "see": ["rename.preview", "rename.smart"]
+      "see": [
+        "rename.preview",
+        "rename.smart"
+      ]
     },
     "rename.rules": {
       "title": "Rename rule sets",
@@ -262,7 +338,11 @@
         "- **Export** (download icon) saves the rule set as a `.json` file, e.g. to copy it to another server.",
         "- Changes are kept only after **Save**; [Try it](#rename.tryIt) shows the result before saving."
       ],
-      "see": ["rename.steps", "rename.smart", "rename.tryIt"]
+      "see": [
+        "rename.steps",
+        "rename.smart",
+        "rename.tryIt"
+      ]
     },
     "rename.steps": {
       "title": "Rename steps",
@@ -280,7 +360,10 @@
         "- **Collapse spaces**: several spaces become one.",
         "Characters that file names can't contain (`/ \\ : * ? \" < > |`) are removed or replaced at the end; `:` becomes ` -`."
       ],
-      "see": ["rename.smart", "rename.tryIt"]
+      "see": [
+        "rename.smart",
+        "rename.tryIt"
+      ]
     },
     "rename.smart": {
       "title": "Recognise episode / movie",
@@ -297,7 +380,10 @@
         "- **Keep the year in the show name**: `East of Eden 2026 S01E01` becomes `East Of Eden (2026) S01e01`. Off by default; useful for remakes.",
         "- **Extra release tags**: more words that mark the start of the release information."
       ],
-      "see": ["rename.showName", "rename.steps"]
+      "see": [
+        "rename.showName",
+        "rename.steps"
+      ]
     },
     "rename.tryIt": {
       "title": "Try it",
@@ -305,7 +391,9 @@
         "Shows what the rule set being edited does to some names, before saving. It starts with the names in your rename list (or a few examples); type or paste any names, one per line.",
         "The **Show name** box works like the one in the [Rename view](#rename.showName)."
       ],
-      "see": ["rename.rules"]
+      "see": [
+        "rename.rules"
+      ]
     },
     "rename.history": {
       "title": "Rename history",
@@ -313,7 +401,9 @@
         "Every batch of renames, newest first, including automatic ones. Click a batch to see each old and new name.",
         "**Undo** gives the files their old names back. A file is skipped if it was deleted or moved since, or if its old name is in use again."
       ],
-      "see": ["rename.overview"]
+      "see": [
+        "rename.overview"
+      ]
     },
     "rename.auto": {
       "title": "Automatic renaming",
@@ -322,7 +412,95 @@
         "To stay safe, a file is renamed only when the rules recognise it **without warnings**. Otherwise the job shows **Needs rename** and you finish it in the [Rename view](#rename.overview). Files that fail the check are not renamed.",
         "Automatic renames appear in [History](#rename.history) and can be undone."
       ],
-      "see": ["settings.renaming", "rename.overview"]
+      "see": [
+        "settings.renaming",
+        "rename.overview"
+      ]
+    },
+    "merge.overview": {
+      "title": "Merging files",
+      "body": [
+        "Joins converted files into one MKV, one after the other, for example a film or a concert split into discs or parts. The chapters of every part are kept.",
+        "1. On the left, browse the **target folder** and drag the parts (or the folder holding them) to the merge list. Under **Converted** in the queue, **Merge these** does the same.",
+        "1. Put the parts [in order](#merge.parts).",
+        "1. Read the [compatibility check](#merge.compat): parts that cannot be joined are explained there.",
+        "1. Choose the [name and chapters](#merge.options) of the merged file and press **Merge**.",
+        "Merging copies the video, audio and subtitles as they are, without converting again, so it takes about as long as copying the files. The merged file is then [checked](#verify.overview) like a conversion: its length must be the parts added together, with the same audio and subtitle tracks as part 1.",
+        "Merges run one at a time, alongside conversions. Progress and results are under [Recent merges](#merge.history). The parts are kept unless you choose to delete them."
+      ],
+      "see": [
+        "merge.parts",
+        "merge.compat",
+        "merge.chapters",
+        "merge.options",
+        "merge.history"
+      ]
+    },
+    "merge.parts": {
+      "title": "Parts and their order",
+      "body": [
+        "The merged file plays the parts top to bottom. A dropped folder adds its video files in name order (`Disc 1`, `Disc 2`, … `Disc 10`).",
+        "- **Drag** a part by its handle, or use the arrows, to change the order.",
+        "- ✕ takes a part out of the list (the file is not touched).",
+        "Each row shows the part’s length, chapters, audio languages, subtitle tracks, picture size and file size, read from the file."
+      ],
+      "see": [
+        "merge.compat"
+      ]
+    },
+    "merge.compat": {
+      "title": "Can the parts be joined?",
+      "body": [
+        "Joining files only works when every part has the **same tracks in the same order**. The easiest way is to convert all parts with the same preset.",
+        "### Problems that stop the merge (red)",
+        "- A different number of video, audio or subtitle tracks, e.g. one part with Italian and English audio and another with Italian only.",
+        "- A track in a different format (e.g. AAC in one part, AC-3 in another), or audio with different channels or sample rate.",
+        "### Warnings (amber): the merge can go ahead",
+        "- A different picture size, or video encoded with slightly different settings (e.g. a different crop). Most players handle it; some may glitch for a moment where the parts join, so check the joins.",
+        "- A track in another language: the merged track keeps part 1’s language."
+      ],
+      "see": [
+        "merge.parts",
+        "presets"
+      ]
+    },
+    "merge.chapters": {
+      "title": "Chapters of the merged file",
+      "body": [
+        "- **Keep each part’s chapters** (default): every chapter keeps its place, moved to where its part starts in the merged file. HandBrake’s generic names (`Chapter 1`, `Chapter 2`…) are renumbered across the whole file; chapters with their own names keep them. A part without chapters gets one chapter named after the file.",
+        "- **One chapter per part**: one chapter at the start of each part, named after its file (dots and underscores become spaces).",
+        "Open **chapters in the merged file** under the options to see the list before merging."
+      ],
+      "see": [
+        "merge.options"
+      ]
+    },
+    "merge.options": {
+      "title": "Name and options of the merged file",
+      "body": [
+        "- **Name**: suggested from what the parts’ names have in common (`Live Aid - Disc 1`, `Live Aid - Disc 2` → `Live Aid`). The file is always `.mkv`.",
+        "- The merged file goes in the **folder of part 1**. If the name is taken, a number is added (`Live Aid_1.mkv`, see [Renaming settings](#settings.renaming)). Nothing is overwritten.",
+        "- **Chapters**: see [Chapters of the merged file](#merge.chapters).",
+        "- **Delete the parts after a successful merge**: off by default. The parts are deleted only if the merge worked and the [check](#verify.overview) did not fail; if checking is off, they are deleted after the merge. This cannot be undone.",
+        "While merging, the file is written as `name.mkv.part` and renamed at the end, so media servers never see a half-written file."
+      ],
+      "see": [
+        "merge.chapters",
+        "merge.history"
+      ]
+    },
+    "merge.history": {
+      "title": "Recent merges",
+      "body": [
+        "Each merge with its status: **Waiting**, **Reading parts**, **Merging** (with progress), **Checking**, **Merged**, **Failed** or **Cancelled**. A merged file also shows its [check result](#verify.results).",
+        "Click a merge to see the output, the parts, any warnings from mkvmerge and the check details.",
+        "- ■ cancels a waiting or running merge; the half-written file is deleted and the parts are kept.",
+        "- 🗑 removes a finished merge from the list. Files are not touched."
+      ],
+      "see": [
+        "merge.overview",
+        "verify.results"
+      ]
     }
   }
 }

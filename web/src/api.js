@@ -37,6 +37,12 @@ export const api = {
   startQueue: () => post('/api/queue/start'),
   stopQueue: () => post('/api/queue/stop'),
 
+  merges: () => get('/api/merge'),
+  mergeInspect: (body) => post('/api/merge/inspect', body),
+  mergeStart: (body) => post('/api/merge', body),
+  mergeCancel: (id) => post(`/api/merge/${id}/cancel`),
+  mergeRemove: (id) => request('DELETE', `/api/merge/${id}`),
+
   renameRules: () => get('/api/rename/rules'),
   createRenameRule: (rule) => post('/api/rename/rules', rule),
   updateRenameRule: (id, rule) => request('PUT', `/api/rename/rules/${id}`, rule),

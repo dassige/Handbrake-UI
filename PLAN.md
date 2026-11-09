@@ -80,5 +80,22 @@ target folder.
        track removed fails.
    - In-app help ported from dgsoft-image-manager: `web/src/help/` (help.json,
      Help.jsx, search.js) and `server/test/help.test.js`.
-6. Later (optional) — watch folder, Emby library refresh, notifications
+6. Merge (2026-11-09) ✅ — `server/src/merge.js`, Merge tab.
+   - Uses mkvmerge (mkvtoolnix, added to the image). A plain append keeps every
+     part's chapters, shifted to where the part starts, but leaves duplicate
+     "Chapter 1" titles. `--generate-chapters when-appending` adds nothing
+     when the parts already have chapters. So the app builds the chapter XML
+     itself: each part's length from `mkvmerge -J` plus the chapters from
+     ffprobe, passed with `--no-chapters` on each part and `--chapters`.
+   - mkvmerge only warns (exit 1) when the track layouts differ, so the app
+     checks compatibility first. Different track counts, codecs or audio
+     format are errors; a different picture size, codec private data or
+     language are warnings.
+   - Tested end to end on asus-serv-1:
+     - two 40 s parts → 3 chapters at the right times;
+     - the custom title is kept and the generic one renumbered;
+     - length 1:21.206 = 40.958 + 40.248 s;
+     - the check passes;
+     - an incompatible clip is blocked.
+7. Later (optional) — watch folder, Emby library refresh, notifications
    (n8n / Home Assistant).
