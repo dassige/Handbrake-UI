@@ -11,3 +11,5 @@ dist/
 
 # Local Claude Code instructions (kept out of the repo)
 /CLAUDE.md
+preset-gerry.json
+todo.txt
