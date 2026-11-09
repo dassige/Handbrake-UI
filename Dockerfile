@@ -75,6 +75,7 @@ RUN ! ldd /usr/local/bin/HandBrakeCLI | grep "not found"
 COPY --from=web /usr/local/bin/node /usr/local/bin/node
 WORKDIR /app
 COPY --from=server /src/server/node_modules server/node_modules
+COPY package.json ./
 COPY server/package.json server/
 COPY server/src server/src
 COPY --from=web /src/web/dist web/dist

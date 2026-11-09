@@ -10,6 +10,23 @@ const LAYOUTS = [
   { value: 'flat', label: 'All in the target folder', example: 'target/episode.mkv' },
 ];
 
+/* global __WEB_VERSION__ */
+const WEB_VERSION = typeof __WEB_VERSION__ === 'undefined' ? {} : __WEB_VERSION__;
+
+/** "1.2.0 · 10 Nov 2026 12:07 · 170ad19" */
+function VersionRow({ label, v, strong }) {
+  const parts = [v?.date, v?.commit?.slice(0, 7)].filter(Boolean);
+  return (
+    <>
+      <dt>{label}</dt>
+      <dd>
+        {strong ? <strong>{v?.version ?? '…'}</strong> : v?.version ?? '…'}
+        {parts.length > 0 && <span className="muted"> · {parts.join(' · ')}</span>}
+      </dd>
+    </>
+  );
+}
+
 const toList = (s) => s.split(',').map((x) => x.trim()).filter(Boolean);
 
 const RESOLUTIONS = [
@@ -274,10 +291,13 @@ export function SettingsDialog({ settings, info, renameRules = [], run, onSaved,
 
         <fieldset>
           <legend>About</legend>
-          <p className="small">
-            HandBrake Queue {info?.app} ·{' '}
-            {hb?.error ? <span className="text-bad">{hb.error}</span> : <>HandBrakeCLI {hb?.version ?? '…'}</>}
-          </p>
+          <dl className="versions small">
+            <VersionRow label="HandBrake Queue" v={info?.app} strong />
+            <VersionRow label="Server" v={info?.server} />
+            <VersionRow label="Web UI" v={WEB_VERSION} />
+            <dt>HandBrakeCLI</dt>
+            <dd>{hb?.error ? <span className="text-bad">{hb.error}</span> : hb?.version ?? '…'}</dd>
+          </dl>
           {hb?.encoders?.length > 0 && <p className="muted small">Video encoders: {hb.encoders.join(', ')}</p>}
         </fieldset>
       </form>

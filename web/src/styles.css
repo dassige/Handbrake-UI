@@ -538,3 +538,6 @@ h2 .help-btn, h3 .help-btn, legend .help-btn { vertical-align: 2px; }
 .root-list .protect.on { color: var(--good); }
 .protected-note { display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; color: var(--muted); padding: 0 6px; }
 .file-list:focus { outline: none; }
+.versions { display: grid; grid-template-columns: 130px 1fr; gap: 3px 10px; margin: 0; }
+.versions dt { color: var(--muted); }
+.versions dd { margin: 0; }

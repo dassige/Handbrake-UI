@@ -14,7 +14,8 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
   let hbInfo = null;
   app.get('/api/info', async () => {
     hbInfo ??= await handbrake.info();
-    return { app: version, handbrake: hbInfo, queue: queue.state() };
+    // app = global (project) version, server = this service's package version.
+    return { app: version.app, server: version.server, handbrake: hbInfo, queue: queue.state() };
   });
 
   app.get('/api/events', (req, reply) => {

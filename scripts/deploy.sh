@@ -36,7 +36,7 @@ echo "==> Copying to $HOST:~/$DIR"
 tar czf - \
   --exclude=./HandBrake --exclude=./data --exclude=./.git --exclude='*/node_modules' \
   --exclude='*/dist' --exclude=./.env --exclude=./AdvancedRenamer --exclude=./todo.txt \
-  Dockerfile docker-compose.yml .dockerignore .env.example README.md server web \
+  Dockerfile docker-compose.yml .dockerignore .env.example README.md package.json server web \
   | "${SSH[@]}" "$HOST" "mkdir -p ~/$DIR && tar xzf - -C ~/$DIR"
 
 echo "==> Building and starting"

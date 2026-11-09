@@ -23,7 +23,20 @@ import { registerQualityRoutes } from './qualityRoutes.js';
 import { Downloads } from './download.js';
 import { registerDownloadRoutes } from './downloadRoutes.js';
 
-const { version } = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '../package.json'), 'utf8'));
+/** version, date and commit from a package.json (managed by DGS AutoVersion); null when missing. */
+function readVersion(file) {
+  try {
+    const p = JSON.parse(fs.readFileSync(file, 'utf8'));
+    return { version: p.version ?? null, date: p.versionDate ?? null, commit: p['git-parentCommit-ID'] ?? null };
+  } catch {
+    return null;
+  }
+}
+// Global (project) version from the root package.json, and the server's own.
+const version = {
+  app: readVersion(path.join(import.meta.dirname, '../../package.json')),
+  server: readVersion(path.join(import.meta.dirname, '../package.json')),
+};
 
 for (const dir of ['', 'logs', 'tmp']) fs.mkdirSync(path.join(config.dataDir, dir), { recursive: true });
 
