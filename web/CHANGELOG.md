@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2] - 2026/11/10
+
+- Update QSV GPU encoding documentation and add details for Quick Sync presets
+
 ## [1.0.1] - 2026/11/10
 
 - Add Dockerfile support for building HandBrakeCLI and update README with encoding details

@@ -165,10 +165,12 @@
       "title": "HandBrake log",
       "body": [
         "Everything HandBrakeCLI printed while converting: the settings it used, the tracks it picked, warnings and errors. It updates live while the job runs.",
-        "When a job fails, the error shown in its details comes from the last error lines of this log. The [check](#verify.overview) also reads it, to know which audio and subtitle tracks HandBrake wrote and whether it found errors in the source."
+        "When a job fails, the error shown in its details comes from the last error lines of this log. The [check](#verify.overview) also reads it, to know which audio and subtitle tracks HandBrake wrote and whether it found errors in the source.",
+        "The `encoder:` line shows which encoder was used, e.g. `H.264 (Intel QSV)` for a [Quick Sync preset](#presets.qsv)."
       ],
       "see": [
-        "verify.overview"
+        "verify.overview",
+        "presets.qsv"
       ]
     },
     "verify.overview": {
@@ -215,11 +217,33 @@
         "- Uploading a preset with the same name again replaces the old one.",
         "- The **default** preset (★) is used when you add files, unless you choose another one in the Queue.",
         "- Each job keeps a copy of its preset, so changing or deleting a preset never changes jobs already in the queue.",
-        "The encoder always comes from the preset. Hardware encoders (`qsv_h264`, `qsv_h265`) only work on Intel CPUs from 11th generation on; the encoders available on this server are listed in Settings → About."
+        "The encoder always comes from the preset. Hardware encoders (`qsv_h264`, `qsv_h265`) convert on the Intel GPU: see [Quick Sync (GPU) presets](#presets.qsv). The encoders available on this server are listed in Settings → About."
       ],
       "see": [
+        "presets.qsv",
         "convert.queue",
         "job.source"
+      ]
+    },
+    "presets.qsv": {
+      "title": "Quick Sync (GPU) presets",
+      "body": [
+        "A preset with an Intel **Quick Sync** encoder converts on the server's Intel GPU instead of the CPU. On a 10th-gen Intel i3 it was about **twice as fast** as x264 at the same bitrate, with files of the same size and nearly the same quality. Quick Sync works on Intel iGPUs from 6th generation on, when the server passes the GPU (`/dev/dri`) to HandBrake Queue. If `qsv_h264` is listed in Settings → About, it's ready.",
+        "### Making one in HandBrake for Windows",
+        "1. Open any video, then select the preset to start from.",
+        "1. On the **Video** tab, set **Video Encoder** to `H.264 (Intel QSV)` and **Encoder Preset** to `Balanced`. Keep the same average bitrate, or add about 10–15% to match x264's quality.",
+        "1. Leave the encoder's **Advanced options** empty: options meant for newer Intel GPUs may not work on the server.",
+        "1. **Save New Preset** with its own name, **Export** it, and upload it in [Presets](#presets).",
+        "The Intel QSV encoders only appear in HandBrake when your own computer has an Intel GPU. Without one, export the x264 preset instead and edit the `.json` file: set `VideoEncoder` to `qsv_h264` and `VideoPreset` to `balanced`.",
+        "### Things to check",
+        "- **Quick Sync decoding must stay off.** If the exported file has `\"VideoHWDecode\": 2`, delete that line: decoding on the GPU fails on 6th–10th gen Intel. The source is decoded on the CPU, which is why it is about twice as fast and not more.",
+        "- `H.264 (Intel QSV)` with **Balanced** gave the best results in tests. **Quality** gave the same result, and `H.265 (Intel QSV)` was slower and slightly worse at the same bitrate.",
+        "- If the server rejects the preset when you upload it, the message says why, e.g. an encoder it doesn't have.",
+        "- To check that a job used the GPU, look for `encoder: H.264 (Intel QSV)` in its [HandBrake log](#job.log). The speed is also higher, e.g. about 60 instead of 30 frames per second."
+      ],
+      "see": [
+        "presets",
+        "job.log"
       ]
     },
     "settings.folders": {
