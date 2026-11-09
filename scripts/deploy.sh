@@ -4,6 +4,8 @@
 #   scripts/deploy.sh [ssh-alias] [remote-dir]
 #
 # Defaults: asus-serv-1, ~/SW/handbrake-ui. Uses ../keys/ssh_config when present.
+# Extra ssh options go in SSH_OPTS, e.g. through a jump host from outside the LAN:
+#   SSH_OPTS="-J rasp-web" scripts/deploy.sh
 # The remote .env is created from .env.example on the first deploy and never
 # overwritten afterwards; data/ (database, logs) is kept.
 set -euo pipefail
@@ -14,6 +16,10 @@ cd "$(dirname "$0")/.."
 
 SSH=(ssh)
 [ -f ../keys/ssh_config ] && SSH=(ssh -F ../keys/ssh_config)
+if [ -n "${SSH_OPTS:-}" ]; then
+  read -r -a EXTRA <<< "$SSH_OPTS"
+  SSH+=("${EXTRA[@]}")
+fi
 
 # Restarting the container stops a running encode (it is re-queued from 0%).
 if [ "${FORCE:-0}" != "1" ]; then

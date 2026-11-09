@@ -1,6 +1,6 @@
 {
   "name": "handbrake-ui-web",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -17,6 +17,6 @@
     "@vitejs/plugin-react": "^6.2.1",
     "vite": "^8.3.6"
   },
-  "versionDate": "2026/11/09 18:23",
-  "git-parentCommit-ID": "fd0830e24ffbc5c7c47b284144a9f4ec97a58eee"
+  "versionDate": "2026/11/10 09:42",
+  "git-parentCommit-ID": "6807dc86b357a96107e7305ea9a761f0d53f02c9"
 }

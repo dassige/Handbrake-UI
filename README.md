@@ -102,13 +102,25 @@ The database, logs and presets live in `./data`.
 
 ### Hardware encoding
 
-The image uses Ubuntu 26.04's `handbrake-cli`, which includes Intel Quick
-Sync (oneVPL). The encoder always comes from your preset; `qsv_h264` /
-`qsv_h265` presets need `/dev/dri` passed through. Ubuntu 26.04 only ships the
-VPL GPU runtime, which supports Intel Tiger Lake (11th gen) and newer. Older
-iGPUs, such as Comet Lake UHD 620, can only use software encoders like x264
-and x265. If the host has no `/dev/dri`, remove the `devices` and `group_add`
-blocks from `docker-compose.yml`.
+The image builds `HandBrakeCLI` from the upstream source (version set by
+`HANDBRAKE_VERSION` in the `Dockerfile`), with Intel Quick Sync on amd64.
+Ubuntu's own `handbrake-cli` package can't be used for Quick Sync: it links the
+system FFmpeg, which lacks HandBrake's QSV patches, so every `qsv_*` encode fails
+in the muxer. The first build compiles HandBrake and its bundled libraries
+(about 45-60 minutes on a 4-thread CPU). Docker caches that step, so later
+builds skip it until the version changes.
+
+The encoder always comes from your preset; `qsv_h264` / `qsv_h265` presets need
+`/dev/dri` passed through. Both Intel runtimes are included: the VPL GPU runtime
+for Tiger Lake (11th gen) and newer, and the legacy Media SDK runtime for 6th-10th
+gen iGPUs such as Comet Lake UHD 620. Quick Sync *decoding* (`--enable-qsv-decoding`)
+does not work with the legacy runtime on Linux, so leave it off in presets on
+those machines. Decoding then runs on the CPU. If the host has no `/dev/dri`,
+remove the `devices` and `group_add` blocks from `docker-compose.yml`.
+
+`preset-gerry-qsv.json` is the Quick Sync variant of `preset-gerry.json`: same
+settings, with `qsv_h264` instead of x264. On a Comet Lake i3 it encodes about
+2.2x faster at the same bitrate, with slightly lower SSIM (0.985 vs 0.988).
 
 ## Development
 
@@ -129,4 +141,5 @@ live updates; React + Vite for the UI. One container, no external database.
 `scripts/deploy.sh [ssh-alias] [remote-dir]` copies the project to a Docker host
 over SSH and runs `docker compose up -d --build` there. It refuses to run while
 a job is converting, because the restart would start that encode again from 0%.
-Use `FORCE=1` to override.
+Use `FORCE=1` to override. Extra ssh options go in `SSH_OPTS`, e.g.
+`SSH_OPTS="-J rasp-web" scripts/deploy.sh` to go through a jump host.
