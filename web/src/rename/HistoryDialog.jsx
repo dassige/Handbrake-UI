@@ -4,8 +4,10 @@ import { api } from '../api.js';
 import { dateTime, fileName } from '../format.js';
 import { Modal } from '../components/Modal.jsx';
 import { Help } from '../help/Help.jsx';
+import { useDialogs } from '../components/Dialogs.jsx';
 
 export function HistoryDialog({ run, onClose, onUndone }) {
+  const dialogs = useDialogs();
   const [list, setList] = useState(null);
   const [open, setOpen] = useState(null);
 
@@ -15,7 +17,7 @@ export function HistoryDialog({ run, onClose, onUndone }) {
   }, []);
 
   async function undo(h) {
-    if (!confirm(`Restore the original names of ${h.items.length} file(s)?`)) return;
+    if (!(await dialogs.confirm({ title: 'Undo rename', message: `Restore the original names of ${h.items.length} file(s)?`, confirmLabel: 'Restore names' }))) return;
     const r = await run(() => api.undoRename(h.id), (x) => `Restored ${x.restored} file(s)${x.errors.length ? `; ${x.errors.length} could not be restored` : ''}`);
     if (r) {
       load();

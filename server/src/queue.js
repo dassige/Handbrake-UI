@@ -4,7 +4,7 @@ import { tx } from './db.js';
 import { badRequest, conflict, notFound } from './errors.js';
 import {
   collectVideos, extensionForFormat, isInside, makeFileMatcher, plannedOutputPath,
-  resolveUnder, uniquePath,
+  resolveUnderAny, uniquePath,
 } from './paths.js';
 
 const ACTIVE = ['running', 'paused'];
@@ -161,12 +161,12 @@ export class Queue {
   // ---------------------------------------------------------------- adding
 
   /**
-   * Adds files and folders (absolute paths under the source root).
+   * Adds files and folders (absolute paths under a source root).
    * Returns { added: [ids], skipped: [{ path, reason }] }.
    */
   async add({ paths, presetId, position = 'end' }) {
     if (!Array.isArray(paths) || !paths.length) throw badRequest('Nothing to add');
-    const sourceRoot = this.settings.get('sourceRoot');
+    const sourceRoots = this.settings.get('sourceRoots');
     const preset = this.presets.resolve(presetId);
     const format = preset.summary.format;
     const matcher = makeFileMatcher(this.settings);
@@ -174,7 +174,7 @@ export class Queue {
     const files = [];
     const skipped = [];
     for (const p of paths) {
-      const abs = await resolveUnder(sourceRoot, p);
+      const { path: abs } = await resolveUnderAny(sourceRoots, p);
       const stat = await fs.stat(abs);
       if (stat.isDirectory()) {
         const found = await collectVideos(abs, { recursive: this.settings.get('recursive'), matcher });

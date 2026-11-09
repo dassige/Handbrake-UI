@@ -12,6 +12,9 @@ export function useLiveData(onError, onNotice) {
   const [presets, setPresets] = useState([]);
   const [renameRules, setRenameRules] = useState([]);
   const [merges, setMerges] = useState([]);
+  const [qualityScans, setQualityScans] = useState([]);
+  // Increases when a quality check finishes, so an open result reloads.
+  const [qualityTick, setQualityTick] = useState(0);
   const [settings, setSettings] = useState(null);
   const [info, setInfo] = useState(null);
   const [connected, setConnected] = useState(false);
@@ -33,6 +36,7 @@ export function useLiveData(onError, onNotice) {
   const loadPresets = useCallback(() => api.presets().then(setPresets, (e) => errRef.current?.(e)), []);
   const loadRenameRules = useCallback(() => api.renameRules().then(setRenameRules, (e) => errRef.current?.(e)), []);
   const loadMerges = useCallback(() => api.merges().then(setMerges, (e) => errRef.current?.(e)), []);
+  const loadQualityScans = useCallback(() => api.qualityScans().then(setQualityScans, (e) => errRef.current?.(e)), []);
   const loadSettings = useCallback(() => api.settings().then(setSettings, (e) => errRef.current?.(e)), []);
   const loadInfo = useCallback(() => api.info().then(setInfo, () => {}), []);
 
@@ -47,6 +51,7 @@ export function useLiveData(onError, onNotice) {
       loadPresets();
       loadRenameRules();
       loadMerges();
+      loadQualityScans();
       loadSettings();
       loadInfo();
     };
@@ -108,6 +113,14 @@ export function useLiveData(onError, onNotice) {
         return next;
       });
     });
+    // A file was uploaded or a folder created.
+    es.addEventListener('files', () => bump());
+    es.addEventListener('qualityScans', () => loadQualityScans());
+    es.addEventListener('qualityProgress', (e) => {
+      const p = JSON.parse(e.data);
+      setQualityScans((list) => list.map((s) => (s.id === p.id ? { ...s, ...p } : s)));
+    });
+    es.addEventListener('qualityScan', () => setQualityTick((t) => t + 1));
     es.addEventListener('settings', (e) => {
       setSettings(JSON.parse(e.data));
       bump();
@@ -116,10 +129,10 @@ export function useLiveData(onError, onNotice) {
       es.close();
       clearTimeout(tickTimer);
     };
-  }, [loadJobs, loadPresets, loadRenameRules, loadMerges, loadSettings, loadInfo]);
+  }, [loadJobs, loadPresets, loadRenameRules, loadMerges, loadQualityScans, loadSettings, loadInfo]);
 
   return {
-    jobs, queue, presets, renameRules, merges, settings, info, connected, changeTick,
+    jobs, queue, presets, renameRules, merges, qualityScans, qualityTick, settings, info, connected, changeTick,
     reloadJobs: loadJobs, reloadPresets: loadPresets, setSettings,
   };
 }

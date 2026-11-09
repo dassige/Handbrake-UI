@@ -97,5 +97,33 @@ target folder.
      - length 1:21.206 = 40.958 + 40.248 s;
      - the check passes;
      - an incompatible clip is blocked.
-7. Later (optional) — watch folder, Emby library refresh, notifications
+7. Round 4 (2026-11-10) ✅
+   - Several sources folders (`sourceRoots`; the old `sourceRoot` setting is
+     migrated on start). A file's output path is worked out from the sources
+     folder it is in. Sources folders cannot be nested, and the target cannot be
+     inside one.
+   - Upload (`server/src/upload.js`): 32 MB chunks via `PUT /api/upload`
+     (raw body, streamed to disk). Each chunk is appended to a hidden
+     `.name.size.hbui-upload` file in the destination folder, so the rename at
+     the end stays on one filesystem. The size on disk is the resume point.
+     Existing names are never replaced (`name (1)`). Partial files are tracked
+     in the `uploads` table and removed after 7 days. Free space is checked
+     first (`fs.statfs`).
+   - Quality check (`server/src/quality.js`): one ffprobe header read per file
+     (sequential, at the nice level), stored in `quality_scans` (last 20 kept).
+     The results are evaluated when they are read, so changing the criteria
+     (setting `quality`) needs no new scan. The resolution class uses
+     max(height, display width × 9/16), so cropped widescreen keeps its class.
+     The bitrate comes from the stream, then the mkvmerge `BPS` tag, then an
+     estimate from the file size.
+   - Download (`server/src/download.js`): `GET /api/download?path=` for one
+     file (Range / If-Range, ETag), `POST /api/download/zip` + `GET
+     /api/download/zip/:id` for folders or several files. The ZIP writer is
+     built in: stored entries, data descriptors, UTF-8 names, ZIP64 where a
+     size or offset passes 4 GB, CRC via `zlib.crc32`, exact Content-Length
+     from `planZip`. Checked with Python's `zipfile` on a 4.8 GB archive.
+     Tokens live in memory for 6 h. Hidden and `.part` files are left out.
+   - All `window.confirm` calls replaced by `components/Dialogs.jsx`
+     (`confirm` / `prompt` / `choose` / `alert`, Promise based).
+8. Later (optional) — watch folder, Emby library refresh, notifications
    (n8n / Home Assistant).

@@ -13,7 +13,7 @@
     "app.overview": {
       "title": "How HandBrake Queue works",
       "body": [
-        "HandBrake Queue converts videos that are already on the server, using HandBrakeCLI with presets exported from the HandBrake desktop app. Nothing is uploaded or downloaded.",
+        "HandBrake Queue converts videos on the server, using HandBrakeCLI with presets exported from the HandBrake desktop app. Videos that are on your computer can be [uploaded](#upload.overview) first.",
         "### The usual workflow",
         "1. Upload a [preset](#presets) exported from HandBrake.",
         "1. In **Convert**, drag files or folders from [Sources](#convert.sources) into the [Queue](#convert.queue).",
@@ -21,6 +21,7 @@
         "1. Each converted file is [checked](#verify.overview) for errors, missing audio or subtitles and the right length.",
         "1. In **Rename**, give the converted files clean names: see [Renaming files](#rename.overview).",
         "Optionally, join several converted files into one (e.g. a film split in two parts) in **Merge**: see [Merging files](#merge.overview).",
+        "To find old or low-quality files anywhere in your folders, use **Quality**: see [Quality check](#quality.overview).",
         "Source files are never changed or deleted, so downloads can keep seeding."
       ],
       "see": [
@@ -30,24 +31,30 @@
         "verify.overview",
         "rename.overview",
         "presets",
-        "merge.overview"
+        "merge.overview",
+        "upload.overview",
+        "quality.overview"
       ]
     },
     "convert.sources": {
       "title": "Sources",
       "body": [
-        "The folders and video files under the **Sources folder** set in [Settings](#settings.folders). Only folders and video files are listed (see [Adding folders](#settings.adding) for the extensions).",
+        "The folders and video files under the **Sources folders** set in [Settings](#settings.folders). With more than one, choose which to browse in the list at the top of the panel. Only folders and video files are listed (see [Adding folders](#settings.adding) for the extensions).",
         "- **Double-click** a folder to open it, or a file to add it to the queue.",
         "- **Drag** files or folders onto the Queue to add them. Ctrl-click and Shift-click select several; the checkbox at the top selects everything.",
         "- **Add to queue** adds what is selected.",
         "- Adding a folder adds every video inside it, sub-folders included. Files already queued are skipped, and so are files already converted unless you turned that off.",
         "Badges show what happened to each file: **Queued**, **Converting**, **Converted**, **Failed**. On folders they count the files inside.",
+        "- **Upload** sends videos from your computer into the open folder; dropping files from your computer onto the panel does the same. See [Uploading videos](#upload.overview).",
+        "- **Download** copies the selected files or folders to your computer: see [Downloading files](#download.overview).",
         "Adding files never starts converting: press **Start** when you are ready ([why](#queue.state))."
       ],
       "see": [
         "convert.queue",
         "settings.adding",
-        "queue.state"
+        "queue.state",
+        "upload.overview",
+        "download.overview"
       ]
     },
     "convert.queue": {
@@ -141,7 +148,8 @@
       ],
       "see": [
         "settings.layout",
-        "job.details"
+        "job.details",
+        "download.overview"
       ]
     },
     "job.source": {
@@ -250,13 +258,15 @@
       "title": "Sources and target folders",
       "body": [
         "Folders on the server (not on your computer). NAS shares mounted on the server work too.",
-        "- **Sources folder**: where the files to convert are. The Sources panel can't go above it.",
-        "- **Target folder**: where converted files are written. The Rename view works only here.",
-        "Both must exist, and the target cannot be inside the sources folder. In Docker they must be inside the folder mounted into the container (`MEDIA_DIR`, usually `/mnt`)."
+        "- **Sources folders**: where the files to convert are. Add as many as you need with **Add a sources folder**; the Sources panel shows one at a time and can't go above it. Removing a folder from the list deletes nothing.",
+        "- **Target folder**: where converted files are written. The Rename and Merge views work only here.",
+        "All must exist. The target cannot be inside a sources folder, and a sources folder cannot be inside another one. In Docker they must be inside the folder mounted into the container (`MEDIA_DIR`, usually `/mnt`).",
+        "The output layouts **Source folder name** and **Full source path** are worked out from the sources folder each file is in."
       ],
       "see": [
         "settings.layout",
-        "convert.sources"
+        "convert.sources",
+        "upload.overview"
       ]
     },
     "settings.layout": {
@@ -524,6 +534,96 @@
       "see": [
         "merge.overview",
         "verify.results"
+      ]
+    },
+    "upload.overview": {
+      "title": "Uploading videos",
+      "body": [
+        "Sends video files from your computer into a sources folder on the server, so they can be converted like any other file.",
+        "1. In **Convert**, open the folder you want in [Sources](#convert.sources) (choose the sources folder first if you have several).",
+        "1. Press **Upload**, or drop files from your computer onto the Sources panel.",
+        "1. Optionally press **New folder** to create a sub-folder and upload into it.",
+        "1. Press **Upload**. The files go one at a time; a panel in the corner shows the progress and you can keep working.",
+        "Only video files are accepted (the extensions in [Adding folders](#settings.adding)). An existing file is never replaced: you choose to skip it or upload a copy named “name (1)”. The upload stops before it starts if the server lacks the space.",
+        "### Interruptions",
+        "Keep the browser tab open until the uploads finish. A dropped connection is retried by itself. If the tab was closed, upload the same file to the same folder again: it continues where it stopped. Unfinished uploads are hidden files, removed by themselves after a week; **Cancel** removes one straight away."
+      ],
+      "see": [
+        "convert.sources",
+        "settings.folders",
+        "download.overview"
+      ]
+    },
+    "quality.overview": {
+      "title": "Quality check",
+      "body": [
+        "Finds video files with an old format, a low resolution or a low bitrate, so you know which ones to replace or convert.",
+        "1. In **Quality**, choose folders or files in the **Folders** panel: every sources folder and the target folder are there.",
+        "1. Press **Check quality**. Every video inside, sub-folders included, is read with ffprobe (only the file headers, so it is quick; it runs at the CPU priority from [Encoding](#settings.encoding)).",
+        "1. The results list the files that **Need attention**. Click the chips to see one kind of problem, or **All**.",
+        "What counts as a problem is set in [Settings → Quality check](#settings.quality). Changing a criterion updates the results straight away, without checking again.",
+        "- **Add to queue** converts the selected files with the chosen preset (only files in a sources folder).",
+        "- **Export CSV** downloads the selected files (or all those listed) as a spreadsheet.",
+        "The last 20 results are kept; pick one in **Result**. A check can run while files are converting."
+      ],
+      "see": [
+        "quality.issues",
+        "settings.quality",
+        "quality.folders"
+      ]
+    },
+    "quality.folders": {
+      "title": "Choosing what to check",
+      "body": [
+        "The Folders panel shows every sources folder and the target folder; choose one in the list at the top.",
+        "Tick folders and files (Ctrl-click and Shift-click select several) and press **Check quality**. A folder includes everything inside it. Files matching the words in [Adding folders](#settings.adding) (like “sample”) are skipped."
+      ],
+      "see": [
+        "quality.overview",
+        "download.overview"
+      ]
+    },
+    "quality.issues": {
+      "title": "Quality problems",
+      "body": [
+        "- **Old container / video codec / audio codec**: formats in the lists in [Settings](#settings.quality), such as `.avi`, MPEG-4 Part 2 (DivX, Xvid), MPEG-2, WMV or RealVideo.",
+        "- **Low resolution**: below the lowest acceptable resolution. Widescreen films with black bars cropped (e.g. 1920×800) count by their width, as 1080p.",
+        "- **Low bitrate**: the video bitrate is below the minimum for its resolution. HEVC, AV1 and VP9 need less, so their minimum is lower. **~** means the bitrate was estimated from the file size because the file doesn't state it.",
+        "- **Interlaced**: only when turned on in Settings.",
+        "- **Unreadable**: ffprobe could not read the file, or it has no video."
+      ],
+      "see": [
+        "settings.quality"
+      ]
+    },
+    "settings.quality": {
+      "title": "Quality check criteria",
+      "body": [
+        "What the [Quality check](#quality.overview) flags. Lists are separated by commas.",
+        "- **Lowest acceptable resolution**: files below it are flagged. The resolution counts the width too, so cropped widescreen films keep their class.",
+        "- **Lowest acceptable video bitrate**: one value per resolution class (SD, 720p, 1080p, 4K) for H.264, MPEG-4 and similar codecs; 0 turns the check off for that class.",
+        "- **Efficient codecs** (HEVC, AV1, VP9 by default) need only the given percentage of those bitrates. With the defaults, a 1080p HEVC file needs 1500 kbps instead of 2500.",
+        "- **Old video codecs**, **old audio codecs** and **old containers**: names as ffprobe reports them (`mpeg4`, `msmpeg4v3`, `wmav2`…) and file extensions (`avi`, `wmv`…). Empty a list to turn that check off.",
+        "- **Flag interlaced video**: off by default, because many TV recordings are interlaced on purpose."
+      ],
+      "see": [
+        "quality.issues",
+        "quality.overview"
+      ]
+    },
+    "download.overview": {
+      "title": "Downloading files",
+      "body": [
+        "Copies files from the server to your computer: from any sources folder or the target folder, in every panel that lists folders (Sources, Rename, Merge and Quality).",
+        "- Point at a file or folder and press its download arrow, or tick several and press **Download**.",
+        "- **One file** downloads straight away. The browser's own download list shows the progress, and an interrupted download can be resumed there.",
+        "- **A folder** (sub-folders included) comes as **one ZIP file** that keeps the folders inside. The files are stored as they are, not compressed, so it starts at once and the browser knows the size. A ZIP download that is interrupted must start again.",
+        "- **Several files** can come as one ZIP or as separate files. For separate files, your browser may ask once whether the site may download several files.",
+        "A converted file can also be downloaded from its job details (**download converted file**). Hidden files and unfinished conversions (`.part`) are left out of ZIP files."
+      ],
+      "see": [
+        "convert.sources",
+        "upload.overview"
       ]
     }
   }

@@ -6,6 +6,7 @@ import { relTo } from '../format.js';
 import { RuleEditor } from './RuleEditor.jsx';
 import { HistoryDialog } from './HistoryDialog.jsx';
 import { Help } from '../help/Help.jsx';
+import { useDialogs } from '../components/Dialogs.jsx';
 
 const pad = (n) => String(n).padStart(2, '0');
 
@@ -41,6 +42,7 @@ function NameInput({ row, onCommit }) {
 }
 
 export function RenameView({ settings, rules, paths, setPaths, changeTick, run, onError }) {
+  const dialogs = useDialogs();
   const [ruleId, setRuleId] = useState(null);
   const [showName, setShowName] = useState('');
   const [edits, setEdits] = useState({});
@@ -97,7 +99,7 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
 
   async function apply() {
     if (!toRename.length) return;
-    if (!confirm(`Rename ${toRename.length} file${toRename.length > 1 ? 's' : ''}?`)) return;
+    if (!(await dialogs.confirm({ title: 'Rename files', message: `Rename ${toRename.length} file${toRename.length > 1 ? 's' : ''}?`, confirmLabel: 'Rename' }))) return;
     const r = await run(
       () => api.applyRename(toRename.map((x) => ({ path: x.path, newName: x.newName })), rule?.name),
       (x) => `Renamed ${x.renamed.length} file${x.renamed.length === 1 ? '' : 's'} · undo from History`,

@@ -2,6 +2,10 @@ import { useCallback, useMemo, useState } from 'react';
 import { Clapperboard, Pause, Play, Settings as SettingsIcon, SlidersHorizontal, WifiOff } from 'lucide-react';
 import { RenameView } from './rename/RenameView.jsx';
 import { MergeView } from './merge/MergeView.jsx';
+import { QualityView } from './quality/QualityView.jsx';
+import { UploadDialog } from './upload/UploadDialog.jsx';
+import { UploadsPanel } from './upload/UploadsPanel.jsx';
+import { useUploads } from './upload/useUploads.js';
 import { Help, HelpProvider, HelpSearchButton } from './help/Help.jsx';
 import { api } from './api.js';
 import { useLiveData } from './useLiveData.js';
@@ -21,9 +25,11 @@ export default function App() {
 
   const [selectedJobId, setSelectedJobId] = useState(null);
   const [dialog, setDialog] = useState(null); // 'presets' | 'settings'
+  const [upload, setUpload] = useState(null); // { dir, root, files } while the upload dialog is open
+  const uploads = useUploads({ onError });
   const [presetId, setPresetId] = useState(null);
   const [position, setPosition] = useState('end');
-  const [view, setView] = useState(() => ({ '#rename': 'rename', '#merge': 'merge' })[location.hash] ?? 'convert');
+  const [view, setView] = useState(() => ({ '#rename': 'rename', '#merge': 'merge', '#quality': 'quality' })[location.hash] ?? 'convert');
   const [renamePaths, setRenamePaths] = useState([]);
   const [mergePaths, setMergePaths] = useState([]);
 
@@ -109,6 +115,9 @@ export default function App() {
           <button className={view === 'merge' ? 'active' : ''} onClick={() => switchView('merge')}>
             Merge{mergePaths.length ? <span className="chip-count"> {mergePaths.length}</span> : null}
           </button>
+          <button className={view === 'quality' ? 'active' : ''} onClick={() => switchView('quality')}>
+            Quality
+          </button>
         </nav>
         <div className="queue-state">
           <span className={`dot ${running ? 'on' : 'off'}`} />
@@ -153,7 +162,18 @@ export default function App() {
         </div>
       )}
 
-      {view === 'merge' ? (
+      {view === 'quality' ? (
+        <QualityView
+          settings={settings}
+          scans={data.qualityScans}
+          tick={data.qualityTick}
+          changeTick={data.changeTick}
+          run={run}
+          onError={onError}
+          onAddToQueue={addPaths}
+          onOpenSettings={() => setDialog('settings')}
+        />
+      ) : view === 'merge' ? (
         <MergeView
           settings={settings}
           merges={data.merges}
@@ -175,7 +195,14 @@ export default function App() {
         />
       ) : (
       <main className="panes">
-        <SourceBrowser settings={settings} changeTick={data.changeTick} onAdd={addPaths} onError={onError} help="convert.sources" />
+        <SourceBrowser
+          settings={settings}
+          changeTick={data.changeTick}
+          onAdd={addPaths}
+          onError={onError}
+          help="convert.sources"
+          onUpload={(dir, root, files) => setUpload({ dir, root, files })}
+        />
         <QueuePanel
           jobs={jobs}
           presets={presets}
@@ -216,6 +243,18 @@ export default function App() {
           onClose={() => setDialog(null)}
         />
       )}
+      {upload && (
+        <UploadDialog
+          dir={upload.dir}
+          root={upload.root}
+          initialFiles={upload.files}
+          settings={settings}
+          onStart={uploads.add}
+          onError={onError}
+          onClose={() => setUpload(null)}
+        />
+      )}
+      <UploadsPanel uploads={uploads} />
       <Toasts toasts={toasts} />
     </div>
     </HelpProvider>

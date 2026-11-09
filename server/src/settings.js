@@ -3,6 +3,9 @@ import path from 'node:path';
 import { badRequest } from './errors.js';
 import { isInside } from './paths.js';
 import { VERIFY_MODES } from './verify.js';
+import { DEFAULT_QUALITY, normalizeQuality } from './quality.js';
+
+export const MAX_SOURCE_ROOTS = 20;
 
 export const OUTPUT_LAYOUTS = ['parent', 'mirror', 'flat'];
 
@@ -13,7 +16,7 @@ export const DEFAULT_VIDEO_EXTENSIONS = [
 
 function defaults(config) {
   return {
-    sourceRoot: config.initialSourceRoot,
+    sourceRoots: [config.initialSourceRoot],
     targetRoot: config.initialTargetRoot,
     outputLayout: 'parent',
     recursive: true,
@@ -28,6 +31,7 @@ function defaults(config) {
     autoRenameRuleId: null,
     renameSeparator: '_',
     verifyMode: 'full',
+    quality: DEFAULT_QUALITY,
   };
 }
 
@@ -35,15 +39,24 @@ export class Settings {
   constructor(db, config) {
     this.db = db;
     this.values = defaults(config);
-    for (const { key, value } of db.prepare('SELECT key, value FROM settings').all()) {
-      if (key in this.values) this.values[key] = JSON.parse(value);
-    }
-    // Normalise separators and trailing slashes so path comparisons work.
-    this.values.sourceRoot = path.resolve(this.values.sourceRoot);
-    this.values.targetRoot = path.resolve(this.values.targetRoot);
     this.upsert = db.prepare(
       'INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
     );
+    const stored = Object.fromEntries(db.prepare('SELECT key, value FROM settings').all().map((r) => [r.key, JSON.parse(r.value)]));
+    // Before 1.1 there was a single source folder.
+    if (typeof stored.sourceRoot === 'string' && !stored.sourceRoots) {
+      stored.sourceRoots = [stored.sourceRoot];
+      this.upsert.run('sourceRoots', JSON.stringify(stored.sourceRoots));
+      db.prepare(`DELETE FROM settings WHERE key = 'sourceRoot'`).run();
+    }
+    for (const [key, value] of Object.entries(stored)) {
+      if (key in this.values) this.values[key] = value;
+    }
+    // Criteria added in later versions take their defaults.
+    this.values.quality = { ...DEFAULT_QUALITY, ...this.values.quality, minKbps: { ...DEFAULT_QUALITY.minKbps, ...this.values.quality?.minKbps } };
+    // Normalise separators and trailing slashes so path comparisons work.
+    this.values.sourceRoots = this.values.sourceRoots.map((r) => path.resolve(r));
+    this.values.targetRoot = path.resolve(this.values.targetRoot);
   }
 
   get(key) {
@@ -69,20 +82,17 @@ export class Settings {
       next[key] = value;
     }
 
-    for (const key of ['sourceRoot', 'targetRoot']) {
-      if (typeof next[key] !== 'string' || !path.isAbsolute(next[key])) {
-        throw badRequest(`${key} must be an absolute path`);
-      }
-      next[key] = path.resolve(next[key]);
-      const stat = await fs.stat(next[key]).catch(() => null);
-      if (!stat?.isDirectory()) throw badRequest(`${key} is not an existing folder: ${next[key]}`);
+    if (!Array.isArray(next.sourceRoots) || !next.sourceRoots.length) throw badRequest('At least one sources folder is required');
+    if (next.sourceRoots.length > MAX_SOURCE_ROOTS) throw badRequest(`At most ${MAX_SOURCE_ROOTS} sources folders`);
+    next.sourceRoots = [...new Set(await Promise.all(next.sourceRoots.map((r) => existingFolder(r, 'Sources folder'))))];
+    next.targetRoot = await existingFolder(next.targetRoot, 'Target folder');
+    for (const root of next.sourceRoots) {
+      if (root === next.targetRoot) throw badRequest(`The target folder cannot also be a sources folder: ${root}`);
+      if (isInside(root, next.targetRoot)) throw badRequest(`The target folder cannot be inside the sources folder ${root}`);
+      const outer = next.sourceRoots.find((r) => r !== root && isInside(r, root));
+      if (outer) throw badRequest(`${root} is already inside the sources folder ${outer}`);
     }
-    if (next.sourceRoot === next.targetRoot) {
-      throw badRequest('Source and target folders must be different');
-    }
-    if (isInside(next.sourceRoot, next.targetRoot)) {
-      throw badRequest('The target folder cannot be inside the source folder');
-    }
+    next.quality = normalizeQuality(next.quality);
     if (!OUTPUT_LAYOUTS.includes(next.outputLayout)) {
       throw badRequest(`outputLayout must be one of ${OUTPUT_LAYOUTS.join(', ')}`);
     }
@@ -111,6 +121,14 @@ export class Settings {
     }
     return this.all();
   }
+}
+
+async function existingFolder(value, label) {
+  if (typeof value !== 'string' || !path.isAbsolute(value.trim())) throw badRequest(`${label} must be an absolute path: ${value}`);
+  const abs = path.resolve(value.trim());
+  const stat = await fs.stat(abs).catch(() => null);
+  if (!stat?.isDirectory()) throw badRequest(`${label} is not an existing folder: ${abs}`);
+  return abs;
 }
 
 function cleanList(value, name) {

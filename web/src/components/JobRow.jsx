@@ -3,6 +3,7 @@ import { ArrowUpToLine, GripVertical, Pause, Play, RotateCcw, SkipForward, Squar
 import { api } from '../api.js';
 import { bytes, dirName, duration, elapsed, fileName, percent, ratio, relTo, ago } from '../format.js';
 import { StatusBadge, VerifyBadge } from './StatusBadge.jsx';
+import { useDialogs } from './Dialogs.jsx';
 
 export const DRAG_JOB = 'application/x-hbui-job';
 
@@ -18,6 +19,7 @@ function useClock(active) {
 
 /** Job buttons: icons in the queue list, labelled buttons in the details drawer. */
 export function JobActions({ job, run, queueIndex = -1, labels = false, onRename }) {
+  const dialogs = useDialogs();
   const act = (name, body) => run(() => api.jobAction(job.id, name, body));
   const s = job.status;
   const btn = ({ icon: Icon, label, title, danger, onClick }) => (
@@ -43,7 +45,7 @@ export function JobActions({ job, run, queueIndex = -1, labels = false, onRename
         btn({ icon: SkipForward, label: 'Skip check', title: 'Keep the converted file and skip the rest of the check', onClick: () => act('cancel') })
       )}
       {['running', 'paused', 'queued'].includes(s) && job.phase !== 'verifying' && (
-        btn({ icon: Square, danger: true, label: 'Cancel', title: s === 'queued' ? 'Cancel (keeps it in the list)' : 'Stop and cancel this conversion', onClick: () => (s === 'queued' || confirm('Cancel this conversion? Progress is lost.')) && act('cancel') })
+        btn({ icon: Square, danger: true, label: 'Cancel', title: s === 'queued' ? 'Cancel (keeps it in the list)' : 'Stop and cancel this conversion', onClick: async () => (s === 'queued' || (await dialogs.confirm({ title: 'Cancel conversion', message: 'Cancel this conversion? Progress is lost.', confirmLabel: 'Cancel conversion', cancelLabel: 'Keep going', danger: true }))) && act('cancel') })
       )}
       {s === 'queued' && queueIndex > 0 && (
         btn({ icon: ArrowUpToLine, label: 'Move to top', onClick: () => act('move', { where: 'top' }) })

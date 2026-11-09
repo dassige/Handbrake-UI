@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { JsonBlockParser } from '../src/handbrake.js';
 import { extractPresets, summarize } from '../src/presets.js';
-import { isInside, makeFileMatcher, plannedOutputPath, uniquePath } from '../src/paths.js';
+import { isInside, makeFileMatcher, plannedOutputPath, rootOf, uniquePath } from '../src/paths.js';
 
 const presetFile = JSON.parse(
   await fs.readFile(path.join(import.meta.dirname, 'fixtures/preset-gerry.json'), 'utf8'),
@@ -53,13 +53,23 @@ function fakeSettings(values) {
 
 test('plannedOutputPath follows the output layout', () => {
   const src = path.resolve('/src/Completed/Show.S01/ep1.avi');
-  const base = { sourceRoot: path.resolve('/src'), targetRoot: path.resolve('/out') };
+  const base = { sourceRoots: [path.resolve('/other'), path.resolve('/src')], targetRoot: path.resolve('/out') };
   const out = (layout) => plannedOutputPath(src, fakeSettings({ ...base, outputLayout: layout }), 'av_mkv');
   assert.equal(out('parent'), path.resolve('/out/Show.S01/ep1.mkv'));
   assert.equal(out('mirror'), path.resolve('/out/Completed/Show.S01/ep1.mkv'));
   assert.equal(out('flat'), path.resolve('/out/ep1.mkv'));
   const top = plannedOutputPath(path.resolve('/src/x.mp4'), fakeSettings({ ...base, outputLayout: 'parent' }), 'av_mp4');
   assert.equal(top, path.resolve('/out/x.mp4'));
+  // Each source keeps its path relative to the source folder it is in.
+  const other = plannedOutputPath(path.resolve('/other/Film/f.avi'), fakeSettings({ ...base, outputLayout: 'mirror' }), 'av_mkv');
+  assert.equal(other, path.resolve('/out/Film/f.mkv'));
+});
+
+test('rootOf picks the deepest root that contains the path', () => {
+  const roots = [path.resolve('/a'), path.resolve('/a/b'), path.resolve('/c')];
+  assert.equal(rootOf(roots, path.resolve('/a/b/x.mkv')), path.resolve('/a/b'));
+  assert.equal(rootOf(roots, path.resolve('/a/bb/x.mkv')), path.resolve('/a'));
+  assert.equal(rootOf(roots, path.resolve('/d/x.mkv')), null);
 });
 
 test('uniquePath adds (1), (2)... and respects .part files', async () => {

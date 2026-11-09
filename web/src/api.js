@@ -43,6 +43,20 @@ export const api = {
   mergeCancel: (id) => post(`/api/merge/${id}/cancel`),
   mergeRemove: (id) => request('DELETE', `/api/merge/${id}`),
 
+  uploadCheck: (dir, files) => post('/api/upload/check', { dir, files }),
+  uploadDiscard: (dir, name, size) => post('/api/upload/discard', { dir, name, size }),
+  makeFolder: (parent, name) => post('/api/folders', { parent, name }),
+
+  downloadUrl: (path) => `/api/download?path=${encodeURIComponent(path)}`,
+  prepareZip: (paths, name) => post('/api/download/zip', { paths, name }),
+  zipUrl: (id) => `/api/download/zip/${id}`,
+
+  qualityScans: () => get('/api/quality/scans'),
+  qualityScan: (id) => get(`/api/quality/scans/${id}`),
+  startQualityScan: (paths) => post('/api/quality/scans', { paths }),
+  cancelQualityScan: (id) => post(`/api/quality/scans/${id}/cancel`),
+  removeQualityScan: (id) => request('DELETE', `/api/quality/scans/${id}`),
+
   renameRules: () => get('/api/rename/rules'),
   createRenameRule: (rule) => post('/api/rename/rules', rule),
   updateRenameRule: (id, rule) => request('PUT', `/api/rename/rules/${id}`, rule),
@@ -62,4 +76,36 @@ export async function readTextFile(file) {
   if (buf[0] === 0xff && buf[1] === 0xfe) return new TextDecoder('utf-16le').decode(buf.subarray(2));
   if (buf[0] === 0xfe && buf[1] === 0xff) return new TextDecoder('utf-16be').decode(buf.subarray(2));
   return new TextDecoder('utf-8').decode(buf).replace(/^﻿/, '');
+}
+
+/**
+ * Sends one upload chunk with XMLHttpRequest (fetch cannot report upload progress).
+ * Returns { promise, abort }; onProgress gets the bytes of this chunk sent so far.
+ */
+export function sendChunk({ dir, name, size, offset }, blob, onProgress) {
+  const xhr = new XMLHttpRequest();
+  const q = new URLSearchParams({ dir, name, size: String(size), offset: String(offset) });
+  const promise = new Promise((resolve, reject) => {
+    xhr.open('PUT', `/api/upload?${q}`);
+    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+    xhr.upload.onprogress = (e) => onProgress?.(e.loaded);
+    xhr.onload = () => {
+      let data = null;
+      try {
+        data = JSON.parse(xhr.responseText);
+      } catch {
+        // not JSON
+      }
+      if (xhr.status >= 200 && xhr.status < 300) resolve(data);
+      else {
+        const err = new Error(data?.error || `${xhr.status} ${xhr.statusText}`);
+        err.status = xhr.status;
+        reject(err);
+      }
+    };
+    xhr.onerror = () => reject(Object.assign(new Error('Network error'), { network: true }));
+    xhr.onabort = () => reject(Object.assign(new Error('Cancelled'), { aborted: true }));
+    xhr.send(blob);
+  });
+  return { promise, abort: () => xhr.abort() };
 }

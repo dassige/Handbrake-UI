@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Plus, Trash2 } from 'lucide-react';
 import { api } from '../api.js';
 import { Modal } from './Modal.jsx';
 import { Help } from '../help/Help.jsx';
@@ -11,12 +12,38 @@ const LAYOUTS = [
 
 const toList = (s) => s.split(',').map((x) => x.trim()).filter(Boolean);
 
+const RESOLUTIONS = [
+  { value: 0, label: 'No check' },
+  { value: 480, label: '480p (DVD NTSC)' },
+  { value: 576, label: '576p (DVD PAL)' },
+  { value: 720, label: '720p (HD)' },
+  { value: 1080, label: '1080p (Full HD)' },
+  { value: 2160, label: '2160p (4K)' },
+];
+const KBPS_CLASSES = [
+  { id: 'sd', label: 'SD' },
+  { id: 'hd', label: '720p' },
+  { id: 'fhd', label: '1080p' },
+  { id: 'uhd', label: '4K' },
+];
+
 export function SettingsDialog({ settings, info, renameRules = [], run, onSaved, onClose }) {
   const [form, setForm] = useState(() => ({
     ...settings,
     videoExtensions: settings.videoExtensions.join(', '),
     excludePatterns: settings.excludePatterns.join(', '),
   }));
+  const [roots, setRoots] = useState(() => [...settings.sourceRoots]);
+  const [quality, setQuality] = useState(() => ({
+    ...settings.quality,
+    badVideoCodecs: settings.quality.badVideoCodecs.join(', '),
+    badAudioCodecs: settings.quality.badAudioCodecs.join(', '),
+    badContainers: settings.quality.badContainers.join(', '),
+    efficientCodecs: settings.quality.efficientCodecs.join(', '),
+    efficientPercent: Math.round(settings.quality.efficientFactor * 100),
+    minKbps: { ...settings.quality.minKbps },
+  }));
+  const setQ = (k) => (e) => setQuality((q) => ({ ...q, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }));
   const [saving, setSaving] = useState(false);
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }));
 
@@ -26,7 +53,7 @@ export function SettingsDialog({ settings, info, renameRules = [], run, onSaved,
     const r = await run(
       () =>
         api.saveSettings({
-          sourceRoot: form.sourceRoot.trim(),
+          sourceRoots: roots.map((r) => r.trim()).filter(Boolean),
           targetRoot: form.targetRoot.trim(),
           outputLayout: form.outputLayout,
           recursive: form.recursive,
@@ -38,6 +65,16 @@ export function SettingsDialog({ settings, info, renameRules = [], run, onSaved,
           autoRenameRuleId: form.autoRenameRuleId ? Number(form.autoRenameRuleId) : null,
           renameSeparator: form.renameSeparator,
           verifyMode: form.verifyMode,
+          quality: {
+            badVideoCodecs: toList(quality.badVideoCodecs),
+            badAudioCodecs: toList(quality.badAudioCodecs),
+            badContainers: toList(quality.badContainers),
+            minHeight: Number(quality.minHeight),
+            minKbps: Object.fromEntries(KBPS_CLASSES.map((c) => [c.id, Number(quality.minKbps[c.id]) || 0])),
+            efficientCodecs: toList(quality.efficientCodecs),
+            efficientFactor: Number(quality.efficientPercent) / 100,
+            flagInterlaced: quality.flagInterlaced,
+          },
         }),
       'Settings saved',
     );
@@ -64,15 +101,41 @@ export function SettingsDialog({ settings, info, renameRules = [], run, onSaved,
       <form id="settings-form" className="settings" onSubmit={save}>
         <fieldset>
           <legend>Folders (paths on the server)<Help id="settings.folders" /></legend>
-          <label>
-            Sources folder
-            <input value={form.sourceRoot} onChange={set('sourceRoot')} required spellCheck={false} />
-          </label>
+          <div className="root-list">
+            <span className="muted small">Sources folders (where videos to convert are)</span>
+            {roots.map((r, i) => (
+              <div key={i} className="inline-form">
+                <input
+                  value={r}
+                  onChange={(e) => setRoots((list) => list.map((x, j) => (j === i ? e.target.value : x)))}
+                  required
+                  spellCheck={false}
+                  aria-label={`Sources folder ${i + 1}`}
+                  placeholder="/mnt/..."
+                />
+                <button
+                  type="button"
+                  className="icon-btn danger"
+                  disabled={roots.length < 2}
+                  title={roots.length < 2 ? 'At least one sources folder is needed' : 'Remove this folder from the list (nothing is deleted)'}
+                  onClick={() => setRoots((list) => list.filter((_, j) => j !== i))}
+                >
+                  <Trash2 size={15} />
+                </button>
+              </div>
+            ))}
+            <button type="button" className="btn small add-root" onClick={() => setRoots((list) => [...list, ''])}>
+              <Plus size={14} /> Add a sources folder
+            </button>
+          </div>
           <label>
             Target folder
             <input value={form.targetRoot} onChange={set('targetRoot')} required spellCheck={false} />
           </label>
-          <p className="muted small">Both must already exist. The target cannot be inside the sources folder.</p>
+          <p className="muted small">
+            All must already exist on the server. The target cannot be inside a sources folder, and a sources folder cannot be
+            inside another one.
+          </p>
         </fieldset>
 
         <fieldset>
@@ -123,6 +186,60 @@ export function SettingsDialog({ settings, info, renameRules = [], run, onSaved,
               <option value="off">Off</option>
             </select>
           </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Quality check<Help id="settings.quality" /></legend>
+          <label>
+            Lowest acceptable resolution
+            <select value={quality.minHeight} onChange={setQ('minHeight')}>
+              {RESOLUTIONS.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
+            </select>
+          </label>
+          <span className="muted small">Lowest acceptable video bitrate (kbps) for H.264-class video; 0 = no check</span>
+          <div className="kbps-grid">
+            {KBPS_CLASSES.map((c) => (
+              <label key={c.id}>
+                {c.label}
+                <input
+                  type="number"
+                  min="0"
+                  step="50"
+                  value={quality.minKbps[c.id]}
+                  onChange={(e) => setQuality((q) => ({ ...q, minKbps: { ...q.minKbps, [c.id]: e.target.value } }))}
+                />
+              </label>
+            ))}
+          </div>
+          <div className="kbps-grid two">
+            <label>
+              Efficient codecs
+              <input value={quality.efficientCodecs} onChange={setQ('efficientCodecs')} spellCheck={false} />
+            </label>
+            <label>
+              …need this % of the bitrate
+              <input type="number" min="10" max="100" step="5" value={quality.efficientPercent} onChange={setQ('efficientPercent')} />
+            </label>
+          </div>
+          <label>
+            Old video codecs (ffprobe names)
+            <input value={quality.badVideoCodecs} onChange={setQ('badVideoCodecs')} spellCheck={false} />
+          </label>
+          <label>
+            Old audio codecs
+            <input value={quality.badAudioCodecs} onChange={setQ('badAudioCodecs')} spellCheck={false} />
+          </label>
+          <label>
+            Old containers (file extensions)
+            <input value={quality.badContainers} onChange={setQ('badContainers')} spellCheck={false} />
+          </label>
+          <label className="check">
+            <input type="checkbox" checked={quality.flagInterlaced} onChange={setQ('flagInterlaced')} />
+            Flag interlaced video
+          </label>
+          <p className="muted small">
+            Changes apply to existing results straight away; no new check is needed.
+          </p>
         </fieldset>
 
         <fieldset>

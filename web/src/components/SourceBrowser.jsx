@@ -1,29 +1,67 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowUp, ChevronRight, FileVideo, Folder, FolderOpen, ListPlus, RefreshCw } from 'lucide-react';
+import { ArrowUp, ChevronRight, Download, FileVideo, Folder, FolderOpen, ListPlus, RefreshCw, Upload } from 'lucide-react';
 import { api } from '../api.js';
 import { bytes, dateTime } from '../format.js';
 import { FolderBadges, StatusBadge } from './StatusBadge.jsx';
 import { Help } from '../help/Help.jsx';
+import { downloadTitle, useDownload } from '../download/useDownload.jsx';
 
 export const DRAG_PATHS = 'application/x-hbui-paths';
 
-/** Folder browser for the source or target root; items can be dragged out or added with a button. */
+const storeKey = (kind) => `hbui.browserRoot.${kind}`;
+const readStore = (k) => {
+  try {
+    return localStorage.getItem(k);
+  } catch {
+    return null;
+  }
+};
+const writeStore = (k, v) => {
+  try {
+    localStorage.setItem(k, v);
+  } catch {
+    // private window: not remembered
+  }
+};
+
+/** The folders a browser of this kind can show: root=source|target|any. */
+export function browserRoots(settings, kind) {
+  if (!settings) return [];
+  if (kind === 'target') return [settings.targetRoot];
+  if (kind === 'any') return [...settings.sourceRoots, settings.targetRoot];
+  return settings.sourceRoots;
+}
+
+/**
+ * Folder browser for the source roots, the target root or all of them; items can be
+ * dragged out or added with a button. With onUpload, it also takes files dropped from
+ * the computer and shows an Upload button: onUpload(dir, root, files).
+ */
 export function SourceBrowser({
   settings, changeTick, onAdd, onError, root = 'source', title = 'Sources', addLabel = 'Add to queue',
-  hint = 'Drag files or folders to the queue. Ctrl/Shift-click to select several.', help,
+  hint = 'Drag files or folders to the queue. Ctrl/Shift-click to select several.', help, onUpload,
 }) {
-  const [dir, setDir] = useState(null); // null = the root
+  const [dir, setDir] = useState(null); // null = the chosen root
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(() => new Set());
+  const [fileDrop, setFileDrop] = useState(false);
   const lastClicked = useRef(null);
-  const sourceRoot = root === 'target' ? settings?.targetRoot : settings?.sourceRoot;
+  const download = useDownload(onError);
+  const roots = browserRoots(settings, root);
+  const rootsKey = roots.join('|');
+  const [chosenRoot, setChosenRoot] = useState(() => readStore(storeKey(root)));
+  const sourceRoot = roots.includes(chosenRoot) ? chosenRoot : roots[0];
+  const chooseRoot = (r) => {
+    setChosenRoot(r);
+    writeStore(storeKey(root), r);
+  };
 
   const load = useCallback(
     async (path, { keepSelection } = {}) => {
       setLoading(true);
       try {
-        const r = await api.browse(root, path);
+        const r = await api.browse(root, path ?? sourceRoot);
         setListing(r);
         if (!keepSelection) setSelected(new Set());
       } catch (e) {
@@ -33,11 +71,12 @@ export function SourceBrowser({
         setLoading(false);
       }
     },
-    [onError, root],
+    [onError, root, sourceRoot],
   );
 
-  // Reset to the root when the configured source folder changes.
-  useEffect(() => setDir(null), [sourceRoot]);
+  // Back to the root when the chosen or configured folders change.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => setDir(null), [sourceRoot, rootsKey]);
   useEffect(() => {
     if (sourceRoot) load(dir);
   }, [dir, sourceRoot, load]);
@@ -89,11 +128,61 @@ export function SourceBrowser({
 
   const allSelected = items.length > 0 && items.every((i) => selected.has(i.path));
 
+  const acceptsFiles = (e) => onUpload && e.dataTransfer.types.includes('Files');
+
   return (
-    <section className="pane sources">
+    <section
+      className={`pane sources ${fileDrop ? 'drop-active' : ''}`}
+      onDragOver={(e) => {
+        if (!acceptsFiles(e)) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        setFileDrop(true);
+      }}
+      onDragLeave={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) setFileDrop(false);
+      }}
+      onDrop={(e) => {
+        if (!acceptsFiles(e)) return;
+        e.preventDefault();
+        setFileDrop(false);
+        if (listing) onUpload(listing.path, listing.root, [...e.dataTransfer.files]);
+      }}
+    >
+      {fileDrop && (
+        <div className="drop-overlay">
+          <Upload size={28} />
+          <span>Drop to upload into {listing ? listing.crumbs.at(-1)?.name : 'this folder'}</span>
+        </div>
+      )}
       <div className="pane-head">
         <h2>{title}{help && <Help id={help} />}</h2>
         <div className="pane-tools">
+          {roots.length > 1 && (
+            <select
+              className="root-select"
+              value={sourceRoot}
+              onChange={(e) => chooseRoot(e.target.value)}
+              title="Which folder to browse"
+              aria-label="Folder to browse"
+            >
+              {roots.map((r) => (
+                <option key={r} value={r}>
+                  {root === 'any' && r === settings.targetRoot ? `${r} (target)` : r}
+                </option>
+              ))}
+            </select>
+          )}
+          {onUpload && (
+            <button
+              className="btn ghost small"
+              disabled={!listing}
+              title="Upload videos from this computer into the open folder"
+              onClick={() => onUpload(listing.path, listing.root, [])}
+            >
+              <Upload size={14} /> Upload
+            </button>
+          )}
           <button className="icon-btn" title="Refresh" onClick={() => load(dir, { keepSelection: true })}>
             <RefreshCw size={16} className={loading ? 'spin' : ''} />
           </button>
@@ -127,9 +216,19 @@ export function SourceBrowser({
           />
           {selected.size ? `${selected.size} selected` : 'Select all'}
         </label>
-        <button className="btn primary small" disabled={!selected.size} onClick={() => onAdd([...selected])}>
-          <ListPlus size={14} /> {addLabel}
-        </button>
+        <div className="select-actions">
+          <button
+            className="btn ghost small"
+            disabled={!selected.size}
+            title="Download the selected files and folders to this computer"
+            onClick={() => download(items.filter((i) => selected.has(i.path)))}
+          >
+            <Download size={14} /> Download
+          </button>
+          <button className="btn primary small" disabled={!selected.size} onClick={() => onAdd([...selected])}>
+            <ListPlus size={14} /> {addLabel}
+          </button>
+        </div>
       </div>
 
       <ul className="file-list" role="listbox" aria-multiselectable="true">
@@ -169,6 +268,18 @@ export function SourceBrowser({
             )}
             <span className="file-name">{item.name}</span>
             <span className="file-meta">
+              <button
+                className="icon-btn row-download"
+                title={downloadTitle(item)}
+                aria-label={downloadTitle(item)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  download([item]);
+                }}
+                onDoubleClick={(e) => e.stopPropagation()}
+              >
+                <Download size={15} />
+              </button>
               {item.type === 'dir' ? (
                 <FolderBadges counts={item.jobs} />
               ) : (

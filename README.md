@@ -1,9 +1,9 @@
 # HandBrake Queue (Handbrake-UI)
 
 A small web UI that turns a headless Linux box into a HandBrake conversion
-server. Pick files and folders that are already on the server, drag them into
-a queue, and they are converted with presets exported from the HandBrake
-desktop app.
+server. Pick files and folders that are on the server (or upload them from your
+computer), drag them into a queue, and they are converted with presets exported
+from the HandBrake desktop app.
 
 It is not affiliated with the HandBrake project. It runs the official
 `HandBrakeCLI`, so the results match what the desktop app produces with the
@@ -13,9 +13,32 @@ same preset.
 
 - **Presets from the desktop app.** In HandBrake, use Presets → Export, then
   upload the `.json` here. Files with several presets or folders are supported.
-- **Server-local files.** Nothing is uploaded or downloaded. You browse a
-  configured *sources* folder (local disk, NFS or SMB mounts…) and results are
-  written to a configured *target* folder.
+- **Server-local files.** You browse one or more configured *sources* folders
+  (local disk, NFS or SMB mounts…) and results are written to a configured
+  *target* folder.
+- **Upload from your computer.** **Upload** in the Sources panel (or dropping
+  files from your computer onto it) sends videos into the open folder, or into
+  a new sub-folder. Files go in 32 MB chunks with automatic retries. An
+  interrupted upload continues where it stopped when the same file is sent to
+  the same folder again. Existing files are never replaced: skip them or upload
+  a copy named `name (1)`. Unfinished uploads are hidden
+  `.name.size.hbui-upload` files, removed after a week.
+- **Download to your computer** from any sources folder or the target folder
+  (every folder panel, plus "download converted file" in the job details). A
+  single file is sent as is, with HTTP Range support, so the browser can pause
+  and resume it. Folders, or several files, come as one ZIP built on the fly.
+  Files are stored without compression and ZIP64 is used for files over 4 GB.
+  The exact size is sent up front, so the browser shows progress. Several
+  files can also come as separate downloads.
+- **Quality check** view: reads every video in the chosen folders (sources or
+  target, sub-folders included) with ffprobe and lists the files with an old
+  container or codec (AVI, DivX/Xvid, MPEG-2, WMV, RealVideo…), a low
+  resolution or a low video bitrate for their resolution. HEVC/AV1/VP9 get a
+  lower bitrate minimum. The criteria are in Settings and apply to existing
+  results straight away. Flagged files can be added to the queue or exported as
+  CSV.
+- **Custom dialogs.** Every question (confirm, name prompts, conflicts) is an
+  in-app dialog, never the browser's own pop-ups.
 - **Drag and drop.** Drag files or whole folders from the source browser into
   the queue. Folders add every video inside, recursively, skipping files that
   are already converted or match an exclude word such as `sample`.
@@ -94,7 +117,7 @@ in **Settings**, then drag files into the queue.
 | `PUID` / `PGID` | User the container runs as; output files are owned by it |
 | `MEDIA_GID` | Extra group, for shares that grant access by group; Synology NFS uses `users` (100). Symptom when missing: "permission denied" on a folder the host user can open |
 | `MEDIA_DIR` | Host folder bind-mounted at the same path inside the container (default `/mnt`) |
-| `SOURCE_ROOT` / `TARGET_ROOT` | Initial folders, changeable later in the UI. They must be inside `MEDIA_DIR` |
+| `SOURCE_ROOT` / `TARGET_ROOT` | Initial folders, changeable later in the UI (where more sources folders can be added). They must be inside `MEDIA_DIR` |
 | `RENDER_GID` | Group of `/dev/dri/renderD128` on the host, for Intel Quick Sync |
 | `PORT` | Web UI port (default 8095) |
 

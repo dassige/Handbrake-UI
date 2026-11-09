@@ -7,6 +7,7 @@ import { SourceBrowser, DRAG_PATHS } from '../components/SourceBrowser.jsx';
 import { VerifyBadge } from '../components/StatusBadge.jsx';
 import { bytes, dateTime, duration, fileName, relTo } from '../format.js';
 import { Help } from '../help/Help.jsx';
+import { useDialogs } from '../components/Dialogs.jsx';
 
 const DRAG_PART = 'application/x-hbui-part';
 
@@ -83,6 +84,7 @@ function MergeItem({ m, settings, run }) {
 }
 
 export function MergeView({ settings, merges, paths, setPaths, changeTick, run, onError }) {
+  const dialogs = useDialogs();
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [chapterMode, setChapterMode] = useState('keep');
@@ -138,7 +140,12 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
 
   async function merge() {
     if (!info?.canMerge) return;
-    if (removeParts && !confirm(`After a successful merge, delete the ${info.parts.length} original parts? This cannot be undone.`)) return;
+    if (removeParts && !(await dialogs.confirm({
+      title: 'Delete the parts?',
+      message: `After a successful merge, delete the ${info.parts.length} original parts? This cannot be undone.`,
+      confirmLabel: 'Merge and delete parts',
+      danger: true,
+    }))) return;
     setStarting(true);
     const r = await run(
       () => api.mergeStart({ paths, outputName: name, chapterMode, removeParts }),

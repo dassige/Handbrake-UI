@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { badRequest } from './errors.js';
-import { isHiddenName, makeFileMatcher, naturalCompare, resolveUnder } from './paths.js';
+import { isHiddenName, makeFileMatcher, naturalCompare, resolveUnderAny } from './paths.js';
 
 const id = (req) => {
   const n = Number(req.params.id);
@@ -34,13 +34,16 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
 
   // ------------------------------------------------------------- browsing
   /**
-   * Lists one folder under the source or target root.
-   * Query: root=source|target, path=<absolute path, defaults to the root>.
+   * Lists one folder under a source root, the target root or any of them.
+   * Query: root=source|target|any, path=<absolute path, defaults to the first root>.
+   * source: folders and video files, with job badges. target: every file. any: folders and video files.
    */
   app.get('/api/browse', async (req) => {
-    const which = req.query.root === 'target' ? 'targetRoot' : 'sourceRoot';
-    const root = settings.get(which);
-    const dir = await resolveUnder(root, req.query.path || root);
+    const kind = ['target', 'any'].includes(req.query.root) ? req.query.root : 'source';
+    const roots = kind === 'target' ? [settings.get('targetRoot')]
+      : kind === 'any' ? [...settings.get('sourceRoots'), settings.get('targetRoot')]
+        : settings.get('sourceRoots');
+    const { root, path: dir } = await resolveUnderAny(roots, req.query.path || roots[0]);
     const stat = await fs.stat(dir);
     if (!stat.isDirectory()) throw badRequest('Not a folder');
 
@@ -59,7 +62,7 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
             return; // broken link, permission problem...
           }
           if (s.isDirectory()) items.push({ name: e.name, path: full, type: 'dir', mtime: s.mtimeMs });
-          else if (s.isFile() && (which === 'targetRoot' || matcher.isVideo(e.name))) {
+          else if (s.isFile() && (kind === 'target' || matcher.isVideo(e.name))) {
             items.push({
               name: e.name, path: full, type: 'file', size: s.size, mtime: s.mtimeMs,
               excluded: matcher.excluded(e.name),
@@ -69,7 +72,7 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
     );
     items.sort((a, b) => (a.type === b.type ? naturalCompare(a.name, b.name) : a.type === 'dir' ? -1 : 1));
 
-    if (which === 'sourceRoot') {
+    if (kind === 'source') {
       const fileStatus = queue.statusForPaths(items.filter((i) => i.type === 'file').map((i) => i.path));
       const dirStatus = queue.statusForDirs(items.filter((i) => i.type === 'dir').map((i) => i.path));
       for (const i of items) i.jobs = i.type === 'file' ? fileStatus[i.path] ?? null : dirStatus[i.path] ?? null;

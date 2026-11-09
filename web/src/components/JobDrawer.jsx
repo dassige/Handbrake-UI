@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { CircleAlert, CircleCheck, CircleX, Copy, FileText, Info, RotateCcw, ShieldCheck, X } from 'lucide-react';
+import { CircleAlert, CircleCheck, CircleX, Copy, Download, FileText, Info, RotateCcw, ShieldCheck, X } from 'lucide-react';
 import { api } from '../api.js';
 import { bytes, dateTime, duration, elapsed, fileName, percent, ratio } from '../format.js';
 import { Help } from '../help/Help.jsx';
@@ -239,6 +239,11 @@ export function JobDrawer({ job, presets, run, onRename, onClose, onSelect }) {
           >
             <Copy size={12} /> copy output path
           </button>
+          {job.status === 'done' && (
+            <a className="link small drawer-download" href={api.downloadUrl(job.outputPath)} download title="Download the converted file to this computer">
+              <Download size={12} /> download converted file
+            </a>
+          )}
         </section>
 
         <section>

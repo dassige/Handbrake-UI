@@ -15,6 +15,12 @@ import { Verifier } from './verify.js';
 import { Merger } from './merge.js';
 import { registerMergeRoutes } from './mergeRoutes.js';
 import { registerRenameRoutes } from './rename/routes.js';
+import { Uploads } from './upload.js';
+import { registerUploadRoutes } from './uploadRoutes.js';
+import { QualityScanner } from './quality.js';
+import { registerQualityRoutes } from './qualityRoutes.js';
+import { Downloads } from './download.js';
+import { registerDownloadRoutes } from './downloadRoutes.js';
 
 const { version } = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '../package.json'), 'utf8'));
 
@@ -38,6 +44,9 @@ const merger = new Merger({
   db, settings, events, verifier, log: app.log, tmpDir: path.join(config.dataDir, 'tmp'),
   mkvmerge: config.mkvmerge, ffprobe: config.ffprobe,
 });
+const uploads = new Uploads({ db, settings, events, log: app.log });
+const downloads = new Downloads({ settings, log: app.log });
+const quality = new QualityScanner({ db, settings, verifier, events, queue, log: app.log });
 
 app.setErrorHandler((err, req, reply) => {
   const status = err.statusCode ?? (err.code === 'ENOENT' ? 404 : 500);
@@ -51,6 +60,9 @@ await app.register(
     registerRoutes(api, { settings, presets, queue, events, handbrake, renamer, version });
     registerRenameRoutes(api, { renamer });
     registerMergeRoutes(api, { merger });
+    registerUploadRoutes(api, { uploads });
+    registerQualityRoutes(api, { quality });
+    registerDownloadRoutes(api, { downloads });
   },
   {
     logLevel: 'warn',
@@ -83,5 +95,8 @@ process.on('SIGINT', () => stop('SIGINT'));
 
 await app.listen({ port: config.port, host: config.host });
 app.log.info(`Data: ${config.dataDir}  HandBrakeCLI: ${config.handbrakeCli}`);
+quality.recover();
+await uploads.cleanup();
+setInterval(() => uploads.cleanup().catch((err) => app.log.warn(err.message)), 6 * 3600 * 1000).unref();
 await merger.recover();
 await queue.recover();

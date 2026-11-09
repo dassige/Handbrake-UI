@@ -91,6 +91,26 @@ CREATE TABLE IF NOT EXISTS merges (
   verify_status TEXT,
   parts_removed INTEGER NOT NULL DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS uploads (
+  part_path  TEXT PRIMARY KEY,   -- hidden partial file next to the final one
+  dir        TEXT NOT NULL,
+  name       TEXT NOT NULL,
+  size       INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS quality_scans (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  status      TEXT NOT NULL,     -- running | done | cancelled | failed
+  paths       TEXT NOT NULL,     -- JSON list of the folders/files checked
+  created_at  INTEGER NOT NULL,
+  finished_at INTEGER,
+  total       INTEGER NOT NULL DEFAULT 0,
+  scanned     INTEGER NOT NULL DEFAULT 0,
+  error       TEXT,
+  results     TEXT               -- JSON list of file descriptions (quality.js describeMedia)
+);
 `;
 
 /** Columns added after the first release. */

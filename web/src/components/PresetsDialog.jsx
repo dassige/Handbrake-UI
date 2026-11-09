@@ -4,8 +4,10 @@ import { api } from '../api.js';
 import { dateTime } from '../format.js';
 import { Modal } from './Modal.jsx';
 import { Help } from '../help/Help.jsx';
+import { useDialogs } from './Dialogs.jsx';
 
 export function PresetsDialog({ presets, run, onClose }) {
+  const dialogs = useDialogs();
   const input = useRef(null);
   const [over, setOver] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -83,7 +85,7 @@ export function PresetsDialog({ presets, run, onClose }) {
                   <button
                     className="icon-btn danger"
                     title="Delete preset"
-                    onClick={() => confirm(`Delete preset "${p.name}"? Queued jobs keep their copy.`) && run(() => api.deletePreset(p.id))}
+                    onClick={async () => (await dialogs.confirm({ title: 'Delete preset', message: `Delete preset "${p.name}"? Queued jobs keep their copy.`, confirmLabel: 'Delete', danger: true })) && run(() => api.deletePreset(p.id))}
                   >
                     <Trash2 size={16} />
                   </button>

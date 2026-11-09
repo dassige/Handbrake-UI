@@ -25,6 +25,23 @@ export async function resolveUnder(root, p) {
   return abs;
 }
 
+/** The root (of several) that contains p, preferring the deepest one; null when none does. */
+export function rootOf(roots, p) {
+  if (typeof p !== 'string' || !p) return null;
+  const abs = path.resolve(p);
+  let best = null;
+  for (const r of roots ?? []) if (isInside(r, abs) && (!best || r.length > best.length)) best = r;
+  return best;
+}
+
+/** Like resolveUnder, but the path may be under any of several roots. Returns { root, path }. */
+export async function resolveUnderAny(roots, p) {
+  if (typeof p !== 'string' || !p) throw badRequest('Missing path');
+  const root = rootOf(roots, p);
+  if (!root) throw badRequest(`Path is outside the configured folders: ${p}`);
+  return { root, path: await resolveUnder(root, p) };
+}
+
 const SKIP_DIRS = new Set(['@eaDir', '#recycle', '#snapshot', '.Trash-1000', 'lost+found']);
 
 export function isHiddenName(name) {
@@ -78,12 +95,12 @@ export function extensionForFormat(format) {
 
 /** Where a source file should be written, before collision handling. */
 export function plannedOutputPath(source, settings, format) {
-  const sourceRoot = settings.get('sourceRoot');
+  const sourceRoot = rootOf(settings.get('sourceRoots'), source);
   const targetRoot = settings.get('targetRoot');
   const name = path.parse(source).name + extensionForFormat(format);
-  const relDir = path.relative(sourceRoot, path.dirname(source));
+  const relDir = sourceRoot ? path.relative(sourceRoot, path.dirname(source)) : '';
   let dir = targetRoot;
-  if (relDir && isInside(sourceRoot, source)) {
+  if (sourceRoot && relDir) {
     if (settings.get('outputLayout') === 'mirror') dir = path.join(targetRoot, relDir);
     else if (settings.get('outputLayout') === 'parent') dir = path.join(targetRoot, path.basename(relDir));
   }

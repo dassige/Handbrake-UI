@@ -4,6 +4,7 @@ import { api } from '../api.js';
 import { DRAG_PATHS } from './SourceBrowser.jsx';
 import { JobRow, DRAG_JOB } from './JobRow.jsx';
 import { Help } from '../help/Help.jsx';
+import { useDialogs } from './Dialogs.jsx';
 
 const FILTERS = [
   { key: 'all', label: 'All', match: () => true },
@@ -16,6 +17,7 @@ export function QueuePanel({
   jobs, presets, presetId, onPresetChange, position, onPositionChange, settings,
   onDropPaths, onSelect, selectedId, run, onRename, onMerge,
 }) {
+  const dialogs = useDialogs();
   const [filter, setFilter] = useState('all');
   const [dropActive, setDropActive] = useState(false);
   const [dragJob, setDragJob] = useState(null);
@@ -116,8 +118,8 @@ export function QueuePanel({
           className="btn ghost small"
           disabled={!finishedCount}
           title="Remove converted, failed and cancelled jobs from the list (files are not touched)"
-          onClick={() => {
-            if (confirm(`Remove ${finishedCount} finished job(s) from the list? Files are not deleted.`)) {
+          onClick={async () => {
+            if (await dialogs.confirm({ title: 'Clear finished jobs', message: `Remove ${finishedCount} finished job(s) from the list? Files are not deleted.`, confirmLabel: 'Clear' })) {
               run(() => api.clearJobs(['done', 'failed', 'cancelled']));
             }
           }}

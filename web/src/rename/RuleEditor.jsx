@@ -4,6 +4,7 @@ import { api, readTextFile } from '../api.js';
 import { Modal } from '../components/Modal.jsx';
 import { STEP_DEFS, newStep } from './stepDefs.js';
 import { Help } from '../help/Help.jsx';
+import { useDialogs } from '../components/Dialogs.jsx';
 
 const SAMPLE_NAMES = [
   'The.Rookie.6x01.La.Maledizione.Dell.Ultimo.Turno.ITA.ENG.1080p.NFRip.AAC.x265-Pir8.mkv',
@@ -59,6 +60,7 @@ function StepFields({ step, onChange, readOnly }) {
 }
 
 export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick }) {
+  const dialogs = useDialogs();
   const [selectedId, setSelectedId] = useState(initialId ?? rules[0]?.id ?? null);
   const selected = rules.find((r) => r.id === selectedId) ?? null;
   const [draft, setDraft] = useState(null);
@@ -98,8 +100,8 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
     return () => clearTimeout(t);
   }, [draft, samples, showName]);
 
-  const confirmDiscard = () => !dirty || confirm('Discard unsaved changes to this rule set?');
-  const select = (id) => confirmDiscard() && setSelectedId(id);
+  const confirmDiscard = async () => !dirty || dialogs.confirm({ title: 'Unsaved changes', message: 'Discard unsaved changes to this rule set?', confirmLabel: 'Discard changes', cancelLabel: 'Keep editing', danger: true });
+  const select = async (id) => (await confirmDiscard()) && setSelectedId(id);
   const setSteps = (fn) => setDraft((d) => ({ ...d, steps: fn(d.steps) }));
   const toggleOpen = (i) => setOpen((o) => {
     const n = new Set(o);
@@ -125,14 +127,14 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
   }
 
   async function duplicate() {
-    if (!confirmDiscard()) return;
+    if (!(await confirmDiscard())) return;
     const src = draft ?? selected;
     const r = await run(() => api.createRenameRule({ name: `${src.name} (copy)`, description: src.description, steps: src.steps }), 'Copy created');
     if (r) setSelectedId(r.id);
   }
 
   async function create() {
-    if (!confirmDiscard()) return;
+    if (!(await confirmDiscard())) return;
     const r = await run(() => api.createRenameRule({ name: 'New rule set', steps: [newStep('smart')] }));
     if (r) setSelectedId(r.id);
   }
@@ -148,7 +150,7 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
   }
 
   async function remove() {
-    if (!confirm(`Delete rule set “${selected.name}”?`)) return;
+    if (!(await dialogs.confirm({ title: 'Delete rule set', message: `Delete rule set “${selected.name}”?`, confirmLabel: 'Delete', danger: true }))) return;
     const r = await run(() => api.deleteRenameRule(selected.id), 'Rule set deleted');
     if (r) setSelectedId(rules.find((x) => x.id !== selected.id)?.id ?? null);
   }
@@ -157,12 +159,12 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
     <Modal
       title={<>Rename rules<Help id="rename.rules" /></>}
       ariaLabel="Rename rules"
-      onClose={() => confirmDiscard() && onClose()}
+      onClose={async () => (await confirmDiscard()) && onClose()}
       wide
       footer={
         <>
           {selected && onPick && (
-            <button className="btn" onClick={() => confirmDiscard() && (onPick(selected.id), onClose())}>Use this rule set</button>
+            <button className="btn" onClick={async () => (await confirmDiscard()) && (onPick(selected.id), onClose())}>Use this rule set</button>
           )}
           <span className="spacer" />
           {!readOnly && selected && (
