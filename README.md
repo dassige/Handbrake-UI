@@ -96,7 +96,11 @@ same preset.
     rules recognise without warnings; the rest are flagged "Needs rename".
 - **Output layout** (setting): `target/<source folder>/file`, the full source
   path mirrored, or everything flat in the target folder.
-- Sources are never modified or deleted.
+- Sources are never modified. They are deleted only when you ask: **Delete** in
+  the Sources panel shows exactly what will go (files, sizes, folder contents)
+  and asks first. Refused: files that are queued or converting, the sources
+  folders themselves, anything in the target folder, and anything in a sources
+  folder marked **Protect** in Settings (e.g. one a download client seeds from).
 - Survives restarts. A job that was interrupted goes back to the queue.
   HandBrake cannot resume an encode from the middle, so that job starts again
   from 0%.

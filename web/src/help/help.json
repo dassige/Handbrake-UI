@@ -22,7 +22,7 @@
         "1. In **Rename**, give the converted files clean names: see [Renaming files](#rename.overview).",
         "Optionally, join several converted files into one (e.g. a film split in two parts) in **Merge**: see [Merging files](#merge.overview).",
         "To find old or low-quality files anywhere in your folders, use **Quality**: see [Quality check](#quality.overview).",
-        "Source files are never changed or deleted, so downloads can keep seeding."
+        "Source files are never changed, so downloads can keep seeding. They are deleted only when you ask: see [Deleting source files](#delete.overview)."
       ],
       "see": [
         "convert.sources",
@@ -47,6 +47,7 @@
         "Badges show what happened to each file: **Queued**, **Converting**, **Converted**, **Failed**. On folders they count the files inside.",
         "- **Upload** sends videos from your computer into the open folder; dropping files from your computer onto the panel does the same. See [Uploading videos](#upload.overview).",
         "- **Download** copies the selected files or folders to your computer: see [Downloading files](#download.overview).",
+        "- **Delete** removes the selected files or folders from the server, after a confirmation: see [Deleting source files](#delete.overview).",
         "Adding files never starts converting: press **Start** when you are ready ([why](#queue.state))."
       ],
       "see": [
@@ -54,7 +55,8 @@
         "settings.adding",
         "queue.state",
         "upload.overview",
-        "download.overview"
+        "download.overview",
+        "delete.overview"
       ]
     },
     "convert.queue": {
@@ -259,6 +261,7 @@
       "body": [
         "Folders on the server (not on your computer). NAS shares mounted on the server work too.",
         "- **Sources folders**: where the files to convert are. Add as many as you need with **Add a sources folder**; the Sources panel shows one at a time and can't go above it. Removing a folder from the list deletes nothing.",
+        "- **Protect** on a sources folder: stops its files and folders being deleted from the app, for example the folder a download client is still seeding from. In the Sources panel such a folder shows **Protected** instead of the Delete button, and the server refuses deletes there too.",
         "- **Target folder**: where converted files are written. The Rename and Merge views work only here.",
         "All must exist. The target cannot be inside a sources folder, and a sources folder cannot be inside another one. In Docker they must be inside the folder mounted into the container (`MEDIA_DIR`, usually `/mnt`).",
         "The output layouts **Source folder name** and **Full source path** are worked out from the sources folder each file is in."
@@ -266,7 +269,8 @@
       "see": [
         "settings.layout",
         "convert.sources",
-        "upload.overview"
+        "upload.overview",
+        "delete.overview"
       ]
     },
     "settings.layout": {
@@ -624,6 +628,25 @@
       "see": [
         "convert.sources",
         "upload.overview"
+      ]
+    },
+    "delete.overview": {
+      "title": "Deleting source files",
+      "body": [
+        "Removes files or folders from a sources folder on the server, for example a download you have finished converting.",
+        "1. In **Convert**, tick the files or folders in [Sources](#convert.sources).",
+        "1. Press **Delete** (or the Delete key).",
+        "1. The confirmation shows exactly what will go: how many files, how much space, and everything inside a chosen folder. Press **Delete** to confirm; **Cancel** is the default.",
+        "Deleting cannot be undone. If a download client such as Deluge is still seeding the files, it will report them as missing.",
+        "### What is refused",
+        "- Files that are queued, converting or paused, and folders that contain one. Remove them from the queue first.",
+        "- Anything in a sources folder marked **Protect** in [Settings](#settings.folders).",
+        "- A sources folder itself (remove it from the list in [Settings](#settings.folders) instead; that deletes nothing).",
+        "- Anything in the target folder: converted files are not deleted from here."
+      ],
+      "see": [
+        "convert.sources",
+        "settings.folders"
       ]
     }
   }

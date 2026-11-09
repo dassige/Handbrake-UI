@@ -46,6 +46,8 @@ export const api = {
   uploadCheck: (dir, files) => post('/api/upload/check', { dir, files }),
   uploadDiscard: (dir, name, size) => post('/api/upload/discard', { dir, name, size }),
   makeFolder: (parent, name) => post('/api/folders', { parent, name }),
+  deletePreview: (paths) => post('/api/files/delete/preview', { paths }),
+  deleteFiles: (paths) => post('/api/files/delete', { paths }),
 
   downloadUrl: (path) => `/api/download?path=${encodeURIComponent(path)}`,
   prepareZip: (paths, name) => post('/api/download/zip', { paths, name }),

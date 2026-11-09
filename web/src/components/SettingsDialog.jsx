@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Lock, Plus, Trash2 } from 'lucide-react';
 import { api } from '../api.js';
 import { Modal } from './Modal.jsx';
 import { Help } from '../help/Help.jsx';
@@ -33,7 +33,9 @@ export function SettingsDialog({ settings, info, renameRules = [], run, onSaved,
     videoExtensions: settings.videoExtensions.join(', '),
     excludePatterns: settings.excludePatterns.join(', '),
   }));
-  const [roots, setRoots] = useState(() => [...settings.sourceRoots]);
+  // [{ path, locked }]: locked = files there can't be deleted from the app.
+  const [roots, setRoots] = useState(() => settings.sourceRoots.map((p) => ({ path: p, locked: settings.protectedRoots.includes(p) })));
+  const setRoot = (i, patch) => setRoots((list) => list.map((x, j) => (j === i ? { ...x, ...patch } : x)));
   const [quality, setQuality] = useState(() => ({
     ...settings.quality,
     badVideoCodecs: settings.quality.badVideoCodecs.join(', '),
@@ -53,7 +55,8 @@ export function SettingsDialog({ settings, info, renameRules = [], run, onSaved,
     const r = await run(
       () =>
         api.saveSettings({
-          sourceRoots: roots.map((r) => r.trim()).filter(Boolean),
+          sourceRoots: roots.map((r) => r.path.trim()).filter(Boolean),
+          protectedRoots: roots.filter((r) => r.locked && r.path.trim()).map((r) => r.path.trim()),
           targetRoot: form.targetRoot.trim(),
           outputLayout: form.outputLayout,
           recursive: form.recursive,
@@ -102,17 +105,21 @@ export function SettingsDialog({ settings, info, renameRules = [], run, onSaved,
         <fieldset>
           <legend>Folders (paths on the server)<Help id="settings.folders" /></legend>
           <div className="root-list">
-            <span className="muted small">Sources folders (where videos to convert are)</span>
+            <span className="muted small">Sources folders (where videos to convert are). <strong>Protect</strong> a folder to stop its files being deleted from the app.</span>
             {roots.map((r, i) => (
               <div key={i} className="inline-form">
                 <input
-                  value={r}
-                  onChange={(e) => setRoots((list) => list.map((x, j) => (j === i ? e.target.value : x)))}
+                  value={r.path}
+                  onChange={(e) => setRoot(i, { path: e.target.value })}
                   required
                   spellCheck={false}
                   aria-label={`Sources folder ${i + 1}`}
                   placeholder="/mnt/..."
                 />
+                <label className={`check protect ${r.locked ? 'on' : ''}`} title="Protect: files and folders in here can't be deleted from the app (e.g. while a download client is seeding them)">
+                  <input type="checkbox" checked={r.locked} onChange={(e) => setRoot(i, { locked: e.target.checked })} aria-label={`Protect sources folder ${i + 1} from deletion`} />
+                  <Lock size={13} /> Protect
+                </label>
                 <button
                   type="button"
                   className="icon-btn danger"
@@ -124,7 +131,7 @@ export function SettingsDialog({ settings, info, renameRules = [], run, onSaved,
                 </button>
               </div>
             ))}
-            <button type="button" className="btn small add-root" onClick={() => setRoots((list) => [...list, ''])}>
+            <button type="button" className="btn small add-root" onClick={() => setRoots((list) => [...list, { path: '', locked: false }])}>
               <Plus size={14} /> Add a sources folder
             </button>
           </div>

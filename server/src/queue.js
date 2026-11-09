@@ -158,6 +158,15 @@ export class Queue {
     return out;
   }
 
+  /** Queued, converting or paused jobs whose source is p or somewhere under it. */
+  pendingSourcesUnder(p) {
+    const prefix = p.endsWith(path.sep) ? p : p + path.sep;
+    return this.db
+      .prepare(`SELECT DISTINCT source_path AS path, status FROM jobs
+        WHERE status IN ('queued', 'running', 'paused') AND (source_path = ? OR substr(source_path, 1, ?) = ?)`)
+      .all(p, prefix.length, prefix);
+  }
+
   // ---------------------------------------------------------------- adding
 
   /**

@@ -16,7 +16,7 @@ target folder.
 | Roots | Source and target roots are user settings (initial: `/mnt/downloads`, `/mnt/multimedia-volume1/~tmp/converted`). |
 | Output layout | User setting: `parent` (target/<source folder name>/file), `mirror` (full relative path), `flat`. |
 | Name collision | Add a suffix: `name (1).mkv`. Resolved when the job starts. |
-| Sources | Never modified or deleted (deluge may still be seeding). Converted files are marked in the UI. |
+| Sources | Never modified (deluge may still be seeding). Deleted only on request, after a confirmation (round 4). Converted files are marked in the UI. |
 | Encoder | Whatever the preset says. gerry preset = x264 fast, 1500 kbps avg, ≤1280×720, PFR 30, MKV, AAC stereo 160k. |
 | Concurrency | One job at a time. |
 
@@ -123,6 +123,14 @@ target folder.
      size or offset passes 4 GB, CRC via `zlib.crc32`, exact Content-Length
      from `planZip`. Checked with Python's `zipfile` on a 4.8 GB archive.
      Tokens live in memory for 6 h. Hidden and `.part` files are left out.
+   - Delete (`server/src/deleteFiles.js`), on request (2026-11-10): files and
+     folders under a sources folder only, never a root or the target. Files
+     with queued/running/paused jobs, or folders containing one, are refused.
+     `POST /api/files/delete/preview` gives the counts for the confirmation;
+     `POST /api/files/delete` checks everything again before `fs.rm`. This
+     replaces the earlier rule that sources are never deleted. Sources folders
+     can be marked protected (setting `protectedRoots`, a subset of
+     `sourceRoots`): nothing in them can be deleted.
    - All `window.confirm` calls replaced by `components/Dialogs.jsx`
      (`confirm` / `prompt` / `choose` / `alert`, Promise based).
 8. Later (optional) — watch folder, Emby library refresh, notifications

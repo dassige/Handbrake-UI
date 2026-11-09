@@ -17,6 +17,8 @@ export const DEFAULT_VIDEO_EXTENSIONS = [
 function defaults(config) {
   return {
     sourceRoots: [config.initialSourceRoot],
+    // Sources folders whose files can't be deleted from the app (e.g. still seeding).
+    protectedRoots: [],
     targetRoot: config.initialTargetRoot,
     outputLayout: 'parent',
     recursive: true,
@@ -56,6 +58,7 @@ export class Settings {
     this.values.quality = { ...DEFAULT_QUALITY, ...this.values.quality, minKbps: { ...DEFAULT_QUALITY.minKbps, ...this.values.quality?.minKbps } };
     // Normalise separators and trailing slashes so path comparisons work.
     this.values.sourceRoots = this.values.sourceRoots.map((r) => path.resolve(r));
+    this.values.protectedRoots = this.values.protectedRoots.map((r) => path.resolve(r));
     this.values.targetRoot = path.resolve(this.values.targetRoot);
   }
 
@@ -92,6 +95,10 @@ export class Settings {
       const outer = next.sourceRoots.find((r) => r !== root && isInside(r, root));
       if (outer) throw badRequest(`${root} is already inside the sources folder ${outer}`);
     }
+    if (!Array.isArray(next.protectedRoots)) throw badRequest('protectedRoots must be a list');
+    // Only folders that are in the list; a removed folder loses its flag.
+    next.protectedRoots = [...new Set(next.protectedRoots.map((r) => path.resolve(String(r).trim())))]
+      .filter((r) => next.sourceRoots.includes(r));
     next.quality = normalizeQuality(next.quality);
     if (!OUTPUT_LAYOUTS.includes(next.outputLayout)) {
       throw badRequest(`outputLayout must be one of ${OUTPUT_LAYOUTS.join(', ')}`);

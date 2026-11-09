@@ -201,6 +201,8 @@ export default function App() {
           onAdd={addPaths}
           onError={onError}
           help="convert.sources"
+          allowDelete
+          onNotice={onNotice}
           onUpload={(dir, root, files) => setUpload({ dir, root, files })}
         />
         <QueuePanel

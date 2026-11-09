@@ -16,6 +16,7 @@ import { Merger } from './merge.js';
 import { registerMergeRoutes } from './mergeRoutes.js';
 import { registerRenameRoutes } from './rename/routes.js';
 import { Uploads } from './upload.js';
+import { SourceFiles } from './deleteFiles.js';
 import { registerUploadRoutes } from './uploadRoutes.js';
 import { QualityScanner } from './quality.js';
 import { registerQualityRoutes } from './qualityRoutes.js';
@@ -45,6 +46,7 @@ const merger = new Merger({
   mkvmerge: config.mkvmerge, ffprobe: config.ffprobe,
 });
 const uploads = new Uploads({ db, settings, events, log: app.log });
+const sourceFiles = new SourceFiles({ settings, queue, events, log: app.log });
 const downloads = new Downloads({ settings, log: app.log });
 const quality = new QualityScanner({ db, settings, verifier, events, queue, log: app.log });
 
@@ -60,7 +62,7 @@ await app.register(
     registerRoutes(api, { settings, presets, queue, events, handbrake, renamer, version });
     registerRenameRoutes(api, { renamer });
     registerMergeRoutes(api, { merger });
-    registerUploadRoutes(api, { uploads });
+    registerUploadRoutes(api, { uploads, sourceFiles });
     registerQualityRoutes(api, { quality });
     registerDownloadRoutes(api, { downloads });
   },

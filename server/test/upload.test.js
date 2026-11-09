@@ -49,6 +49,12 @@ test('settings: nested or overlapping roots are rejected', async () => {
   await assert.rejects(t.settings.update({ sourceRoots: [path.join(t.dir, 'missing')] }), /not an existing folder/);
   // Duplicates collapse.
   assert.deepEqual((await t.settings.update({ sourceRoots: [t.src, t.src + path.sep] })).sourceRoots, [t.src]);
+  // Protected flags only for folders in the list; removing a folder drops its flag.
+  let r = await t.settings.update({ sourceRoots: [t.src, t.src2], protectedRoots: [t.src2 + path.sep, t.out] });
+  assert.deepEqual(r.protectedRoots, [t.src2]);
+  r = await t.settings.update({ sourceRoots: [t.src] });
+  assert.deepEqual(r.protectedRoots, []);
+  await assert.rejects(t.settings.update({ protectedRoots: 'x' }), /must be a list/);
   await t.done();
 });
 

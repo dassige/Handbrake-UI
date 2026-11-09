@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowUp, ChevronRight, Download, FileVideo, Folder, FolderOpen, ListPlus, RefreshCw, Upload } from 'lucide-react';
+import { ArrowUp, ChevronRight, Download, FileVideo, Folder, FolderOpen, ListPlus, Lock, RefreshCw, Trash2, Upload } from 'lucide-react';
 import { api } from '../api.js';
 import { bytes, dateTime } from '../format.js';
 import { FolderBadges, StatusBadge } from './StatusBadge.jsx';
 import { Help } from '../help/Help.jsx';
 import { downloadTitle, useDownload } from '../download/useDownload.jsx';
+import { useDeleteFiles } from './useDeleteFiles.jsx';
 
 export const DRAG_PATHS = 'application/x-hbui-paths';
 
@@ -39,7 +40,7 @@ export function browserRoots(settings, kind) {
  */
 export function SourceBrowser({
   settings, changeTick, onAdd, onError, root = 'source', title = 'Sources', addLabel = 'Add to queue',
-  hint = 'Drag files or folders to the queue. Ctrl/Shift-click to select several.', help, onUpload,
+  hint = 'Drag files or folders to the queue. Ctrl/Shift-click to select several.', help, onUpload, allowDelete, onNotice,
 }) {
   const [dir, setDir] = useState(null); // null = the chosen root
   const [listing, setListing] = useState(null);
@@ -48,6 +49,7 @@ export function SourceBrowser({
   const [fileDrop, setFileDrop] = useState(false);
   const lastClicked = useRef(null);
   const download = useDownload(onError);
+  const removeFiles = useDeleteFiles({ onError, onNotice });
   const roots = browserRoots(settings, root);
   const rootsKey = roots.join('|');
   const [chosenRoot, setChosenRoot] = useState(() => readStore(storeKey(root)));
@@ -126,6 +128,15 @@ export function SourceBrowser({
     setTimeout(() => ghost.remove(), 0);
   }
 
+  const isProtected = (settings?.protectedRoots ?? []).includes(listing?.root ?? sourceRoot);
+
+  async function deleteSelected() {
+    if (await removeFiles([...selected])) {
+      setSelected(new Set());
+      load(dir, { keepSelection: true });
+    }
+  }
+
   const allSelected = items.length > 0 && items.every((i) => selected.has(i.path));
 
   const acceptsFiles = (e) => onUpload && e.dataTransfer.types.includes('Files');
@@ -169,6 +180,7 @@ export function SourceBrowser({
               {roots.map((r) => (
                 <option key={r} value={r}>
                   {root === 'any' && r === settings.targetRoot ? `${r} (target)` : r}
+                  {root === 'source' && settings.protectedRoots?.includes(r) ? ' (protected)' : ''}
                 </option>
               ))}
             </select>
@@ -217,6 +229,21 @@ export function SourceBrowser({
           {selected.size ? `${selected.size} selected` : 'Select all'}
         </label>
         <div className="select-actions">
+          {allowDelete && !isProtected && (
+            <button
+              className="btn ghost small danger"
+              disabled={!selected.size}
+              title="Delete the selected files and folders from the server (asks first)"
+              onClick={deleteSelected}
+            >
+              <Trash2 size={14} /> Delete
+            </button>
+          )}
+          {allowDelete && isProtected && (
+            <span className="protected-note" title="This sources folder is protected: its files can't be deleted from the app. Change it in Settings → Folders.">
+              <Lock size={13} /> Protected
+            </span>
+          )}
           <button
             className="btn ghost small"
             disabled={!selected.size}
@@ -231,7 +258,18 @@ export function SourceBrowser({
         </div>
       </div>
 
-      <ul className="file-list" role="listbox" aria-multiselectable="true">
+      <ul
+        className="file-list"
+        role="listbox"
+        aria-multiselectable="true"
+        tabIndex={-1}
+        onKeyDown={(e) => {
+          if (allowDelete && !isProtected && e.key === 'Delete' && selected.size) {
+            e.preventDefault();
+            deleteSelected();
+          }
+        }}
+      >
         {items.length === 0 && !loading && <li className="empty">No folders or video files here.</li>}
         {items.map((item) => (
           <li

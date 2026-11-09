@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026/11/10
+
+- feat: implement file deletion feature with confirmation and protection settings for source folders
+- feat: implement dialog system for alerts, confirmations, and prompts
+
 ## [1.0.2] - 2026/11/10
 
 - Update QSV GPU encoding documentation and add details for Quick Sync presets
