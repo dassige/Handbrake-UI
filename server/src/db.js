@@ -52,11 +52,37 @@ CREATE TABLE IF NOT EXISTS jobs (
 
 CREATE INDEX IF NOT EXISTS jobs_status_position ON jobs(status, position);
 CREATE INDEX IF NOT EXISTS jobs_source ON jobs(source_path);
+
+CREATE TABLE IF NOT EXISTS rename_rules (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  name        TEXT NOT NULL,
+  description TEXT,
+  steps       TEXT NOT NULL,     -- JSON list of steps
+  builtin     INTEGER NOT NULL DEFAULT 0,
+  created_at  INTEGER NOT NULL,
+  updated_at  INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS rename_history (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  created_at INTEGER NOT NULL,
+  rule_name  TEXT,
+  auto       INTEGER NOT NULL DEFAULT 0,
+  items      TEXT NOT NULL,      -- JSON [{ from, to }]
+  undone_at  INTEGER
+);
 `;
+
+/** Columns added after the first release. */
+const MIGRATIONS = [['jobs', 'rename_note', 'TEXT']];
 
 export function openDb(file) {
   const db = new DatabaseSync(file);
   db.exec(SCHEMA);
+  for (const [table, column, type] of MIGRATIONS) {
+    const cols = db.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
+    if (!cols.includes(column)) db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
+  }
   return db;
 }
 

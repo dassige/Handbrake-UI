@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Trash2, Upload } from 'lucide-react';
+import { Trash2, Upload, Wand2 } from 'lucide-react';
 import { api } from '../api.js';
 import { DRAG_PATHS } from './SourceBrowser.jsx';
 import { JobRow, DRAG_JOB } from './JobRow.jsx';
@@ -13,7 +13,7 @@ const FILTERS = [
 
 export function QueuePanel({
   jobs, presets, presetId, onPresetChange, position, onPositionChange, settings,
-  onDropPaths, onSelect, selectedId, run,
+  onDropPaths, onSelect, selectedId, run, onRename,
 }) {
   const [filter, setFilter] = useState('all');
   const [dropActive, setDropActive] = useState(false);
@@ -92,6 +92,15 @@ export function QueuePanel({
           </button>
         ))}
         <span className="spacer" />
+        {filter === 'done' && counts.done > 0 && (
+          <button
+            className="btn ghost small"
+            title="Open the converted files in the Rename view"
+            onClick={() => onRename(visible.map((j) => j.outputPath))}
+          >
+            <Wand2 size={14} /> Rename these
+          </button>
+        )}
         <button
           className="btn ghost small"
           disabled={!finishedCount}
@@ -121,6 +130,7 @@ export function QueuePanel({
             selected={job.id === selectedId}
             onSelect={() => onSelect(job.id)}
             run={run}
+            onRename={onRename}
             queueIndex={queuedIds.indexOf(job.id)}
             queueLength={queuedIds.length}
             dropBefore={dropTarget === job.id}

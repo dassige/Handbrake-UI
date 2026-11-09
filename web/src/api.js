@@ -36,4 +36,24 @@ export const api = {
   clearJobs: (statuses) => post('/api/jobs/clear', { statuses }),
   startQueue: () => post('/api/queue/start'),
   stopQueue: () => post('/api/queue/stop'),
+
+  renameRules: () => get('/api/rename/rules'),
+  createRenameRule: (rule) => post('/api/rename/rules', rule),
+  updateRenameRule: (id, rule) => request('PUT', `/api/rename/rules/${id}`, rule),
+  deleteRenameRule: (id) => request('DELETE', `/api/rename/rules/${id}`),
+  importRenameRule: (fileName, content) => post('/api/rename/rules/import', { fileName, content }),
+  exportRenameRuleUrl: (id) => `/api/rename/rules/${id}/export`,
+  testRename: (steps, names, showOverride) => post('/api/rename/test', { steps, names, showOverride }),
+  previewRename: (body) => post('/api/rename/preview', body),
+  applyRename: (items, ruleName) => post('/api/rename/apply', { items, ruleName }),
+  renameHistory: () => get('/api/rename/history'),
+  undoRename: (id) => post(`/api/rename/history/${id}/undo`),
 };
+
+/** Reads a text file, decoding UTF-16 (Advanced Renamer presets) when it has a BOM. */
+export async function readTextFile(file) {
+  const buf = new Uint8Array(await file.arrayBuffer());
+  if (buf[0] === 0xff && buf[1] === 0xfe) return new TextDecoder('utf-16le').decode(buf.subarray(2));
+  if (buf[0] === 0xfe && buf[1] === 0xff) return new TextDecoder('utf-16be').decode(buf.subarray(2));
+  return new TextDecoder('utf-8').decode(buf).replace(/^﻿/, '');
+}

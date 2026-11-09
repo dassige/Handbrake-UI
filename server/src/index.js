@@ -10,6 +10,8 @@ import { Presets } from './presets.js';
 import { Queue } from './queue.js';
 import { Events } from './events.js';
 import { registerRoutes } from './routes.js';
+import { Renamer } from './rename/renamer.js';
+import { registerRenameRoutes } from './rename/routes.js';
 
 const { version } = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '../package.json'), 'utf8'));
 
@@ -26,6 +28,8 @@ const handbrake = new HandBrake(config.handbrakeCli);
 const events = new Events();
 const presets = new Presets({ db, settings, handbrake, tmpDir: path.join(config.dataDir, 'tmp') });
 const queue = new Queue({ db, settings, presets, handbrake, events, dataDir: config.dataDir, log: app.log });
+const renamer = new Renamer({ db, settings, events, log: app.log });
+queue.renamer = renamer;
 
 app.setErrorHandler((err, req, reply) => {
   const status = err.statusCode ?? (err.code === 'ENOENT' ? 404 : 500);
@@ -34,9 +38,15 @@ app.setErrorHandler((err, req, reply) => {
 });
 
 // Per-request access logs are noise here (the UI polls); keep warnings and errors.
-await app.register(async (api) => registerRoutes(api, { settings, presets, queue, events, handbrake, version }), {
-  logLevel: 'warn',
-});
+await app.register(
+  async (api) => {
+    registerRoutes(api, { settings, presets, queue, events, handbrake, renamer, version });
+    registerRenameRoutes(api, { renamer });
+  },
+  {
+    logLevel: 'warn',
+  },
+);
 
 if (fs.existsSync(config.webDir)) {
   await app.register(fastifyStatic, { root: config.webDir, wildcard: false, logLevel: 'warn' });

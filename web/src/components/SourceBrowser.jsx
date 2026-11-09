@@ -6,19 +6,23 @@ import { FolderBadges, StatusBadge } from './StatusBadge.jsx';
 
 export const DRAG_PATHS = 'application/x-hbui-paths';
 
-export function SourceBrowser({ settings, changeTick, onAdd, onError }) {
-  const [dir, setDir] = useState(null); // null = source root
+/** Folder browser for the source or target root; items can be dragged out or added with a button. */
+export function SourceBrowser({
+  settings, changeTick, onAdd, onError, root = 'source', title = 'Sources', addLabel = 'Add to queue',
+  hint = 'Drag files or folders to the queue. Ctrl/Shift-click to select several.',
+}) {
+  const [dir, setDir] = useState(null); // null = the root
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(() => new Set());
   const lastClicked = useRef(null);
-  const sourceRoot = settings?.sourceRoot;
+  const sourceRoot = root === 'target' ? settings?.targetRoot : settings?.sourceRoot;
 
   const load = useCallback(
     async (path, { keepSelection } = {}) => {
       setLoading(true);
       try {
-        const r = await api.browse('source', path);
+        const r = await api.browse(root, path);
         setListing(r);
         if (!keepSelection) setSelected(new Set());
       } catch (e) {
@@ -28,7 +32,7 @@ export function SourceBrowser({ settings, changeTick, onAdd, onError }) {
         setLoading(false);
       }
     },
-    [onError],
+    [onError, root],
   );
 
   // Reset to the root when the configured source folder changes.
@@ -87,7 +91,7 @@ export function SourceBrowser({ settings, changeTick, onAdd, onError }) {
   return (
     <section className="pane sources">
       <div className="pane-head">
-        <h2>Sources</h2>
+        <h2>{title}</h2>
         <div className="pane-tools">
           <button className="icon-btn" title="Refresh" onClick={() => load(dir, { keepSelection: true })}>
             <RefreshCw size={16} className={loading ? 'spin' : ''} />
@@ -123,7 +127,7 @@ export function SourceBrowser({ settings, changeTick, onAdd, onError }) {
           {selected.size ? `${selected.size} selected` : 'Select all'}
         </label>
         <button className="btn primary small" disabled={!selected.size} onClick={() => onAdd([...selected])}>
-          <ListPlus size={14} /> Add to queue
+          <ListPlus size={14} /> {addLabel}
         </button>
       </div>
 
@@ -139,7 +143,7 @@ export function SourceBrowser({ settings, changeTick, onAdd, onError }) {
             onDragStart={(e) => onDragStart(e, item)}
             onClick={(e) => onRowClick(e, item)}
             onDoubleClick={() => (item.type === 'dir' ? setDir(item.path) : onAdd([item.path]))}
-            title={item.type === 'dir' ? 'Double-click to open · drag to the queue to add every video inside' : 'Double-click or drag to the queue to add'}
+            title={item.type === 'dir' ? 'Double-click to open · drag it to add every video inside' : `Double-click or drag to ${addLabel.toLowerCase()}`}
           >
             <input
               type="checkbox"
@@ -177,7 +181,7 @@ export function SourceBrowser({ settings, changeTick, onAdd, onError }) {
           </li>
         ))}
       </ul>
-      <p className="hint">Drag files or folders to the queue. Ctrl/Shift-click to select several.</p>
+      <p className="hint">{hint}</p>
     </section>
   );
 }

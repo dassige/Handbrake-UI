@@ -52,7 +52,7 @@ function LogViewer({ job }) {
   );
 }
 
-export function JobDrawer({ job, presets, settings, run, onClose, onSelect }) {
+export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSelect }) {
   const [showLog, setShowLog] = useState(job.status === 'failed');
   const [outputEdit, setOutputEdit] = useState(null);
   const info = job.sourceInfo;
@@ -88,7 +88,7 @@ export function JobDrawer({ job, presets, settings, run, onClose, onSelect }) {
 
       <div className="drawer-body">
         <div className="drawer-actions">
-          <JobActions job={job} run={run} queueIndex={queued ? 1 : -1} labels />
+          <JobActions job={job} run={run} queueIndex={queued ? 1 : -1} labels onRename={onRename} />
           {!queued && job.status !== 'running' && job.status !== 'paused' && presets.length > 0 && (
             <label className="field-inline">
               <RotateCcw size={14} /> Convert again with
@@ -112,6 +112,13 @@ export function JobDrawer({ job, presets, settings, run, onClose, onSelect }) {
             <Row label="Time left">{job.eta && job.status === 'running' ? duration(job.eta) : null}</Row>
             <Row label="Elapsed">{duration(elapsed(job))}</Row>
             <Row label="Pass">{job.passCount > 1 ? `${job.pass} of ${job.passCount}` : null}</Row>
+          </section>
+        )}
+
+        {job.renameNote && (
+          <section>
+            <h3>Rename</h3>
+            <p className="warn-text">{job.renameNote}</p>
           </section>
         )}
 

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Clapperboard, Pause, Play, Settings as SettingsIcon, SlidersHorizontal, WifiOff } from 'lucide-react';
+import { RenameView } from './rename/RenameView.jsx';
 import { api } from './api.js';
 import { useLiveData } from './useLiveData.js';
 import { Toasts, useToasts } from './components/Toasts.jsx';
@@ -19,6 +20,23 @@ export default function App() {
   const [dialog, setDialog] = useState(null); // 'presets' | 'settings'
   const [presetId, setPresetId] = useState(null);
   const [position, setPosition] = useState('end');
+  const [view, setView] = useState(() => (location.hash === '#rename' ? 'rename' : 'convert'));
+  const [renamePaths, setRenamePaths] = useState([]);
+
+  const switchView = useCallback((v) => {
+    setView(v);
+    history.replaceState(null, '', v === 'rename' ? '#rename' : '#');
+  }, []);
+
+  /** Opens the rename view with these files added. */
+  const openRename = useCallback(
+    (paths) => {
+      setRenamePaths((p) => [...new Set([...p, ...paths])]);
+      setSelectedJobId(null);
+      switchView('rename');
+    },
+    [switchView],
+  );
 
   const effectivePresetId = presetId ?? presets.find((p) => p.isDefault)?.id ?? presets[0]?.id ?? null;
   const selectedJob = useMemo(() => jobs.find((j) => j.id === selectedJobId) ?? null, [jobs, selectedJobId]);
@@ -67,6 +85,12 @@ export default function App() {
           <Clapperboard size={20} />
           <span>HandBrake Queue</span>
         </div>
+        <nav className="tabs" aria-label="View">
+          <button className={view === 'convert' ? 'active' : ''} onClick={() => switchView('convert')}>Convert</button>
+          <button className={view === 'rename' ? 'active' : ''} onClick={() => switchView('rename')}>
+            Rename{renamePaths.length ? <span className="chip-count"> {renamePaths.length}</span> : null}
+          </button>
+        </nav>
         <div className="queue-state">
           <span className={`dot ${running ? 'on' : 'off'}`} />
           <span>{running ? 'Queue running' : 'Queue stopped'}</span>
@@ -108,6 +132,17 @@ export default function App() {
         </div>
       )}
 
+      {view === 'rename' ? (
+        <RenameView
+          settings={settings}
+          rules={data.renameRules}
+          paths={renamePaths}
+          setPaths={setRenamePaths}
+          changeTick={data.changeTick}
+          run={run}
+          onError={onError}
+        />
+      ) : (
       <main className="panes">
         <SourceBrowser settings={settings} changeTick={data.changeTick} onAdd={addPaths} onError={onError} />
         <QueuePanel
@@ -122,8 +157,10 @@ export default function App() {
           onSelect={setSelectedJobId}
           selectedId={selectedJobId}
           run={run}
+          onRename={openRename}
         />
       </main>
+      )}
 
       {selectedJob && (
         <JobDrawer
@@ -131,6 +168,7 @@ export default function App() {
           presets={presets}
           settings={settings}
           run={run}
+          onRename={openRename}
           onClose={() => setSelectedJobId(null)}
           onSelect={setSelectedJobId}
         />
@@ -140,6 +178,7 @@ export default function App() {
         <SettingsDialog
           settings={settings}
           info={info}
+          renameRules={data.renameRules}
           run={run}
           onSaved={data.setSettings}
           onClose={() => setDialog(null)}

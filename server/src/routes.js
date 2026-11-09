@@ -9,7 +9,7 @@ const id = (req) => {
   return n;
 };
 
-export function registerRoutes(app, { settings, presets, queue, events, handbrake, version }) {
+export function registerRoutes(app, { settings, presets, queue, events, handbrake, renamer, version }) {
   // ------------------------------------------------------------- status
   let hbInfo = null;
   app.get('/api/info', async () => {
@@ -25,6 +25,7 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
   // ------------------------------------------------------------- settings
   app.get('/api/settings', async () => settings.all());
   app.put('/api/settings', async (req) => {
+    if (req.body?.autoRenameRuleId != null) renamer.getRule(Number(req.body.autoRenameRuleId));
     const result = await settings.update(req.body);
     events.emit('settings', result);
     queue.tick();

@@ -22,6 +22,9 @@ function defaults(config) {
     niceLevel: 10,
     defaultPresetId: null,
     queueRunning: true,
+    autoRename: false,
+    autoRenameRuleId: null,
+    renameSeparator: '_',
   };
 }
 
@@ -80,7 +83,14 @@ export class Settings {
     if (!OUTPUT_LAYOUTS.includes(next.outputLayout)) {
       throw badRequest(`outputLayout must be one of ${OUTPUT_LAYOUTS.join(', ')}`);
     }
-    for (const key of ['recursive', 'skipConverted', 'queueRunning']) {
+    if (next.autoRenameRuleId != null) {
+      next.autoRenameRuleId = Number(next.autoRenameRuleId);
+      if (!Number.isInteger(next.autoRenameRuleId)) throw badRequest('autoRenameRuleId must be a rule set id');
+    }
+    if (typeof next.renameSeparator !== 'string' || next.renameSeparator.length > 3 || /[/\\]/.test(next.renameSeparator)) {
+      throw badRequest('renameSeparator must be at most 3 characters, without slashes');
+    }
+    for (const key of ['recursive', 'skipConverted', 'queueRunning', 'autoRename']) {
       if (typeof next[key] !== 'boolean') throw badRequest(`${key} must be true or false`);
     }
     next.videoExtensions = cleanList(next.videoExtensions, 'videoExtensions')

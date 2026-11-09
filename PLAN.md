@@ -51,5 +51,19 @@ target folder.
 3. Deploy — Dockerfile, compose, deploy script, README. ✅ Running on
    asus-serv-1 (`~/SW/handbrake-ui`, http://10.1.1.115:8095). The container
    needs the `users` group (`MEDIA_GID=100`) to write to the Synology NFS share.
-4. Later (optional) — watch folder, Emby library refresh, notifications
-   (n8n / Home Assistant), output renaming (see `AdvancedRenamer/`).
+4. Rename (2026-11-09) ✅ — Rename view for files in the target folder.
+   - Decisions: real apostrophes (`L'Osservatore`); no year in show names unless
+     the "keep year" option is on (remakes); name collisions get `_1`;
+     automatic rename after conversion is opt-in (off by default); no moving
+     into the Emby library (stays manual).
+   - Rule sets are ordered steps. Advanced Renamer methods are imported from
+     `.aren` (both templates import with all 51 and 11 steps). The smart
+     "recognise episode/movie" step uses templates
+     `{show} S{season}e{episode}[ - {title}]` / `{title}[ ({year})]`.
+   - On the 309 file names in /mnt/downloads, 289 come out right with no help,
+     3 need the show name typed (`S04E07 Reacher …`) and 17 have no standard
+     pattern (Live Aid DVD clips, movies without a year).
+   - The typed show name only fills rows with no detected show, unless "for all
+     rows" is chosen.
+5. Later (optional) — watch folder, Emby library refresh, notifications
+   (n8n / Home Assistant).

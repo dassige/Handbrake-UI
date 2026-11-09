@@ -10,7 +10,7 @@ const LAYOUTS = [
 
 const toList = (s) => s.split(',').map((x) => x.trim()).filter(Boolean);
 
-export function SettingsDialog({ settings, info, run, onSaved, onClose }) {
+export function SettingsDialog({ settings, info, renameRules = [], run, onSaved, onClose }) {
   const [form, setForm] = useState(() => ({
     ...settings,
     videoExtensions: settings.videoExtensions.join(', '),
@@ -33,6 +33,9 @@ export function SettingsDialog({ settings, info, run, onSaved, onClose }) {
           videoExtensions: toList(form.videoExtensions),
           excludePatterns: toList(form.excludePatterns),
           niceLevel: Number(form.niceLevel),
+          autoRename: form.autoRename,
+          autoRenameRuleId: form.autoRenameRuleId ? Number(form.autoRenameRuleId) : null,
+          renameSeparator: form.renameSeparator,
         }),
       'Settings saved',
     );
@@ -109,6 +112,29 @@ export function SettingsDialog({ settings, info, run, onSaved, onClose }) {
           <label>
             CPU priority (nice 0–19, higher = gentler on other services)
             <input type="number" min="0" max="19" value={form.niceLevel} onChange={set('niceLevel')} />
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Renaming</legend>
+          <label className="check">
+            <input type="checkbox" checked={form.autoRename} onChange={set('autoRename')} />
+            Rename files automatically after conversion
+          </label>
+          <label>
+            Rule set for automatic renaming
+            <select value={form.autoRenameRuleId ?? ''} onChange={set('autoRenameRuleId')} disabled={!form.autoRename}>
+              <option value="">{renameRules[0]?.name ?? 'first rule set'} (default)</option>
+              {renameRules.slice(1).map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+            </select>
+          </label>
+          <p className="muted small">
+            A file is renamed automatically only if the rules recognise it without warnings; otherwise the job is
+            marked “Needs rename” and you finish it in the Rename view.
+          </p>
+          <label>
+            Separator before the number when a name is taken (name_1.mkv)
+            <input value={form.renameSeparator} maxLength={3} onChange={set('renameSeparator')} style={{ width: 80 }} />
           </label>
         </fieldset>
 

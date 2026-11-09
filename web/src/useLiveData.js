@@ -10,6 +10,7 @@ export function useLiveData(onError) {
   const [jobs, setJobs] = useState([]);
   const [queue, setQueue] = useState(null);
   const [presets, setPresets] = useState([]);
+  const [renameRules, setRenameRules] = useState([]);
   const [settings, setSettings] = useState(null);
   const [info, setInfo] = useState(null);
   const [connected, setConnected] = useState(false);
@@ -27,6 +28,7 @@ export function useLiveData(onError) {
     }
   }, []);
   const loadPresets = useCallback(() => api.presets().then(setPresets, (e) => errRef.current?.(e)), []);
+  const loadRenameRules = useCallback(() => api.renameRules().then(setRenameRules, (e) => errRef.current?.(e)), []);
   const loadSettings = useCallback(() => api.settings().then(setSettings, (e) => errRef.current?.(e)), []);
   const loadInfo = useCallback(() => api.info().then(setInfo, () => {}), []);
 
@@ -39,6 +41,7 @@ export function useLiveData(onError) {
     const loadAll = () => {
       loadJobs();
       loadPresets();
+      loadRenameRules();
       loadSettings();
       loadInfo();
     };
@@ -79,6 +82,7 @@ export function useLiveData(onError) {
     });
     es.addEventListener('queue', (e) => setQueue(JSON.parse(e.data)));
     es.addEventListener('presets', () => loadPresets());
+    es.addEventListener('renameRules', () => loadRenameRules());
     es.addEventListener('settings', (e) => {
       setSettings(JSON.parse(e.data));
       bump();
@@ -87,10 +91,10 @@ export function useLiveData(onError) {
       es.close();
       clearTimeout(tickTimer);
     };
-  }, [loadJobs, loadPresets, loadSettings, loadInfo]);
+  }, [loadJobs, loadPresets, loadRenameRules, loadSettings, loadInfo]);
 
   return {
-    jobs, queue, presets, settings, info, connected, changeTick,
+    jobs, queue, presets, renameRules, settings, info, connected, changeTick,
     reloadJobs: loadJobs, reloadPresets: loadPresets, setSettings,
   };
 }

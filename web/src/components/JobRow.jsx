@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowUpToLine, GripVertical, Pause, Play, RotateCcw, Square, Trash2 } from 'lucide-react';
+import { ArrowUpToLine, GripVertical, Pause, Play, RotateCcw, Square, Trash2, Wand2 } from 'lucide-react';
 import { api } from '../api.js';
 import { bytes, dirName, duration, elapsed, fileName, percent, ratio, relTo, ago } from '../format.js';
 import { StatusBadge } from './StatusBadge.jsx';
@@ -17,7 +17,7 @@ function useClock(active) {
 }
 
 /** Job buttons: icons in the queue list, labelled buttons in the details drawer. */
-export function JobActions({ job, run, queueIndex = -1, labels = false }) {
+export function JobActions({ job, run, queueIndex = -1, labels = false, onRename }) {
   const act = (name, body) => run(() => api.jobAction(job.id, name, body));
   const s = job.status;
   const btn = ({ icon: Icon, label, title, danger, onClick }) => (
@@ -45,6 +45,7 @@ export function JobActions({ job, run, queueIndex = -1, labels = false }) {
       {s === 'queued' && queueIndex > 0 && (
         btn({ icon: ArrowUpToLine, label: 'Move to top', onClick: () => act('move', { where: 'top' }) })
       )}
+      {s === 'done' && onRename && btn({ icon: Wand2, label: 'Rename', title: 'Rename the converted file', onClick: () => onRename([job.outputPath]) })}
       {s === 'done' && (
         btn({ icon: RotateCcw, label: 'Convert again', title: 'Convert again (new job; the output gets a suffix)', onClick: () => act('again', { position: 'end' }) })
       )}
@@ -59,7 +60,7 @@ export function JobActions({ job, run, queueIndex = -1, labels = false }) {
 }
 
 export function JobRow({
-  job, settings, selected, onSelect, run, queueIndex, dropBefore,
+  job, settings, selected, onSelect, run, onRename, queueIndex, dropBefore,
   onJobDragStart, onJobDragEnd, onJobDragOver, onJobDrop,
 }) {
   const active = job.status === 'running' || job.status === 'paused';
@@ -86,6 +87,7 @@ export function JobRow({
       `in ${duration(elapsed(job))}`,
       job.avgFps ? `${job.avgFps.toFixed(1)} fps avg` : null,
       ago(job.finishedAt),
+      job.renameNote,
     ];
   } else if (job.status === 'failed') {
     meta = [job.error];
@@ -125,11 +127,11 @@ export function JobRow({
             <div className="bar" style={{ width: `${(job.progress ?? 0) * 100}%` }} />
           </div>
         )}
-        <div className={`job-meta ${job.status === 'failed' ? 'text-bad' : ''}`}>
+        <div className={`job-meta ${job.status === 'failed' ? 'text-bad' : ''} ${job.renameNote ? 'has-note' : ''}`}>
           {meta.filter(Boolean).join(' · ')}
         </div>
       </div>
-      <JobActions job={job} run={run} queueIndex={queueIndex} />
+      <JobActions job={job} run={run} queueIndex={queueIndex} onRename={onRename} />
     </div>
   );
 }

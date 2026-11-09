@@ -29,6 +29,19 @@ same preset.
 - **Safe output.** Each encode is written to `name.mkv.part` and renamed when it
   finishes, so media servers never pick up half-written files. Existing
   files are never overwritten: the new file gets a suffix, `name (1).mkv`.
+- **Rename** view for converted files:
+  - Recognises TV episodes (`S01E02`, `1x02`) and movies (title + year).
+  - Drops release tags (`1080p`, `WEB-DL`, `x265`, `ITA`…) and builds names from
+    templates: `Show S01e02 - Episode title`, `Movie Title (2020)`.
+  - Fixes apostrophes: `L Uomo` → `L'Uomo`.
+  - Preview before applying: edit any name by hand, or type a show name for files
+    that have none.
+  - Undo any batch from History.
+  - Rule sets work like Advanced Renamer methods (replace, remove pattern, add,
+    move, trim, case…). You can edit them, export them, and import Advanced
+    Renamer `.aren` presets.
+  - Optional automatic rename after each conversion. It only renames files the
+    rules recognise without warnings; the rest are flagged "Needs rename".
 - **Output layout** (setting): `target/<source folder>/file`, the full source
   path mirrored, or everything flat in the target folder.
 - Sources are never modified or deleted.
@@ -83,4 +96,6 @@ to scan and encode; everything else works without it.
 live updates; React + Vite for the UI. One container, no external database.
 
 `scripts/deploy.sh [ssh-alias] [remote-dir]` copies the project to a Docker host
-over SSH and runs `docker compose up -d --build` there.
+over SSH and runs `docker compose up -d --build` there. It refuses to run while
+a job is converting, because the restart would start that encode again from 0%.
+Use `FORCE=1` to override.

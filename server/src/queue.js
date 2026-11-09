@@ -11,7 +11,7 @@ const ACTIVE = ['running', 'paused'];
 const FINISHED = ['done', 'failed', 'cancelled'];
 const LIST_COLUMNS = `id, status, phase, position, source_path, output_path, preset_id, preset_name,
   format, created_at, started_at, finished_at, paused_ms, progress, fps, avg_fps, eta, pass,
-  pass_count, source_size, output_size, source_info, scan_error, exit_code, error, attempts`;
+  pass_count, source_size, output_size, source_info, scan_error, exit_code, error, attempts, rename_note`;
 
 function rowToJob(r) {
   if (!r) return r;
@@ -42,6 +42,7 @@ function rowToJob(r) {
     exitCode: r.exit_code,
     error: r.error,
     attempts: r.attempts,
+    renameNote: r.rename_note,
   };
 }
 
@@ -456,7 +457,7 @@ export class Queue {
     this.db
       .prepare(`UPDATE jobs SET status = 'running', phase = 'scanning', output_path = ?, started_at = ?,
         finished_at = NULL, paused_ms = 0, progress = 0, fps = NULL, avg_fps = NULL, eta = NULL, error = NULL,
-        exit_code = NULL, output_size = NULL, source_size = ?, attempts = attempts + 1 WHERE id = ?`)
+        exit_code = NULL, output_size = NULL, source_size = ?, rename_note = NULL, attempts = attempts + 1 WHERE id = ?`)
       .run(finalPath, Date.now(), sourceStat.size, id);
 
     const active = { id, partPath, finalPath, presetFile, cancelled: false, pausedAt: null };
@@ -541,6 +542,7 @@ export class Queue {
           .prepare(`UPDATE jobs SET status = 'done', phase = NULL, finished_at = ?, exit_code = 0, progress = 1,
             eta = 0, fps = NULL, output_size = ? WHERE id = ?`)
           .run(now, partSize, id);
+        await this.maybeAutoRename(id, finalPath);
       } catch (err) {
         await this.markFailed(id, now, code, `Encoded, but could not rename the output: ${err.message}`);
       }
@@ -561,6 +563,19 @@ export class Queue {
       this.emitJob(id);
       this.events.emit('queue', this.state());
       this.tick();
+    }
+  }
+
+  /** Optional automatic rename after a successful encode (setting "autoRename"). */
+  async maybeAutoRename(id, file) {
+    if (!this.renamer || !this.settings.get('autoRename')) return;
+    try {
+      const r = await this.renamer.autoRename(file);
+      if (r.note) this.db.prepare('UPDATE jobs SET rename_note = ? WHERE id = ?').run(r.note, id);
+      else if (r.path !== file) this.log.info(`Job ${id}: renamed to ${path.basename(r.path)}`);
+    } catch (err) {
+      this.log.error(err, `Job ${id}: automatic rename failed`);
+      this.db.prepare('UPDATE jobs SET rename_note = ? WHERE id = ?').run(`Automatic rename failed: ${err.message}`, id);
     }
   }
 
