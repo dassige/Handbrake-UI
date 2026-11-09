@@ -53,6 +53,20 @@ export const api = {
   prepareZip: (paths, name) => post('/api/download/zip', { paths, name }),
   zipUrl: (id) => `/api/download/zip/${id}`,
 
+  backupUrl: (logs) => `/api/backup${logs ? '' : '?logs=0'}`,
+  backupSnapshots: () => get('/api/backup/snapshots'),
+  saveBackupSnapshot: (logs) => post('/api/backup/snapshots', { logs }),
+  backupSnapshotUrl: (name) => `/api/backup/snapshots/${encodeURIComponent(name)}`,
+  deleteBackupSnapshot: (name) => request('DELETE', `/api/backup/snapshots/${encodeURIComponent(name)}`),
+  inspectBackupSnapshot: (name) => post('/api/backup/inspect', { source: `snapshot:${name}` }),
+  inspectBackupFile: async (file) => {
+    const res = await fetch('/api/backup/inspect', { method: 'POST', headers: { 'Content-Type': 'application/octet-stream' }, body: file });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || `${res.status} ${res.statusText}`);
+    return data;
+  },
+  restoreBackup: (source, scope) => post('/api/backup/restore', { source, scope }),
+
   qualityScans: () => get('/api/quality/scans'),
   qualityScan: (id) => get(`/api/quality/scans/${id}`),
   startQualityScan: (paths) => post('/api/quality/scans', { paths }),

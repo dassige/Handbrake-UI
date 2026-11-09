@@ -270,7 +270,8 @@
         "settings.layout",
         "convert.sources",
         "upload.overview",
-        "delete.overview"
+        "delete.overview",
+        "backup.overview"
       ]
     },
     "settings.layout": {
@@ -646,6 +647,25 @@
       ],
       "see": [
         "convert.sources",
+        "settings.folders"
+      ]
+    },
+    "backup.overview": {
+      "title": "Backup and restore",
+      "body": [
+        "A backup holds the app's own data: settings (folders, quality criteria…), presets, rename rule sets, the job list and history, rename history, merges and quality check results. Optionally it also holds the HandBrake log of each job. Video files are never part of it.",
+        "Open it from [Settings](#settings.folders) → **Backup and restore…**.",
+        "- **Download backup** saves a ZIP file on your computer.",
+        "- **Save on the server** keeps one in the app's data folder (`data/backups`). The newest 10 are kept.",
+        "### Restoring",
+        "1. **Choose a backup file…** from your computer, or pick one under **Backups on the server**.",
+        "1. Check what it holds: the table compares the backup with the current data, and folders that don't exist on this server are pointed out.",
+        "1. Choose **Configuration only** (settings, presets and rename rules; jobs and history stay) or **Everything** (also jobs and their logs, histories, merges and quality results).",
+        "1. Press **Restore…** and confirm. The page reloads afterwards.",
+        "Before every restore the current data is saved on the server as **Before a restore**, so a restore can be undone by restoring that one.",
+        "A restore never starts the queue. **Everything** can't be restored while a conversion, merge, quality check or upload is running."
+      ],
+      "see": [
         "settings.folders"
       ]
     }

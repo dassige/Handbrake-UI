@@ -40,10 +40,17 @@ function defaults(config) {
 export class Settings {
   constructor(db, config) {
     this.db = db;
-    this.values = defaults(config);
+    this.config = config;
     this.upsert = db.prepare(
       'INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
     );
+    this.reload();
+  }
+
+  /** (Re)reads every setting from the database, e.g. after a restore. */
+  reload() {
+    const { db } = this;
+    this.values = defaults(this.config);
     const stored = Object.fromEntries(db.prepare('SELECT key, value FROM settings').all().map((r) => [r.key, JSON.parse(r.value)]));
     // Before 1.1 there was a single source folder.
     if (typeof stored.sourceRoot === 'string' && !stored.sourceRoots) {

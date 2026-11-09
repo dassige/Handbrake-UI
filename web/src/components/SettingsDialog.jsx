@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Lock, Plus, Trash2 } from 'lucide-react';
+import { ArchiveRestore, Lock, Plus, Trash2 } from 'lucide-react';
 import { api } from '../api.js';
 import { Modal } from './Modal.jsx';
 import { Help } from '../help/Help.jsx';
@@ -44,7 +44,7 @@ const KBPS_CLASSES = [
   { id: 'uhd', label: '4K' },
 ];
 
-export function SettingsDialog({ settings, info, renameRules = [], run, onSaved, onClose }) {
+export function SettingsDialog({ settings, info, renameRules = [], run, onSaved, onClose, onBackup }) {
   const [form, setForm] = useState(() => ({
     ...settings,
     videoExtensions: settings.videoExtensions.join(', '),
@@ -287,6 +287,16 @@ export function SettingsDialog({ settings, info, renameRules = [], run, onSaved,
             Separator before the number when a name is taken (name_1.mkv)
             <input value={form.renameSeparator} maxLength={3} onChange={set('renameSeparator')} style={{ width: 80 }} />
           </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Backup and restore<Help id="backup.overview" /></legend>
+          <p className="muted small">
+            Download or keep on the server a copy of the settings, presets, rename rules and history, and restore one.
+          </p>
+          <button type="button" className="btn small backup-open" onClick={onBackup}>
+            <ArchiveRestore size={14} /> Backup and restore…
+          </button>
         </fieldset>
 
         <fieldset>

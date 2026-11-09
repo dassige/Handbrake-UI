@@ -15,6 +15,7 @@ import { QueuePanel } from './components/QueuePanel.jsx';
 import { JobDrawer } from './components/JobDrawer.jsx';
 import { PresetsDialog } from './components/PresetsDialog.jsx';
 import { SettingsDialog } from './components/SettingsDialog.jsx';
+import { BackupDialog } from './components/BackupDialog.jsx';
 
 export default function App() {
   const toasts = useToasts();
@@ -243,7 +244,11 @@ export default function App() {
           run={run}
           onSaved={data.setSettings}
           onClose={() => setDialog(null)}
+          onBackup={() => setDialog('backup')}
         />
+      )}
+      {dialog === 'backup' && (
+        <BackupDialog run={run} onError={onError} onNotice={onNotice} onClose={() => setDialog(null)} />
       )}
       {upload && (
         <UploadDialog

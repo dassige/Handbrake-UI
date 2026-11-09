@@ -37,6 +37,13 @@ same preset.
   lower bitrate minimum. The criteria are in Settings and apply to existing
   results straight away. Flagged files can be added to the queue or exported as
   CSV.
+- **Backup and restore** (Settings → Backup and restore…): a ZIP holding the
+  database (settings, presets, rename rules, jobs, histories, merges, quality
+  results) and optionally the job logs; never video files. It can be downloaded
+  or saved on the server (`data/backups`, newest 10 kept). A restore replaces
+  either the configuration only or everything. It runs live, with no restart,
+  and saves the current data first so it can be undone. It never starts the
+  queue, and "everything" is refused while something is running.
 - **Custom dialogs.** Every question (confirm, name prompts, conflicts) is an
   in-app dialog, never the browser's own pop-ups.
 - **Drag and drop.** Drag files or whole folders from the source browser into

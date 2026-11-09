@@ -21,6 +21,8 @@ import { registerUploadRoutes } from './uploadRoutes.js';
 import { QualityScanner } from './quality.js';
 import { registerQualityRoutes } from './qualityRoutes.js';
 import { Downloads } from './download.js';
+import { Backups } from './backup.js';
+import { registerBackupRoutes } from './backupRoutes.js';
 import { registerDownloadRoutes } from './downloadRoutes.js';
 
 /** version, date and commit from a package.json (managed by DGS AutoVersion); null when missing. */
@@ -38,7 +40,7 @@ const version = {
   server: readVersion(path.join(import.meta.dirname, '../package.json')),
 };
 
-for (const dir of ['', 'logs', 'tmp']) fs.mkdirSync(path.join(config.dataDir, dir), { recursive: true });
+for (const dir of ['', 'logs', 'tmp', 'backups']) fs.mkdirSync(path.join(config.dataDir, dir), { recursive: true });
 
 const app = Fastify({
   logger: { level: config.logLevel },
@@ -62,6 +64,9 @@ const uploads = new Uploads({ db, settings, events, log: app.log });
 const sourceFiles = new SourceFiles({ settings, queue, events, log: app.log });
 const downloads = new Downloads({ settings, log: app.log });
 const quality = new QualityScanner({ db, settings, verifier, events, queue, log: app.log });
+const backups = new Backups({
+  db, dataDir: config.dataDir, settings, queue, merger, quality, uploads, renamer, events, log: app.log, versions: version,
+});
 
 app.setErrorHandler((err, req, reply) => {
   const status = err.statusCode ?? (err.code === 'ENOENT' ? 404 : 500);
@@ -78,6 +83,7 @@ await app.register(
     registerUploadRoutes(api, { uploads, sourceFiles });
     registerQualityRoutes(api, { quality });
     registerDownloadRoutes(api, { downloads });
+    registerBackupRoutes(api, { backups });
   },
   {
     logLevel: 'warn',

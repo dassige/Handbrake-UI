@@ -541,3 +541,22 @@ h2 .help-btn, h3 .help-btn, legend .help-btn { vertical-align: 2px; }
 .versions { display: grid; grid-template-columns: 130px 1fr; gap: 3px 10px; margin: 0; }
 .versions dt { color: var(--muted); }
 .versions dd { margin: 0; }
+
+/* ------------------------------------------------------------------ backup and restore */
+.settings .backup-open { align-self: flex-start; }
+.backup-section { padding: 4px 0 16px; border-bottom: 1px solid var(--border); margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px; }
+.backup-section:last-child { border-bottom: 0; margin-bottom: 0; }
+.backup-section h3 { margin: 0; font-size: 14px; }
+.backup-section p { margin: 0; }
+.backup-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.backup-inspect { border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; background: var(--panel-2); }
+.backup-counts { border-collapse: collapse; width: 100%; max-width: 460px; }
+.backup-counts th { text-align: left; font-weight: 550; color: var(--muted); padding: 2px 8px 2px 0; }
+.backup-counts td { padding: 2px 8px 2px 0; }
+.backup-counts td:not(:first-child), .backup-counts th:not(:first-child) { text-align: right; width: 90px; }
+.backup-counts tr.off td { color: var(--muted); text-decoration: line-through; }
+.backup-scope { display: flex; flex-direction: column; gap: 6px; }
+.backup-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.backup-list li { display: flex; align-items: center; gap: 8px; padding: 3px 4px; border-radius: 6px; }
+.backup-list li:hover { background: var(--panel-2); }
+.backup-list .icon-btn { width: 26px; height: 26px; }

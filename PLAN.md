@@ -131,6 +131,15 @@ target folder.
      replaces the earlier rule that sources are never deleted. Sources folders
      can be marked protected (setting `protectedRoots`, a subset of
      `sourceRoots`): nothing in them can be deleted.
+   - Backup/restore (`server/src/backup.js`, `zipReader.js`): the backup is
+     `VACUUM INTO` (a consistent copy while running) plus `manifest.json` and
+     optional `logs/`, zipped with the download writer. Restore ATTACHes the
+     backup and copies the shared columns table by table in one transaction,
+     so older backups (missing columns or tables) work and no restart is
+     needed. Afterwards Settings reloads (`settings.reload()`); for "all", the
+     logs are swapped and the queue, merge and quality recovery run. A
+     `before-restore-*.zip` is always saved first. The reader handles stored
+     and deflated entries and ZIP64.
    - All `window.confirm` calls replaced by `components/Dialogs.jsx`
      (`confirm` / `prompt` / `choose` / `alert`, Promise based).
 8. Later (optional) — watch folder, Emby library refresh, notifications
