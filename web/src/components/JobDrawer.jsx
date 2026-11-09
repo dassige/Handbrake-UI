@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { Copy, FileText, RotateCcw, X } from 'lucide-react';
+import { CircleAlert, CircleCheck, CircleX, Copy, FileText, Info, RotateCcw, ShieldCheck, X } from 'lucide-react';
 import { api } from '../api.js';
 import { bytes, dateTime, duration, elapsed, fileName, percent, ratio } from '../format.js';
-import { StatusBadge } from './StatusBadge.jsx';
+import { Help } from '../help/Help.jsx';
+import { useEscape } from './Modal.jsx';
+import { StatusBadge, VerifyBadge } from './StatusBadge.jsx';
 import { JobActions } from './JobRow.jsx';
 
 function Row({ label, children }) {
@@ -12,6 +14,15 @@ function Row({ label, children }) {
       <span className="k">{label}</span>
       <span className="v">{children}</span>
     </div>
+  );
+}
+
+function SectionTitle({ children, help }) {
+  return (
+    <h3>
+      {children}
+      {help && <Help id={help} />}
+    </h3>
   );
 }
 
@@ -52,24 +63,74 @@ function LogViewer({ job }) {
   );
 }
 
-export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSelect }) {
+const CHECK_ICON = {
+  ok: <CircleCheck size={15} className="text-good" />,
+  warning: <CircleAlert size={15} className="text-warn" />,
+  error: <CircleX size={15} className="text-bad" />,
+  info: <Info size={15} className="muted" />,
+};
+
+function CheckSection({ job, run }) {
+  const v = job.verify;
+  const checking = job.verifyStatus === 'running' || (job.status !== 'done' && job.phase === 'verifying');
+  return (
+    <section>
+      <SectionTitle help="verify.results">Check</SectionTitle>
+      {checking ? (
+        <>
+          <p className="muted">Checking the converted file…</p>
+          {job.verifyProgress != null && job.status === 'done' && (
+            <div className="progress"><div className="bar" style={{ width: `${job.verifyProgress * 100}%` }} /></div>
+          )}
+        </>
+      ) : !v ? (
+        <p className="muted">Not checked.</p>
+      ) : (
+        <>
+          <p className="check-summary">
+            <VerifyBadge status={job.verifyStatus} />
+            <span className="muted small">
+              {v.mode === 'quick' ? 'Quick check' : v.mode === 'full' ? 'Full check' : 'Check'}
+              {v.checkedAt ? ` · ${dateTime(v.checkedAt)}` : ''}
+              {v.tookMs ? ` · ${duration(v.tookMs / 1000)}` : ''}
+            </span>
+          </p>
+          {v.note && <p className="muted">{v.note}</p>}
+          <ul className="checks">
+            {v.checks.map((c) => (
+              <li key={c.id} className={c.status}>
+                {CHECK_ICON[c.status] ?? CHECK_ICON.info}
+                <span>
+                  <strong>{c.label}</strong> <span className="check-detail">{c.detail}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {job.status === 'done' && !checking && (
+        <button className="btn small" onClick={() => run(() => api.jobAction(job.id, 'verify'), 'Checking the file…')}>
+          <ShieldCheck size={14} /> Check again
+        </button>
+      )}
+    </section>
+  );
+}
+
+export function JobDrawer({ job, presets, run, onRename, onClose, onSelect }) {
   const [showLog, setShowLog] = useState(job.status === 'failed');
   const [outputEdit, setOutputEdit] = useState(null);
   const info = job.sourceInfo;
   const saved = ratio(job);
   const queued = job.status === 'queued';
+  const active = job.status === 'running' || job.status === 'paused';
+  useEscape(onClose);
 
   useEffect(() => {
     setOutputEdit(null);
     setShowLog(job.status === 'failed');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [job.id]);
-
-  useEffect(() => {
-    const onKey = (e) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
 
   async function convertAgain(presetId) {
     const r = await run(() => api.jobAction(job.id, 'again', { presetId, position: 'end' }), 'Added to the queue');
@@ -80,16 +141,25 @@ export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSe
     <aside className="drawer" aria-label="Job details">
       <div className="drawer-head">
         <div>
-          <StatusBadge status={job.status} phase={job.phase} />
+          <span className="badges">
+            <StatusBadge status={job.status} phase={job.phase} />
+            {job.status === 'done' && <VerifyBadge status={job.verifyStatus} />}
+          </span>
           <h2 title={job.sourcePath}>{fileName(job.sourcePath)}</h2>
         </div>
-        <button className="icon-btn" onClick={onClose} aria-label="Close"><X size={18} /></button>
+        <span className="drawer-head-tools">
+          <Help id="job.details" />
+          <button className="icon-btn" onClick={onClose} aria-label="Close"><X size={18} /></button>
+        </span>
       </div>
 
       <div className="drawer-body">
         <div className="drawer-actions">
-          <JobActions job={job} run={run} queueIndex={queued ? 1 : -1} labels onRename={onRename} />
-          {!queued && job.status !== 'running' && job.status !== 'paused' && presets.length > 0 && (
+          <span className="row-inline">
+            <JobActions job={job} run={run} queueIndex={queued ? 1 : -1} labels onRename={onRename} />
+            <Help id="job.actions" />
+          </span>
+          {!queued && !active && presets.length > 0 && (
             <label className="field-inline">
               <RotateCcw size={14} /> Convert again with
               <select value="" onChange={(e) => e.target.value && convertAgain(Number(e.target.value))}>
@@ -100,37 +170,39 @@ export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSe
           )}
         </div>
 
-        {(job.status === 'running' || job.status === 'paused') && (
+        {active && (
           <section>
-            <h3>Progress</h3>
-            <div className={`progress big ${job.status === 'paused' ? 'paused' : ''}`}>
+            <SectionTitle help="job.statuses">Progress</SectionTitle>
+            <div className={`progress big ${job.status === 'paused' ? 'paused' : ''} ${job.phase === 'verifying' ? 'checking' : ''}`}>
               <div className="bar" style={{ width: `${(job.progress ?? 0) * 100}%` }} />
-              <span>{percent(job.progress)}</span>
+              <span>{job.phase === 'verifying' ? `Checking ${percent(job.progress)}` : percent(job.progress)}</span>
             </div>
-            <Row label="Phase">{job.status === 'paused' ? 'paused' : job.phase}</Row>
+            <Row label="Phase">{job.status === 'paused' ? 'paused' : job.phase === 'verifying' ? 'checking the converted file' : job.phase}</Row>
             <Row label="Speed">{job.fps != null && job.status === 'running' ? `${job.fps.toFixed(1)} fps (avg ${job.avgFps?.toFixed(1) ?? '—'})` : null}</Row>
-            <Row label="Time left">{job.eta && job.status === 'running' ? duration(job.eta) : null}</Row>
+            <Row label="Time left">{job.eta && job.status === 'running' && job.phase !== 'verifying' ? duration(job.eta) : null}</Row>
             <Row label="Elapsed">{duration(elapsed(job))}</Row>
             <Row label="Pass">{job.passCount > 1 ? `${job.pass} of ${job.passCount}` : null}</Row>
           </section>
         )}
 
+        {(job.status === 'done' || job.phase === 'verifying') && <CheckSection job={job} run={run} />}
+
         {job.renameNote && (
           <section>
-            <h3>Rename</h3>
+            <SectionTitle help="rename.auto">Rename</SectionTitle>
             <p className="warn-text">{job.renameNote}</p>
           </section>
         )}
 
         {job.error && (
           <section>
-            <h3>{job.status === 'failed' ? 'Error' : 'Note'}</h3>
+            <SectionTitle help="job.log">{job.status === 'failed' ? 'Error' : 'Note'}</SectionTitle>
             <p className={job.status === 'failed' ? 'text-bad' : 'muted'}>{job.error}</p>
           </section>
         )}
 
         <section>
-          <h3>Files</h3>
+          <SectionTitle help="job.files">Files</SectionTitle>
           <Row label="Source"><code className="path">{job.sourcePath}</code></Row>
           <Row label="Output">
             {queued && outputEdit != null ? (
@@ -170,7 +242,7 @@ export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSe
         </section>
 
         <section>
-          <h3>Preset</h3>
+          <SectionTitle help="presets">Preset</SectionTitle>
           {queued ? (
             <select
               value={job.presetId ?? ''}
@@ -187,7 +259,7 @@ export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSe
         </section>
 
         <section>
-          <h3>Source</h3>
+          <SectionTitle help="job.source">Source</SectionTitle>
           {info ? (
             <>
               <Row label="Duration">{duration(info.duration)}</Row>
@@ -213,7 +285,7 @@ export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSe
         </section>
 
         <section>
-          <h3>Timing</h3>
+          <SectionTitle help="job.timing">Timing</SectionTitle>
           <Row label="Added">{dateTime(job.createdAt)}</Row>
           <Row label="Started">{job.startedAt ? dateTime(job.startedAt) : null}</Row>
           <Row label="Finished">{job.finishedAt ? dateTime(job.finishedAt) : null}</Row>
@@ -228,6 +300,7 @@ export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSe
             <button className="link" onClick={() => setShowLog((v) => !v)}>
               <FileText size={14} /> {showLog ? 'Hide' : 'Show'} HandBrake log
             </button>
+            <Help id="job.log" />
           </h3>
           {showLog && <LogViewer job={job} />}
         </section>

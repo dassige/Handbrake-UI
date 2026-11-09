@@ -11,6 +11,7 @@ import { Queue } from './queue.js';
 import { Events } from './events.js';
 import { registerRoutes } from './routes.js';
 import { Renamer } from './rename/renamer.js';
+import { Verifier } from './verify.js';
 import { registerRenameRoutes } from './rename/routes.js';
 
 const { version } = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '../package.json'), 'utf8'));
@@ -27,7 +28,8 @@ const settings = new Settings(db, config);
 const handbrake = new HandBrake(config.handbrakeCli);
 const events = new Events();
 const presets = new Presets({ db, settings, handbrake, tmpDir: path.join(config.dataDir, 'tmp') });
-const queue = new Queue({ db, settings, presets, handbrake, events, dataDir: config.dataDir, log: app.log });
+const verifier = new Verifier({ ffprobe: config.ffprobe, ffmpeg: config.ffmpeg });
+const queue = new Queue({ db, settings, presets, handbrake, verifier, events, dataDir: config.dataDir, log: app.log });
 const renamer = new Renamer({ db, settings, events, log: app.log });
 queue.renamer = renamer;
 

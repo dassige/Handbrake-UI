@@ -6,7 +6,7 @@ import { api } from './api.js';
  * the server's event stream. `changeTick` increases whenever job statuses
  * change, so the file browser can refresh its badges.
  */
-export function useLiveData(onError) {
+export function useLiveData(onError, onNotice) {
   const [jobs, setJobs] = useState([]);
   const [queue, setQueue] = useState(null);
   const [presets, setPresets] = useState([]);
@@ -17,6 +17,8 @@ export function useLiveData(onError) {
   const [changeTick, setChangeTick] = useState(0);
   const errRef = useRef(onError);
   errRef.current = onError;
+  const noticeRef = useRef(onNotice);
+  noticeRef.current = onNotice;
 
   const loadJobs = useCallback(async () => {
     try {
@@ -80,7 +82,11 @@ export function useLiveData(onError) {
       loadJobs();
       bump();
     });
-    es.addEventListener('queue', (e) => setQueue(JSON.parse(e.data)));
+    es.addEventListener('queue', (e) => {
+      const q = JSON.parse(e.data);
+      setQueue(q);
+      if (q.finished) noticeRef.current?.('Queue finished: every job is done. Press Start for the next ones.');
+    });
     es.addEventListener('presets', () => loadPresets());
     es.addEventListener('renameRules', () => loadRenameRules());
     es.addEventListener('settings', (e) => {

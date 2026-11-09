@@ -3,13 +3,14 @@ import { ArrowUp, ChevronRight, FileVideo, Folder, FolderOpen, ListPlus, Refresh
 import { api } from '../api.js';
 import { bytes, dateTime } from '../format.js';
 import { FolderBadges, StatusBadge } from './StatusBadge.jsx';
+import { Help } from '../help/Help.jsx';
 
 export const DRAG_PATHS = 'application/x-hbui-paths';
 
 /** Folder browser for the source or target root; items can be dragged out or added with a button. */
 export function SourceBrowser({
   settings, changeTick, onAdd, onError, root = 'source', title = 'Sources', addLabel = 'Add to queue',
-  hint = 'Drag files or folders to the queue. Ctrl/Shift-click to select several.',
+  hint = 'Drag files or folders to the queue. Ctrl/Shift-click to select several.', help,
 }) {
   const [dir, setDir] = useState(null); // null = the root
   const [listing, setListing] = useState(null);
@@ -91,7 +92,7 @@ export function SourceBrowser({
   return (
     <section className="pane sources">
       <div className="pane-head">
-        <h2>{title}</h2>
+        <h2>{title}{help && <Help id={help} />}</h2>
         <div className="pane-tools">
           <button className="icon-btn" title="Refresh" onClick={() => load(dir, { keepSelection: true })}>
             <RefreshCw size={16} className={loading ? 'spin' : ''} />

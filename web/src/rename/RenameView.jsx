@@ -5,6 +5,7 @@ import { SourceBrowser, DRAG_PATHS } from '../components/SourceBrowser.jsx';
 import { relTo } from '../format.js';
 import { RuleEditor } from './RuleEditor.jsx';
 import { HistoryDialog } from './HistoryDialog.jsx';
+import { Help } from '../help/Help.jsx';
 
 const pad = (n) => String(n).padStart(2, '0');
 
@@ -123,6 +124,7 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
         title="Converted files"
         addLabel="Add to rename"
         hint="Drag files or folders to the rename list. Ctrl/Shift-click to select several."
+        help="rename.overview"
         changeTick={changeTick}
         onAdd={addPaths}
         onError={onError}
@@ -147,10 +149,10 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
         }}
       >
         <div className="pane-head">
-          <h2>Rename</h2>
+          <h2>Rename<Help id="rename.overview" /></h2>
           <div className="pane-tools">
             <label className="field-inline">
-              Rules
+              Rules<Help id="rename.rules" />
               <select value={effectiveRuleId ?? ''} onChange={(e) => setRuleId(Number(e.target.value))}>
                 {rules.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
               </select>
@@ -162,7 +164,7 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
 
         <div className="rename-bar">
           <label className="field-inline" title="Use when the show name is missing or wrong, e.g. “S04E07 Reacher Title”">
-            Show name
+            Show name<Help id="rename.showName" />
             <input value={showName} onChange={(e) => setShowName(e.target.value)} placeholder="auto-detected" />
           </label>
           <select
@@ -204,7 +206,7 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
                       aria-label="Select all"
                     />
                   </th>
-                  <th>Current name → new name</th>
+                  <th>Current name → new name<Help id="rename.preview" /></th>
                   <th />
                 </tr>
               </thead>

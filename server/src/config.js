@@ -8,6 +8,8 @@ export const config = {
   host: env.HOST || '0.0.0.0',
   dataDir: path.resolve(env.DATA_DIR || './data'),
   handbrakeCli: env.HANDBRAKE_CLI || 'HandBrakeCLI',
+  ffprobe: env.FFPROBE || 'ffprobe',
+  ffmpeg: env.FFMPEG || 'ffmpeg',
   // Only used to seed the settings the first time the app starts.
   initialSourceRoot: env.SOURCE_ROOT || '/mnt/downloads',
   initialTargetRoot: env.TARGET_ROOT || '/mnt/converted',

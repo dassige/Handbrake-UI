@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Clapperboard, Pause, Play, Settings as SettingsIcon, SlidersHorizontal, WifiOff } from 'lucide-react';
 import { RenameView } from './rename/RenameView.jsx';
+import { Help, HelpProvider, HelpSearchButton } from './help/Help.jsx';
 import { api } from './api.js';
 import { useLiveData } from './useLiveData.js';
 import { Toasts, useToasts } from './components/Toasts.jsx';
@@ -13,7 +14,8 @@ import { SettingsDialog } from './components/SettingsDialog.jsx';
 export default function App() {
   const toasts = useToasts();
   const onError = useCallback((e) => toasts.error(e.message || String(e)), [toasts]);
-  const data = useLiveData(onError);
+  const onNotice = useCallback((t) => toasts.info(t), [toasts]);
+  const data = useLiveData(onError, onNotice);
   const { jobs, queue, presets, settings, info, connected } = data;
 
   const [selectedJobId, setSelectedJobId] = useState(null);
@@ -79,11 +81,13 @@ export default function App() {
   const counts = queue?.counts ?? {};
 
   return (
+    <HelpProvider>
     <div className="app">
       <header className="topbar">
         <div className="brand">
           <Clapperboard size={20} />
           <span>HandBrake Queue</span>
+          <Help id="app.overview" />
         </div>
         <nav className="tabs" aria-label="View">
           <button className={view === 'convert' ? 'active' : ''} onClick={() => switchView('convert')}>Convert</button>
@@ -102,6 +106,7 @@ export default function App() {
             {running ? <Pause size={14} /> : <Play size={14} />}
             {running ? 'Stop after current' : 'Start'}
           </button>
+          <Help id="queue.state" />
           <span className="counts">
             {counts.queued ?? 0} queued · {counts.done ?? 0} done
             {counts.failed ? <span className="text-bad"> · {counts.failed} failed</span> : null}
@@ -113,6 +118,7 @@ export default function App() {
               <WifiOff size={14} /> offline
             </span>
           )}
+          <HelpSearchButton />
           <button className="btn ghost" onClick={() => setDialog('presets')}>
             <SlidersHorizontal size={16} /> Presets
           </button>
@@ -144,7 +150,7 @@ export default function App() {
         />
       ) : (
       <main className="panes">
-        <SourceBrowser settings={settings} changeTick={data.changeTick} onAdd={addPaths} onError={onError} />
+        <SourceBrowser settings={settings} changeTick={data.changeTick} onAdd={addPaths} onError={onError} help="convert.sources" />
         <QueuePanel
           jobs={jobs}
           presets={presets}
@@ -186,5 +192,6 @@ export default function App() {
       )}
       <Toasts toasts={toasts} />
     </div>
+    </HelpProvider>
   );
 }

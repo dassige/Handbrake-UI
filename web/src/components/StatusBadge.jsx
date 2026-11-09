@@ -11,7 +11,23 @@ export function StatusBadge({ status, phase }) {
   let label = LABELS[status] ?? status;
   if (status === 'running' && phase === 'scanning') label = 'Scanning';
   if (status === 'running' && phase === 'muxing') label = 'Finishing';
+  if (phase === 'verifying' && (status === 'running' || status === 'paused')) label = status === 'paused' ? 'Check paused' : 'Checking';
   return <span className={`badge ${status}`}>{label}</span>;
+}
+
+const VERIFY = {
+  ok: ['done', 'Checked'],
+  warning: ['paused', 'Check warnings'],
+  error: ['failed', 'Check failed'],
+  skipped: ['', 'Not checked'],
+  running: ['running', 'Checking'],
+};
+
+/** Result of the check after conversion (see help topic verify.results). */
+export function VerifyBadge({ status }) {
+  if (!status) return null;
+  const [cls, label] = VERIFY[status] ?? ['', status];
+  return <span className={`badge ${cls} verify`}>{label}</span>;
 }
 
 /** Compact summary of a folder's job counts, e.g. "3 converted · 1 queued". */

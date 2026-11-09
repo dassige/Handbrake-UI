@@ -3,6 +3,7 @@ import { Trash2, Upload, Wand2 } from 'lucide-react';
 import { api } from '../api.js';
 import { DRAG_PATHS } from './SourceBrowser.jsx';
 import { JobRow, DRAG_JOB } from './JobRow.jsx';
+import { Help } from '../help/Help.jsx';
 
 const FILTERS = [
   { key: 'all', label: 'All', match: () => true },
@@ -63,10 +64,10 @@ export function QueuePanel({
       onDrop={onDrop}
     >
       <div className="pane-head">
-        <h2>Queue</h2>
+        <h2>Queue<Help id="convert.queue" /></h2>
         <div className="pane-tools">
           <label className="field-inline" title="Preset used for files you add">
-            Preset
+            Preset<Help id="presets" />
             <select value={presetId ?? ''} onChange={(e) => onPresetChange(Number(e.target.value))} disabled={!presets.length}>
               {presets.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -91,6 +92,7 @@ export function QueuePanel({
             {f.label} <span className="chip-count">{counts[f.key]}</span>
           </button>
         ))}
+        <Help id="job.statuses" />
         <span className="spacer" />
         {filter === 'done' && counts.done > 0 && (
           <button

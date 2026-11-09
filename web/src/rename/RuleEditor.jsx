@@ -3,6 +3,7 @@ import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, Copy, Download, Plus, Tr
 import { api, readTextFile } from '../api.js';
 import { Modal } from '../components/Modal.jsx';
 import { STEP_DEFS, newStep } from './stepDefs.js';
+import { Help } from '../help/Help.jsx';
 
 const SAMPLE_NAMES = [
   'The.Rookie.6x01.La.Maledizione.Dell.Ultimo.Turno.ITA.ENG.1080p.NFRip.AAC.x265-Pir8.mkv',
@@ -16,7 +17,7 @@ function StepFields({ step, onChange, readOnly }) {
   const set = (k, v) => onChange({ ...step, [k]: v });
   return (
     <div className="step-fields">
-      {def.help && <p className="muted small">{def.help}</p>}
+      {def.help && <p className="muted small">{def.help}{step.type === 'smart' && <Help id="rename.smart" />}</p>}
       <label className="step-field wide">
         <span>Note</span>
         <input value={step.description} onChange={(e) => set('description', e.target.value)} disabled={readOnly} placeholder="optional description" />
@@ -154,7 +155,8 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
 
   return (
     <Modal
-      title="Rename rules"
+      title={<>Rename rules<Help id="rename.rules" /></>}
+      ariaLabel="Rename rules"
       onClose={() => confirmDiscard() && onClose()}
       wide
       footer={
@@ -209,6 +211,7 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
             />
             {readOnly && <p className="note">Built-in rule sets are read-only. Use <Copy size={12} /> Duplicate to make an editable copy.</p>}
 
+            <h3 className="steps-title">Steps<Help id="rename.steps" /></h3>
             <ol className="steps">
               {draft.steps.map((step, i) => {
                 const def = STEP_DEFS[step.type];
@@ -265,7 +268,7 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
             )}
 
             <div className="try-it">
-              <h3>Try it</h3>
+              <h3>Try it<Help id="rename.tryIt" /></h3>
               <div className="try-grid">
                 <textarea value={samples} onChange={(e) => setSamples(e.target.value)} spellCheck={false} rows={5} placeholder="One file name per line" />
                 <label className="step-field">

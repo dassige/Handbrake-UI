@@ -3,6 +3,7 @@ import { Star, Trash2, Upload } from 'lucide-react';
 import { api } from '../api.js';
 import { dateTime } from '../format.js';
 import { Modal } from './Modal.jsx';
+import { Help } from '../help/Help.jsx';
 
 export function PresetsDialog({ presets, run, onClose }) {
   const input = useRef(null);
@@ -26,7 +27,7 @@ export function PresetsDialog({ presets, run, onClose }) {
   }
 
   return (
-    <Modal title="Presets" onClose={onClose} wide>
+    <Modal title={<>Presets<Help id="presets" /></>} ariaLabel="Presets" onClose={onClose} wide>
       <div
         className={`upload-zone ${over ? 'over' : ''}`}
         onDragOver={(e) => {

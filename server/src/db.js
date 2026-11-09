@@ -74,7 +74,11 @@ CREATE TABLE IF NOT EXISTS rename_history (
 `;
 
 /** Columns added after the first release. */
-const MIGRATIONS = [['jobs', 'rename_note', 'TEXT']];
+const MIGRATIONS = [
+  ['jobs', 'rename_note', 'TEXT'],
+  ['jobs', 'verify', 'TEXT'], // JSON result of the check after conversion
+  ['jobs', 'verify_status', 'TEXT'], // ok | warning | error | skipped | running
+];
 
 export function openDb(file) {
   const db = new DatabaseSync(file);

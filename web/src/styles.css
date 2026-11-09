@@ -365,3 +365,50 @@ select, input[type='text'], input:not([type]), input[type='number'] {
   .rule-list { border-right: 0; border-bottom: 1px solid var(--border); padding: 0 0 10px; }
   .try-grid { grid-template-columns: 1fr; }
 }
+
+/* ------------------------------------------------------------------ help (same look as dgsoft-image-manager) */
+.help-btn {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: 17px; height: 17px; margin-left: 6px; padding: 0; vertical-align: 1px;
+  border: 1px solid var(--border); border-radius: 50%; background: var(--panel);
+  color: var(--muted); font: 700 10.5px/1 system-ui, sans-serif; text-transform: none; letter-spacing: 0; cursor: pointer;
+}
+.help-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.help-btn:focus-visible { outline: 2px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 1px; }
+.overlay.help-layer { z-index: 50; }
+.overlay.help-layer .modal { width: min(620px, 100%); }
+.help-title { display: inline-flex; align-items: center; gap: 6px; }
+.help-body { display: grid; gap: 10px; line-height: 1.55; }
+.help-body p, .help-body ul, .help-body ol { margin: 0; }
+.help-body ul, .help-body ol { padding-left: 20px; display: grid; gap: 4px; }
+.help-body h3 { margin: 6px 0 0; }
+.help-body code { background: var(--panel-2); border: 1px solid var(--border); border-radius: 4px; padding: 0 4px; }
+.help-see { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; padding-top: 12px; border-top: 1px solid var(--border); }
+.help-search { display: grid; gap: 10px; }
+.help-search-row { display: flex; align-items: center; gap: 4px; }
+.help-search-row input { flex: 1; padding: 7px 10px; }
+.help-search p { margin: 0; }
+.help-hits { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; max-height: min(55vh, 520px); overflow: auto; }
+.help-hit { display: grid; gap: 3px; width: 100%; text-align: left; padding: 8px 10px; border: 1px solid transparent; border-radius: 8px; background: none; cursor: pointer; }
+.help-hit:hover, .help-hit:focus-visible { background: var(--panel-2); border-color: var(--border); outline: none; }
+.help-hit-title { font-weight: 600; }
+.help-hit-text { font-size: 13px; line-height: 1.45; color: var(--muted); }
+.help-hits mark { background: var(--accent-soft); color: var(--accent); border-radius: 3px; padding: 0 1px; }
+.link-btn { border: 0; background: none; padding: 0; color: var(--info); font: inherit; cursor: pointer; text-decoration: underline; }
+h2 .help-btn, h3 .help-btn, legend .help-btn { vertical-align: 2px; }
+.steps-title { margin: 14px 0 0; }
+
+/* ------------------------------------------------------------------ check results */
+.text-good { color: var(--good); }
+.text-warn { color: var(--warn); }
+.badges { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.badge.verify { font-weight: 500; }
+.drawer-head-tools, .row-inline { display: inline-flex; align-items: center; gap: 4px; }
+.check-summary { display: flex; align-items: center; gap: 10px; margin: 0 0 6px !important; }
+.checks { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 6px; }
+.checks li { display: grid; grid-template-columns: 18px 1fr; gap: 6px; align-items: start; line-height: 1.4; }
+.checks li svg { margin-top: 2px; }
+.check-detail { color: var(--muted); }
+.checks li.error .check-detail { color: var(--bad); }
+.checks li.warning .check-detail { color: var(--warn); }
+.progress.checking .bar { background: var(--info); }

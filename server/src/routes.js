@@ -154,6 +154,7 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
   action('retry', (jobId) => queue.retry(jobId));
   action('again', async (jobId, body) => ({ id: await queue.convertAgain(jobId, body) }));
   action('move', (jobId, body) => queue.move(jobId, body.where));
+  action('verify', (jobId) => queue.verifyJob(jobId));
 
   app.post('/api/queue/start', async () => {
     queue.setRunning(true);

@@ -1,0 +1,328 @@
+{
+  "topics": {
+    "help.search": {
+      "title": "Searching the help",
+      "body": [
+        "Type one or more words: a topic is listed when its title or text has **every** word. Case and accents don't matter, and words in the title rank first.",
+        "With nothing typed, every topic is listed from A to Z. Every round **?** in the app opens the topic for the thing next to it."
+      ],
+      "see": ["app.overview"]
+    },
+    "app.overview": {
+      "title": "How HandBrake Queue works",
+      "body": [
+        "HandBrake Queue converts videos that are already on the server, using HandBrakeCLI with presets exported from the HandBrake desktop app. Nothing is uploaded or downloaded.",
+        "### The usual workflow",
+        "1. Upload a [preset](#presets) exported from HandBrake.",
+        "1. In **Convert**, drag files or folders from [Sources](#convert.sources) into the [Queue](#convert.queue).",
+        "1. Press **Start**: see [Starting and stopping the queue](#queue.state).",
+        "1. Each converted file is [checked](#verify.overview) for errors, missing audio or subtitles and the right length.",
+        "1. In **Rename**, give the converted files clean names: see [Renaming files](#rename.overview).",
+        "Source files are never changed or deleted, so downloads can keep seeding."
+      ],
+      "see": ["convert.sources", "convert.queue", "queue.state", "verify.overview", "rename.overview", "presets"]
+    },
+    "convert.sources": {
+      "title": "Sources",
+      "body": [
+        "The folders and video files under the **Sources folder** set in [Settings](#settings.folders). Only folders and video files are listed (see [Adding folders](#settings.adding) for the extensions).",
+        "- **Double-click** a folder to open it, or a file to add it to the queue.",
+        "- **Drag** files or folders onto the Queue to add them. Ctrl-click and Shift-click select several; the checkbox at the top selects everything.",
+        "- **Add to queue** adds what is selected.",
+        "- Adding a folder adds every video inside it, sub-folders included. Files already queued are skipped, and so are files already converted unless you turned that off.",
+        "Badges show what happened to each file: **Queued**, **Converting**, **Converted**, **Failed**. On folders they count the files inside.",
+        "Adding files never starts converting: press **Start** when you are ready ([why](#queue.state))."
+      ],
+      "see": ["convert.queue", "settings.adding", "queue.state"]
+    },
+    "convert.queue": {
+      "title": "Queue",
+      "body": [
+        "Every file to convert is a **job**. Jobs run one at a time, top to bottom.",
+        "- **Preset**: the [preset](#presets) used for the files you add next. A queued job's preset can be changed in its details.",
+        "- **Add**: put new files **at the end** of the queue or **next**, before the other waiting jobs.",
+        "- **Drag** a queued job by its handle (⋮⋮) to change the order, or use **Move to top**.",
+        "- The filters show all jobs, the active ones, the converted ones or the failed and cancelled ones. **Rename these** (under Converted) opens their files in the Rename view.",
+        "- **Clear finished** removes converted, failed and cancelled jobs from the list. Files are not touched.",
+        "Click a job to see its [details](#job.details)."
+      ],
+      "see": ["queue.state", "job.statuses", "job.actions", "job.details"]
+    },
+    "queue.state": {
+      "title": "Starting and stopping the queue",
+      "body": [
+        "The queue **never starts by itself**: adding or dropping files only puts them in the list. Press **Start** to begin converting.",
+        "- While it runs, files you add join the run.",
+        "- When the last job is done the queue stops again, so the next files you add wait for **Start**.",
+        "- **Stop after current** lets the job being converted finish, then stops. To stop at once, pause or cancel that job.",
+        "- If the server restarts during a run, the run continues after the restart. The job that was converting starts again from 0%, because HandBrake cannot resume an encode halfway."
+      ],
+      "see": ["convert.queue", "job.actions"]
+    },
+    "job.statuses": {
+      "title": "Job statuses",
+      "body": [
+        "- **Queued**: waiting for its turn.",
+        "- **Scanning**: HandBrake is reading the source before converting.",
+        "- **Converting**: encoding, with progress, speed (frames per second) and time left.",
+        "- **Finishing**: HandBrake is writing the end of the file.",
+        "- **Checking**: the converted file is being [checked](#verify.overview).",
+        "- **Paused**: stopped where it was; **Resume** continues.",
+        "- **Converted**: done. A second badge shows the result of the check: **Checked**, **Check warnings** or **Check failed**.",
+        "- **Failed**: HandBrake stopped with an error; the details show why and the log has more.",
+        "- **Cancelled**: you cancelled it."
+      ],
+      "see": ["job.actions", "verify.results"]
+    },
+    "job.actions": {
+      "title": "Job actions",
+      "body": [
+        "- **Pause / Resume**: freezes the conversion (or the check) and continues it later. Restarting the server while paused starts the conversion again from 0%.",
+        "- **Cancel**: stops the conversion and deletes the half-written file. On a queued job it only marks it cancelled. While the file is being checked, **Skip check** keeps the converted file and skips the rest of the check.",
+        "- **Move to top**: converts this queued job next.",
+        "- **Retry**: puts a failed or cancelled job back in the queue.",
+        "- **Convert again**: a new job for the same source. The new file gets a suffix such as `name (1).mkv`, so the first one is kept. In the details you can choose another preset.",
+        "- **Rename**: opens the converted file in the [Rename view](#rename.overview).",
+        "- **Check again**: runs the [check](#verify.overview) on a converted file again.",
+        "- **Remove**: takes the job off the list. Files are never deleted."
+      ],
+      "see": ["job.statuses", "job.details"]
+    },
+    "job.details": {
+      "title": "Job details",
+      "body": [
+        "Everything about one job: [progress](#job.statuses), the [check](#verify.results), [files](#job.files), preset, [source](#job.source), [timing](#job.timing) and the [HandBrake log](#job.log). The buttons at the top are the [job actions](#job.actions).",
+        "The details follow the job live while it converts. Close them with ✕ or Escape."
+      ],
+      "see": ["job.actions", "job.files", "verify.results", "job.log"]
+    },
+    "job.files": {
+      "title": "Source and output files",
+      "body": [
+        "- **Source**: the file being converted. It is never changed.",
+        "- **Output**: where the converted file goes, under the **Target folder** in the layout chosen in [Settings](#settings.layout). While the job is queued you can **edit** it (it must stay inside the target folder).",
+        "- If a file with that name already exists when the job starts, the new file gets a suffix: `name (1).mkv`. Nothing is overwritten.",
+        "- While converting, the output is written as `name.mkv.part` and renamed when HandBrake finishes, so media servers never pick up half-written files.",
+        "- **Sizes** compares the source with the output."
+      ],
+      "see": ["settings.layout", "job.details"]
+    },
+    "job.source": {
+      "title": "Source details",
+      "body": [
+        "What HandBrake found in the source when the job was added: length, video format and size, frame rate, and the audio and subtitle tracks with their languages.",
+        "The [preset](#presets) decides which of these tracks go into the output. The [check](#verify.overview) compares the output with what HandBrake meant to write."
+      ],
+      "see": ["presets", "verify.overview"]
+    },
+    "job.timing": {
+      "title": "Timing",
+      "body": [
+        "When the job was added, started and finished, how long encoding took (pauses not counted) and the average speed in frames per second. **Attempts** counts how many times it was started, e.g. after a retry or a restart."
+      ]
+    },
+    "job.log": {
+      "title": "HandBrake log",
+      "body": [
+        "Everything HandBrakeCLI printed while converting: the settings it used, the tracks it picked, warnings and errors. It updates live while the job runs.",
+        "When a job fails, the error shown in its details comes from the last error lines of this log. The [check](#verify.overview) also reads it, to know which audio and subtitle tracks HandBrake wrote and whether it found errors in the source."
+      ],
+      "see": ["verify.overview"]
+    },
+    "verify.overview": {
+      "title": "Checking converted files",
+      "body": [
+        "After each successful conversion the output is checked before the job is marked converted. The job shows **Checking** meanwhile, and the next job waits.",
+        "### What is checked",
+        "- **Readable**: the file opens and has a video stream.",
+        "- **Length matches the source**: where the video really ends, measured by reading the whole file. A file cut short can still claim the full length in its metadata, so that alone isn't trusted. Up to 2 seconds (or 0.5%) of difference is fine, up to 10 seconds (or 2%) is a warning, more is an error.",
+        "- **Audio tracks**: the file has every audio track HandBrake wrote (from the [log](#job.log)), and each one lasts as long as the video.",
+        "- **Subtitle tracks**: the file has every subtitle track HandBrake passed through. Subtitles burned into the picture are part of the video. A track with no lines (e.g. forced subtitles in an episode without any) is shown but is not a problem.",
+        "- **Full decode**: every video and audio frame is decoded to find damaged data. It takes about 1–2 minutes for a 45-minute episode.",
+        "- **Source**: if HandBrake found decoding errors in the source, the damage may be visible in the output too (a warning).",
+        "Choose **Full**, **Quick** (everything except the full decode) or **Off** in [Settings](#settings.encoding)."
+      ],
+      "see": ["verify.results", "settings.encoding", "rename.auto"]
+    },
+    "verify.results": {
+      "title": "Check results",
+      "body": [
+        "- **Checked** (green): every check passed.",
+        "- **Check warnings** (amber): something to look at, e.g. errors in the source or a few seconds of difference in length. The file is usually fine.",
+        "- **Check failed** (red): the file is probably broken: too short, a missing or short audio track, or many decoding errors. Use **Convert again**, or try another source.",
+        "- **Not checked**: the check was skipped, stopped by a restart, or turned off.",
+        "Each line in the job details says what was found. **Check again** repeats the check, e.g. after copying the file back.",
+        "Files that fail the check are never [renamed automatically](#rename.auto)."
+      ],
+      "see": ["verify.overview", "job.actions"]
+    },
+    "presets": {
+      "title": "Presets",
+      "body": [
+        "A preset holds every conversion setting: video encoder and quality, size, frame rate, audio and subtitle tracks, container. Presets are made in the HandBrake desktop app and uploaded here.",
+        "1. In HandBrake: **Presets** → select your preset → **Export**.",
+        "1. Here: drop the `.json` file in **Presets**, or choose it.",
+        "- A file can hold several presets, also inside folders: each one is added.",
+        "- Uploading a preset with the same name again replaces the old one.",
+        "- The **default** preset (★) is used when you add files, unless you choose another one in the Queue.",
+        "- Each job keeps a copy of its preset, so changing or deleting a preset never changes jobs already in the queue.",
+        "The encoder always comes from the preset. Hardware encoders (`qsv_h264`, `qsv_h265`) only work on Intel CPUs from 11th generation on; the encoders available on this server are listed in Settings → About."
+      ],
+      "see": ["convert.queue", "job.source"]
+    },
+    "settings.folders": {
+      "title": "Sources and target folders",
+      "body": [
+        "Folders on the server (not on your computer). NAS shares mounted on the server work too.",
+        "- **Sources folder**: where the files to convert are. The Sources panel can't go above it.",
+        "- **Target folder**: where converted files are written. The Rename view works only here.",
+        "Both must exist, and the target cannot be inside the sources folder. In Docker they must be inside the folder mounted into the container (`MEDIA_DIR`, usually `/mnt`)."
+      ],
+      "see": ["settings.layout", "convert.sources"]
+    },
+    "settings.layout": {
+      "title": "Output folder layout",
+      "body": [
+        "Where under the target folder each converted file goes:",
+        "- **Source folder name**: `target/Show.S01/episode.mkv`, using only the name of the folder the source is in. Good for season folders.",
+        "- **Full source path**: `target/Completed/Show.S01/episode.mkv`, the whole path below the sources folder.",
+        "- **All in the target folder**: `target/episode.mkv`.",
+        "If the file already exists, the new one gets a suffix (`episode (1).mkv`). The layout applies to files added after the change; queued jobs keep their output path."
+      ],
+      "see": ["job.files"]
+    },
+    "settings.adding": {
+      "title": "Adding folders",
+      "body": [
+        "- **Include sub-folders**: adding a folder also adds the videos in its sub-folders.",
+        "- **Skip files that were already converted**: a file with a converted job is not added again. Use **Convert again** on its job to redo one.",
+        "- **Video file extensions**: which files count as videos, separated by commas.",
+        "- **Skip files and folders containing these words**: whole words, any case, e.g. `sample` skips `show-sample.mkv` and a `Sample` folder but not `samples.mkv`."
+      ],
+      "see": ["convert.sources"]
+    },
+    "settings.encoding": {
+      "title": "Encoding settings",
+      "body": [
+        "- **CPU priority**: how politely conversions share the CPU with other services on the server (Linux `nice`, 0–19). Higher is gentler and slower only when the server is busy.",
+        "- **Check after conversion**: **Full** (every check, with a complete decode), **Quick** (lengths, tracks and readability without decoding) or **Off**. See [Checking converted files](#verify.overview)."
+      ],
+      "see": ["verify.overview"]
+    },
+    "settings.renaming": {
+      "title": "Renaming settings",
+      "body": [
+        "- **Rename files automatically after conversion**: off by default. See [Automatic renaming](#rename.auto).",
+        "- **Rule set for automatic renaming**: which [rule set](#rename.rules) is used.",
+        "- **Separator**: when the new name is taken, a number is added after it: with `_` you get `name_1.mkv`, `name_2.mkv`."
+      ],
+      "see": ["rename.auto", "rename.rules"]
+    },
+    "rename.overview": {
+      "title": "Renaming files",
+      "body": [
+        "Downloaded files have names like `The.Rookie.6x01.Title.ITA.ENG.1080p.NFRip.AAC.x265-Pir8`. The Rename view turns them into `The Rookie S06e01 - Title`, using [rule sets](#rename.rules).",
+        "1. On the left, browse the **target folder** and drag converted files or folders to the rename list (or use **Rename** on a converted job).",
+        "1. Pick the **Rules**. The built-in **Auto** recognises both TV episodes and movies.",
+        "1. Look at the [preview](#rename.preview): fix any name by hand, and type a [show name](#rename.showName) where none was found.",
+        "1. Press **Rename**. Every batch can be undone from [History](#rename.history).",
+        "Only files in the target folder can be renamed, never the sources (downloads may still be seeding)."
+      ],
+      "see": ["rename.preview", "rename.showName", "rename.rules", "rename.history", "rename.auto"]
+    },
+    "rename.preview": {
+      "title": "Rename preview",
+      "body": [
+        "Each row shows the current name (small, grey) and the new name. Nothing changes on disk until you press **Rename**.",
+        "- **Edit** any new name by typing in it (Enter to confirm, Escape to cancel). An edited row is blue; **undo edit** goes back to the rules' name.",
+        "- **Ticks** choose which rows are renamed. Rows with a warning start unticked: check them and tick them when they look right.",
+        "- **Warnings** explain what the rules couldn't find, e.g. no episode number, no year, or no show name.",
+        "- **TV · S06e01** or **Movie · 2024** shows what was recognised; **no change** means the name is already right.",
+        "- If two files would get the same name, or the name is taken by another file in the folder, a number is added: `name_1.mkv` (see [Renaming settings](#settings.renaming)).",
+        "Files in different folders are grouped under their folder."
+      ],
+      "see": ["rename.showName", "rename.rules"]
+    },
+    "rename.showName": {
+      "title": "Show name",
+      "body": [
+        "Some files don't have the show name before the episode number, e.g. `S04E07 Reacher Tutti Con Sampson (2026)…`. Type the show name (`Reacher`) and the rows get `Reacher S04e07 - Tutti Con Sampson`; the name is also taken out of the episode title.",
+        "- **only where missing** (default): only rows where no show name was found get it. Other shows in the same list keep theirs.",
+        "- **for all rows**: every TV row gets this show name, e.g. to shorten a long one or to add a year for a remake: `Silo (2023)`."
+      ],
+      "see": ["rename.preview", "rename.smart"]
+    },
+    "rename.rules": {
+      "title": "Rename rule sets",
+      "body": [
+        "A rule set is a list of [steps](#rename.steps) applied in order to each file name (without its extension).",
+        "- **Built-in** rule sets (**Auto**, **TV series**, **Movies**) can't be changed: use **Duplicate** to make an editable copy.",
+        "- **New** starts a rule set with the [Recognise episode / movie](#rename.smart) step.",
+        "- **Import** reads Advanced Renamer presets (`.aren`) as well as rule sets exported from here. Every Advanced Renamer method used for names (replace, remove pattern, remove, add, move, trim, case) becomes a step.",
+        "- **Export** (download icon) saves the rule set as a `.json` file, e.g. to copy it to another server.",
+        "- Changes are kept only after **Save**; [Try it](#rename.tryIt) shows the result before saving."
+      ],
+      "see": ["rename.steps", "rename.smart", "rename.tryIt"]
+    },
+    "rename.steps": {
+      "title": "Rename steps",
+      "body": [
+        "Steps run top to bottom; untick one to switch it off without deleting it. Click a step to edit it.",
+        "- **Recognise episode / movie**: builds the whole name from a template. See [Recognise episode / movie](#rename.smart).",
+        "- **Remove release tags**: cuts the name at the first tag such as `1080p`, `WEB-DL`, `x265` or `ITA`.",
+        "- **Replace**: finds text and replaces it: all, first or last occurrence, matching case or not. With **Regular expression**, `$1`, `$2`… insert the groups found.",
+        "- **Remove pattern**: deletes what matches, e.g. `(720p).*$` deletes from `720p` to the end.",
+        "- **Remove everything after text**: e.g. after `)`.",
+        "- **Remove characters / Add text / Move characters**: work on positions, like Advanced Renamer. Positions change with each file name, so pattern steps are usually safer.",
+        "- **Trim characters**: removes the listed characters from both ends.",
+        "- **Change case**: Title Case, UPPER, lower or Sentence case.",
+        "- **Fix apostrophes**: `L Uomo` → `L'Uomo`, `Dell Oca` → `Dell'Oca`, `Wouldn T` → `Wouldn't`.",
+        "- **Collapse spaces**: several spaces become one.",
+        "Characters that file names can't contain (`/ \\ : * ? \" < > |`) are removed or replaced at the end; `:` becomes ` -`."
+      ],
+      "see": ["rename.smart", "rename.tryIt"]
+    },
+    "rename.smart": {
+      "title": "Recognise episode / movie",
+      "body": [
+        "Reads the parts of a release name and builds a clean one.",
+        "- **TV**: finds `S01E02`, `S01E01E02` or `1x02`. The show is the text before it, the episode title the text after it, up to the first release tag.",
+        "- **Movie**: finds the year (`2024` or `(2024)`); the title is the text before it.",
+        "- **Type**: **Auto** treats a name with an episode number as TV and anything else as a movie.",
+        "### Templates",
+        "`{show}`, `{season}`, `{episode}`, `{title}` and `{year}` are replaced by what was found; season and episode get two digits. A part in `[ ]` disappears when a field inside it is empty: `{show} S{season}e{episode}[ - {title}]` gives `Lanterns S01e01` when there is no episode title.",
+        "### Options",
+        "- **Title Case words**: capitalises each word, keeping capitals already there (`McLaren`, `INXS`).",
+        "- **Fix apostrophes**: `L Osservatore` → `L'Osservatore`.",
+        "- **Keep the year in the show name**: `East of Eden 2026 S01E01` becomes `East Of Eden (2026) S01e01`. Off by default; useful for remakes.",
+        "- **Extra release tags**: more words that mark the start of the release information."
+      ],
+      "see": ["rename.showName", "rename.steps"]
+    },
+    "rename.tryIt": {
+      "title": "Try it",
+      "body": [
+        "Shows what the rule set being edited does to some names, before saving. It starts with the names in your rename list (or a few examples); type or paste any names, one per line.",
+        "The **Show name** box works like the one in the [Rename view](#rename.showName)."
+      ],
+      "see": ["rename.rules"]
+    },
+    "rename.history": {
+      "title": "Rename history",
+      "body": [
+        "Every batch of renames, newest first, including automatic ones. Click a batch to see each old and new name.",
+        "**Undo** gives the files their old names back. A file is skipped if it was deleted or moved since, or if its old name is in use again."
+      ],
+      "see": ["rename.overview"]
+    },
+    "rename.auto": {
+      "title": "Automatic renaming",
+      "body": [
+        "When **Rename files automatically after conversion** is on (Settings → Renaming), each converted file is renamed with the chosen rule set right after its [check](#verify.overview).",
+        "To stay safe, a file is renamed only when the rules recognise it **without warnings**. Otherwise the job shows **Needs rename** and you finish it in the [Rename view](#rename.overview). Files that fail the check are not renamed.",
+        "Automatic renames appear in [History](#rename.history) and can be undone."
+      ],
+      "see": ["settings.renaming", "rename.overview"]
+    }
+  }
+}

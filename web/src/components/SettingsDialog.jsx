@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api } from '../api.js';
 import { Modal } from './Modal.jsx';
+import { Help } from '../help/Help.jsx';
 
 const LAYOUTS = [
   { value: 'parent', label: 'Source folder name', example: 'target/Show.S01/episode.mkv' },
@@ -36,6 +37,7 @@ export function SettingsDialog({ settings, info, renameRules = [], run, onSaved,
           autoRename: form.autoRename,
           autoRenameRuleId: form.autoRenameRuleId ? Number(form.autoRenameRuleId) : null,
           renameSeparator: form.renameSeparator,
+          verifyMode: form.verifyMode,
         }),
       'Settings saved',
     );
@@ -61,7 +63,7 @@ export function SettingsDialog({ settings, info, renameRules = [], run, onSaved,
     >
       <form id="settings-form" className="settings" onSubmit={save}>
         <fieldset>
-          <legend>Folders (paths on the server)</legend>
+          <legend>Folders (paths on the server)<Help id="settings.folders" /></legend>
           <label>
             Sources folder
             <input value={form.sourceRoot} onChange={set('sourceRoot')} required spellCheck={false} />
@@ -74,7 +76,7 @@ export function SettingsDialog({ settings, info, renameRules = [], run, onSaved,
         </fieldset>
 
         <fieldset>
-          <legend>Output folder layout</legend>
+          <legend>Output folder layout<Help id="settings.layout" /></legend>
           {LAYOUTS.map((l) => (
             <label key={l.value} className="radio">
               <input type="radio" name="layout" value={l.value} checked={form.outputLayout === l.value} onChange={set('outputLayout')} />
@@ -88,7 +90,7 @@ export function SettingsDialog({ settings, info, renameRules = [], run, onSaved,
         </fieldset>
 
         <fieldset>
-          <legend>Adding folders</legend>
+          <legend>Adding folders<Help id="settings.adding" /></legend>
           <label className="check">
             <input type="checkbox" checked={form.recursive} onChange={set('recursive')} />
             Include sub-folders
@@ -108,15 +110,23 @@ export function SettingsDialog({ settings, info, renameRules = [], run, onSaved,
         </fieldset>
 
         <fieldset>
-          <legend>Encoding</legend>
+          <legend>Encoding<Help id="settings.encoding" /></legend>
           <label>
             CPU priority (nice 0–19, higher = gentler on other services)
             <input type="number" min="0" max="19" value={form.niceLevel} onChange={set('niceLevel')} />
           </label>
+          <label>
+            <span>Check after conversion<Help id="verify.overview" /></span>
+            <select value={form.verifyMode} onChange={set('verifyMode')}>
+              <option value="full">Full: lengths, tracks and a complete decode (about 1–2 min per episode)</option>
+              <option value="quick">Quick: lengths and tracks, no decode (seconds)</option>
+              <option value="off">Off</option>
+            </select>
+          </label>
         </fieldset>
 
         <fieldset>
-          <legend>Renaming</legend>
+          <legend>Renaming<Help id="settings.renaming" /></legend>
           <label className="check">
             <input type="checkbox" checked={form.autoRename} onChange={set('autoRename')} />
             Rename files automatically after conversion

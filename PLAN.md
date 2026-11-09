@@ -65,5 +65,20 @@ target folder.
      pattern (Live Aid DVD clips, movies without a year).
    - The typed show name only fills rows with no detected show, unless "for all
      rows" is chosen.
-5. Later (optional) — watch folder, Emby library refresh, notifications
+5. Round 3 (2026-11-09) ✅
+   - The queue never starts by itself. Default `queueRunning: false`, and the
+     queue stops when it runs empty. A run that was going when the server
+     restarted continues after the restart.
+   - Check after conversion (`server/src/verify.js`, setting `verifyMode`,
+     default `full`). It uses ffprobe/ffmpeg, which are added to the image. It
+     reads the real stream ends with a full packet read, because metadata
+     claims the full length even on truncated files. It compares the audio and
+     subtitle counts against HandBrake's log, and optionally does a full decode
+     (filtering the null muxer's `[null @…]` timestamp messages).
+     - Tested with the real tools on a 60 s encode: a good file passes; a
+       truncated, corrupted copy fails (37.9 s short); a copy with one audio
+       track removed fails.
+   - In-app help ported from dgsoft-image-manager: `web/src/help/` (help.json,
+     Help.jsx, search.js) and `server/test/help.test.js`.
+6. Later (optional) — watch folder, Emby library refresh, notifications
    (n8n / Home Assistant).

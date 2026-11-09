@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { badRequest } from './errors.js';
 import { isInside } from './paths.js';
+import { VERIFY_MODES } from './verify.js';
 
 export const OUTPUT_LAYOUTS = ['parent', 'mirror', 'flat'];
 
@@ -21,10 +22,12 @@ function defaults(config) {
     excludePatterns: ['sample'],
     niceLevel: 10,
     defaultPresetId: null,
-    queueRunning: true,
+    // The queue never starts by itself: Start is always manual.
+    queueRunning: false,
     autoRename: false,
     autoRenameRuleId: null,
     renameSeparator: '_',
+    verifyMode: 'full',
   };
 }
 
@@ -83,6 +86,7 @@ export class Settings {
     if (!OUTPUT_LAYOUTS.includes(next.outputLayout)) {
       throw badRequest(`outputLayout must be one of ${OUTPUT_LAYOUTS.join(', ')}`);
     }
+    if (!VERIFY_MODES.includes(next.verifyMode)) throw badRequest(`verifyMode must be one of ${VERIFY_MODES.join(', ')}`);
     if (next.autoRenameRuleId != null) {
       next.autoRenameRuleId = Number(next.autoRenameRuleId);
       if (!Number.isInteger(next.autoRenameRuleId)) throw badRequest('autoRenameRuleId must be a rule set id');

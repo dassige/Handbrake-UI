@@ -11,7 +11,7 @@ const ACTIVE = ['running', 'paused'];
 const FINISHED = ['done', 'failed', 'cancelled'];
 const LIST_COLUMNS = `id, status, phase, position, source_path, output_path, preset_id, preset_name,
   format, created_at, started_at, finished_at, paused_ms, progress, fps, avg_fps, eta, pass,
-  pass_count, source_size, output_size, source_info, scan_error, exit_code, error, attempts, rename_note`;
+  pass_count, source_size, output_size, source_info, scan_error, exit_code, error, attempts, rename_note, verify, verify_status`;
 
 function rowToJob(r) {
   if (!r) return r;
@@ -43,15 +43,19 @@ function rowToJob(r) {
     error: r.error,
     attempts: r.attempts,
     renameNote: r.rename_note,
+    verifyStatus: r.verify_status,
+    verify: r.verify ? JSON.parse(r.verify) : null,
   };
 }
 
 export class Queue {
-  constructor({ db, settings, presets, handbrake, events, dataDir, log }) {
+  constructor({ db, settings, presets, handbrake, verifier, events, dataDir, log }) {
     this.db = db;
     this.settings = settings;
     this.presets = presets;
     this.hb = handbrake;
+    this.verifier = verifier;
+    this.manualChecks = Promise.resolve();
     this.events = events;
     this.log = log;
     this.logDir = path.join(dataDir, 'logs');
@@ -68,16 +72,27 @@ export class Queue {
   /** Jobs interrupted by a restart go back to the queue; their partial files are removed. */
   async recover() {
     const stale = this.db
-      .prepare(`SELECT id, output_path FROM jobs WHERE status IN ('running', 'paused')`)
+      .prepare(`SELECT id, output_path, phase FROM jobs WHERE status IN ('running', 'paused')`)
       .all();
-    for (const j of stale) {
+    for (const j of stale.filter((x) => x.phase === 'verifying')) {
+      // The encode had finished; only the check was interrupted.
+      const size = await fs.stat(j.output_path).then((st) => st.size, () => null);
+      if (size == null) continue;
+      this.db
+        .prepare(`UPDATE jobs SET status = 'done', phase = NULL, progress = 1, eta = 0, fps = NULL, output_size = ?,
+          finished_at = COALESCE(finished_at, ?), verify_status = 'skipped', verify = ? WHERE id = ?`)
+        .run(size, Date.now(), JSON.stringify({ status: 'skipped', checks: [], note: 'Check interrupted by a restart' }), j.id);
+      j.recovered = true;
+    }
+    for (const j of stale.filter((x) => !x.recovered)) {
       await fs.rm(j.output_path + '.part', { force: true }).catch(() => {});
       this.db
         .prepare(`UPDATE jobs SET status = 'queued', phase = NULL, progress = 0, fps = NULL, eta = NULL,
           started_at = NULL, paused_ms = 0, error = 'Interrupted by a restart; queued again' WHERE id = ?`)
         .run(j.id);
     }
-    if (stale.length) this.log.info(`Re-queued ${stale.length} interrupted job(s)`);
+    if (stale.length) this.log.info(`Recovered ${stale.length} interrupted job(s)`);
+    this.db.prepare(`UPDATE jobs SET verify_status = 'skipped' WHERE verify_status = 'running'`).run();
     for (const r of this.db.prepare(`SELECT id FROM jobs WHERE source_info IS NULL AND scan_error IS NULL`).all()) {
       this.scanQueue.push(r.id);
     }
@@ -297,7 +312,7 @@ export class Queue {
     this.db
       .prepare(`UPDATE jobs SET status = 'queued', phase = NULL, position = ?, progress = 0, fps = NULL,
         avg_fps = NULL, eta = NULL, pass = NULL, pass_count = NULL, started_at = NULL, finished_at = NULL,
-        paused_ms = 0, output_size = NULL, exit_code = NULL, error = NULL,
+        paused_ms = 0, output_size = NULL, exit_code = NULL, error = NULL, verify = NULL, verify_status = NULL,
         output_path = ? WHERE id = ?`)
       .run(this.nextPosition('end', 1), plannedOutputPath(job.sourcePath, this.settings, job.format), id);
     this.emitJob(id);
@@ -419,7 +434,13 @@ export class Queue {
   tick() {
     if (this.active || this.starting || !this.settings.get('queueRunning')) return;
     const next = this.db.prepare(`SELECT id FROM jobs WHERE status = 'queued' ORDER BY position LIMIT 1`).get();
-    if (!next) return;
+    if (!next) {
+      // Nothing left: stop, so files added later wait for a manual Start.
+      this.settings.set('queueRunning', false);
+      this.events.emit('queue', { ...this.state(), finished: this.ranSinceStart === true });
+      this.ranSinceStart = false;
+      return;
+    }
     this.starting = true;
     this.start(next.id)
       .catch((err) => this.log.error(err, `Job ${next.id} failed to start`))
@@ -457,10 +478,11 @@ export class Queue {
     this.db
       .prepare(`UPDATE jobs SET status = 'running', phase = 'scanning', output_path = ?, started_at = ?,
         finished_at = NULL, paused_ms = 0, progress = 0, fps = NULL, avg_fps = NULL, eta = NULL, error = NULL,
-        exit_code = NULL, output_size = NULL, source_size = ?, rename_note = NULL, attempts = attempts + 1 WHERE id = ?`)
+        exit_code = NULL, output_size = NULL, source_size = ?, rename_note = NULL, verify = NULL, verify_status = NULL,
+        attempts = attempts + 1 WHERE id = ?`)
       .run(finalPath, Date.now(), sourceStat.size, id);
 
-    const active = { id, partPath, finalPath, presetFile, cancelled: false, pausedAt: null };
+    const active = { id, partPath, finalPath, presetFile, source: row.source_path, cancelled: false, pausedAt: null };
     active.exited = new Promise((resolve) => {
       active.child = this.hb.encode({
         presetFile,
@@ -477,6 +499,7 @@ export class Queue {
       });
     });
     this.active = active;
+    this.ranSinceStart = true;
     this.log.info(`Job ${id}: encoding ${row.source_path} -> ${finalPath}`);
     this.emitJob(id);
     this.events.emit('queue', this.state());
@@ -538,11 +561,18 @@ export class Queue {
     } else if (code === 0 && partSize > 0) {
       try {
         await fs.rename(partPath, finalPath);
+        const verify = await this.verifyActive(active);
         this.db
           .prepare(`UPDATE jobs SET status = 'done', phase = NULL, finished_at = ?, exit_code = 0, progress = 1,
-            eta = 0, fps = NULL, output_size = ? WHERE id = ?`)
-          .run(now, partSize, id);
-        await this.maybeAutoRename(id, finalPath);
+            eta = 0, fps = NULL, output_size = ?, verify_status = ?, verify = ? WHERE id = ?`)
+          .run(now, partSize, verify?.status ?? null, verify ? JSON.stringify(verify) : null, id);
+        if (verify?.status === 'error') {
+          if (this.settings.get('autoRename')) {
+            this.db.prepare('UPDATE jobs SET rename_note = ? WHERE id = ?').run('Not renamed automatically: the check found problems', id);
+          }
+        } else {
+          await this.maybeAutoRename(id, finalPath);
+        }
       } catch (err) {
         await this.markFailed(id, now, code, `Encoded, but could not rename the output: ${err.message}`);
       }
@@ -564,6 +594,74 @@ export class Queue {
       this.events.emit('queue', this.state());
       this.tick();
     }
+  }
+
+  /** Checks the finished output (setting "verifyMode"); the job stays "running" meanwhile. */
+  async verifyActive(active) {
+    const mode = this.settings.get('verifyMode');
+    if (!this.verifier || mode === 'off') return null;
+    active.verifying = true;
+    active.latest = { phase: 'verifying', progress: 0, fps: null, eta: null };
+    active.phase = 'verifying';
+    this.saveProgress(active);
+    this.events.emit('progress', { id: active.id, phase: 'verifying', progress: 0, fps: null, eta: null });
+    let last = 0;
+    const result = await this.verifier.verify({
+      output: active.finalPath,
+      source: active.source,
+      logFile: this.logFile(active.id),
+      mode,
+      nice: this.settings.get('niceLevel'),
+      isStopped: () => active.cancelled || active.shuttingDown,
+      onChild: (child) => {
+        active.child = child;
+        if (active.pausedAt) child.kill('SIGSTOP');
+      },
+      onProgress: (p) => {
+        active.latest = { ...active.latest, progress: p };
+        if (Date.now() - last > 1000) {
+          last = Date.now();
+          this.events.emit('progress', { id: active.id, phase: 'verifying', progress: p });
+        }
+      },
+    });
+    if (active.cancelled || active.shuttingDown) {
+      return { ...result, status: 'skipped', checks: [], note: active.cancelled ? 'Check skipped' : 'Check interrupted by a restart' };
+    }
+    this.log.info(`Job ${active.id}: check ${result.status}`);
+    return result;
+  }
+
+  /** Checks a finished job's output again, outside the queue (one at a time). */
+  verifyJob(id) {
+    const job = this.get(id);
+    if (job.status !== 'done') throw conflict('Only converted jobs can be checked');
+    if (job.verifyStatus === 'running') throw conflict('This job is being checked already');
+    if (!this.verifier) throw conflict('Checking is not available');
+    this.db.prepare(`UPDATE jobs SET verify_status = 'running' WHERE id = ?`).run(id);
+    this.emitJob(id);
+    this.manualChecks = this.manualChecks.then(async () => {
+      let last = 0;
+      const mode = this.settings.get('verifyMode') === 'quick' ? 'quick' : 'full';
+      const result = await this.verifier
+        .verify({
+          output: job.outputPath,
+          source: job.sourcePath,
+          logFile: this.logFile(id),
+          mode,
+          nice: this.settings.get('niceLevel'),
+          onProgress: (p) => {
+            if (Date.now() - last > 1000) {
+              last = Date.now();
+              this.events.emit('progress', { id, verifyProgress: p });
+            }
+          },
+        })
+        .catch((err) => ({ status: 'error', checks: [{ id: 'internal', label: 'Check', status: 'error', detail: err.message }] }));
+      if (!this.db.prepare('SELECT id FROM jobs WHERE id = ?').get(id)) return;
+      this.db.prepare('UPDATE jobs SET verify_status = ?, verify = ? WHERE id = ?').run(result.status, JSON.stringify(result), id);
+      this.emitJob(id);
+    });
   }
 
   /** Optional automatic rename after a successful encode (setting "autoRename"). */

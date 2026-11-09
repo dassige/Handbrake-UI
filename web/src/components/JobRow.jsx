@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { ArrowUpToLine, GripVertical, Pause, Play, RotateCcw, Square, Trash2, Wand2 } from 'lucide-react';
+import { ArrowUpToLine, GripVertical, Pause, Play, RotateCcw, SkipForward, Square, Trash2, Wand2 } from 'lucide-react';
 import { api } from '../api.js';
 import { bytes, dirName, duration, elapsed, fileName, percent, ratio, relTo, ago } from '../format.js';
-import { StatusBadge } from './StatusBadge.jsx';
+import { StatusBadge, VerifyBadge } from './StatusBadge.jsx';
 
 export const DRAG_JOB = 'application/x-hbui-job';
 
@@ -39,7 +39,10 @@ export function JobActions({ job, run, queueIndex = -1, labels = false, onRename
     <div className="job-actions" onClick={(e) => e.stopPropagation()}>
       {s === 'running' && btn({ icon: Pause, label: 'Pause', onClick: () => act('pause') })}
       {s === 'paused' && btn({ icon: Play, label: 'Resume', onClick: () => act('resume') })}
-      {['running', 'paused', 'queued'].includes(s) && (
+      {['running', 'paused', 'queued'].includes(s) && job.phase === 'verifying' && (
+        btn({ icon: SkipForward, label: 'Skip check', title: 'Keep the converted file and skip the rest of the check', onClick: () => act('cancel') })
+      )}
+      {['running', 'paused', 'queued'].includes(s) && job.phase !== 'verifying' && (
         btn({ icon: Square, danger: true, label: 'Cancel', title: s === 'queued' ? 'Cancel (keeps it in the list)' : 'Stop and cancel this conversion', onClick: () => (s === 'queued' || confirm('Cancel this conversion? Progress is lost.')) && act('cancel') })
       )}
       {s === 'queued' && queueIndex > 0 && (
@@ -71,7 +74,9 @@ export function JobRow({
 
   let meta;
   if (active) {
-    meta = job.phase === 'encoding' || job.status === 'paused'
+    meta = job.phase === 'verifying'
+      ? [`checking the converted file · ${percent(job.progress)}`]
+      : job.phase === 'encoding' || job.status === 'paused'
       ? [
           percent(job.progress),
           job.status === 'running' && job.fps != null ? `${job.fps.toFixed(1)} fps` : null,
@@ -116,6 +121,7 @@ export function JobRow({
       <div className="job-main">
         <div className="job-title">
           <StatusBadge status={job.status} phase={job.phase} />
+          {job.status === 'done' && <VerifyBadge status={job.verifyStatus} />}
           <span className="job-name" title={job.sourcePath}>{fileName(job.sourcePath)}</span>
         </div>
         <div className="job-sub" title={job.outputPath}>
@@ -123,7 +129,7 @@ export function JobRow({
           <span className="muted">→ {relTo(settings?.targetRoot, dirName(job.outputPath)) || '.'}</span>
         </div>
         {active && (
-          <div className={`progress ${job.status === 'paused' ? 'paused' : ''}`}>
+          <div className={`progress ${job.status === 'paused' ? 'paused' : ''} ${job.phase === 'verifying' ? 'checking' : ''}`}>
             <div className="bar" style={{ width: `${(job.progress ?? 0) * 100}%` }} />
           </div>
         )}

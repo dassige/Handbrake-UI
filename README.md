@@ -26,9 +26,26 @@ same preset.
   - retry, or "convert again" with another preset
   - per-job details: source tracks, sizes, compression, encode time and the
     full HandBrake log
+- **Manual start.** Adding files never starts converting; press **Start**. The
+  queue stops by itself when the last job is done.
 - **Safe output.** Each encode is written to `name.mkv.part` and renamed when it
   finishes, so media servers never pick up half-written files. Existing
   files are never overwritten: the new file gets a suffix, `name (1).mkv`.
+- **Check after conversion** (setting: Full, Quick or Off). Each output is
+  checked before the job counts as converted:
+  - It must be readable and have a video stream.
+  - Its real length, measured by reading the whole file, must match the source.
+  - It must have every audio and subtitle track HandBrake wrote (taken from its
+    log), and every audio track must last as long as the video.
+  - In **Full** mode, every video and audio frame must decode without errors
+    (about 1–2 minutes per 45-minute episode).
+
+  Results show as **Checked**, **Check warnings** or **Check failed**, with
+  details per job and a **Check again** button.
+- **In-app help:** a round **?** next to every page, panel, section and
+  setting, plus **Help** search in the top bar. The content lives in
+  `web/src/help/help.json`; `server/test/help.test.js` checks that every `?` has
+  a topic and that every link works.
 - **Rename** view for converted files:
   - Recognises TV episodes (`S01E02`, `1x02`) and movies (title + year).
   - Drops release tags (`1080p`, `WEB-DL`, `x265`, `ITA`…) and builds names from
@@ -90,7 +107,9 @@ cd server && npm test
 ```
 
 The server needs `HandBrakeCLI` on the `PATH` (or `HANDBRAKE_CLI=/path/to/it`)
-to scan and encode; everything else works without it.
+to scan and encode, and `ffprobe`/`ffmpeg` (`FFPROBE`, `FFMPEG`) for the check
+after conversion. Everything else works without them; the Docker image
+includes all three.
 
 **Stack:** Node 24 + Fastify, built-in `node:sqlite`, Server-Sent Events for
 live updates; React + Vite for the UI. One container, no external database.

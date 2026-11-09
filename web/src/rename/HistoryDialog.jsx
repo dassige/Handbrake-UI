@@ -3,6 +3,7 @@ import { ChevronDown, ChevronRight, Undo2 } from 'lucide-react';
 import { api } from '../api.js';
 import { dateTime, fileName } from '../format.js';
 import { Modal } from '../components/Modal.jsx';
+import { Help } from '../help/Help.jsx';
 
 export function HistoryDialog({ run, onClose, onUndone }) {
   const [list, setList] = useState(null);
@@ -23,7 +24,7 @@ export function HistoryDialog({ run, onClose, onUndone }) {
   }
 
   return (
-    <Modal title="Rename history" onClose={onClose} wide>
+    <Modal title={<>Rename history<Help id="rename.history" /></>} ariaLabel="Rename history" onClose={onClose} wide>
       {list === null && <p className="muted">Loading…</p>}
       {list?.length === 0 && <p className="muted">Nothing renamed yet.</p>}
       <ul className="history">

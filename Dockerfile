@@ -19,7 +19,7 @@ FROM ubuntu:26.04
 ARG TARGETARCH
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-      handbrake-cli ca-certificates tini \
+      handbrake-cli ffmpeg ca-certificates tini \
  && if [ "$TARGETARCH" = "amd64" ]; then \
       DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         intel-media-va-driver-non-free libvpl2 libmfx-gen1.2 ; \
