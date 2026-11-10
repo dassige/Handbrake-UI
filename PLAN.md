@@ -140,6 +140,10 @@ target folder.
      logs are swapped and the queue, merge and quality recovery run. A
      `before-restore-*.zip` is always saved first. The reader handles stored
      and deflated entries and ZIP64.
+   - Deploy from git (`scripts/deploy.sh`): asus-serv-1 has a read-only GitHub
+     deploy key (`~/.ssh/handbrake-ui-deploy`, used only through
+     `core.sshCommand` of the checkout). The script deploys the pushed commit
+     of `origin/main`, never the local working copy.
    - All `window.confirm` calls replaced by `components/Dialogs.jsx`
      (`confirm` / `prompt` / `choose` / `alert`, Promise based).
 8. Later (optional) — watch folder, Emby library refresh, notifications

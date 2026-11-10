@@ -172,8 +172,27 @@ else works without them; the Docker image includes all of them.
 **Stack:** Node 24 + Fastify, built-in `node:sqlite`, Server-Sent Events for
 live updates; React + Vite for the UI. One container, no external database.
 
-`scripts/deploy.sh [ssh-alias] [remote-dir]` copies the project to a Docker host
-over SSH and runs `docker compose up -d --build` there. It refuses to run while
-a job is converting, because the restart would start that encode again from 0%.
-Use `FORCE=1` to override. Extra ssh options go in `SSH_OPTS`, e.g.
-`SSH_OPTS="-J rasp-web" scripts/deploy.sh` to go through a jump host.
+`scripts/deploy.sh [ssh-alias] [remote-dir]` deploys **what is on GitHub**,
+not your working copy:
+
+- It picks the commit of `origin/main` (`BRANCH=` for another branch). It
+  refuses if your local branch has commits that are not pushed, and warns that
+  uncommitted changes are not deployed.
+- Over SSH, the host fetches that commit with its own read-only deploy key and
+  checks it out in `~/SW/handbrake-ui`. Then it runs
+  `docker compose up -d --build`. `.env` and `data/` are git-ignored, so they
+  are kept.
+- It refuses to run while a job is converting, because the restart would start
+  that encode again from 0%. Use `FORCE=1` to override.
+- Extra ssh options go in `SSH_OPTS`, e.g. `SSH_OPTS="-J rasp-web"
+  scripts/deploy.sh` to go through a jump host.
+
+One-time setup on a new host (needs git):
+
+```bash
+ssh-keygen -t ed25519 -N "" -C "<host> handbrake-ui deploy (read-only)" -f ~/.ssh/handbrake-ui-deploy
+ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts   # compare with GitHub's published fingerprint
+```
+
+Add `~/.ssh/handbrake-ui-deploy.pub` in GitHub → Settings → Deploy keys,
+without write access. The first deploy turns the folder into a checkout.
