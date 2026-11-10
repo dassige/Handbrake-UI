@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { BellRing, CheckCircle2, Mail, Send, TriangleAlert, Webhook } from 'lucide-react';
+import { BellRing, CheckCircle2, Mail, Plus, Send, Trash2, TriangleAlert, Webhook } from 'lucide-react';
 import { api } from '../api.js';
 import { ago } from '../format.js';
 import { BROWSER_EVENTS, browserNotifySupported, useBrowserNotifyPrefs } from '../attention.js';
@@ -38,7 +38,13 @@ function forTest(n) {
 export function NotificationsSection({ draft, set, run }) {
   const n = draft.notifications;
   const setN = (k, v) => set('notifications', { ...n, [k]: v });
-  const setHook = (k, v) => setN('webhook', { ...n.webhook, [k]: v });
+  const hooks = n.webhooks ?? [];
+  const setHook = (i, patch) => setN('webhooks', hooks.map((h, j) => (j === i ? { ...h, ...patch } : h)));
+  const addHook = () =>
+    setN('webhooks', [
+      ...hooks,
+      { id: `webhook-${Date.now().toString(36)}`, name: `Webhook ${hooks.length + 1}`, enabled: true, url: '', headers: '', events: null },
+    ]);
   const setMail = (k, v) => setN('email', { ...n.email, [k]: v });
   const [recent, setRecent] = useState([]);
   const [testing, setTesting] = useState(null);
@@ -48,19 +54,26 @@ export function NotificationsSection({ draft, set, run }) {
     loadRecent();
   }, [loadRecent]);
 
-  async function test(channel) {
-    setTesting(channel);
-    await run(() => api.testNotification(channel, forTest(n)), channel === 'email' ? 'Test e-mail sent' : 'Test sent to the webhook');
+  /** channel 'email', or a webhook's index. */
+  async function test(target) {
+    setTesting(target);
+    if (target === 'email') await run(() => api.testNotification('email', forTest(n)), 'Test e-mail sent');
+    else {
+      const h = hooks[target];
+      // By position: the row may not be saved yet.
+      await run(() => api.testNotification('webhook', forTest(n), `#${target}`), `Test sent to ${h.name || 'the webhook'}`);
+    }
     setTesting(null);
     loadRecent();
   }
 
-  const anyChannel = n.webhook.enabled || n.email.enabled;
+  const anyChannel = hooks.some((h) => h.enabled) || n.email.enabled;
   const passwordTyped = typeof n.email.password === 'string';
 
   return (
     <>
       <Card title="Send a message when…" help="settings.notifications">
+        <p className="set-hint">E-mail and webhooks follow this list, unless a webhook has its own choice below.</p>
         <div className="set-grid-2">
           {EVENTS.map((e) => (
             <Check key={e.id} checked={n.events[e.id]} onChange={(v) => setN('events', { ...n.events, [e.id]: v })} hint={e.hint}>
@@ -78,25 +91,78 @@ export function NotificationsSection({ draft, set, run }) {
       </Card>
 
       <Card
-        title={<><Webhook size={15} /> Webhook</>}
-        aside={<Switch checked={n.webhook.enabled} onChange={(v) => setHook('enabled', v)} label={n.webhook.enabled ? 'On' : 'Off'} />}
+        title={<><Webhook size={15} /> Webhooks</>}
+        aside={
+          <button type="button" className="btn small" onClick={addHook} disabled={hooks.length >= 10}>
+            <Plus size={14} /> Add a webhook
+          </button>
+        }
       >
-        <p className="set-hint">A JSON POST for each message: an n8n Webhook node, a Home Assistant webhook trigger, ntfy, Gotify…</p>
-        <Field label="URL">
-          <input value={n.webhook.url} onChange={(e) => setHook('url', e.target.value)} placeholder="https://n8n.local/webhook/handbrake" spellCheck={false} />
-        </Field>
-        <Field label="Extra headers (optional, one per line)" hint="e.g. Authorization: Bearer abc123">
-          <textarea rows={2} value={n.webhook.headers} onChange={(e) => setHook('headers', e.target.value)} spellCheck={false} className="mono" />
-        </Field>
+        <p className="set-hint">
+          A JSON POST for each message: an n8n Webhook node, a Home Assistant webhook trigger, ntfy, Gotify… Add as many as you
+          need (up to 10), each with the events it should get.
+        </p>
+        {hooks.length === 0 && <p className="set-hint">No webhooks yet.</p>}
+        <div className="hook-list">
+          {hooks.map((h, i) => (
+            <div key={h.id ?? i} className={`hook ${h.enabled ? '' : 'off'}`}>
+              <div className="hook-head">
+                <input
+                  className="hook-name"
+                  value={h.name}
+                  maxLength={40}
+                  onChange={(e) => setHook(i, { name: e.target.value })}
+                  aria-label={`Name of webhook ${i + 1}`}
+                  placeholder={`Webhook ${i + 1}`}
+                />
+                <Switch checked={h.enabled} onChange={(v) => setHook(i, { enabled: v })} label={h.enabled ? 'On' : 'Off'} />
+                <button
+                  type="button"
+                  className="icon-btn danger"
+                  title="Remove this webhook"
+                  aria-label={`Remove ${h.name || `webhook ${i + 1}`}`}
+                  onClick={() => setN('webhooks', hooks.filter((_, j) => j !== i))}
+                >
+                  <Trash2 size={15} />
+                </button>
+              </div>
+              <Field label="URL">
+                <input value={h.url} onChange={(e) => setHook(i, { url: e.target.value })} placeholder="https://n8n.local/webhook/handbrake" spellCheck={false} />
+              </Field>
+              <Field label="Extra headers (optional, one per line)" hint="e.g. Authorization: Bearer abc123">
+                <textarea rows={2} value={h.headers} onChange={(e) => setHook(i, { headers: e.target.value })} spellCheck={false} className="mono" />
+              </Field>
+              <div className="set-radios hook-events">
+                <label className="radio">
+                  <input type="radio" name={`hook-ev-${i}`} checked={!h.events} onChange={() => setHook(i, { events: null })} />
+                  <span>The events chosen above</span>
+                </label>
+                <label className="radio">
+                  <input type="radio" name={`hook-ev-${i}`} checked={!!h.events} onChange={() => setHook(i, { events: { ...n.events } })} />
+                  <span>Only these events</span>
+                </label>
+                {h.events && (
+                  <div className="set-grid-2 hook-event-list">
+                    {EVENTS.map((e) => (
+                      <Check key={e.id} checked={h.events[e.id]} onChange={(v) => setHook(i, { events: { ...h.events, [e.id]: v } })}>
+                        {e.label}
+                      </Check>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="set-actions">
+                <button type="button" className="btn small" onClick={() => test(i)} disabled={!h.url || testing != null}>
+                  <Send size={14} /> {testing === i ? 'Sending…' : 'Send a test'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
         <details className="set-details">
           <summary>What is sent</summary>
           <pre className="code-block">{EXAMPLE}</pre>
         </details>
-        <div className="set-actions">
-          <button type="button" className="btn small" onClick={() => test('webhook')} disabled={!n.webhook.url || !!testing}>
-            <Send size={14} /> {testing === 'webhook' ? 'Sending…' : 'Send a test'}
-          </button>
-        </div>
       </Card>
 
       <Card
@@ -155,7 +221,7 @@ export function NotificationsSection({ draft, set, run }) {
         </div>
         <p className="set-hint">The password is stored on the server and included in backups; it is never sent back to the browser.</p>
         <div className="set-actions">
-          <button type="button" className="btn small" onClick={() => test('email')} disabled={!n.email.host || !n.email.to || !!testing}>
+          <button type="button" className="btn small" onClick={() => test('email')} disabled={!n.email.host || !n.email.to || testing != null}>
             <Send size={14} /> {testing === 'email' ? 'Sending…' : 'Send a test e-mail'}
           </button>
         </div>
@@ -171,7 +237,7 @@ export function NotificationsSection({ draft, set, run }) {
                 {r.ok ? <CheckCircle2 size={14} className="text-good" /> : <TriangleAlert size={14} className="text-bad" />}
                 <span className="file-name">{r.title}</span>
                 <span className={`small ${r.ok ? 'muted' : 'text-bad'}`}>
-                  {r.channel === 'email' ? 'e-mail' : 'webhook'} · {r.ok ? ago(r.at) : r.error}
+                  {r.channel === 'email' ? 'e-mail' : r.target ?? 'webhook'} · {r.ok ? ago(r.at) : r.error}
                 </span>
               </li>
             ))}

@@ -733,9 +733,11 @@
     "settings.notifications": {
       "title": "Notifications",
       "body": [
-        "The server can tell you when the queue finishes, a conversion or its check fails, each file is converted, or a watch folder adds files. Choose the events at the top; they go to every channel that is on.",
-        "### Webhook",
-        "A JSON `POST` per message to a URL: an n8n **Webhook** node, a Home Assistant webhook trigger, ntfy, Gotify… The body has `event`, `title`, `message` (plain text), `url` (the app address, if set), `at` and `data` (the job or the run’s details). Extra headers, e.g. `Authorization: Bearer …`, go one per line.",
+        "The server can tell you when the queue finishes, a conversion or its check fails, each file is converted, or a watch folder adds files. Choose the events at the top; e-mail and the webhooks follow that list, unless a webhook has its own.",
+        "### Webhooks",
+        "A JSON `POST` per message to a URL: an n8n **Webhook** node, a Home Assistant webhook trigger, ntfy, Gotify… Add as many as you need (up to 10) with **Add a webhook**; each has a name, an on/off switch, its URL and optional extra headers, e.g. `Authorization: Bearer …`, one per line.",
+        "- Each webhook gets **the events chosen above**, or **only these events**: for example everything to n8n, but only “the queue finished” to Home Assistant.",
+        "- The body has `event`, `title`, `message` (plain text), `url` (the app address, if set), `at` and `data` (the job or the run’s details).",
         "### E-mail",
         "Sent through your SMTP server. Typical settings: **STARTTLS** on port 587, **TLS** on 465. For Gmail and Outlook, use an **app password**, not your normal one.",
         "- The password is stored on the server and never sent back to the browser; leave the box empty to keep it.",

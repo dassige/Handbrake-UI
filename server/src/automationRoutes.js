@@ -18,7 +18,7 @@ export function registerAutomationRoutes(app, { history, watcher, notifier }) {
   app.get('/api/notifications/recent', async () => notifier.recent());
   // Sends a test through one channel using the settings in the body (not yet saved).
   app.post('/api/notifications/test', async (req) => {
-    const { channel, notifications } = req.body ?? {};
-    return notifier.test(channel, notifications);
+    const { channel, notifications, webhookId } = req.body ?? {};
+    return notifier.test(channel, notifications, webhookId);
   });
 }

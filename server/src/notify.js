@@ -11,24 +11,38 @@ export const DEFAULT_NOTIFICATIONS = {
   events: { queueFinished: true, jobFailed: true, checkFailed: true, jobDone: false, watchAdded: false },
   // Shown as a link in messages, e.g. http://10.1.1.115:8095
   appUrl: '',
-  webhook: { enabled: false, url: '', headers: '' },
+  // [{ id, name, enabled, url, headers, events }]; events null = the general list above.
+  webhooks: [],
   email: { enabled: false, host: '', port: 587, security: 'starttls', user: '', password: '', from: '', to: '' },
 };
 
 const RECENT = 30;
 const TIMEOUT = 15_000;
+export const MAX_WEBHOOKS = 10;
+const WEBHOOK_ID = /^[\w-]{1,40}$/;
 
 /** Fills missing keys with defaults (settings saved by older versions). */
 export function mergeNotifications(n) {
   const d = DEFAULT_NOTIFICATIONS;
+  const { webhook: old, ...rest } = n ?? {};
+  let webhooks = Array.isArray(n?.webhooks) ? n.webhooks : [];
+  // Before 2.1 there was a single webhook: it becomes the first in the list.
+  if (!Array.isArray(n?.webhooks) && old && (old.url || old.enabled)) {
+    webhooks = [{ id: 'webhook-1', name: 'Webhook', enabled: !!old.enabled, url: old.url ?? '', headers: old.headers ?? '', events: null }];
+  }
   return {
     ...d,
-    ...n,
+    ...rest,
     events: { ...d.events, ...n?.events },
-    webhook: { ...d.webhook, ...n?.webhook },
+    webhooks,
     email: { ...d.email, ...n?.email },
   };
 }
+
+const cleanEvents = (e) => Object.fromEntries(NOTIFY_EVENTS.map((k) => [k, e?.[k] === true]));
+
+/** The events a webhook receives: its own list, or the general one. */
+export const webhookEvents = (w, cfg) => (w.events ? w.events : cfg.events);
 
 /**
  * Validates notification settings from the UI. The e-mail password is never sent
@@ -37,20 +51,30 @@ export function mergeNotifications(n) {
 export function normalizeNotifications(n, previous) {
   const v = mergeNotifications(n);
   const prev = mergeNotifications(previous);
-  const events = {};
-  for (const k of NOTIFY_EVENTS) events[k] = v.events[k] === true;
+  const events = cleanEvents(v.events);
 
   const appUrl = String(v.appUrl ?? '').trim();
   if (appUrl && !/^https?:\/\/\S+$/i.test(appUrl)) throw badRequest('The app address must start with http:// or https://');
 
-  const webhook = {
-    enabled: v.webhook.enabled === true,
-    url: String(v.webhook.url ?? '').trim(),
-    headers: String(v.webhook.headers ?? '').trim(),
-  };
-  if (webhook.url && !/^https?:\/\/\S+$/i.test(webhook.url)) throw badRequest('The webhook URL must start with http:// or https://');
-  if (webhook.enabled && !webhook.url) throw badRequest('Enter the webhook URL, or turn the webhook off');
-  parseHeaders(webhook.headers);
+  if (v.webhooks.length > MAX_WEBHOOKS) throw badRequest(`At most ${MAX_WEBHOOKS} webhooks`);
+  const ids = new Set();
+  const webhooks = v.webhooks.map((w, i) => {
+    let id = typeof w?.id === 'string' && WEBHOOK_ID.test(w.id) ? w.id : null;
+    if (!id || ids.has(id)) for (let k = i + 1; !id || ids.has(id); k++) id = `webhook-${k}`;
+    ids.add(id);
+    const hook = {
+      id,
+      name: String(w?.name ?? '').trim().slice(0, 40) || `Webhook ${i + 1}`,
+      enabled: w?.enabled === true,
+      url: String(w?.url ?? '').trim(),
+      headers: String(w?.headers ?? '').trim(),
+      events: w?.events ? cleanEvents(w.events) : null,
+    };
+    if (hook.url && !/^https?:\/\/\S+$/i.test(hook.url)) throw badRequest(`${hook.name}: the URL must start with http:// or https://`);
+    if (hook.enabled && !hook.url) throw badRequest(`${hook.name}: enter the URL, or turn it off`);
+    parseHeaders(hook.headers);
+    return hook;
+  });
 
   const e = v.email;
   const email = {
@@ -71,7 +95,7 @@ export function normalizeNotifications(n, previous) {
     if (!recipients(email.to).length) throw badRequest('Enter at least one e-mail address to send to');
     if (!email.from && !email.user.includes('@')) throw badRequest('Enter the sender address ("From")');
   }
-  return { events, appUrl, webhook, email };
+  return { events, appUrl, webhooks, email };
 }
 
 /** The settings as the browser sees them: no password, only whether one is saved. */
@@ -199,9 +223,11 @@ export class Notifier {
   /** Sends an event to every enabled channel, if that event is switched on. Never throws. */
   notify(event, data) {
     const cfg = mergeNotifications(this.settings.get('notifications'));
-    if (!cfg.events[event]) return Promise.resolve([]);
-    const channels = ['webhook', 'email'].filter((c) => cfg[c].enabled);
-    if (!channels.length) return Promise.resolve([]);
+    const targets = cfg.webhooks
+      .filter((w) => w.enabled && w.url && webhookEvents(w, cfg)[event])
+      .map((w) => ({ channel: 'webhook', hook: w }));
+    if (cfg.email.enabled && cfg.events[event]) targets.push({ channel: 'email' });
+    if (!targets.length) return Promise.resolve([]);
     let message;
     try {
       message = buildMessage(event, data);
@@ -209,36 +235,48 @@ export class Notifier {
       this.log?.error(err, `Could not build the ${event} notification`);
       return Promise.resolve([]);
     }
-    return Promise.all(channels.map((c) => this.deliver(c, message, cfg)));
+    return Promise.all(targets.map((t) => this.deliver(t.channel, message, cfg, { hook: t.hook })));
   }
 
-  /** Sends a test message through one channel with the given (unsaved) settings; throws on failure. */
-  async test(channel, notifications) {
+  /**
+   * Sends a test message through one channel with the given (unsaved) settings; throws on failure.
+   * For a webhook, webhookId says which one (the id from the settings, or its position "#0").
+   */
+  async test(channel, notifications, webhookId) {
     if (!['webhook', 'email'].includes(channel)) throw badRequest('channel must be webhook or email');
+    const raw = mergeNotifications(notifications);
     const cfg = normalizeNotifications(notifications, this.settings.get('notifications'));
-    const r = await this.deliver(channel, buildMessage('test'), cfg, { force: true });
+    let hook;
+    if (channel === 'webhook') {
+      const i = raw.webhooks.findIndex((w) => w?.id === webhookId);
+      const at = i >= 0 ? i : /^#\d+$/.test(String(webhookId)) ? Number(String(webhookId).slice(1)) : -1;
+      hook = cfg.webhooks[at];
+      if (!hook) throw badRequest('Webhook not found');
+    }
+    const r = await this.deliver(channel, buildMessage('test'), cfg, { force: true, hook });
     if (!r.ok) throw badRequest(r.error);
     return r;
   }
 
-  async deliver(channel, message, cfg, { force = false } = {}) {
-    const entry = { at: Date.now(), channel, event: message.event, title: message.title, ok: false, error: null };
+  async deliver(channel, message, cfg, { force = false, hook = null } = {}) {
+    const entry = {
+      at: Date.now(), channel, target: hook?.name ?? null, event: message.event, title: message.title, ok: false, error: null,
+    };
     try {
-      if (channel === 'webhook') await this.sendWebhook(cfg, message, force);
+      if (channel === 'webhook') await this.sendWebhook(cfg, hook, message, force);
       else await this.sendEmail(cfg, message, force);
       entry.ok = true;
     } catch (err) {
       entry.error = err.message || String(err);
-      this.log?.warn(`Notification (${channel}, ${message.event}) failed: ${entry.error}`);
+      this.log?.warn(`Notification (${hook ? `webhook "${hook.name}"` : channel}, ${message.event}) failed: ${entry.error}`);
     }
     this.history.unshift(entry);
     this.history.length = Math.min(this.history.length, RECENT);
     return entry;
   }
 
-  async sendWebhook(cfg, message, force) {
-    const w = cfg.webhook;
-    if (!w.url) throw new Error('No webhook URL');
+  async sendWebhook(cfg, w, message, force) {
+    if (!w?.url) throw new Error('No webhook URL');
     if (!w.enabled && !force) return;
     const body = {
       app: 'HandBrake Queue',

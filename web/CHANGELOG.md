@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.1] - 2026/11/10
+
+- feat: enhance webhook functionality and UI in notifications settings
+- feat: add release script and configuration for GitHub releases
+
 ## [2.0.0] - 2026/11/10
 
 - feat: add backup and restore functionality for settings and presets

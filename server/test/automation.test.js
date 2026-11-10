@@ -120,18 +120,23 @@ test('notifications: the password is kept when not sent and never shown', () => 
   // An explicit empty string clears it.
   assert.equal(normalizeNotifications({ ...view, email: { ...email, password: '' } }, saved).email.password, '');
 
-  assert.throws(() => normalizeNotifications({ webhook: { enabled: true, url: '' } }), /webhook URL/);
+  assert.throws(() => normalizeNotifications({ webhooks: [{ name: 'n8n', enabled: true, url: '' }] }), /n8n: enter the URL/);
   assert.throws(() => normalizeNotifications({ email: { enabled: true, host: 'h', to: '' } }), /address/);
   assert.deepEqual(parseHeaders('Authorization: Bearer x\n\nX-A:1'), { Authorization: 'Bearer x', 'X-A': '1' });
   assert.throws(() => parseHeaders('no colon here'), /Name: value/);
 });
 
-test('notifications: only enabled events go out, to every enabled channel', async () => {
+test('notifications: several webhooks, each with the general events or its own', async () => {
   const calls = [];
   const sent = [];
-  let settingsValue = normalizeNotifications({
-    events: { jobFailed: true, jobDone: false },
-    webhook: { enabled: true, url: 'http://hook.local/x', headers: 'X-Token: 1' },
+  const settingsValue = normalizeNotifications({
+    events: { jobFailed: true, jobDone: false, queueFinished: true },
+    webhooks: [
+      { id: 'n8n', name: 'n8n', enabled: true, url: 'http://hook.local/n8n', headers: 'X-Token: 1' },
+      // Only the end of a run, whatever the general list says.
+      { id: 'ha', name: 'Home Assistant', enabled: true, url: 'http://hook.local/ha', events: { queueFinished: true } },
+      { id: 'off', name: 'Off', enabled: false, url: 'http://hook.local/off' },
+    ],
     email: { enabled: true, host: 'smtp.local', port: 25, security: 'none', from: 'hb@x', to: 'me@x, you@x' },
   });
   const n = new Notifier({
@@ -146,23 +151,48 @@ test('notifications: only enabled events go out, to every enabled channel', asyn
   const job = { id: 1, sourcePath: '/s/Show.mkv', outputPath: '/o/Show.mkv', status: 'failed', error: 'boom' };
   await n.notify('jobDone', job);
   assert.equal(calls.length + sent.length, 0);
+
   await n.notify('jobFailed', job);
-  assert.equal(calls.length, 1);
+  assert.deepEqual(calls.map((c) => c.url), ['http://hook.local/n8n']);
   assert.equal(calls[0].opts.headers['X-Token'], '1');
   assert.equal(calls[0].body.event, 'jobFailed');
   assert.match(calls[0].body.title, /Show\.mkv/);
   assert.equal(sent.length, 1);
   assert.deepEqual(sent[0].m.to, ['me@x', 'you@x']);
   assert.equal(sent[0].opts.ignoreTLS, true);
-  assert.equal(n.recent().length, 2);
 
-  // A failing webhook is recorded, not thrown; test() throws.
-  n.fetch = async () => ({ ok: false, status: 500, statusText: 'Server Error', text: async () => 'nope' });
-  const [r] = await n.notify('jobFailed', job).then((x) => x.filter((e) => e.channel === 'webhook'));
-  assert.equal(r.ok, false);
-  assert.match(r.error, /500/);
-  await assert.rejects(() => n.test('webhook', settingsValue), /500/);
-  settingsValue = { ...settingsValue, webhook: { ...settingsValue.webhook, enabled: false } };
+  calls.length = 0;
+  await n.notify('queueFinished', { jobs: [job], startedAt: 0, finishedAt: 1000 });
+  assert.deepEqual(calls.map((c) => c.url).sort(), ['http://hook.local/ha', 'http://hook.local/n8n']);
+  assert.ok(n.recent().some((r) => r.target === 'Home Assistant' && r.ok));
+
+  // A failing webhook is recorded, not thrown; test() throws, and tests only the chosen webhook.
+  n.fetch = async (url) => (url.endsWith('/ha')
+    ? { ok: false, status: 500, statusText: 'Server Error', text: async () => 'nope' }
+    : { ok: true });
+  const results = await n.notify('queueFinished', { jobs: [job], startedAt: 0, finishedAt: 1000 });
+  assert.equal(results.find((e) => e.target === 'Home Assistant').ok, false);
+  assert.equal(results.find((e) => e.target === 'n8n').ok, true);
+  await assert.rejects(() => n.test('webhook', settingsValue, 'ha'), /500/);
+  assert.equal((await n.test('webhook', settingsValue, 'n8n')).ok, true);
+  // Unsaved rows are found by position; a disabled one can still be tested.
+  assert.equal((await n.test('webhook', settingsValue, '#2')).ok, true);
+  await assert.rejects(() => n.test('webhook', settingsValue, 'nope'), /not found/);
+});
+
+test('notifications: the single webhook of older versions becomes the first in the list', () => {
+  const old = { events: { jobFailed: true }, webhook: { enabled: true, url: 'http://old/hook', headers: 'A: b' } };
+  const v = normalizeNotifications(old);
+  assert.deepEqual(v.webhooks, [
+    { id: 'webhook-1', name: 'Webhook', enabled: true, url: 'http://old/hook', headers: 'A: b', events: null },
+  ]);
+  assert.equal('webhook' in v, false);
+  // Empty old settings give an empty list.
+  assert.deepEqual(normalizeNotifications({ webhook: { enabled: false, url: '' } }).webhooks, []);
+  // Missing or repeated ids and names are filled in.
+  const w = normalizeNotifications({ webhooks: [{ url: 'http://a' }, { id: 'x', url: 'http://b' }, { id: 'x', url: 'http://c' }] }).webhooks;
+  assert.deepEqual(w.map((h) => [h.id, h.name]), [['webhook-1', 'Webhook 1'], ['x', 'Webhook 2'], ['webhook-3', 'Webhook 3']]);
+  assert.throws(() => normalizeNotifications({ webhooks: Array.from({ length: 11 }, () => ({})) }), /At most 10/);
 });
 
 test('notifications: queue summary message', () => {
