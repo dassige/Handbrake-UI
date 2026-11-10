@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.1] - 2026/11/11
+
+- 
+
 ## [2.1.0] - 2026/11/10
 
 - feat: implement scheduled backups feature

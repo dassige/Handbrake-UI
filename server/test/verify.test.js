@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluate, parseHandBrakeLog, videoLength } from '../src/verify.js';
+import { decodeArgs, evaluate, mainVideo, parseHandBrakeLog, videoLength } from '../src/verify.js';
 
 const LOG = `
 [01:04:45]  * subtitle track 1, italiano (UTF-8) (track 0, id 0x3, Text) -> Passthru, Default
@@ -79,4 +79,30 @@ test('small length differences are fine, medium ones are warnings', () => {
   assert.equal(run(2617.9), 'ok'); // 1.3 s
   assert.equal(run(2640), 'warning'); // 23 s, under 2 %
   assert.equal(run(2900), 'error');
+});
+
+// Seen on 2026-11-11: outputs with a cover picture (a PNG listed as a video stream) failed
+// with "Output is 43:18 shorter than the source: 0:00", because "-map 0:v" decoded the cover
+// too and ffmpeg then reported an end time of ~0.
+test('a cover picture is not the video, and the decode maps only the real video', () => {
+  const withCover = {
+    ...probe,
+    streams: [
+      ...probe.streams,
+      { index: 6, codec_type: 'video', codec_name: 'png', disposition: { attached_pic: 1 } },
+    ],
+  };
+  assert.equal(mainVideo(withCover).index, 0);
+  const args = decodeArgs('/x.mkv', mainVideo(withCover).index);
+  assert.deepEqual(args.slice(args.indexOf('-map'), args.indexOf('-map') + 4), ['-map', '0:0', '-map', '0:a?']);
+  assert.ok(!args.includes('0:v'));
+  // Cover first in the file: still the real video.
+  const coverFirst = { ...probe, streams: [{ index: 0, codec_type: 'video', codec_name: 'mjpeg', disposition: { attached_pic: 1 } }, { ...probe.streams[0], index: 1 }] };
+  assert.equal(mainVideo(coverFirst).index, 1);
+  const fallback = decodeArgs('/x.mkv', undefined);
+  assert.equal(fallback[fallback.indexOf('-map') + 1], '0:v:0');
+
+  // And if a decode still reports ~0 while the packets run for 43 minutes, the packets win.
+  const r = evaluate({ sourceLength: 2616.656, probe: withCover, packets: goodPackets, decode: { end: 0.000011, errors: [] }, log: parseHandBrakeLog(LOG) });
+  assert.equal(byId(r).length.status, 'ok');
 });

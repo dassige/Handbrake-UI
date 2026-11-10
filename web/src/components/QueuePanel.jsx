@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { CalendarClock, Clock, Combine, Trash2, Upload, Wand2 } from 'lucide-react';
+import { CalendarClock, Clock, Combine, ShieldCheck, Trash2, Upload, Wand2 } from 'lucide-react';
 import { clockTime, humanDuration } from '../format.js';
 import { api } from '../api.js';
 import { DRAG_PATHS } from './SourceBrowser.jsx';
@@ -12,6 +12,8 @@ const FILTERS = [
   { key: 'active', label: 'Active', match: (j) => ['running', 'paused', 'queued'].includes(j.status) },
   { key: 'done', label: 'Converted', match: (j) => j.status === 'done' },
   { key: 'failed', label: 'Failed / cancelled', match: (j) => ['failed', 'cancelled'].includes(j.status) },
+  // Converted, but the check after conversion found problems (shown in red when there are any).
+  { key: 'checkFailed', label: 'Check failed', match: (j) => j.status === 'done' && j.verifyStatus === 'error', alert: true },
 ];
 
 export function QueuePanel({
@@ -91,12 +93,29 @@ export function QueuePanel({
 
       <div className="filters">
         {FILTERS.map((f) => (
-          <button key={f.key} className={`chip ${filter === f.key ? 'active' : ''}`} onClick={() => setFilter(f.key)}>
+          <button
+            key={f.key}
+            className={`chip ${filter === f.key ? 'active' : ''} ${f.alert && counts[f.key] ? 'alert' : ''}`}
+            onClick={() => setFilter(f.key)}
+            title={f.key === 'checkFailed' ? 'Converted files whose check after conversion failed' : undefined}
+          >
             {f.label} <span className="chip-count">{counts[f.key]}</span>
           </button>
         ))}
         <Help id="job.statuses" />
         <span className="spacer" />
+        {filter === 'checkFailed' && counts.checkFailed > 0 && (
+          <button
+            className="btn ghost small"
+            title="Check these converted files again, one after the other"
+            onClick={async () => {
+              for (const j of visible) await run(() => api.jobAction(j.id, 'verify'));
+            }}
+            disabled={visible.some((j) => j.verifyStatus === 'running')}
+          >
+            <ShieldCheck size={14} /> Check all again
+          </button>
+        )}
         {filter === 'done' && counts.done > 0 && (
           <button
             className="btn ghost small"

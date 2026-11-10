@@ -872,3 +872,5 @@ textarea.mono { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
 
 .backup-status { display: flex; flex-direction: column; gap: 2px; }
 .backup-status p { margin: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 13px; }
+
+.chip.alert:not(.active) { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 45%, var(--border)); background: var(--bad-soft); }

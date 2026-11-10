@@ -49,8 +49,23 @@ function num(v) {
 }
 
 /** Length of the main video stream from ffprobe JSON (stream, tag, then container). */
+/** The main video stream: not a cover picture, which ffprobe also lists as "video" (e.g. a PNG). */
+export function mainVideo(probe) {
+  return probe?.streams?.find((s) => s.codec_type === 'video' && !s.disposition?.attached_pic) ?? null;
+}
+
+/**
+ * ffmpeg arguments for the full decode. Only the main video stream is mapped: with "-map 0:v"
+ * a cover picture came along, and ffmpeg's reported end time dropped to ~0 (a false "Output is
+ * 43:18 shorter than the source: 0:00").
+ */
+export function decodeArgs(file, videoIndex) {
+  const v = Number.isInteger(videoIndex) ? `0:${videoIndex}` : '0:v:0';
+  return ['-nostdin', '-v', 'error', '-i', file, '-map', v, '-map', '0:a?', '-fps_mode', 'passthrough', '-f', 'null', '-', '-progress', 'pipe:1', '-nostats'];
+}
+
 export function videoLength(probe) {
-  const v = probe?.streams?.find((s) => s.codec_type === 'video' && !s.disposition?.attached_pic);
+  const v = mainVideo(probe);
   return num(v?.duration) ?? tagSeconds(v?.tags?.DURATION ?? v?.tags?.duration) ?? num(probe?.format?.duration);
 }
 
@@ -85,7 +100,10 @@ export function evaluate({ sourceLength, probe, packets, decode, log, sourceLabe
 
   // Real length: where the video packets actually end (metadata can claim more).
   const videoEnd = packets?.[video.index]?.end ?? null;
-  const decodedEnd = decode?.end ?? null;
+  // A decode end of (almost) zero while the packets run for minutes is a measuring problem,
+  // not a short file: trust the packets then.
+  const rawDecoded = decode?.end ?? null;
+  const decodedEnd = rawDecoded != null && videoEnd != null && rawDecoded < 1 && videoEnd > 60 ? null : rawDecoded;
   const outLength = decodedEnd != null && videoEnd != null ? Math.min(decodedEnd, videoEnd) : decodedEnd ?? videoEnd ?? videoLength(probe);
   if (sourceLength == null || outLength == null) {
     add('length', 'Length', 'info', `Output ${fmtSec(outLength)}; the ${sourceLabel} length is unknown`);
@@ -212,12 +230,12 @@ export class Verifier {
   }
 
   /** Decodes every video and audio frame; returns { end, errors[] } or { failed }. */
-  async decode(file, length, { onProgress, ...opts }) {
+  async decode(file, length, { onProgress, videoIndex, ...opts }) {
     let end = null;
     let rest = '';
     const r = await run(
       this.ffmpeg,
-      ['-nostdin', '-v', 'error', '-i', file, '-map', '0:v', '-map', '0:a?', '-fps_mode', 'passthrough', '-f', 'null', '-', '-progress', 'pipe:1', '-nostats'],
+      decodeArgs(file, videoIndex),
       {
         ...opts,
         onStdout: (d) => {
@@ -270,7 +288,11 @@ export class Verifier {
       let decode = null;
       if (mode === 'full') {
         const len = videoLength(probe);
-        decode = await this.decode(output, len, { ...opts, onProgress: (p) => onProgress?.(0.08 + p * 0.92) });
+        decode = await this.decode(output, len, {
+          ...opts,
+          videoIndex: mainVideo(probe)?.index,
+          onProgress: (p) => onProgress?.(0.08 + p * 0.92),
+        });
         if (isStopped()) return done({ status: 'skipped', checks: [], note: 'Check stopped' });
       }
       const result = evaluate({ sourceLength, probe, packets, decode, log, sourceLabel });
