@@ -3,6 +3,9 @@
   "version": "2.0.0",
   "private": true,
   "description": "Project (global) version — managed by DGS AutoVersion",
+  "scripts": {
+    "release": "node scripts/release.cjs"
+  },
   "versionDate": "2026/11/10 14:13",
   "git-parentCommit-ID": "94587d697239da50d7483522dbcc6738aac8448d"
 }

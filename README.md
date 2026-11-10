@@ -228,6 +228,23 @@ not your working copy:
 - Extra ssh options go in `SSH_OPTS`, e.g. `SSH_OPTS="-J rasp-web"
   scripts/deploy.sh` to go through a jump host.
 
+### Releasing
+
+`npm run release` (in the repo root), or the **Release GITHUB** button of the
+VS Code *Action Buttons* extension (`.vscode/settings.json`, kept local), runs
+`scripts/release.cjs`, the same script as dgsoft-image-manager:
+
+- It reads the version from the root `package.json` (set by DGS AutoVersion).
+  It refuses to run with uncommitted changes.
+- It lists the commits since the previous release and asks for confirmation.
+- It creates and pushes the `vX.Y.Z` tag (or reuses it if AutoVersion already
+  made it), then creates the GitHub Release with `gh`. The notes are built from
+  the conventional-commit messages (Features, Bug Fixes…), or are text you type.
+
+The project values are in `scripts/release.config.cjs`. `TAG_PATTERN` makes
+the previous release a `vX.Y.Z` tag, never the `server-v…` / `web-v…` package
+tags. Settings → About links to the GitHub release of the running version.
+
 One-time setup on a new host (needs git):
 
 ```bash

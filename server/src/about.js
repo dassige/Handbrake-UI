@@ -58,8 +58,9 @@ export function aboutInfo({ version, dataDir }) {
     license: LICENSE,
     licenseText: readText(path.join(ROOT, 'LICENSE')),
     repositoryUrl: REPOSITORY,
-    releaseNotesUrl: app ? `${REPOSITORY}/blob/v${app}/CHANGELOG.md` : `${REPOSITORY}/blob/main/CHANGELOG.md`,
-    releasesUrl: `${REPOSITORY}/tags`,
+    // GitHub Releases, made by scripts/release.cjs (npm run release).
+    releaseNotesUrl: app ? `${REPOSITORY}/releases/tag/v${app}` : `${REPOSITORY}/releases`,
+    releasesUrl: `${REPOSITORY}/releases`,
     versions: version,
     releases: changelog,
     runtime: {

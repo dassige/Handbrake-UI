@@ -13,3 +13,9 @@ dist/
 /CLAUDE.md
 preset-gerry.json
 todo.txt
+
+# Local editor settings (VS Code action buttons, as in dgsoft-image-manager)
+.vscode/*
+
+# Left behind only if scripts/release.cjs is interrupted
+.release-notes.tmp

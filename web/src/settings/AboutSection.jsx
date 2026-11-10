@@ -73,7 +73,7 @@ export function AboutSection({ info, onError }) {
           {about && (
             <div className="about-links">
               <External href={about.releaseNotesUrl}>Release notes for v{app?.version}</External>
-              <External href={about.releasesUrl}>All versions</External>
+              <External href={about.releasesUrl}>All releases</External>
               <External href={about.repositoryUrl}>Source code</External>
             </div>
           )}
