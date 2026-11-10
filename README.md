@@ -615,6 +615,10 @@ redistribute it and/or modify it under the terms of the
 [GNU General Public License, version 2](LICENSE) (GPL-2.0-only), as published
 by the Free Software Foundation.
 
+It was developed with [Claude Code](https://claude.com/claude-code),
+Anthropic's AI coding assistant, which contributed to the code, tests and
+documentation.
+
 It runs or uses these projects, each under its own licence:
 
 | Project | Used for | Licence |

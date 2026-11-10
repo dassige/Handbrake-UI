@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.2] - 2026/11/11
+
+- - Credit Claude Code in the README and Settings → About; drop the
+  "repository is private" note from About
+
 ## [3.0.1] - 2026/11/11
 
 - chore: relicense under GPL-2.0-only; add hardware and performance guide

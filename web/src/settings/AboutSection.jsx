@@ -77,7 +77,6 @@ export function AboutSection({ info, onError }) {
               <External href={about.repositoryUrl}>Source code</External>
             </div>
           )}
-          <p className="set-hint">The repository is private: the links need a GitHub account with access to it.</p>
         </div>
       </section>
 
@@ -105,6 +104,11 @@ export function AboutSection({ info, onError }) {
       </Card>
 
       <Card title="Credits">
+        <p>
+          Developed by {about?.author ?? 'Gerry Dassi (DGSoft)'} with{' '}
+          <a href="https://claude.com/claude-code" target="_blank" rel="noreferrer">Claude Code</a>, Anthropic's AI coding
+          assistant, which contributed to the code, tests and documentation.
+        </p>
         <p className="set-hint">HandBrake Queue is built on these projects. Thank you to their authors.</p>
         <ul className="credits">
           {content.credits.map((c) => (
