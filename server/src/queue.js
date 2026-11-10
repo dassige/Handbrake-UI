@@ -14,6 +14,10 @@ const LIST_COLUMNS = `id, status, phase, position, source_path, output_path, pre
   format, created_at, started_at, finished_at, paused_ms, progress, fps, avg_fps, eta, pass,
   pass_count, source_size, output_size, source_info, scan_error, exit_code, error, attempts, rename_note, verify, verify_status, origin`;
 
+// Pause/resume send SIGSTOP/SIGCONT. Windows has no such signals: Node would
+// terminate HandBrakeCLI instead, so pausing is turned off there.
+const CAN_PAUSE = process.platform !== 'win32';
+
 function rowToJob(r) {
   if (!r) return r;
   return {
@@ -138,6 +142,7 @@ export class Queue {
     return {
       running,
       activeJobId: this.active?.id ?? null,
+      canPause: CAN_PAUSE,
       counts,
       schedule: {
         enabled: !!schedule?.enabled,
@@ -452,6 +457,7 @@ export class Queue {
 
   pause(id) {
     const a = this.requireActive(id);
+    if (!CAN_PAUSE) throw conflict('Pausing a conversion is not supported on Windows; cancel it instead');
     if (a.pausedAt) return;
     a.child.kill('SIGSTOP');
     a.pausedAt = Date.now();

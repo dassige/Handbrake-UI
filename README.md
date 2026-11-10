@@ -1,264 +1,599 @@
 # HandBrake Queue (Handbrake-UI)
 
-A small web UI that turns a headless Linux box into a HandBrake conversion
-server. Pick files and folders that are on the server (or upload them from your
-computer), drag them into a queue, and they are converted with presets exported
-from the HandBrake desktop app.
+A web UI that turns a headless Linux box (or a Windows PC) into a HandBrake
+conversion server. Browse the folders on the server or upload videos from your
+computer, drag them into a queue, and they are converted with presets exported
+from the HandBrake desktop app. Everything happens in the browser: phone,
+tablet or computer.
 
-It is not affiliated with the HandBrake project. It runs the official
-`HandBrakeCLI`, so the results match what the desktop app produces with the
-same preset.
+It runs the official `HandBrakeCLI`, so a preset gives the same result as in
+the desktop app.
+
+![The Convert view: a sources folder on the left, the queue with a running conversion on the right](docs/screenshots/convert.png)
+
+> **Not affiliated with HandBrake.** HandBrake is a separate project by the
+> HandBrake Team. This app only runs its command-line tool. See
+> [Credits and licences](#credits-and-licences).
+
+**Contents:** [Features](#features) · [Screenshots](#screenshots) ·
+[Requirements](#requirements) · [Installation](#installation) ·
+[First steps](#first-steps) · [Configuration](#configuration) ·
+[Updating](#updating) · [Hardware encoding](#hardware-encoding-intel-quick-sync) ·
+[Security](#security) · [Troubleshooting](#troubleshooting) ·
+[Development](#development) · [Credits and licences](#credits-and-licences)
 
 ## Features
+
+**Converting**
 
 - **Presets from the desktop app.** In HandBrake, use Presets → Export, then
   import the `.json` on the **Presets** page. Files with several presets or
   folders are supported. The page shows every setting of a preset, grouped like
   HandBrake's tabs, plus its raw JSON, how it has performed (speed, size
-  reduction) and a download that HandBrake can import again.
-- **Server-local files.** You browse one or more configured *sources* folders
-  (local disk, NFS or SMB mounts…) and results are written to a configured
-  *target* folder. A sources folder can have a friendly name ("Downloads")
-  that the app shows instead of its path.
-- **Upload from your computer.** **Upload** in the Sources panel (or dropping
-  files from your computer onto it) sends videos into the open folder, or into
-  a new sub-folder. Files go in 32 MB chunks with automatic retries. An
-  interrupted upload continues where it stopped when the same file is sent to
-  the same folder again. Existing files are never replaced: skip them or upload
-  a copy named `name (1)`. Unfinished uploads are hidden
-  `.name.size.hbui-upload` files, removed after a week.
-- **Download to your computer** from any sources folder or the target folder
-  (every folder panel, plus "download converted file" in the job details). A
-  single file is sent as is, with HTTP Range support, so the browser can pause
-  and resume it. Folders, or several files, come as one ZIP built on the fly.
-  Files are stored without compression and ZIP64 is used for files over 4 GB.
-  The exact size is sent up front, so the browser shows progress. Several
-  files can also come as separate downloads.
-- **Quality check** view: reads every video in the chosen folders (sources or
-  target, sub-folders included) with ffprobe and lists the files with an old
-  container or codec (AVI, DivX/Xvid, MPEG-2, WMV, RealVideo…), a low
-  resolution or a low video bitrate for their resolution. HEVC/AV1/VP9 get a
-  lower bitrate minimum. The criteria are in Settings and apply to existing
-  results straight away. Flagged files can be added to the queue or exported as
-  CSV.
-- **Backup and restore** (Settings → Backup and restore…): a ZIP holding the
-  database (settings, presets, rename rules, jobs, histories, merges, quality
-  results) and optionally the job logs; never video files. It can be downloaded
-  or saved on the server (`data/backups`, newest 10 kept). A restore replaces
-  either the configuration only or everything. It runs live, with no restart,
-  and saves the current data first so it can be undone. It never starts the
-  queue, and "everything" is refused while something is running.
-- **Custom dialogs.** Every question (confirm, name prompts, conflicts) is an
-  in-app dialog, never the browser's own pop-ups.
+  reduction) and a download that HandBrake can import again. Two ready-made
+  presets are in [`presets/`](presets).
 - **Drag and drop.** Drag files or whole folders from the source browser into
   the queue. Folders add every video inside, recursively, skipping files that
   are already converted or match an exclude word such as `sample`.
-- **Queue management:**
-  - live progress, fps and ETA
-  - pause/resume and cancel
-  - reorder by dragging
-  - retry, or "convert again" with another preset
-  - per-job details: source tracks, sizes, compression, encode time and the
-    full HandBrake log
+- **Queue management:** live progress, fps and ETA; pause/resume and cancel;
+  reorder by dragging; retry, or "convert again" with another preset; per-job
+  details with source tracks, sizes, compression, encode time and the full
+  HandBrake log.
 - **Manual start.** Adding files never starts converting; press **Start**. The
   queue stops by itself when the last job is done. The conversion window and
   watch folders can start it for you, both opt-in.
 - **Finish time.** The queue shows how much conversion time is left and when it
-  will be done, and each queued job shows its own estimate. The estimate is the
-  source length × the median speed of the last 20 conversions with the same
-  preset, check included. It follows the conversion window.
-- **Conversion window** (Settings → Conversion window): convert only between
-  set times on chosen days, e.g. 23:00–07:00. Outside the window the next job
-  waits; a job that is converting when it closes is finished. Optionally the
-  queue starts by itself when the window opens. **Start** outside the window
-  asks whether to wait for it or start now. The window follows the server's
-  clock (`TZ`).
-- **Watch folders** (Settings → Watch folders): new videos in chosen folders
-  under the sources are added to the queue by themselves, each with its own
-  preset, once they have not changed for a set time (polling, so it works on
-  NFS/SMB). Files already there when a folder is added are left alone, and each
-  file is added once. Add one with **Watch** next to the folder in the Sources
-  panel, or in Settings, where **Browse…** picks the folder on the server.
-- **Notifications** (Settings → Notifications): a webhook (JSON POST, e.g. n8n
-  or Home Assistant) and/or e-mail over SMTP when the queue finishes, a
-  conversion or its check fails, each file is converted, or a watch folder adds
-  files. Both have a **Send a test** button. The SMTP password is never sent
-  back to the browser (it is in backups). In the browser, the tab title shows
-  the progress; desktop notifications can be turned on per browser (they need
-  https or localhost).
-- **Stats** view: files converted, space saved, video length and encode time,
-  speed, check results, a per-day (or per-month) chart, a per-preset table and
-  the biggest savings, for 7 days to all time. The history is kept when jobs
-  are cleared from the queue.
-- **Settings page.** All settings are on one page, one section at a time, with
-  a save bar that lists the sections with unsaved changes. **About** has the
-  version, the release notes (from `CHANGELOG.md`, with links to GitHub),
-  credits and the licence.
-- **Works on a phone.** The top bar becomes compact, and two-panel views show
-  one panel at a time with a switch above them. Everything that needs drag and
-  drop on a computer has a button: Add to queue, and Up / Down / Move to top /
-  Move to bottom in a job's details.
+  will be done, and each queued job shows its own estimate (source length ×
+  the median speed of the last 20 conversions with the same preset).
+- **Conversion window:** convert only between set times on chosen days, e.g.
+  23:00–07:00. A job that is converting when the window closes is finished.
+- **Watch folders:** new videos in chosen folders are added to the queue by
+  themselves, each folder with its own preset, once they have stopped changing.
+  Polling, so it works on NFS/SMB shares.
 - **Safe output.** Each encode is written to `name.mkv.part` and renamed when it
-  finishes, so media servers never pick up half-written files. Existing
-  files are never overwritten: the new file gets a suffix, `name (1).mkv`.
-- **Check after conversion** (setting: Full, Quick or Off). Each output is
-  checked before the job counts as converted:
-  - It must be readable and have a video stream.
-  - Its real length, measured by reading the whole file, must match the source.
-  - It must have every audio and subtitle track HandBrake wrote (taken from its
-    log), and every audio track must last as long as the video.
-  - In **Full** mode, every video and audio frame must decode without errors
-    (about 1–2 minutes per 45-minute episode).
+  finishes, so media servers never pick up half-written files. Existing files
+  are never overwritten: the new file gets a suffix, `name (1).mkv`.
+- **Check after conversion** (Full, Quick or Off): each output must be readable,
+  as long as the source, and have every audio and subtitle track HandBrake
+  wrote. **Full** also decodes every frame. Results show as **Checked**,
+  **Check warnings** or **Check failed**.
+- **Survives restarts.** An interrupted job goes back to the queue (HandBrake
+  cannot resume an encode from the middle, so it starts again from 0%).
 
-  Results show as **Checked**, **Check warnings** or **Check failed**, with
-  details per job and a **Check again** button.
-- **Merge** view: joins converted files into one MKV with mkvmerge. There is no
-  re-encode, so it takes about as long as copying the files.
-  - Put the parts in order by dragging.
-  - Each part's chapters are kept and moved to where that part starts in the
-    merged file. HandBrake's generic "Chapter N" names are renumbered, and a
-    part without chapters gets one named after its file. You can also choose
-    one chapter per part instead.
-  - A compatibility check first blocks parts with different tracks, and warns
-    about a different picture size or encoder settings.
-  - The merged file is checked like a conversion: its length must be the parts
-    added together.
-  - Optionally, the parts are deleted after a successful merge.
-- **In-app help:** a round **?** next to every page, panel, section and
-  setting, plus **Help** search in the top bar. The content lives in
-  `web/src/help/help.json`; `server/test/help.test.js` checks that every `?` has
-  a topic and that every link works.
-- **Rename** view for converted files:
-  - Recognises TV episodes (`S01E02`, `1x02`) and movies (title + year).
-  - Drops release tags (`1080p`, `WEB-DL`, `x265`, `ITA`…) and builds names from
-    templates: `Show S01e02 - Episode title`, `Movie Title (2020)`.
-  - Fixes apostrophes: `L Uomo` → `L'Uomo`.
-  - Preview before applying: edit any name by hand, or type a show name for files
-    that have none.
-  - Undo any batch from History.
-  - Rule sets work like Advanced Renamer methods (replace, remove pattern, add,
-    move, trim, case…). You can edit them, export them, and import Advanced
-    Renamer `.aren` presets.
-  - Optional automatic rename after each conversion. It only renames files the
-    rules recognise without warnings; the rest are flagged "Needs rename".
-- **Output layout** (setting): `target/<source folder>/file`, the full source
-  path mirrored, or everything flat in the target folder.
-- Sources are never modified. They are deleted only when you ask: **Delete** in
-  the Sources panel shows exactly what will go (files, sizes, folder contents)
-  and asks first. Refused: files that are queued or converting, the sources
-  folders themselves, anything in the target folder, and anything in a sources
-  folder marked **Protect** in Settings (e.g. one a download client seeds from).
-- Survives restarts. A job that was interrupted goes back to the queue.
-  HandBrake cannot resume an encode from the middle, so that job starts again
-  from 0%.
+**Files**
 
-## Run with Docker Compose
+- **Server-local folders.** Browse one or more *sources* folders (local disk,
+  NFS or SMB mounts…); results go to a *target* folder. Folders can have a
+  friendly name ("Downloads") shown instead of the path.
+- **Upload from your computer** in 32 MB chunks with automatic retries. An
+  interrupted upload continues where it stopped.
+- **Download to your computer:** single files with resume support, or folders
+  and several files as one ZIP built on the fly (ZIP64 for files over 4 GB).
+- **Output layout:** `target/<source folder>/file`, the full source path
+  mirrored, or everything flat in the target folder.
+- **Delete sources** only when you ask: **Delete** shows exactly what will go
+  and asks first. Files in the queue, the target folder and folders marked
+  **Protect** (e.g. one a download client seeds from) are refused.
+
+**Tools**
+
+- **Quality check:** reads every video in chosen folders with ffprobe and lists
+  files with an old container or codec (AVI, DivX/Xvid, MPEG-2, WMV…), a low
+  resolution or a low bitrate. Flagged files can be queued or exported as CSV.
+- **Merge:** joins converted files into one MKV with mkvmerge, without
+  re-encoding. Chapters of each part are kept and moved to where the part
+  starts. The merged file is checked like a conversion.
+- **Rename:** recognises TV episodes (`S01E02`, `1x02`) and movies (title +
+  year), drops release tags (`1080p`, `WEB-DL`, `x265`…) and builds clean names
+  from templates (`Show S01e02 - Episode title`, `Movie Title (2020)`). Preview
+  and edit before applying, undo any batch, and optionally rename after each
+  conversion. Rule sets work like Advanced Renamer methods and can import
+  Advanced Renamer `.aren` presets.
+- **Stats:** files converted, space saved, encode time and speed, per day or
+  month, per preset, and the biggest savings.
+
+**Everything else**
+
+- **Notifications:** a webhook (JSON POST, e.g. n8n or Home Assistant) and/or
+  e-mail over SMTP when the queue finishes, a conversion or check fails, a file
+  is converted or a watch folder adds files. In the browser, the tab title
+  shows progress and desktop notifications can be turned on.
+- **Backup and restore:** a ZIP with the database (settings, presets, rename
+  rules, jobs, histories) and optionally the logs; never video files.
+  Downloadable, saved on the server, or scheduled. Restore runs live.
+- **Settings page** with a save bar listing unsaved sections, and an **About**
+  section with version, release notes, credits and licence.
+- **In-app help:** a round **?** next to every page, panel and setting, plus a
+  **Help** search in the top bar.
+- **Works on a phone:** compact top bar, one panel at a time, and buttons for
+  everything that needs drag and drop on a computer.
+- **Light and dark theme**, following your system setting.
+
+## Screenshots
+
+All files shown are generated demo videos.
+
+<table>
+  <tr>
+    <td width="50%"><a href="docs/screenshots/job-details.png"><img src="docs/screenshots/job-details.png" alt="Job details: the check after conversion, files, sizes and preset"></a><br><b>Job details</b>: the check after conversion, sizes, tracks and the HandBrake log</td>
+    <td width="50%"><a href="docs/screenshots/presets.png"><img src="docs/screenshots/presets.png" alt="Presets page showing every setting of an imported preset"></a><br><b>Presets</b> imported from the desktop app, with every setting and how they performed</td>
+  </tr>
+  <tr>
+    <td><a href="docs/screenshots/quality.png"><img src="docs/screenshots/quality.png" alt="Quality check listing files with old formats, low resolution or low bitrate"></a><br><b>Quality check</b>: old formats, low resolution and low bitrate at a glance</td>
+    <td><a href="docs/screenshots/rename.png"><img src="docs/screenshots/rename.png" alt="Rename view previewing clean names for TV episodes"></a><br><b>Rename</b>: clean names for episodes and movies, previewed before applying</td>
+  </tr>
+  <tr>
+    <td><a href="docs/screenshots/merge.png"><img src="docs/screenshots/merge.png" alt="Merge view with two parts in order"></a><br><b>Merge</b> converted parts into one MKV, chapters included</td>
+    <td><a href="docs/screenshots/stats.png"><img src="docs/screenshots/stats.png" alt="Stats page with files converted, space saved and speed"></a><br><b>Stats</b>: space saved, speed, check results and per-preset numbers</td>
+  </tr>
+  <tr>
+    <td><a href="docs/screenshots/settings.png"><img src="docs/screenshots/settings.png" alt="Settings page, conversion window section"></a><br><b>Settings</b>, here the conversion window (overnight encoding)</td>
+    <td><a href="docs/screenshots/convert-dark.png"><img src="docs/screenshots/convert-dark.png" alt="The Convert view in the dark theme"></a><br><b>Dark theme</b></td>
+  </tr>
+</table>
+
+<p>
+  <img src="docs/screenshots/mobile-queue.png" alt="The queue on a phone" width="260">
+  &nbsp;
+  <img src="docs/screenshots/mobile.png" alt="The sources panel on a phone" width="260">
+</p>
+
+## Requirements
+
+| | Docker (recommended) | Without Docker |
+|---|---|---|
+| **OS** | Linux (amd64 or arm64). Windows 10/11 or macOS with Docker Desktop | Linux, Windows 10/11 (macOS should work but is untested) |
+| **Software** | Docker Engine with Compose v2.24 or newer, git | Node.js 22.13 or newer (24 LTS recommended), git, HandBrakeCLI, FFmpeg (`ffmpeg` + `ffprobe`), MKVToolNix (`mkvmerge`) |
+| **CPU / RAM** | Any x86-64 or ARM64 CPU; 2 GB RAM. The first build compiles HandBrake: allow 4 GB RAM, ~10 GB free disk and 45–60 minutes on a 4-thread CPU | Any; encoding speed depends on the CPU |
+| **GPU (optional)** | Intel iGPU, 6th gen or newer, for Quick Sync (Linux hosts only) | CPU encoding; Quick Sync needs a HandBrakeCLI built with QSV |
+| **Browser** | Any recent Chrome, Edge, Firefox or Safari, desktop or mobile | same |
+
+FFmpeg is only needed for the check after conversion and the quality check,
+and MKVToolNix only for merging. The rest of the app works without them. The
+Docker image includes all of them.
+
+## Installation
+
+Pick one:
+
+1. [Docker on Linux](#1-docker-on-linux): recommended; includes Intel Quick Sync.
+2. [Docker Desktop on Windows or macOS](#2-docker-desktop-on-windows-or-macos)
+3. [Linux without Docker](#3-linux-without-docker)
+4. [Windows without Docker](#4-windows-without-docker)
+
+### 1. Docker on Linux
+
+**Install the prerequisites** (Debian/Ubuntu shown; other distributions: see
+[Docker's install guide](https://docs.docker.com/engine/install/)):
 
 ```bash
-git clone <this repo> handbrake-ui && cd handbrake-ui
-cp .env.example .env      # set PUID/PGID, MEDIA_DIR, SOURCE_ROOT, TARGET_ROOT
+sudo apt update && sudo apt install -y git curl
+curl -fsSL https://get.docker.com | sudo sh     # Docker Engine + Compose plugin
+sudo usermod -aG docker "$USER"                 # then log out and in again
+docker compose version                          # must be v2.24 or newer
+```
+
+**Get the app and configure it:**
+
+```bash
+git clone https://github.com/dassige/Handbrake-UI.git handbrake-ui
+cd handbrake-ui
+cp .env.example .env
+nano .env
+```
+
+In `.env`, set at least:
+
+- `PUID` / `PGID`: the owner of your media files (`id -u`, `id -g`).
+  Converted files are written as this user.
+- `MEDIA_DIR`: the host folder that holds your videos (e.g. `/mnt` or
+  `/srv/media`). It appears at the same path inside the container.
+- `SOURCE_ROOT` / `TARGET_ROOT`: where videos come from and where converted
+  files go, both inside `MEDIA_DIR`. You can change them (and add more source
+  folders) in the UI later.
+- `TZ`: your time zone, e.g. `Europe/London`.
+- **Intel GPU:** set `RENDER_GID` to `getent group render | cut -d: -f3`.
+  **No Intel GPU** (`ls /dev/dri` shows nothing): uncomment the Linux
+  `COMPOSE_FILE=` line instead.
+
+All settings are explained in [Configuration](#configuration).
+
+**Build and start:**
+
+```bash
+docker compose up -d --build
+docker compose logs -f        # Ctrl+C to stop following the log
+```
+
+The first build compiles HandBrake from source, which takes 45–60 minutes on
+a 4-thread CPU. Later builds reuse it and take a minute or two. When the log
+shows `Server listening`, open `http://<server-ip>:8095` and go to
+[First steps](#first-steps).
+
+The container restarts by itself after a reboot. The database, logs and
+backups are in `./data`.
+
+### 2. Docker Desktop on Windows or macOS
+
+1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+   and [Git](https://git-scm.com/downloads), or with winget on Windows:
+   `winget install Docker.DockerDesktop Git.Git`. Start Docker Desktop once.
+2. In PowerShell (Windows) or Terminal (macOS):
+
+   ```powershell
+   git clone https://github.com/dassige/Handbrake-UI.git handbrake-ui
+   cd handbrake-ui
+   copy .env.example .env        # macOS: cp .env.example .env
+   notepad .env                  # macOS: open -e .env
+   ```
+
+3. In `.env`:
+   - Quick Sync is not available under Docker Desktop. Uncomment the
+     `COMPOSE_FILE=` line for your system. Windows uses `;` between the files,
+     macOS uses `:`.
+   - **Windows:** a Windows path can't be used inside the Linux container, so
+     mount your video folder at a Linux path:
+
+     ```ini
+     MEDIA_DIR=D:/Videos
+     MEDIA_MOUNT=/media
+     SOURCE_ROOT=/media/downloads
+     TARGET_ROOT=/media/converted
+     ```
+
+     In the app, folders then look like `/media/...`.
+   - **macOS:** set `MEDIA_DIR` to your folder, e.g. `/Users/you/Movies`, and
+     `SOURCE_ROOT` / `TARGET_ROOT` to folders inside it. No `MEDIA_MOUNT`
+     needed.
+   - `PUID`, `PGID`, `MEDIA_GID` and `RENDER_GID` can stay as they are.
+4. Build and start: `docker compose up -d --build` (the first build takes
+   45–60 minutes; give Docker Desktop at least 4 GB of memory in its settings).
+   Then open `http://localhost:8095`.
+
+### 3. Linux without Docker
+
+No container, but no Quick Sync either with distribution packages (see
+[Hardware encoding](#hardware-encoding-intel-quick-sync)).
+
+**Install the prerequisites** (Debian/Ubuntu):
+
+```bash
+sudo apt update
+sudo apt install -y git handbrake-cli ffmpeg mkvtoolnix nodejs npm
+node --version            # must be v22.13 or newer
+```
+
+If your distribution's Node.js is older, install a current one from
+[nodejs.org](https://nodejs.org/en/download) (e.g. via NodeSource or `nvm`).
+On Fedora: `sudo dnf install git HandBrake-cli ffmpeg mkvtoolnix nodejs` (FFmpeg
+and HandBrake come from RPM Fusion).
+
+**Build the app:**
+
+```bash
+sudo git clone https://github.com/dassige/Handbrake-UI.git /opt/handbrake-ui
+sudo chown -R "$USER" /opt/handbrake-ui
+cd /opt/handbrake-ui
+(cd web && npm ci && npm run build)
+(cd server && npm ci --omit=dev)
+```
+
+**Try it** (Ctrl+C to stop):
+
+```bash
+cd /opt/handbrake-ui/server
+DATA_DIR=$HOME/.handbrake-ui SOURCE_ROOT=/srv/media/downloads TARGET_ROOT=/srv/media/converted npm start
+```
+
+Open `http://<server-ip>:8095`.
+
+**Run it as a service.** Create `/etc/systemd/system/handbrake-ui.service`,
+with `User=` set to the owner of your media files:
+
+```ini
+[Unit]
+Description=HandBrake Queue
+After=network-online.target remote-fs.target
+Wants=network-online.target
+
+[Service]
+User=media
+WorkingDirectory=/opt/handbrake-ui/server
+StateDirectory=handbrake-ui
+Environment=DATA_DIR=/var/lib/handbrake-ui
+Environment=PORT=8095
+Environment=SOURCE_ROOT=/srv/media/downloads
+Environment=TARGET_ROOT=/srv/media/converted
+ExecStart=/usr/bin/node --disable-warning=ExperimentalWarning src/index.js
+KillSignal=SIGTERM
+TimeoutStopSec=20
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now handbrake-ui
+journalctl -u handbrake-ui -f
+```
+
+Use the path from `which node` in `ExecStart` if Node.js is not in `/usr/bin`.
+
+### 4. Windows without Docker
+
+Runs directly on Windows with the official Windows builds of the tools.
+Differences from Linux: running conversions can't be **paused** (only
+cancelled), and the CPU priority setting is ignored.
+
+**Install the prerequisites** in PowerShell:
+
+```powershell
+winget install OpenJS.NodeJS.LTS Git.Git Gyan.FFmpeg MoritzBunkus.MKVToolNix
+```
+
+Then download **HandBrakeCLI** (the command-line version, not the desktop
+app) from [handbrake.fr/downloads2.php](https://handbrake.fr/downloads2.php)
+and unzip it, e.g. to `C:\Tools\HandBrakeCLI\`. Close and reopen PowerShell so
+the new programs are on the `PATH`, then check:
+
+```powershell
+node --version       # v22.13 or newer
+ffprobe -version
+& "C:\Tools\HandBrakeCLI\HandBrakeCLI.exe" --version
+```
+
+**Build the app:**
+
+```powershell
+git clone https://github.com/dassige/Handbrake-UI.git C:\handbrake-ui
+cd C:\handbrake-ui\web
+npm ci; npm run build
+cd ..\server
+npm ci --omit=dev
+```
+
+**Start it:**
+
+```powershell
+cd C:\handbrake-ui\server
+$env:DATA_DIR      = "C:\handbrake-ui\data"
+$env:SOURCE_ROOT   = "D:\Videos\Downloads"
+$env:TARGET_ROOT   = "D:\Videos\Converted"
+$env:HANDBRAKE_CLI = "C:\Tools\HandBrakeCLI\HandBrakeCLI.exe"
+$env:MKVMERGE      = "C:\Program Files\MKVToolNix\mkvmerge.exe"
+npm start
+```
+
+Open `http://localhost:8095`. Allow Node.js through Windows Firewall when
+asked if other devices should reach it.
+
+**Start it with Windows:** run it as a service with
+[NSSM](https://nssm.cc/), for example:
+
+```powershell
+nssm install HandBrakeQueue "C:\Program Files\nodejs\node.exe" "--disable-warning=ExperimentalWarning src\index.js"
+nssm set HandBrakeQueue AppDirectory C:\handbrake-ui\server
+nssm set HandBrakeQueue AppEnvironmentExtra DATA_DIR=C:\handbrake-ui\data HANDBRAKE_CLI=C:\Tools\HandBrakeCLI\HandBrakeCLI.exe "MKVMERGE=C:\Program Files\MKVToolNix\mkvmerge.exe"
+nssm set HandBrakeQueue ObjectName .\YourUser YourPassword
+nssm start HandBrakeQueue
+```
+
+Run the service as your own user (`ObjectName`), not the default system
+account: that account can't see mapped drives or your network shares. Use UNC
+paths (`\\nas\videos`) for network folders.
+
+## First steps
+
+1. **Import a preset.** In the HandBrake desktop app, use Presets → Export to
+   save a preset as `.json`, or take one from [`presets/`](presets). Open
+   **Presets** in the app and import it.
+2. **Check the folders.** In **Settings → Folders**, check the sources and
+   target folders, add more sources folders and give them friendly names.
+3. **Queue and convert.** On **Convert**, drag files or folders from the
+   Sources panel into the queue (or select them and use **Add to queue**), then
+   press **Start**.
+
+Every page and setting has a **?** with help.
+
+## Configuration
+
+### Docker (`.env`)
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `PUID` / `PGID` | `1000` | User and group the container runs as; converted files are owned by them |
+| `MEDIA_GID` | `100` | Extra group, for shares that grant access by group. Synology NFS uses `users` (100). Symptom when missing: "permission denied" on a folder the host user can open |
+| `RENDER_GID` | `991` | Group of `/dev/dri/renderD128` on the host, for Intel Quick Sync |
+| `COMPOSE_FILE` | – | Add `docker-compose.no-gpu.yml` on hosts without `/dev/dri` (see `.env.example`) |
+| `PORT` | `8095` | Web UI port on the host |
+| `MEDIA_DIR` | `/mnt` | Host folder with your videos, bind-mounted into the container |
+| `MEDIA_MOUNT` | `MEDIA_DIR` | Where `MEDIA_DIR` appears inside the container. Set it on Windows (e.g. `/media`) |
+| `SOURCE_ROOT` / `TARGET_ROOT` | `/mnt/downloads`, `/mnt/converted` | Initial folders, as seen inside the container. Used on first start only; change them later in Settings |
+| `TZ` | `UTC` | Time zone of the server clock. The conversion window follows it |
+
+### Without Docker (environment variables)
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `PORT` | `8095` | Web UI port |
+| `HOST` | `0.0.0.0` | Address to listen on. `127.0.0.1` makes it reachable from this computer only |
+| `DATA_DIR` | `./data` | Database, logs and backups |
+| `SOURCE_ROOT` / `TARGET_ROOT` | `/mnt/downloads`, `/mnt/converted` | Initial folders, used on first start only |
+| `HANDBRAKE_CLI` | `HandBrakeCLI` | HandBrakeCLI program (name on the `PATH`, or full path) |
+| `FFPROBE` / `FFMPEG` | `ffprobe` / `ffmpeg` | FFmpeg programs |
+| `MKVMERGE` | `mkvmerge` | MKVToolNix merge program |
+| `WEB_DIR` | `../web/dist` | Built web UI |
+| `LOG_LEVEL` | `info` | `debug`, `info`, `warn` or `error` |
+
+Everything else (folders, output layout, check mode, CPU priority, conversion
+window, watch folders, notifications, backups…) is set in the app, on the
+**Settings** page.
+
+## Updating
+
+**Docker, on the server**, in the folder you cloned:
+
+```bash
+scripts/deploy.sh --here
+```
+
+It refuses to run while a job is converting, because restarting the container
+would start that encode again from 0% (`FORCE=1` overrides). Then it gets the
+latest version from GitHub, rebuilds and restarts. `.env` and `data/` are kept.
+To do the same by hand:
+
+```bash
+git pull
 docker compose up -d --build
 ```
 
-Open `http://<server>:8095`, import a preset (**Presets**), check the folders
-in **Settings**, then drag files into the queue.
+**Docker, from another computer** (Linux, macOS, or Git Bash on Windows), over
+SSH. The server pulls from GitHub itself, so only what is on GitHub is deployed:
 
-| `.env` | Meaning |
-|---|---|
-| `PUID` / `PGID` | User the container runs as; output files are owned by it |
-| `MEDIA_GID` | Extra group, for shares that grant access by group; Synology NFS uses `users` (100). Symptom when missing: "permission denied" on a folder the host user can open |
-| `MEDIA_DIR` | Host folder bind-mounted at the same path inside the container (default `/mnt`) |
-| `SOURCE_ROOT` / `TARGET_ROOT` | Initial folders, changeable later in the UI (where more sources folders can be added). They must be inside `MEDIA_DIR` |
-| `RENDER_GID` | Group of `/dev/dri/renderD128` on the host, for Intel Quick Sync |
-| `PORT` | Web UI port (default 8095) |
-| `TZ` | Time zone of the server clock, e.g. `Pacific/Auckland`. The conversion window uses it; Settings → Conversion window warns when it differs from the browser's |
+```bash
+scripts/deploy.sh user@server [folder]      # folder default: ~/handbrake-ui
+```
 
-The database, logs and presets live in `./data`.
+The first run clones the repository on the server. Defaults for the host,
+folder and SSH options can go in a git-ignored `.deploy.env` (see the comments
+at the top of [`scripts/deploy.sh`](scripts/deploy.sh)).
 
-### Hardware encoding
+**Without Docker:**
 
-The image builds `HandBrakeCLI` from the upstream source (version set by
+```bash
+git pull
+(cd web && npm ci && npm run build)
+(cd server && npm ci --omit=dev)
+sudo systemctl restart handbrake-ui     # or restart the Windows service / npm start
+```
+
+Back up first if you want to be able to go back: **Settings → Backup and
+restore**.
+
+## Hardware encoding (Intel Quick Sync)
+
+The Docker image builds `HandBrakeCLI` from the upstream source (version set by
 `HANDBRAKE_VERSION` in the `Dockerfile`), with Intel Quick Sync on amd64.
 Ubuntu's own `handbrake-cli` package can't be used for Quick Sync: it links the
-system FFmpeg, which lacks HandBrake's QSV patches, so every `qsv_*` encode fails
-in the muxer. The first build compiles HandBrake and its bundled libraries
-(about 45-60 minutes on a 4-thread CPU). Docker caches that step, so later
-builds skip it until the version changes.
+system FFmpeg, which lacks HandBrake's QSV patches, so every `qsv_*` encode
+fails in the muxer ("non monotonically increasing dts").
 
-The encoder always comes from your preset; `qsv_h264` / `qsv_h265` presets need
-`/dev/dri` passed through. Both Intel runtimes are included: the VPL GPU runtime
-for Tiger Lake (11th gen) and newer, and the legacy Media SDK runtime for 6th-10th
-gen iGPUs such as Comet Lake UHD 620. Quick Sync *decoding* (`--enable-qsv-decoding`)
-does not work with the legacy runtime on Linux, so leave it off in presets on
-those machines. Decoding then runs on the CPU. If the host has no `/dev/dri`,
-remove the `devices` and `group_add` blocks from `docker-compose.yml`.
+- The encoder always comes from your preset: a preset with `qsv_h264` /
+  `qsv_h265` uses the GPU, `x264` / `x265` the CPU.
+  [`presets/tv-720p-qsv.json`](presets/tv-720p-qsv.json) is the Quick Sync
+  version of [`presets/tv-720p-x264.json`](presets/tv-720p-x264.json). On a
+  10th-gen Core i3 it encodes about 2.2× faster at the same bitrate, with
+  slightly lower quality (SSIM 0.985 vs 0.988).
+- `/dev/dri` must be passed through (the default `docker-compose.yml` does) and
+  `RENDER_GID` must match the host's `render` group.
+- Both Intel runtimes are included: the VPL GPU runtime for 11th gen (Tiger
+  Lake) and newer, and the legacy Media SDK runtime for 6th–10th gen iGPUs.
+  Quick Sync *decoding* (`--enable-qsv-decoding`) does not work with the legacy
+  runtime on Linux, so leave it off in presets on those machines; decoding then
+  runs on the CPU.
+- NVIDIA (NVENC) and AMD (VCE) encoders are not built into the image.
 
-`preset-gerry-qsv.json` is the Quick Sync variant of `preset-gerry.json`: same
-settings, with `qsv_h264` instead of x264. On a Comet Lake i3 it encodes about
-2.2x faster at the same bitrate, with slightly lower SSIM (0.985 vs 0.988).
+## Security
+
+The app has **no login**. Anyone who can open its web page can browse,
+upload, download, rename and **delete files** in the configured folders, and
+change its settings.
+
+- Run it only on a trusted home or office network. **Do not expose port 8095
+  to the internet.**
+- For remote access, use a VPN (WireGuard, Tailscale…) or a reverse proxy with
+  authentication and HTTPS in front of it.
+- Give it only the folders it needs: `MEDIA_DIR` in Docker, and the sources and
+  target folders in Settings. The app refuses paths outside the configured
+  folders.
+- The SMTP password is stored in its database and backups, so keep `data/` and
+  backup files private.
+
+## Troubleshooting
+
+| Problem | Fix |
+|---|---|
+| "permission denied" on a folder the host user can open | The share grants access by group: set `MEDIA_GID` (Synology NFS: `100`). Check `PUID`/`PGID` |
+| `docker compose up` fails with `/dev/dri: no such file or directory` | No Intel GPU: enable `docker-compose.no-gpu.yml` with `COMPOSE_FILE` in `.env` |
+| `!reset` / `!override` error from Compose | Your Compose is older than v2.24: update Docker |
+| Quick Sync preset fails or isn't listed | Check `ls -l /dev/dri` on the host and `RENDER_GID`. Settings → About lists the video encoders HandBrakeCLI found: `qsv_*` ones appear only when Quick Sync works |
+| Red banner "HandBrakeCLI is not available" | Without Docker: install it, or set `HANDBRAKE_CLI` to its full path |
+| Network share mounted after the container started doesn't show up | The bind mount uses `rslave` propagation, so mounts made later under `MEDIA_DIR` should appear. Otherwise `docker compose restart` |
+| The conversion window starts at the wrong time | Set `TZ` (Docker) or the system time zone. Settings → Conversion window warns when it differs from your browser's |
+| Logs | Docker: `docker compose logs -f`. Without Docker: the console, or `journalctl -u handbrake-ui -f`. Per-job HandBrake logs: job details in the app |
 
 ## Development
 
 ```bash
 cd server && npm install && SOURCE_ROOT=/some/dir TARGET_ROOT=/other/dir npm run dev   # API on :8095
-cd web && npm install && npm run dev                                                   # UI on :5173
+cd web && npm install && npm run dev                                                   # UI on :5173, proxies /api
 cd server && npm test
 ```
 
-The server needs `HandBrakeCLI` on the `PATH` (or `HANDBRAKE_CLI=/path/to/it`)
-to scan and encode, `ffprobe`/`ffmpeg` (`FFPROBE`, `FFMPEG`) for the check after
-conversion, and `mkvmerge` (`MKVMERGE`, from MKVToolNix) for merging. Everything
-else works without them; the Docker image includes all of them.
+**Stack:** Node.js + Fastify, the built-in `node:sqlite`, Server-Sent Events
+for live updates; React + Vite for the UI. One process, no external database.
 
-**Stack:** Node 24 + Fastify, built-in `node:sqlite`, Server-Sent Events for
-live updates; React + Vite for the UI. One container, no external database.
+The in-app help lives in `web/src/help/help.json`. `server/test/help.test.js`
+checks that every **?** has a topic and that every link works.
 
-`scripts/deploy.sh [ssh-alias] [remote-dir]` deploys **what is on GitHub**,
-not your working copy:
+Issues and pull requests are welcome. Please run `npm test` in `server/` and
+`npm run build` in `web/` before sending a pull request.
 
-- It picks the commit of `origin/main` (`BRANCH=` for another branch). It
-  refuses if your local branch has commits that are not pushed, and warns that
-  uncommitted changes are not deployed.
-- Over SSH, the host fetches that commit with its own read-only deploy key and
-  checks it out in `~/SW/handbrake-ui`. Then it runs
-  `docker compose up -d --build`. `.env` and `data/` are git-ignored, so they
-  are kept.
-- It refuses to run while a job is converting, because the restart would start
-  that encode again from 0%. Use `FORCE=1` to override.
-- Extra ssh options go in `SSH_OPTS`, e.g. `SSH_OPTS="-J rasp-web"
-  scripts/deploy.sh` to go through a jump host.
+### Releasing (maintainers)
 
-### Releasing
+`npm run release` in the repo root runs `scripts/release.cjs`:
 
-`npm run release` (in the repo root), or the **Release GITHUB** button of the
-VS Code *Action Buttons* extension (`.vscode/settings.json`, kept local), runs
-`scripts/release.cjs`, the same script as dgsoft-image-manager:
+- It reads the version from the root `package.json` and refuses to run with
+  uncommitted changes.
+- It lists the commits since the previous `vX.Y.Z` tag and asks for
+  confirmation.
+- It creates and pushes the `vX.Y.Z` tag and creates the GitHub Release with
+  `gh`. The notes are built from the conventional-commit messages (Features,
+  Bug Fixes…), or are text you type.
 
-- It reads the version from the root `package.json` (set by DGS AutoVersion).
-  It refuses to run with uncommitted changes.
-- It lists the commits since the previous release and asks for confirmation.
-- It creates and pushes the `vX.Y.Z` tag (or reuses it if AutoVersion already
-  made it), then creates the GitHub Release with `gh`. The notes are built from
-  the conventional-commit messages (Features, Bug Fixes…), or are text you type.
+The project values are in `scripts/release.config.cjs`. Settings → About links
+to the GitHub release of the running version.
 
-The project values are in `scripts/release.config.cjs`. `TAG_PATTERN` makes
-the previous release a `vX.Y.Z` tag, never the `server-v…` / `web-v…` package
-tags. Settings → About links to the GitHub release of the running version.
+## Credits and licences
 
-One-time setup on a new host (needs git):
+HandBrake Queue is © 2026 Gerry Dassi (DGSoft), released under the
+[MIT License](LICENSE).
 
-```bash
-ssh-keygen -t ed25519 -N "" -C "<host> handbrake-ui deploy (read-only)" -f ~/.ssh/handbrake-ui-deploy
-ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts   # compare with GitHub's published fingerprint
-```
+It runs or uses these projects, each under its own licence:
 
-Add `~/.ssh/handbrake-ui-deploy.pub` in GitHub → Settings → Deploy keys,
-without write access. The first deploy turns the folder into a checkout.
+| Project | Used for | Licence |
+|---|---|---|
+| [HandBrake](https://handbrake.fr/) (HandBrakeCLI) | the video conversion engine; built from source, unmodified | GPL-2.0 |
+| [FFmpeg](https://ffmpeg.org/) (ffprobe, ffmpeg) | reading video details, the check after conversion and the quality check | LGPL-2.1 / GPL-2.0 |
+| [MKVToolNix](https://mkvtoolnix.download/) (mkvmerge) | merging converted files and their chapters | GPL-2.0 |
+| [Intel VPL GPU runtime, Media SDK and media driver](https://github.com/intel/vpl-gpu-rt) | Quick Sync hardware encoding | MIT |
+| [Node.js](https://nodejs.org/) | the server runtime, with its built-in SQLite | MIT |
+| [SQLite](https://sqlite.org/) | the database | Public domain |
+| [Fastify](https://fastify.dev/) | the web server | MIT |
+| [Nodemailer](https://nodemailer.com/) | e-mail notifications | MIT-0 |
+| [React](https://react.dev/) | the user interface | MIT |
+| [Vite](https://vite.dev/) | building the user interface | MIT |
+| [Lucide](https://lucide.dev/) | icons | ISC |
+| [Advanced Renamer](https://www.advancedrenamer.com/) by Kim Jensen | the rename methods and the `.aren` presets the Rename view imports (not included) | Freeware |
 
-## Licence
+The same list is in the app (Settings → About, from
+`web/src/settings/credits.json`).
 
-MIT, see [LICENSE](LICENSE). © 2026 Gerry Dassi (DGSoft).
+HandBrakeCLI, FFmpeg and MKVToolNix are separate programs: the app starts them
+as external processes and does not link to them, so its own code stays under
+the MIT License. The Docker image you build *contains* them, so if you
+**redistribute that image** (e.g. push it to a public registry), you must
+follow their licences (GPL/LGPL), including offering their source code. The
+`Dockerfile` builds HandBrake from its official, unmodified source tag.
 
-HandBrakeCLI, FFmpeg and MKVToolNix, which the Docker image includes and the
-app runs, are separate programs under their own licences (GPL/LGPL). The full
-list of credits is in Settings → About (`web/src/settings/credits.json`).
+## Disclaimer
+
+This software is provided "as is", without warranty of any kind (see
+[LICENSE](LICENSE)). It writes, renames and, when you ask, deletes files: keep
+backups of media you care about, and try new settings on copies first.
+
+HandBrake is a trademark of its respective owners. This project is not
+affiliated with or endorsed by the HandBrake Team, the FFmpeg project,
+MKVToolNix, Intel or Advanced Renamer.

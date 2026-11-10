@@ -157,9 +157,10 @@ select, textarea, input[type='text'], input:not([type]), input[type='number'], i
 .file-row.excluded .file-name { color: var(--muted); }
 .file-row .folder { color: var(--accent); width: 24px; height: 24px; }
 .file-icon { color: var(--muted); flex: none; margin: 0 3px; }
-.file-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.file-meta { display: flex; align-items: center; gap: 6px; font-size: 12px; flex: none; }
-.folder-badges { display: flex; gap: 4px; }
+/* The name keeps at least 40% of the row; on narrow screens the badges wrap instead. */
+.file-name { flex: 1 1 40%; min-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-meta { display: flex; align-items: center; justify-content: flex-end; gap: 6px; font-size: 12px; flex: 0 1 auto; min-width: 0; }
+.folder-badges { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; }
 .empty { padding: 24px; text-align: center; color: var(--muted); }
 .hint { margin: 0; padding: 8px 12px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); }
 .drag-ghost {

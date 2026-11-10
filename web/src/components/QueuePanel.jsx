@@ -168,6 +168,7 @@ export function QueuePanel({
             onRename={onRename}
             queueIndex={queuedIds.indexOf(job.id)}
             queueLength={queuedIds.length}
+            canPause={queueState?.canPause !== false}
             estimate={job.status === 'queued' ? estimate?.perJob.get(job.id) : undefined}
             dropBefore={dropTarget === job.id}
             onJobDragStart={(e) => {

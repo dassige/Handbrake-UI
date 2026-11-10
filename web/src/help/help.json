@@ -120,7 +120,7 @@
     "job.actions": {
       "title": "Job actions",
       "body": [
-        "- **Pause / Resume**: freezes the conversion (or the check) and continues it later. Restarting the server while paused starts the conversion again from 0%.",
+        "- **Pause / Resume**: freezes the conversion (or the check) and continues it later. Restarting the server while paused starts the conversion again from 0%. Not available when the server runs on Windows without Docker: cancel instead.",
         "- **Cancel**: stops the conversion and deletes the half-written file. On a queued job it only marks it cancelled. While the file is being checked, **Skip check** keeps the converted file and skips the rest of the check.",
         "- **Move to top**: converts this queued job next.",
         "- **Retry**: puts a failed or cancelled job back in the queue.",
@@ -312,7 +312,7 @@
     "settings.encoding": {
       "title": "Encoding settings",
       "body": [
-        "- **CPU priority**: how politely conversions share the CPU with other services on the server (Linux `nice`, 0–19). Higher is gentler and slower only when the server is busy.",
+        "- **CPU priority**: how politely conversions share the CPU with other services on the server (Linux `nice`, 0–19). Higher is gentler and slower only when the server is busy. Ignored when the server runs on Windows without Docker.",
         "- **Check after conversion**: **Full** (every check, with a complete decode), **Quick** (lengths, tracks and readability without decoding) or **Off**. See [Checking converted files](#verify.overview)."
       ],
       "see": [
@@ -688,7 +688,7 @@
         "The estimate is each source’s length × how fast this server converted similar files before: the median of the last 20 conversions with the **same preset** (encode plus the [check after conversion](#verify.overview)). For a preset with no history, all presets together are used; with no history at all, the speed of the job converting now.",
         "- A job whose source hasn’t been read yet gets the average length of the others (“some lengths guessed”).",
         "- With a [conversion window](#settings.schedule), the finish time follows it: jobs only start inside the window, and one that is converting when it closes is finished first.",
-        "- Other work on the server (Emby transcoding, a quality check) slows conversions down, so treat the time as a guide."
+        "- Other work on the server (media server transcoding, a quality check) slows conversions down, so treat the time as a guide."
       ],
       "see": [
         "queue.state",
@@ -699,13 +699,13 @@
     "settings.schedule": {
       "title": "Conversion window",
       "body": [
-        "Converts only at certain times, e.g. overnight, so encoding doesn’t slow down Emby or other services during the day.",
+        "Converts only at certain times, e.g. overnight, so encoding doesn’t slow down a media server or other services during the day.",
         "- **Opens at / Closes at**: when the closing time is earlier than the opening time (23:00 → 07:00) the window runs overnight. The same time for both means all day.",
         "- **Days** are the days the window **opens**: Friday with 23:00 → 07:00 ends on Saturday morning.",
         "- Outside the window the queue doesn’t start a new job. A job that is converting when the window closes is finished first.",
         "- **Start the queue by itself when the window opens**: if jobs are waiting and the queue is stopped, it starts when the window opens. Pressing Stop during the window is respected until the next opening.",
         "The top bar shows the window’s state (open until …, or when it opens next); click it to come here.",
-        "The window follows the **server’s clock**. If the server’s time zone differs from yours, this page says so: set `TZ` in the server’s `.env` (e.g. `TZ=Pacific/Auckland`) and restart the container."
+        "The window follows the **server’s clock**. If the server’s time zone differs from yours, this page says so: set `TZ` in the server’s `.env` (e.g. `TZ=Europe/London`) and restart the container."
       ],
       "see": [
         "queue.state",

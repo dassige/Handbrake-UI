@@ -130,7 +130,7 @@ export function EncodingSection({ draft, set }) {
   return (
     <>
       <Card title="Encoding" help="settings.encoding">
-        <Field label="CPU priority (nice)" hint="0–19. Higher is gentler on other services on the server (Emby, downloads); encodes take a little longer.">
+        <Field label="CPU priority (nice)" hint="0–19. Higher is gentler on other services on the server (media server, downloads); encodes take a little longer.">
           <NumberInput min="0" max="19" value={draft.niceLevel} onChange={(v) => set('niceLevel', v)} className="narrow" />
         </Field>
       </Card>

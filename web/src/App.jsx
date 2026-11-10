@@ -391,6 +391,7 @@ export default function App() {
           settings={settings}
           run={run}
           onRename={openRename}
+          canPause={queue?.canPause !== false}
           onClose={() => setSelectedJobId(null)}
           onSelect={setSelectedJobId}
         />

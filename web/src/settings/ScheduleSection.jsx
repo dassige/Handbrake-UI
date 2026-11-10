@@ -43,7 +43,7 @@ export function ScheduleSection({ draft, set, info }) {
         aside={<Switch checked={s.enabled} onChange={(v) => setS('enabled', v)} label={s.enabled ? 'On' : 'Off'} />}
       >
         <p className="set-hint">
-          Convert only at certain times, e.g. at night, so encoding doesn’t compete with Emby or other services. Outside the window
+          Convert only at certain times, e.g. at night, so encoding doesn’t compete with a media server or other services. Outside the window
           the queue holds the next job; a job that is converting when the window closes is finished first.
         </p>
         <fieldset className="set-fieldset" disabled={!s.enabled}>
@@ -88,7 +88,7 @@ export function ScheduleSection({ draft, set, info }) {
           <p className="warn-text">
             The server’s clock is on {info.time.zone} (UTC{info.time.offset >= 0 ? '+' : '−'}
             {Math.abs(info.time.offset / 60)}), not this computer’s time zone. The window follows the server: set <code>TZ</code> in
-            the server’s <code>.env</code> (e.g. <code>TZ=Pacific/Auckland</code>) and restart the container.
+            the server’s <code>.env</code> (e.g. <code>TZ=Europe/London</code>) and restart the container.
           </p>
         )}
       </Card>

@@ -73,7 +73,7 @@ export function BackupSection({ draft, set, base, run, onError, onNotice, backup
             hint={
               <>
                 Empty = the app’s own data folder (<code>data/backups</code>). A network share works if it is mounted on the server
-                and, with Docker, inside the mounted media folder (e.g. <code>/mnt/multimedia-volume1/backups/handbrake-ui</code>).
+                and, with Docker, inside the mounted media folder (e.g. <code>/mnt/media/backups/handbrake-ui</code>).
               </>
             }
           >

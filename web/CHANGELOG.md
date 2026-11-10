@@ -2,6 +2,46 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0] - 2026/11/11
+
+- chore: prepare repository for public release (MIT)
+
+Docs
+- Rewrite README: features, screenshots, requirements, and installation
+  for Linux and Windows, with and without Docker (packages, service
+  setup), plus configuration, updating, hardware encoding, security,
+  troubleshooting, development, credits/licences and a disclaimer
+- Add screenshots in docs/screenshots/, taken with demo data
+
+Privacy
+- Stop tracking PLAN.md and the QSV investigation PDF, and ignore them
+- Ignore .deploy.env, which holds personal deploy defaults
+- Use generic examples in the UI, help text and notifications instead of
+  personal hostnames, paths, time zone and media server name
+- Move the personal preset to presets/tv-720p-qsv.json and add an x264
+  version (presets/tv-720p-x264.json)
+
+Deploy
+- scripts/deploy.sh: the host is now an argument (or DEPLOY_HOST from
+  .deploy.env). New --here mode updates the checkout on the server
+  itself. It also refuses to deploy while a conversion is running
+  (override with FORCE=1) and creates .env from .env.example on the
+  first deploy
+- docker-compose.yml: MEDIA_MOUNT sets the path inside the container, so
+  Windows paths work on Docker Desktop
+- Add docker-compose.no-gpu.yml for hosts without /dev/dri
+- Document COMPOSE_FILE, Windows paths and TZ in .env.example
+
+Windows support
+- Turn off pausing on Windows: Node has no SIGSTOP there and would kill
+  HandBrakeCLI instead. The queue state reports canPause and the Pause
+  button is hidden
+- Add Windows notes to the help for Pause and CPU priority
+
+Fixes
+- Mobile: folder names no longer shrink to one letter when status
+  badges are shown; the badges wrap instead
+
 ## [2.1.2] - 2026/11/11
 
 - feat: improve topbar layout for better responsiveness and readability

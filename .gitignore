@@ -11,7 +11,6 @@ dist/
 
 # Local Claude Code instructions (kept out of the repo)
 /CLAUDE.md
-preset-gerry.json
 todo.txt
 
 # Local editor settings (VS Code action buttons, as in dgsoft-image-manager)
@@ -19,3 +18,11 @@ todo.txt
 
 # Left behind only if scripts/release.cjs is interrupted
 .release-notes.tmp
+
+# Personal notes and reports (kept out of the public repo)
+/PLAN.md
+/docs/QSV-GPU-Encoding-Report.pdf
+
+# Personal defaults for scripts/deploy.sh (host, folder, ssh options)
+/.deploy.env
+/preset-gerry.json

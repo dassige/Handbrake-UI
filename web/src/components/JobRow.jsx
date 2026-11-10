@@ -18,7 +18,7 @@ function useClock(active) {
 }
 
 /** Job buttons: icons in the queue list, labelled buttons in the details drawer. */
-export function JobActions({ job, run, queueIndex = -1, labels = false, onRename }) {
+export function JobActions({ job, run, queueIndex = -1, labels = false, onRename, canPause = true }) {
   const dialogs = useDialogs();
   const act = (name, body) => run(() => api.jobAction(job.id, name, body));
   const s = job.status;
@@ -39,7 +39,7 @@ export function JobActions({ job, run, queueIndex = -1, labels = false, onRename
   );
   return (
     <div className="job-actions" onClick={(e) => e.stopPropagation()}>
-      {s === 'running' && btn({ icon: Pause, label: 'Pause', onClick: () => act('pause') })}
+      {s === 'running' && canPause && btn({ icon: Pause, label: 'Pause', onClick: () => act('pause') })}
       {s === 'paused' && btn({ icon: Play, label: 'Resume', onClick: () => act('resume') })}
       {['running', 'paused', 'queued'].includes(s) && job.phase === 'verifying' && (
         btn({ icon: SkipForward, label: 'Skip check', title: 'Keep the converted file and skip the rest of the check', onClick: () => act('cancel') })
@@ -70,7 +70,7 @@ export function JobActions({ job, run, queueIndex = -1, labels = false, onRename
 
 export function JobRow({
   job, settings, selected, onSelect, run, onRename, queueIndex, dropBefore,
-  onJobDragStart, onJobDragEnd, onJobDragOver, onJobDrop, estimate,
+  onJobDragStart, onJobDragEnd, onJobDragOver, onJobDrop, estimate, canPause,
 }) {
   const active = job.status === 'running' || job.status === 'paused';
   useClock(job.status === 'running');
@@ -144,7 +144,7 @@ export function JobRow({
           {meta.filter(Boolean).join(' · ')}
         </div>
       </div>
-      <JobActions job={job} run={run} queueIndex={queueIndex} onRename={onRename} />
+      <JobActions job={job} run={run} queueIndex={queueIndex} onRename={onRename} canPause={canPause} />
     </div>
   );
 }

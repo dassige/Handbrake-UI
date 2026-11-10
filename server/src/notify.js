@@ -9,7 +9,7 @@ export const SMTP_SECURITY = ['starttls', 'tls', 'none'];
 
 export const DEFAULT_NOTIFICATIONS = {
   events: { queueFinished: true, jobFailed: true, checkFailed: true, jobDone: false, watchAdded: false, backupFailed: true },
-  // Shown as a link in messages, e.g. http://10.1.1.115:8095
+  // Shown as a link in messages, e.g. http://my-server:8095
   appUrl: '',
   // [{ id, name, enabled, url, headers, events }]; events null = the general list above.
   webhooks: [],

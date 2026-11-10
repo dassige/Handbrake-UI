@@ -15,18 +15,20 @@ services:
       TARGET_ROOT: ${TARGET_ROOT:-/mnt/converted}
     volumes:
       - ./data:/data
-      # The host folder that holds your sources and targets, at the same path
-      # inside the container. rslave lets NFS/autofs mounts made later on the
-      # host show up inside the container.
+      # The host folder that holds your sources and targets. On Linux it is
+      # mounted at the same path inside the container; set MEDIA_MOUNT when the
+      # host path can't be used there (Windows: MEDIA_DIR=C:/Videos, MEDIA_MOUNT=/media).
+      # rslave lets NFS/autofs mounts made later on the host show up inside.
       - type: bind
         source: ${MEDIA_DIR:-/mnt}
-        target: ${MEDIA_DIR:-/mnt}
+        target: ${MEDIA_MOUNT:-${MEDIA_DIR:-/mnt}}
         bind:
           propagation: rslave
     group_add:
       # Extra group for NAS shares that grant access by group (Synology: "users").
       - "${MEDIA_GID:-100}"
-      # Intel Quick Sync. Remove this line and the "devices" block if the host has no /dev/dri.
+      # Intel Quick Sync. Without /dev/dri on the host (no Intel GPU, Docker
+      # Desktop on Windows/macOS), add docker-compose.no-gpu.yml: see .env.example.
       - "${RENDER_GID:-991}"
     devices:
       - /dev/dri:/dev/dri

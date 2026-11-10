@@ -85,7 +85,7 @@ export function NotificationsSection({ draft, set, run }) {
         {!anyChannel && <p className="set-hint">Turn on a webhook or e-mail below for these to go anywhere.</p>}
         <Field label="Address of this app, for links in messages (optional)">
           <div className="inline-form">
-            <input value={n.appUrl} onChange={(e) => setN('appUrl', e.target.value)} placeholder="http://10.1.1.115:8095" spellCheck={false} />
+            <input value={n.appUrl} onChange={(e) => setN('appUrl', e.target.value)} placeholder="http://my-server:8095" spellCheck={false} />
             <button type="button" className="btn small" onClick={() => setN('appUrl', location.origin)}>Use this page’s address</button>
           </div>
         </Field>
