@@ -11,6 +11,7 @@ const EVENTS = [
   { id: 'checkFailed', label: 'A check after conversion failed' },
   { id: 'jobDone', label: 'Each converted file', hint: 'Can be a lot of messages for a long queue.' },
   { id: 'watchAdded', label: 'A watch folder added files' },
+  { id: 'backupFailed', label: 'A scheduled backup failed' },
 ];
 
 const SECURITY = [

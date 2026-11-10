@@ -27,6 +27,7 @@ export function useLiveData(onError, onNotice, onEvent) {
   const eventRef = useRef(onEvent);
   eventRef.current = onEvent;
   const [watch, setWatch] = useState(null);
+  const [backupSchedule, setBackupSchedule] = useState(null);
 
   const loadJobs = useCallback(async () => {
     try {
@@ -133,6 +134,7 @@ export function useLiveData(onError, onNotice, onEvent) {
     });
     es.addEventListener('qualityScan', () => setQualityTick((t) => t + 1));
     es.addEventListener('watch', (e) => setWatch(JSON.parse(e.data)));
+    es.addEventListener('backupSchedule', (e) => setBackupSchedule(JSON.parse(e.data)));
     es.addEventListener('settings', (e) => {
       setSettings(JSON.parse(e.data));
       bump();
@@ -144,7 +146,7 @@ export function useLiveData(onError, onNotice, onEvent) {
   }, [loadJobs, loadPresets, loadRenameRules, loadMerges, loadQualityScans, loadSettings, loadInfo]);
 
   return {
-    jobs, queue, presets, renameRules, merges, qualityScans, qualityTick, settings, info, connected, changeTick, watch,
+    jobs, queue, presets, renameRules, merges, qualityScans, qualityTick, settings, info, connected, changeTick, watch, backupSchedule,
     reloadJobs: loadJobs, reloadPresets: loadPresets, setSettings,
   };
 }

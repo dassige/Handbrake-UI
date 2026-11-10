@@ -6,6 +6,7 @@ import { VERIFY_MODES } from './verify.js';
 import { DEFAULT_QUALITY, normalizeQuality } from './quality.js';
 import { DEFAULT_SCHEDULE, normalizeSchedule } from './schedule.js';
 import { DEFAULT_WATCH, normalizeWatch } from './watch.js';
+import { DEFAULT_BACKUP_SCHEDULE, normalizeBackupSchedule } from './backupSchedule.js';
 import { DEFAULT_NOTIFICATIONS, mergeNotifications, normalizeNotifications, publicNotifications } from './notify.js';
 
 export const MAX_SOURCE_ROOTS = 20;
@@ -42,6 +43,7 @@ function defaults(config) {
     schedule: DEFAULT_SCHEDULE,
     watch: DEFAULT_WATCH,
     notifications: DEFAULT_NOTIFICATIONS,
+    backupSchedule: DEFAULT_BACKUP_SCHEDULE,
   };
 }
 
@@ -74,6 +76,7 @@ export class Settings {
     this.values.schedule = { ...DEFAULT_SCHEDULE, ...this.values.schedule };
     this.values.watch = { ...DEFAULT_WATCH, ...this.values.watch };
     this.values.notifications = mergeNotifications(this.values.notifications);
+    this.values.backupSchedule = { ...DEFAULT_BACKUP_SCHEDULE, ...this.values.backupSchedule };
     // Normalise separators and trailing slashes so path comparisons work.
     this.values.sourceRoots = this.values.sourceRoots.map((r) => path.resolve(r));
     this.values.protectedRoots = this.values.protectedRoots.map((r) => path.resolve(r));
@@ -134,6 +137,7 @@ export class Settings {
     }
     next.watch = await normalizeWatch(next.watch, next.sourceRoots);
     next.notifications = normalizeNotifications(next.notifications, this.values.notifications);
+    next.backupSchedule = await normalizeBackupSchedule(next.backupSchedule);
     if (!OUTPUT_LAYOUTS.includes(next.outputLayout)) {
       throw badRequest(`outputLayout must be one of ${OUTPUT_LAYOUTS.join(', ')}`);
     }

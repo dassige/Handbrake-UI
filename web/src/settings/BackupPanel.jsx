@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArchiveRestore, Download, HardDriveDownload, RotateCcw, Save, Trash2, Upload } from 'lucide-react';
+import { ArchiveRestore, CalendarClock, Download, HardDriveDownload, RotateCcw, Save, Trash2, Upload } from 'lucide-react';
 import { api } from '../api.js';
 import { bytes, dateTime } from '../format.js';
 import { useDialogs } from '../components/Dialogs.jsx';
@@ -16,7 +16,7 @@ const COUNTS = [
 ];
 
 /** Downloads or keeps backups of the settings and database, and restores them (Settings → Backup and restore). */
-export function BackupPanel({ run, onError, onNotice }) {
+export function BackupPanel({ run, onError, onNotice, scheduled, onScheduledChange }) {
   const dialogs = useDialogs();
   const [logs, setLogs] = useState(true);
   const [snapshots, setSnapshots] = useState(null);
@@ -25,7 +25,11 @@ export function BackupPanel({ run, onError, onNotice }) {
   const [busy, setBusy] = useState(null); // text while working
   const fileInput = useRef(null);
 
-  const loadSnapshots = useCallback(() => api.backupSnapshots().then(setSnapshots, (e) => onError(e)), [onError]);
+  // Scheduled backups have their own list (they may be in another folder).
+  const loadSnapshots = useCallback(
+    () => api.backupSnapshots().then((l) => setSnapshots(l.filter((s) => s.reason !== 'scheduled')), (e) => onError(e)),
+    [onError],
+  );
   useEffect(() => {
     loadSnapshots();
   }, [loadSnapshots]);
@@ -59,7 +63,8 @@ export function BackupPanel({ run, onError, onNotice }) {
   }
 
   async function inspectSnapshot(s) {
-    const r = await work('Reading the backup…', () => api.inspectBackupSnapshot(s.name));
+    const r = await work('Reading the backup…', () =>
+      s.reason === 'scheduled' ? api.inspectScheduledBackup(s.name) : api.inspectBackupSnapshot(s.name));
     if (r) {
       setInspection({ ...r, label: s.name });
       setScope('config');
@@ -74,6 +79,16 @@ export function BackupPanel({ run, onError, onNotice }) {
       danger: true,
     });
     if (ok && (await run(() => api.deleteBackupSnapshot(s.name)))) loadSnapshots();
+  }
+
+  async function removeScheduled(s) {
+    const ok = await dialogs.confirm({
+      title: 'Delete backup',
+      message: `Delete the scheduled backup ${s.name} from ${scheduled?.folder}?`,
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (ok && (await run(() => api.deleteScheduledBackup(s.name)))) onScheduledChange?.();
   }
 
   async function restore() {
@@ -231,6 +246,37 @@ export function BackupPanel({ run, onError, onNotice }) {
           </ul>
         )}
       </Card>
+
+      {scheduled && (scheduled.enabled || scheduled.backups.length > 0) && (
+        <Card title="Kept by the schedule">
+          <p className="set-hint">
+            In <code>{scheduled.folder}</code>
+            {scheduled.backups.length ? ` · ${scheduled.backups.length} kept` : ''}
+          </p>
+          {scheduled.backups.length === 0 ? (
+            <p className="set-hint">None yet.</p>
+          ) : (
+            <ul className="backup-list">
+              {scheduled.backups.map((s) => (
+                <li key={s.name}>
+                  <CalendarClock size={15} className="muted" />
+                  <span className="file-name" title={s.name}>Scheduled · {dateTime(s.createdAt)}</span>
+                  <span className="muted small">{bytes(s.size)}</span>
+                  <button className="icon-btn" title="Restore from this backup" aria-label={`Restore ${s.name}`} disabled={!!busy} onClick={() => inspectSnapshot(s)}>
+                    <ArchiveRestore size={15} />
+                  </button>
+                  <button className="icon-btn" title="Download" aria-label={`Download ${s.name}`} onClick={() => startDownload(api.scheduledBackupUrl(s.name))}>
+                    <Download size={15} />
+                  </button>
+                  <button className="icon-btn danger" title="Delete" aria-label={`Delete ${s.name}`} onClick={() => removeScheduled(s)}>
+                    <Trash2 size={15} />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+      )}
     </>
   );
 }

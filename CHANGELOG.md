@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2026/11/10
+
+- feat: implement scheduled backups feature
+
+- Added BackupScheduler class to manage scheduled backups.
+- Introduced new API routes for scheduled backups: status, run, retrieve, and delete.
+- Enhanced backup settings in the application to include scheduling options.
+- Updated notification system to handle backup failure events.
+- Created a new BackupSection component in the settings page for user interaction with backup scheduling.
+- Implemented validation for backup schedule settings.
+- Added tests for backup scheduling functionality.
+
 ## [2.0.1] - 2026/11/10
 
 - feat: enhance webhook functionality and UI in notifications settings

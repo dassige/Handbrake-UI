@@ -8,8 +8,9 @@ import { Modal } from './Modal.jsx';
  * Lets you pick a folder under the sources folders by browsing the server, instead
  * of typing its path. onPick(path) gets the chosen folder.
  */
-export function FolderPicker({ settings, title = 'Choose a folder', initial, onPick, onClose, onError }) {
-  const roots = settings.sourceRoots;
+export function FolderPicker({ settings, title = 'Choose a folder', initial, onPick, onClose, onError, kind = 'source' }) {
+  // kind 'any': the target folder too (the server only lets the app browse the configured folders).
+  const roots = kind === 'any' ? [...settings.sourceRoots, settings.targetRoot] : settings.sourceRoots;
   const startRoot = roots.find((r) => initial && (initial === r || initial.startsWith(r))) ?? roots[0];
   const [root, setRoot] = useState(startRoot);
   const [listing, setListing] = useState(null);
@@ -19,14 +20,14 @@ export function FolderPicker({ settings, title = 'Choose a folder', initial, onP
     async (p) => {
       setLoading(true);
       try {
-        setListing(await api.browse('source', p));
+        setListing(await api.browse(kind, p));
       } catch (e) {
         onError?.(e);
       } finally {
         setLoading(false);
       }
     },
-    [onError],
+    [onError, kind],
   );
 
   useEffect(() => {

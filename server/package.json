@@ -1,6 +1,6 @@
 {
   "name": "handbrake-ui-server",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
   "description": "Headless HandBrakeCLI queue with a web UI",
@@ -17,6 +17,6 @@
     "fastify": "^5.12.8",
     "nodemailer": "^10.4.0"
   },
-  "versionDate": "2026/11/10 14:30",
-  "git-parentCommit-ID": "9de447e773434ac1e9625287fe10f7e0044316fb"
+  "versionDate": "2026/11/10 14:36",
+  "git-parentCommit-ID": "416db4d823d3cf5837502a94c99639a30c31b641"
 }

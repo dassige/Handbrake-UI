@@ -10,7 +10,7 @@ const id = (req) => {
   return n;
 };
 
-export function registerRoutes(app, { settings, presets, queue, events, handbrake, renamer, watcher, version, dataDir }) {
+export function registerRoutes(app, { settings, presets, queue, events, handbrake, renamer, watcher, backupScheduler, version, dataDir }) {
   // ------------------------------------------------------------- status
   let hbInfo = null;
   app.get('/api/info', async () => {
@@ -43,6 +43,7 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
     events.emit('settings', result);
     if ('schedule' in (req.body ?? {})) queue.scheduleChanged();
     if ('watch' in (req.body ?? {}) || 'sourceRoots' in (req.body ?? {})) await watcher?.reconfigure();
+    if ('backupSchedule' in (req.body ?? {})) backupScheduler?.reconfigure().catch(() => {});
     queue.tick();
     return result;
   });

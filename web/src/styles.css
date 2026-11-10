@@ -869,3 +869,6 @@ textarea.mono { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
 .hook-head .hook-name { flex: 1; min-width: 0; font-weight: 600; color: var(--text); }
 .hook-events { gap: 6px; }
 .hook-event-list { padding-left: 24px; }
+
+.backup-status { display: flex; flex-direction: column; gap: 2px; }
+.backup-status p { margin: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 13px; }

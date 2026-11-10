@@ -28,6 +28,7 @@ import { History } from './history.js';
 import { Notifier } from './notify.js';
 import { Watcher } from './watch.js';
 import { registerAutomationRoutes } from './automationRoutes.js';
+import { BackupScheduler } from './backupSchedule.js';
 
 /** version, date and commit from a package.json (managed by DGS AutoVersion); null when missing. */
 function readVersion(file) {
@@ -74,6 +75,8 @@ const quality = new QualityScanner({ db, settings, verifier, events, queue, log:
 const backups = new Backups({
   db, dataDir: config.dataDir, settings, queue, merger, quality, uploads, renamer, watcher, events, log: app.log, versions: version,
 });
+const backupScheduler = new BackupScheduler({ settings, backups, notifier, events, log: app.log });
+backups.scheduler = backupScheduler;
 
 app.setErrorHandler((err, req, reply) => {
   const status = err.statusCode ?? (err.code === 'ENOENT' ? 404 : 500);
@@ -84,14 +87,14 @@ app.setErrorHandler((err, req, reply) => {
 // Per-request access logs are noise here (the UI polls); keep warnings and errors.
 await app.register(
   async (api) => {
-    registerRoutes(api, { settings, presets, queue, events, handbrake, renamer, watcher, version, dataDir: config.dataDir });
+    registerRoutes(api, { settings, presets, queue, events, handbrake, renamer, watcher, backupScheduler, version, dataDir: config.dataDir });
     registerAutomationRoutes(api, { history, watcher, notifier });
     registerRenameRoutes(api, { renamer });
     registerMergeRoutes(api, { merger });
     registerUploadRoutes(api, { uploads, sourceFiles });
     registerQualityRoutes(api, { quality });
     registerDownloadRoutes(api, { downloads });
-    registerBackupRoutes(api, { backups });
+    registerBackupRoutes(api, { backups, backupScheduler });
   },
   {
     logLevel: 'warn',
@@ -114,6 +117,7 @@ async function stop(signal) {
   stopping = true;
   app.log.info(`${signal} received, stopping`);
   watcher.stop();
+  backupScheduler.stop();
   await queue.shutdown();
   events.close();
   await app.close();
@@ -134,3 +138,4 @@ await queue.recover();
 queue.scheduleTick();
 setInterval(() => queue.scheduleTick(), 30_000).unref();
 await watcher.reconfigure().catch((err) => app.log.warn(`Watch folders: ${err.message}`));
+await backupScheduler.start().catch((err) => app.log.warn(`Scheduled backups: ${err.message}`));

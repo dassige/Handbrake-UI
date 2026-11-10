@@ -9,7 +9,7 @@ import {
 import { ScheduleSection } from './ScheduleSection.jsx';
 import { WatchSection } from './WatchSection.jsx';
 import { NotificationsSection } from './NotificationsSection.jsx';
-import { BackupPanel } from './BackupPanel.jsx';
+import { BackupSection } from './BackupSection.jsx';
 import { AboutSection } from './AboutSection.jsx';
 
 // keys: the settings a section edits (for its "unsaved" dot and for saving only what changed).
@@ -41,7 +41,7 @@ export const SECTIONS = [
   {
     group: 'System',
     items: [
-      { id: 'backup', label: 'Backup and restore', icon: ArchiveRestore, keys: [] },
+      { id: 'backup', label: 'Backup and restore', icon: ArchiveRestore, keys: ['backupSchedule'], Component: BackupSection },
       { id: 'about', label: 'About', icon: Info, keys: [] },
     ],
   },
@@ -77,7 +77,9 @@ function clean(key, value) {
  * Settings as a page: sections on the left, one at a time on the right. Every section
  * edits the same draft; the bar at the bottom saves (only what changed) or discards it.
  */
-export function SettingsPage({ settings, info, presets, renameRules, watchStatus, section, onSection, run, onSaved, onError, onNotice, onDirtyChange }) {
+export function SettingsPage({
+  settings, info, presets, renameRules, watchStatus, backupStatus, section, onSection, run, onSaved, onError, onNotice, onDirtyChange,
+}) {
   const [draft, setDraft] = useState(settings);
   const [saving, setSaving] = useState(false);
   const changedKeys = useMemo(() => EDITABLE.filter((k) => !same(draft[k], settings[k])), [draft, settings]);
@@ -124,7 +126,7 @@ export function SettingsPage({ settings, info, presets, renameRules, watchStatus
     }
   }
 
-  const props = { draft, set, base: settings, info, presets, renameRules, run, onError, onNotice, liveStatus: watchStatus, dirty };
+  const props = { draft, set, base: settings, info, presets, renameRules, run, onError, onNotice, liveStatus: watchStatus, backupStatus, dirty };
   const Body = current.Component;
 
   return (
@@ -163,7 +165,6 @@ export function SettingsPage({ settings, info, presets, renameRules, watchStatus
             <h1>{current.label}</h1>
           </header>
           {Body && <Body {...props} />}
-          {current.id === 'backup' && <BackupPanel run={run} onError={onError} onNotice={onNotice} />}
           {current.id === 'about' && <AboutSection info={info} onError={onError} />}
         </div>
         {dirty && (

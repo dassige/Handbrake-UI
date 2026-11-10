@@ -4,11 +4,11 @@ import path from 'node:path';
 import nodemailer from 'nodemailer';
 import { badRequest } from './errors.js';
 
-export const NOTIFY_EVENTS = ['queueFinished', 'jobFailed', 'checkFailed', 'jobDone', 'watchAdded'];
+export const NOTIFY_EVENTS = ['queueFinished', 'jobFailed', 'checkFailed', 'jobDone', 'watchAdded', 'backupFailed'];
 export const SMTP_SECURITY = ['starttls', 'tls', 'none'];
 
 export const DEFAULT_NOTIFICATIONS = {
-  events: { queueFinished: true, jobFailed: true, checkFailed: true, jobDone: false, watchAdded: false },
+  events: { queueFinished: true, jobFailed: true, checkFailed: true, jobDone: false, watchAdded: false, backupFailed: true },
   // Shown as a link in messages, e.g. http://10.1.1.115:8095
   appUrl: '',
   // [{ id, name, enabled, url, headers, events }]; events null = the general list above.
@@ -194,6 +194,10 @@ export function buildMessage(event, data = {}) {
       if (data.queueState) lines.push(data.queueState);
       return { event, title, text: lines.join('\n'), data: { folder, added } };
     }
+    case 'backupFailed':
+      title = 'Scheduled backup failed';
+      lines.push(`The backup into ${data.folder} could not be made:`, data.error ?? 'Unknown error', 'It is tried again in 30 minutes.');
+      return { event, title, text: lines.join('\n'), data: { folder: data.folder, error: data.error ?? null } };
     case 'test':
     default:
       return {

@@ -300,6 +300,7 @@ export default function App() {
           presets={presets}
           renameRules={data.renameRules}
           watchStatus={data.watch}
+          backupStatus={data.backupSchedule}
           section={SECTION_IDS.includes(route.sub) ? route.sub : SECTION_IDS[0]}
           onSection={(s) => go('settings', s)}
           run={run}

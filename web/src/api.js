@@ -69,6 +69,11 @@ export const api = {
     return data;
   },
   restoreBackup: (source, scope) => post('/api/backup/restore', { source, scope }),
+  backupScheduled: () => get('/api/backup/scheduled'),
+  runScheduledBackup: () => post('/api/backup/scheduled/run'),
+  scheduledBackupUrl: (name) => `/api/backup/scheduled/${encodeURIComponent(name)}`,
+  deleteScheduledBackup: (name) => request('DELETE', `/api/backup/scheduled/${encodeURIComponent(name)}`),
+  inspectScheduledBackup: (name) => post('/api/backup/inspect', { source: `scheduled:${name}` }),
 
   stats: (days) => get(`/api/stats?days=${days}`),
   watchStatus: () => get('/api/watch'),

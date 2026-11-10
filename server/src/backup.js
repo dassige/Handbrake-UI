@@ -9,6 +9,7 @@
 // - scope "config": settings, presets and rename rules; jobs and history stay.
 // - scope "all": everything, plus the job logs. Refused while something runs.
 // Before every restore the current data is saved on the server, so it can be undone.
+// Scheduled backups (backupSchedule.js) go to a chosen folder, possibly a network share.
 import { createReadStream, createWriteStream } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -106,29 +107,72 @@ export class Backups {
     return reply.send(stream);
   }
 
-  /** Keeps a backup on the server; reason goes into the file name (manual, before-restore). */
-  async saveSnapshot({ logs = true, reason = 'manual' } = {}) {
-    await fs.mkdir(this.dir, { recursive: true });
+  /**
+   * Keeps a backup on the server; reason goes into the file name (manual, before-restore, scheduled).
+   * dir: another folder (scheduled backups). The file is written as a hidden .part and renamed
+   * when complete, so a half-written backup never shows up (e.g. on a network share).
+   */
+  async saveSnapshot({ logs = true, reason = 'manual', dir = this.dir } = {}) {
+    await fs.mkdir(dir, { recursive: true });
     const { work, plan } = await this.build({ logs });
     const name = `${reason}-${stamp()}.zip`;
+    const part = path.join(dir, `.${name}.part`);
     try {
-      await pipeline(zipStream(plan), createWriteStream(path.join(this.dir, name)));
+      await pipeline(zipStream(plan), createWriteStream(part));
+      await fs.rename(part, path.join(dir, name));
+    } catch (err) {
+      await fs.rm(part, { force: true }).catch(() => {});
+      throw err;
     } finally {
       await fs.rm(work, { recursive: true, force: true });
     }
-    await this.prune();
-    return { name, size: plan.size };
+    if (dir === this.dir) await this.prune();
+    return { name, size: plan.size, dir };
   }
 
-  async listSnapshots() {
-    const names = (await fs.readdir(this.dir).catch(() => [])).filter((n) => SNAPSHOT_NAME.test(n));
+  async listSnapshots(dir = this.dir) {
+    const names = (await fs.readdir(dir).catch(() => [])).filter((n) => SNAPSHOT_NAME.test(n));
     const out = await Promise.all(
       names.map(async (name) => {
-        const st = await fs.stat(path.join(this.dir, name)).catch(() => null);
-        return st && { name, size: st.size, createdAt: st.mtimeMs, reason: name.startsWith('before-restore') ? 'before-restore' : 'manual' };
+        const st = await fs.stat(path.join(dir, name)).catch(() => null);
+        const reason = name.startsWith('before-restore') ? 'before-restore' : name.startsWith('scheduled-') ? 'scheduled' : 'manual';
+        return st && { name, size: st.size, createdAt: st.mtimeMs, reason };
       }),
     );
     return out.filter(Boolean).sort((a, b) => b.createdAt - a.createdAt);
+  }
+
+  /** The folder scheduled backups go to: the chosen one, or DATA_DIR/backups. */
+  scheduledDir() {
+    return this.settings.get('backupSchedule')?.folder || this.dir;
+  }
+
+  async listScheduled() {
+    return (await this.listSnapshots(this.scheduledDir())).filter((s) => s.reason === 'scheduled');
+  }
+
+  scheduledPath(name) {
+    if (typeof name !== 'string' || !/^scheduled-[\w.-]+\.zip$/.test(name)) throw badRequest('Invalid backup name');
+    return path.join(this.scheduledDir(), name);
+  }
+
+  async sendScheduled(name, reply) {
+    const file = this.scheduledPath(name);
+    const st = await fs.stat(file).catch(() => null);
+    if (!st) throw notFound(`Backup ${name} not found`);
+    reply.headers({ 'Content-Type': 'application/zip', 'Content-Disposition': attachment(name), 'Content-Length': st.size });
+    return reply.send(createReadStream(file));
+  }
+
+  async deleteScheduled(name) {
+    await fs.rm(this.scheduledPath(name), { force: true });
+    return { ok: true };
+  }
+
+  /** Keeps the newest `keep` scheduled backups in their folder; other files there are not touched. */
+  async pruneScheduled(keep) {
+    const dir = this.scheduledDir();
+    for (const s of (await this.listScheduled()).slice(keep)) await fs.rm(path.join(dir, s.name), { force: true });
   }
 
   snapshotPath(name) {
@@ -185,9 +229,10 @@ export class Backups {
   }
 
   sourcePath(source) {
-    const m = /^(upload|snapshot):(.+)$/.exec(String(source ?? ''));
+    const m = /^(upload|snapshot|scheduled):(.+)$/.exec(String(source ?? ''));
     if (!m) throw badRequest('Invalid backup source');
     if (m[1] === 'snapshot') return this.snapshotPath(m[2]);
+    if (m[1] === 'scheduled') return this.scheduledPath(m[2]);
     if (!/^[0-9a-f-]{36}$/.test(m[2])) throw badRequest('Invalid backup source');
     return path.join(this.tmpDir, `restore-${m[2]}.zip`);
   }
@@ -332,6 +377,7 @@ export class Backups {
       this.settings.set('queueRunning', scope === 'all' ? false : wasRunning);
       this.renamer?.seed();
       await this.watcher?.reconfigure();
+      this.scheduler?.reconfigure().catch(() => {});
       this.queue.scheduleChanged?.();
 
       if (scope === 'all') {

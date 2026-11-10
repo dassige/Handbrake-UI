@@ -676,7 +676,8 @@
         "The e-mail password for [notifications](#settings.notifications) is part of the settings, so it is in every backup: keep backup files somewhere private."
       ],
       "see": [
-        "settings.folders"
+        "settings.folders",
+        "backup.schedule"
       ]
     },
     "queue.eta": {
@@ -733,7 +734,7 @@
     "settings.notifications": {
       "title": "Notifications",
       "body": [
-        "The server can tell you when the queue finishes, a conversion or its check fails, each file is converted, or a watch folder adds files. Choose the events at the top; e-mail and the webhooks follow that list, unless a webhook has its own.",
+        "The server can tell you when the queue finishes, a conversion or its check fails, each file is converted, a watch folder adds files, or a scheduled backup fails. Choose the events at the top; e-mail and the webhooks follow that list, unless a webhook has its own.",
         "### Webhooks",
         "A JSON `POST` per message to a URL: an n8n **Webhook** node, a Home Assistant webhook trigger, ntfy, Gotify… Add as many as you need (up to 10) with **Add a webhook**; each has a name, an on/off switch, its URL and optional extra headers, e.g. `Authorization: Bearer …`, one per line.",
         "- Each webhook gets **the events chosen above**, or **only these events**: for example everything to n8n, but only “the queue finished” to Home Assistant.",
@@ -764,6 +765,23 @@
       "see": [
         "queue.eta",
         "presets"
+      ]
+    },
+    "backup.schedule": {
+      "title": "Scheduled backups",
+      "body": [
+        "Makes a [backup](#backup.overview) by itself every day or every week at the time you choose, and keeps the newest ones (14 by default). Older scheduled backups are deleted; other files in the folder are never touched.",
+        "- **Folder on the server**: empty means the app’s own `data/backups`. To keep backups off the server, use a network share that is mounted on it, e.g. a folder on the NAS. With Docker the folder must be inside the folder mounted into the container (`MEDIA_DIR`, usually `/mnt`). **Browse…** picks a folder under the sources or target folders; any other path can be typed.",
+        "- The folder must exist and be writable when you turn the schedule on.",
+        "- If the server was off or the share was not mounted at backup time, the backup is made as soon as possible. A failed backup is tried again after 30 minutes, and can send a [notification](#settings.notifications) (“A scheduled backup failed”).",
+        "- Each file is written under a temporary name and renamed when complete, so a half-written backup never appears in the folder.",
+        "- **Back up now** makes one straight away with the saved settings.",
+        "Scheduled backups are listed under **Kept by the schedule**, where they can be restored, downloaded or deleted like the others.",
+        "The backup holds the settings, so also the e-mail password for notifications: keep the folder private."
+      ],
+      "see": [
+        "backup.overview",
+        "settings.notifications"
       ]
     }
   }
