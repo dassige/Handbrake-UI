@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ArrowUpToLine, GripVertical, Pause, Play, RotateCcw, SkipForward, Square, Trash2, Wand2 } from 'lucide-react';
+import { ArrowDown, ArrowDownToLine, ArrowUp, ArrowUpToLine, GripVertical, Pause, Play, RotateCcw, SkipForward, Square, Trash2, Wand2 } from 'lucide-react';
 import { api } from '../api.js';
-import { bytes, dirName, duration, elapsed, fileName, percent, ratio, relTo, ago } from '../format.js';
+import { bytes, dirName, duration, elapsed, fileName, humanDuration, percent, ratio, relTo, ago } from '../format.js';
 import { StatusBadge, VerifyBadge } from './StatusBadge.jsx';
 import { useDialogs } from './Dialogs.jsx';
 
@@ -50,6 +50,10 @@ export function JobActions({ job, run, queueIndex = -1, labels = false, onRename
       {s === 'queued' && queueIndex > 0 && (
         btn({ icon: ArrowUpToLine, label: 'Move to top', onClick: () => act('move', { where: 'top' }) })
       )}
+      {/* In the details drawer: step by step, for touch screens where dragging doesn't work. */}
+      {s === 'queued' && labels && btn({ icon: ArrowUp, label: 'Up', title: 'Move one place up', onClick: () => act('move', { where: 'up' }) })}
+      {s === 'queued' && labels && btn({ icon: ArrowDown, label: 'Down', title: 'Move one place down', onClick: () => act('move', { where: 'down' }) })}
+      {s === 'queued' && labels && btn({ icon: ArrowDownToLine, label: 'Move to bottom', onClick: () => act('move', { where: 'bottom' }) })}
       {s === 'done' && onRename && btn({ icon: Wand2, label: 'Rename', title: 'Rename the converted file', onClick: () => onRename([job.outputPath]) })}
       {s === 'done' && (
         btn({ icon: RotateCcw, label: 'Convert again', title: 'Convert again (new job; the output gets a suffix)', onClick: () => act('again', { position: 'end' }) })
@@ -66,7 +70,7 @@ export function JobActions({ job, run, queueIndex = -1, labels = false, onRename
 
 export function JobRow({
   job, settings, selected, onSelect, run, onRename, queueIndex, dropBefore,
-  onJobDragStart, onJobDragEnd, onJobDragOver, onJobDrop,
+  onJobDragStart, onJobDragEnd, onJobDragOver, onJobDrop, estimate,
 }) {
   const active = job.status === 'running' || job.status === 'paused';
   useClock(job.status === 'running');
@@ -104,6 +108,7 @@ export function JobRow({
       info?.duration ? duration(info.duration) : null,
       info?.width ? `${info.width}×${info.height}` : null,
       info?.videoCodec,
+      estimate != null ? `≈ ${humanDuration(estimate)} to convert` : null,
     ];
   }
 

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { usePaneSwitch } from '../components/PaneSwitch.jsx';
 import {
   ArrowDown, ArrowUp, ChevronDown, ChevronRight, CircleAlert, CircleX, Combine, GripVertical, ListX, Square, Trash2, Upload, X,
 } from 'lucide-react';
@@ -164,8 +165,11 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
   const warnings = info?.problems.filter((p) => p.level === 'warning') ?? [];
   const parts = info?.parts ?? [];
 
+  const [paneClass, paneSwitch, showPane] = usePaneSwitch(['Converted files', `Parts${paths.length ? ` (${paths.length})` : ''}`]);
+
   return (
-    <main className="panes merge-panes">
+    <main className={`panes merge-panes ${paneClass}`}>
+      {paneSwitch}
       <SourceBrowser
         settings={settings}
         root="target"
@@ -174,7 +178,10 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
         hint="Drag files, or a folder with the parts, to the merge list. Ctrl/Shift-click to select several."
         help="merge.overview"
         changeTick={changeTick}
-        onAdd={addPaths}
+        onAdd={(list) => {
+          addPaths(list);
+          showPane(1);
+        }}
         onError={onError}
       />
 

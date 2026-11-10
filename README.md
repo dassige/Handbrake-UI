@@ -12,10 +12,14 @@ same preset.
 ## Features
 
 - **Presets from the desktop app.** In HandBrake, use Presets → Export, then
-  upload the `.json` here. Files with several presets or folders are supported.
+  import the `.json` on the **Presets** page. Files with several presets or
+  folders are supported. The page shows every setting of a preset, grouped like
+  HandBrake's tabs, plus its raw JSON, how it has performed (speed, size
+  reduction) and a download that HandBrake can import again.
 - **Server-local files.** You browse one or more configured *sources* folders
   (local disk, NFS or SMB mounts…) and results are written to a configured
-  *target* folder.
+  *target* folder. A sources folder can have a friendly name ("Downloads")
+  that the app shows instead of its path.
 - **Upload from your computer.** **Upload** in the Sources panel (or dropping
   files from your computer onto it) sends videos into the open folder, or into
   a new sub-folder. Files go in 32 MB chunks with automatic retries. An
@@ -57,7 +61,43 @@ same preset.
   - per-job details: source tracks, sizes, compression, encode time and the
     full HandBrake log
 - **Manual start.** Adding files never starts converting; press **Start**. The
-  queue stops by itself when the last job is done.
+  queue stops by itself when the last job is done. The conversion window and
+  watch folders can start it for you, both opt-in.
+- **Finish time.** The queue shows how much conversion time is left and when it
+  will be done, and each queued job shows its own estimate. The estimate is the
+  source length × the median speed of the last 20 conversions with the same
+  preset, check included. It follows the conversion window.
+- **Conversion window** (Settings → Conversion window): convert only between
+  set times on chosen days, e.g. 23:00–07:00. Outside the window the next job
+  waits; a job that is converting when it closes is finished. Optionally the
+  queue starts by itself when the window opens. **Start** outside the window
+  asks whether to wait for it or start now. The window follows the server's
+  clock (`TZ`).
+- **Watch folders** (Settings → Watch folders): new videos in chosen folders
+  under the sources are added to the queue by themselves, each with its own
+  preset, once they have not changed for a set time (polling, so it works on
+  NFS/SMB). Files already there when a folder is added are left alone, and each
+  file is added once. Add one with **Watch** next to the folder in the Sources
+  panel, or in Settings, where **Browse…** picks the folder on the server.
+- **Notifications** (Settings → Notifications): a webhook (JSON POST, e.g. n8n
+  or Home Assistant) and/or e-mail over SMTP when the queue finishes, a
+  conversion or its check fails, each file is converted, or a watch folder adds
+  files. Both have a **Send a test** button. The SMTP password is never sent
+  back to the browser (it is in backups). In the browser, the tab title shows
+  the progress; desktop notifications can be turned on per browser (they need
+  https or localhost).
+- **Stats** view: files converted, space saved, video length and encode time,
+  speed, check results, a per-day (or per-month) chart, a per-preset table and
+  the biggest savings, for 7 days to all time. The history is kept when jobs
+  are cleared from the queue.
+- **Settings page.** All settings are on one page, one section at a time, with
+  a save bar that lists the sections with unsaved changes. **About** has the
+  version, the release notes (from `CHANGELOG.md`, with links to GitHub),
+  credits and the licence.
+- **Works on a phone.** The top bar becomes compact, and two-panel views show
+  one panel at a time with a switch above them. Everything that needs drag and
+  drop on a computer has a button: Add to queue, and Up / Down / Move to top /
+  Move to bottom in a job's details.
 - **Safe output.** Each encode is written to `name.mkv.part` and renamed when it
   finishes, so media servers never pick up half-written files. Existing
   files are never overwritten: the new file gets a suffix, `name (1).mkv`.
@@ -120,7 +160,7 @@ cp .env.example .env      # set PUID/PGID, MEDIA_DIR, SOURCE_ROOT, TARGET_ROOT
 docker compose up -d --build
 ```
 
-Open `http://<server>:8095`, upload a preset (**Presets**), check the folders
+Open `http://<server>:8095`, import a preset (**Presets**), check the folders
 in **Settings**, then drag files into the queue.
 
 | `.env` | Meaning |
@@ -131,6 +171,7 @@ in **Settings**, then drag files into the queue.
 | `SOURCE_ROOT` / `TARGET_ROOT` | Initial folders, changeable later in the UI (where more sources folders can be added). They must be inside `MEDIA_DIR` |
 | `RENDER_GID` | Group of `/dev/dri/renderD128` on the host, for Intel Quick Sync |
 | `PORT` | Web UI port (default 8095) |
+| `TZ` | Time zone of the server clock, e.g. `Pacific/Auckland`. The conversion window uses it; Settings → Conversion window warns when it differs from the browser's |
 
 The database, logs and presets live in `./data`.
 
@@ -196,3 +237,11 @@ ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts   # compare with GitHub'
 
 Add `~/.ssh/handbrake-ui-deploy.pub` in GitHub → Settings → Deploy keys,
 without write access. The first deploy turns the folder into a checkout.
+
+## Licence
+
+MIT, see [LICENSE](LICENSE). © 2026 Gerry Dassi (DGSoft).
+
+HandBrakeCLI, FFmpeg and MKVToolNix, which the Docker image includes and the
+app runs, are separate programs under their own licences (GPL/LGPL). The full
+list of credits is in Settings → About (`web/src/settings/credits.json`).

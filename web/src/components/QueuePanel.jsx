@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Combine, Trash2, Upload, Wand2 } from 'lucide-react';
+import { CalendarClock, Clock, Combine, Trash2, Upload, Wand2 } from 'lucide-react';
+import { clockTime, humanDuration } from '../format.js';
 import { api } from '../api.js';
 import { DRAG_PATHS } from './SourceBrowser.jsx';
 import { JobRow, DRAG_JOB } from './JobRow.jsx';
@@ -15,7 +16,7 @@ const FILTERS = [
 
 export function QueuePanel({
   jobs, presets, presetId, onPresetChange, position, onPositionChange, settings,
-  onDropPaths, onSelect, selectedId, run, onRename, onMerge,
+  onDropPaths, onSelect, selectedId, run, onRename, onMerge, estimate, queueState,
 }) {
   const dialogs = useDialogs();
   const [filter, setFilter] = useState('all');
@@ -128,6 +129,8 @@ export function QueuePanel({
         </button>
       </div>
 
+      <EstimateBar estimate={estimate} queue={queueState} />
+
       <div className="job-list" onDragOver={(e) => dragJob != null && e.preventDefault()} onDrop={() => dragJob != null && reorderDrop(null)}>
         {visible.length === 0 && (
           <div className="drop-hint">
@@ -146,6 +149,7 @@ export function QueuePanel({
             onRename={onRename}
             queueIndex={queuedIds.indexOf(job.id)}
             queueLength={queuedIds.length}
+            estimate={job.status === 'queued' ? estimate?.perJob.get(job.id) : undefined}
             dropBefore={dropTarget === job.id}
             onJobDragStart={(e) => {
               e.dataTransfer.setData(DRAG_JOB, String(job.id));
@@ -173,5 +177,37 @@ export function QueuePanel({
         {dropActive && <div className="drop-overlay">Drop to add to the queue</div>}
       </div>
     </section>
+  );
+}
+
+/** "≈ 5 h 20 min left · done around 03:40", or why it isn't converting now. */
+function EstimateBar({ estimate, queue }) {
+  if (!estimate) return null;
+  const sched = queue?.schedule;
+  const parts = [];
+  if (estimate.seconds > 0) parts.push(`≈ ${humanDuration(estimate.seconds)} of conversion left`);
+  if (estimate.unknown) parts.push(`${estimate.unknown} job${estimate.unknown === 1 ? '' : 's'} not estimated yet`);
+  let when = null;
+  if (estimate.finishAt && !estimate.unknown) {
+    when = queue?.running ? `done around ${clockTime(estimate.finishAt)}` : `if started, done around ${clockTime(estimate.finishAt)}`;
+  }
+  let note = null;
+  if (sched?.enabled && !sched.override) {
+    if (sched.waiting && sched.nextStart) note = `Waiting for the conversion window: starts ${clockTime(sched.nextStart)}`;
+    else if (queue?.running && !sched.open && sched.nextStart) note = `Window closed: the current job finishes, the rest waits until ${clockTime(sched.nextStart)}`;
+    else if (queue?.running && sched.open && sched.closesAt) note = `Window open until ${clockTime(sched.closesAt)}`;
+  }
+  if (!parts.length && !note) return null;
+  return (
+    <div className="estimate-bar">
+      <Clock size={14} />
+      <span>
+        {parts.join(' · ')}
+        {when && <>{parts.length ? ' · ' : ''}<strong>{when}</strong></>}
+        {estimate.estimated > 0 && !estimate.unknown && <span className="muted"> (some lengths guessed)</span>}
+      </span>
+      {note && <span className="estimate-note"><CalendarClock size={14} /> {note}</span>}
+      <Help id="queue.eta" />
+    </div>
   );
 }

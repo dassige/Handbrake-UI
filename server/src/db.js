@@ -1,3 +1,4 @@
+import { backfillHistory } from './history.js';
 import { DatabaseSync } from 'node:sqlite';
 
 const SCHEMA = `
@@ -111,6 +112,41 @@ CREATE TABLE IF NOT EXISTS quality_scans (
   error       TEXT,
   results     TEXT               -- JSON list of file descriptions (quality.js describeMedia)
 );
+
+-- One row per finished conversion attempt; kept when jobs are cleared (history.js).
+CREATE TABLE IF NOT EXISTS job_history (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  job_id         INTEGER,
+  status         TEXT NOT NULL,    -- done | failed | cancelled
+  finished_at    INTEGER NOT NULL,
+  preset_name    TEXT,
+  source_path    TEXT,
+  output_path    TEXT,
+  source_size    INTEGER,
+  output_size    INTEGER,
+  media_seconds  REAL,             -- length of the source
+  encode_seconds REAL,             -- time spent, pauses left out, check included
+  avg_fps        REAL,
+  verify_status  TEXT,
+  origin         TEXT              -- 'watch' when a watch folder added the job
+);
+CREATE INDEX IF NOT EXISTS job_history_finished ON job_history(finished_at);
+
+-- Files a watch folder has dealt with, so each is added at most once (watch.js).
+CREATE TABLE IF NOT EXISTS watch_seen (
+  path    TEXT PRIMARY KEY,
+  folder  TEXT NOT NULL,
+  seen_at INTEGER NOT NULL,
+  action  TEXT NOT NULL,           -- existing | added | skipped
+  job_id  INTEGER,
+  note    TEXT
+);
+
+-- Watch folders whose existing files have been recorded as "existing".
+CREATE TABLE IF NOT EXISTS watch_folders (
+  path          TEXT PRIMARY KEY,
+  baselined_at  INTEGER NOT NULL
+);
 `;
 
 /** Columns added after the first release. */
@@ -118,15 +154,19 @@ const MIGRATIONS = [
   ['jobs', 'rename_note', 'TEXT'],
   ['jobs', 'verify', 'TEXT'], // JSON result of the check after conversion
   ['jobs', 'verify_status', 'TEXT'], // ok | warning | error | skipped | running
+  ['jobs', 'origin', 'TEXT'], // 'watch' when a watch folder added the job
 ];
 
 export function openDb(file) {
   const db = new DatabaseSync(file);
+  const hadHistory = !!db.prepare(`SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'job_history'`).get();
   db.exec(SCHEMA);
   for (const [table, column, type] of MIGRATIONS) {
     const cols = db.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
     if (!cols.includes(column)) db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
   }
+  // Before 1.4 there was no history: start it from the finished jobs still listed.
+  if (!hadHistory) backfillHistory(db);
   return db;
 }
 

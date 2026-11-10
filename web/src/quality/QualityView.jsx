@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { usePaneSwitch } from '../components/PaneSwitch.jsx';
 import { ArrowDown, ArrowUp, Download, Gauge, ListPlus, Square, Trash2 } from 'lucide-react';
 import { api } from '../api.js';
 import { SourceBrowser, browserRoots } from '../components/SourceBrowser.jsx';
@@ -6,6 +7,7 @@ import { StatusBadge } from '../components/StatusBadge.jsx';
 import { useDialogs } from '../components/Dialogs.jsx';
 import { bytes, dateTime, dirName, duration, fileName, relTo } from '../format.js';
 import { Help } from '../help/Help.jsx';
+import { rootLabel } from '../roots.js';
 
 const KINDS = [
   { id: 'format', label: 'Old format' },
@@ -163,12 +165,18 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
   );
   const rootOf = (p) => roots.filter((r) => p === r || p.startsWith(`${r}/`) || p.startsWith(`${r}\\`)).sort((a, b) => b.length - a.length)[0];
 
+  const [paneClass, paneSwitch, showPane] = usePaneSwitch(['Folders', 'Results']);
+
   return (
-    <main className="panes quality-panes">
+    <main className={`panes quality-panes ${paneClass}`}>
+      {paneSwitch}
       <SourceBrowser
         settings={settings}
         changeTick={changeTick}
-        onAdd={start}
+        onAdd={(list) => {
+          start(list);
+          showPane(1);
+        }}
         onError={onError}
         root="any"
         title="Folders"
@@ -297,7 +305,7 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
                               {f.job && <StatusBadge status={f.job} />}
                             </div>
                             <div className="old-name" title={f.path}>
-                              {dirName(f.path) === root ? root : <>{relTo(root, dirName(f.path))} <span className="muted">· {root}</span></>}
+                              {dirName(f.path) === root ? rootLabel(settings, root) : <>{relTo(root, dirName(f.path))} <span className="muted" title={root}>· {rootLabel(settings, root)}</span></>}
                             </div>
                           </td>
                           <td className="small nowrap">

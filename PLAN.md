@@ -146,5 +146,36 @@ target folder.
      of `origin/main`, never the local working copy.
    - All `window.confirm` calls replaced by `components/Dialogs.jsx`
      (`confirm` / `prompt` / `choose` / `alert`, Promise based).
-8. Later (optional) — watch folder, Emby library refresh, notifications
-   (n8n / Home Assistant).
+8. Round 5 (2026-11-10) — automation, stats, pages.
+   - History (`server/src/history.js`, table `job_history`): one row per
+     finished attempt (done, failed, or cancelled after it started), written in
+     `Queue.afterFinish`. On the first start it is filled from the finished jobs
+     still listed. "Clear" doesn't touch it.
+     - `speeds()`: median seconds of work per second of video, over the last 20
+       conversions per preset. It is sent with the queue state, and the UI
+       (`web/src/eta.js`) works out the remaining time and the finish time.
+     - `stats({ days })` feeds the Stats view.
+   - Conversion window (`schedule.js`, a copy in `web/src/schedule.js`; the
+     tests run both). `Queue.tick` holds the next job outside the window.
+     `scheduleTick` (every 30 s) starts the queue only on the closed → open
+     transition (setting `autoStart`), so a Stop during the window is respected.
+     `POST /api/queue/start { now: true }` ignores the window until the queue
+     stops.
+   - Watch folders (`watch.js`, tables `watch_seen`, `watch_folders`): polling,
+     because inotify doesn't see NFS changes made by other machines. A file is
+     added once its size is unchanged since the previous look and its mtime is
+     older than `settleMinutes`. Adding a folder records the files already there
+     as "existing". Jobs get `origin = 'watch'`.
+   - Notifications (`notify.js`): webhook via fetch, e-mail via nodemailer.
+     Events: queueFinished (summary of the run), jobFailed, checkFailed,
+     jobDone, watchAdded. `Settings.public()` strips the SMTP password, and a
+     save without a password keeps the saved one. Tab title and desktop
+     notifications are client-side (`web/src/attention.js`); desktop
+     notifications need a secure context, so plain http on the LAN can't use
+     them.
+   - UI: Settings and Presets became pages (`#settings/<section>`,
+     `#presets/<id>`) and Stats is a new view. The Backup dialog is now a
+     settings section. `web/src/presets/presetFields.js` describes the preset
+     keys, with choices, by HandBrake tab, ready for an in-app preset editor.
+9. Later (optional) — Emby library refresh as a plugin (needs a plugin
+   architecture first), editing presets in the app.

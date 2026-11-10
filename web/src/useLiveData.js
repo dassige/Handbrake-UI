@@ -6,7 +6,7 @@ import { api } from './api.js';
  * the server's event stream. `changeTick` increases whenever job statuses
  * change, so the file browser can refresh its badges.
  */
-export function useLiveData(onError, onNotice) {
+export function useLiveData(onError, onNotice, onEvent) {
   const [jobs, setJobs] = useState([]);
   const [queue, setQueue] = useState(null);
   const [presets, setPresets] = useState([]);
@@ -23,6 +23,10 @@ export function useLiveData(onError, onNotice) {
   errRef.current = onError;
   const noticeRef = useRef(onNotice);
   noticeRef.current = onNotice;
+  // onEvent('jobStatus', { prev, job }) / onEvent('queueFinished', queue): tab title and browser notifications.
+  const eventRef = useRef(onEvent);
+  eventRef.current = onEvent;
+  const [watch, setWatch] = useState(null);
 
   const loadJobs = useCallback(async () => {
     try {
@@ -76,7 +80,11 @@ export function useLiveData(onError, onNotice) {
       setJobs((list) => {
         const i = list.findIndex((j) => j.id === job.id);
         if (i < 0) return [...list, job];
-        if (list[i].status !== job.status) bump();
+        if (list[i].status !== job.status) {
+          bump();
+          const prev = list[i];
+          setTimeout(() => eventRef.current?.('jobStatus', { prev, job }));
+        }
         const next = list.slice();
         next[i] = job;
         return next;
@@ -97,7 +105,10 @@ export function useLiveData(onError, onNotice) {
     es.addEventListener('queue', (e) => {
       const q = JSON.parse(e.data);
       setQueue(q);
-      if (q.finished) noticeRef.current?.('Queue finished: every job is done. Press Start for the next ones.');
+      if (q.finished) {
+        noticeRef.current?.('Queue finished: every job is done. Press Start for the next ones.');
+        eventRef.current?.('queueFinished', q);
+      }
     });
     es.addEventListener('presets', () => loadPresets());
     es.addEventListener('renameRules', () => loadRenameRules());
@@ -121,6 +132,7 @@ export function useLiveData(onError, onNotice) {
       setQualityScans((list) => list.map((s) => (s.id === p.id ? { ...s, ...p } : s)));
     });
     es.addEventListener('qualityScan', () => setQualityTick((t) => t + 1));
+    es.addEventListener('watch', (e) => setWatch(JSON.parse(e.data)));
     es.addEventListener('settings', (e) => {
       setSettings(JSON.parse(e.data));
       bump();
@@ -132,7 +144,7 @@ export function useLiveData(onError, onNotice) {
   }, [loadJobs, loadPresets, loadRenameRules, loadMerges, loadQualityScans, loadSettings, loadInfo]);
 
   return {
-    jobs, queue, presets, renameRules, merges, qualityScans, qualityTick, settings, info, connected, changeTick,
+    jobs, queue, presets, renameRules, merges, qualityScans, qualityTick, settings, info, connected, changeTick, watch,
     reloadJobs: loadJobs, reloadPresets: loadPresets, setSettings,
   };
 }

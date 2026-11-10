@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { usePaneSwitch } from '../components/PaneSwitch.jsx';
 import { AlertTriangle, History, ListX, RotateCcw, SlidersHorizontal, Wand2, Upload } from 'lucide-react';
 import { api } from '../api.js';
 import { SourceBrowser, DRAG_PATHS } from '../components/SourceBrowser.jsx';
@@ -118,8 +119,11 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
 
   const allTicked = counts.rename > 0 && toRename.length === counts.rename;
 
+  const [paneClass, paneSwitch, showPane] = usePaneSwitch(['Converted files', `Rename list${paths.length ? ` (${paths.length})` : ''}`]);
+
   return (
-    <main className="panes rename-panes">
+    <main className={`panes rename-panes ${paneClass}`}>
+      {paneSwitch}
       <SourceBrowser
         settings={settings}
         root="target"
@@ -128,7 +132,10 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
         hint="Drag files or folders to the rename list. Ctrl/Shift-click to select several."
         help="rename.overview"
         changeTick={changeTick}
-        onAdd={addPaths}
+        onAdd={(list) => {
+          addPaths(list);
+          showPane(1);
+        }}
         onError={onError}
       />
 

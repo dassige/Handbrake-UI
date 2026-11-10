@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { badRequest } from './errors.js';
 import { isHiddenName, makeFileMatcher, naturalCompare, resolveUnderAny } from './paths.js';
+import { aboutInfo } from './about.js';
 
 const id = (req) => {
   const n = Number(req.params.id);
@@ -9,13 +10,20 @@ const id = (req) => {
   return n;
 };
 
-export function registerRoutes(app, { settings, presets, queue, events, handbrake, renamer, version }) {
+export function registerRoutes(app, { settings, presets, queue, events, handbrake, renamer, watcher, version, dataDir }) {
   // ------------------------------------------------------------- status
   let hbInfo = null;
   app.get('/api/info', async () => {
     hbInfo ??= await handbrake.info();
     // app = global (project) version, server = this service's package version.
-    return { app: version.app, server: version.server, handbrake: hbInfo, queue: queue.state() };
+    // The conversion window follows the server's clock (container TZ).
+    const time = { zone: Intl.DateTimeFormat().resolvedOptions().timeZone, offset: -new Date().getTimezoneOffset(), now: Date.now() };
+    return { app: version.app, server: version.server, handbrake: hbInfo, queue: queue.state(), time };
+  });
+
+  app.get('/api/about', async () => {
+    hbInfo ??= await handbrake.info();
+    return { ...aboutInfo({ version, dataDir }), handbrake: hbInfo };
   });
 
   app.get('/api/events', (req, reply) => {
@@ -24,11 +32,17 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
   });
 
   // ------------------------------------------------------------- settings
-  app.get('/api/settings', async () => settings.all());
+  app.get('/api/settings', async () => settings.public());
   app.put('/api/settings', async (req) => {
     if (req.body?.autoRenameRuleId != null) renamer.getRule(Number(req.body.autoRenameRuleId));
-    const result = await settings.update(req.body);
+    for (const f of req.body?.watch?.folders ?? []) {
+      if (f?.presetId != null && f.presetId !== '') presets.get(Number(f.presetId));
+    }
+    await settings.update(req.body);
+    const result = settings.public();
     events.emit('settings', result);
+    if ('schedule' in (req.body ?? {})) queue.scheduleChanged();
+    if ('watch' in (req.body ?? {}) || 'sourceRoots' in (req.body ?? {})) await watcher?.reconfigure();
     queue.tick();
     return result;
   });
@@ -81,7 +95,9 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
 
     const crumbs = [];
     for (let p = dir; ; p = path.dirname(p)) {
-      crumbs.unshift({ name: p === root ? path.basename(root) || root : path.basename(p), path: p });
+      // The root shows its friendly name (Settings → Folders) when it has one.
+      const rootName = settings.get('sourceNames')?.[root] || path.basename(root) || root;
+      crumbs.unshift({ name: p === root ? rootName : path.basename(p), path: p });
       if (p === root || path.dirname(p) === p) break;
     }
     return { root, path: dir, parent: dir === root ? null : path.dirname(dir), crumbs, items };
@@ -106,6 +122,15 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
     const result = await presets.import(data, fileName);
     events.emit('presets');
     return result;
+  });
+  // The preset as a file HandBrake (desktop or CLI) can import.
+  app.get('/api/presets/:id/export', async (req, reply) => {
+    const p = presets.get(id(req));
+    const safe = p.name.replace(/[^\w .()-]+/g, '_').trim() || 'preset';
+    reply
+      .type('application/json; charset=utf-8')
+      .header('Content-Disposition', `attachment; filename="${safe}.json"; filename*=UTF-8''${encodeURIComponent(p.name)}.json`);
+    return p.json;
   });
   app.post('/api/presets/:id/default', async (req) => {
     presets.setDefault(id(req));
@@ -160,8 +185,9 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
   action('move', (jobId, body) => queue.move(jobId, body.where));
   action('verify', (jobId) => queue.verifyJob(jobId));
 
-  app.post('/api/queue/start', async () => {
-    queue.setRunning(true);
+  // body.now: start even outside the conversion window.
+  app.post('/api/queue/start', async (req) => {
+    queue.setRunning(true, { now: req.body?.now === true });
     return queue.state();
   });
   app.post('/api/queue/stop', async () => {

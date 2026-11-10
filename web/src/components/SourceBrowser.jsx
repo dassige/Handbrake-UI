@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowUp, ChevronRight, Download, FileVideo, Folder, FolderOpen, ListPlus, Lock, RefreshCw, Trash2, Upload } from 'lucide-react';
+import { ArrowUp, ChevronRight, Download, Eye, FileVideo, Folder, FolderOpen, ListPlus, Lock, RefreshCw, Trash2, Upload } from 'lucide-react';
+import { rootLabel, watchedFolder } from '../roots.js';
 import { api } from '../api.js';
 import { bytes, dateTime } from '../format.js';
 import { FolderBadges, StatusBadge } from './StatusBadge.jsx';
@@ -40,7 +41,7 @@ export function browserRoots(settings, kind) {
  */
 export function SourceBrowser({
   settings, changeTick, onAdd, onError, root = 'source', title = 'Sources', addLabel = 'Add to queue',
-  hint = 'Drag files or folders to the queue. Ctrl/Shift-click to select several.', help, onUpload, allowDelete, onNotice,
+  hint = 'Drag files or folders to the queue. Ctrl/Shift-click to select several.', help, onUpload, allowDelete, onNotice, onWatch,
 }) {
   const [dir, setDir] = useState(null); // null = the chosen root
   const [listing, setListing] = useState(null);
@@ -178,8 +179,8 @@ export function SourceBrowser({
               aria-label="Folder to browse"
             >
               {roots.map((r) => (
-                <option key={r} value={r}>
-                  {root === 'any' && r === settings.targetRoot ? `${r} (target)` : r}
+                <option key={r} value={r} title={r}>
+                  {rootLabel(settings, r)}
                   {root === 'source' && settings.protectedRoots?.includes(r) ? ' (protected)' : ''}
                 </option>
               ))}
@@ -217,6 +218,25 @@ export function SourceBrowser({
             )}
           </span>
         ))}
+        {onWatch && listing && (
+          watchedFolder(settings, listing.path) ? (
+            <button
+              className={`watch-pill ${settings.watch.enabled ? 'on' : ''}`}
+              onClick={() => onWatch(listing.path)}
+              title={settings.watch.enabled ? 'New videos in this folder are added to the queue by themselves. Click for the settings.' : 'A watch folder, but watching is off in Settings'}
+            >
+              <Eye size={13} /> {settings.watch.enabled ? 'Watched' : 'Watched (off)'}
+            </button>
+          ) : (
+            <button
+              className="btn ghost small watch-btn"
+              onClick={() => onWatch(listing.path)}
+              title="Add new videos that appear in this folder to the queue by themselves"
+            >
+              <Eye size={14} /> Watch
+            </button>
+          )
+        )}
       </nav>
 
       <div className="select-bar">
@@ -305,6 +325,9 @@ export function SourceBrowser({
               <FileVideo size={17} className="file-icon" />
             )}
             <span className="file-name">{item.name}</span>
+            {item.type === 'dir' && watchedFolder(settings, item.path) && (
+              <Eye size={14} className="watched-icon" aria-label="Watch folder" title="Watch folder" />
+            )}
             <span className="file-meta">
               <button
                 className="icon-btn row-download"

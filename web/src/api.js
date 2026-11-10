@@ -15,6 +15,7 @@ const post = (url, body = {}) => request('POST', url, body);
 
 export const api = {
   info: () => get('/api/info'),
+  about: () => get('/api/about'),
   settings: () => get('/api/settings'),
   saveSettings: (s) => request('PUT', '/api/settings', s),
   browse: (root, path) =>
@@ -25,6 +26,7 @@ export const api = {
   uploadPreset: (fileName, content) => post('/api/presets', { fileName, content }),
   setDefaultPreset: (id) => post(`/api/presets/${id}/default`),
   deletePreset: (id) => request('DELETE', `/api/presets/${id}`),
+  presetExportUrl: (id) => `/api/presets/${id}/export`,
 
   jobs: () => get('/api/jobs'),
   addJobs: (paths, presetId, position) => post('/api/jobs', { paths, presetId, position }),
@@ -34,7 +36,8 @@ export const api = {
   reorder: (ids) => post('/api/jobs/reorder', { ids }),
   removeJobs: (ids) => post('/api/jobs/remove', { ids }),
   clearJobs: (statuses) => post('/api/jobs/clear', { statuses }),
-  startQueue: () => post('/api/queue/start'),
+  // now: start even outside the conversion window
+  startQueue: (now = false) => post('/api/queue/start', { now }),
   stopQueue: () => post('/api/queue/stop'),
 
   merges: () => get('/api/merge'),
@@ -66,6 +69,12 @@ export const api = {
     return data;
   },
   restoreBackup: (source, scope) => post('/api/backup/restore', { source, scope }),
+
+  stats: (days) => get(`/api/stats?days=${days}`),
+  watchStatus: () => get('/api/watch'),
+  watchScan: () => post('/api/watch/scan'),
+  recentNotifications: () => get('/api/notifications/recent'),
+  testNotification: (channel, notifications) => post('/api/notifications/test', { channel, notifications }),
 
   qualityScans: () => get('/api/quality/scans'),
   qualityScan: (id) => get(`/api/quality/scans/${id}`),

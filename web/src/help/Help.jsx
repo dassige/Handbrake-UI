@@ -78,8 +78,8 @@ export function HelpProvider({ children }) {
 export function HelpSearchButton() {
   const search = useHelpSearch();
   return (
-    <button className="btn ghost" onClick={search} title="Search help">
-      <CircleHelp size={16} /> Help
+    <button className="btn ghost" onClick={search} title="Search help" aria-label="Search help">
+      <CircleHelp size={16} /> <span className="btn-label">Help</span>
     </button>
   );
 }

@@ -66,3 +66,29 @@ export function ratio(job) {
   if (!job.sourceSize || !job.outputSize) return null;
   return Math.round((1 - job.outputSize / job.sourceSize) * 100);
 }
+
+/** "5 h 20 min", "12 min", "40 s". */
+export function humanDuration(seconds) {
+  if (seconds == null || !isFinite(seconds)) return '—';
+  const s = Math.max(0, Math.round(seconds));
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  if (d) return `${d} d ${h} h`;
+  if (h) return m ? `${h} h ${m} min` : `${h} h`;
+  if (m) return `${m} min`;
+  return `${s} s`;
+}
+
+/** A moment in the near future: "14:05", "tomorrow 03:40", "Thu 03:40", "24 Nov 03:40". */
+export function clockTime(ms, now = Date.now()) {
+  if (ms == null) return '—';
+  const t = new Date(ms);
+  const time = t.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  const day = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const days = Math.round((day(t) - day(new Date(now))) / 86_400_000);
+  if (days === 0) return time;
+  if (days === 1) return `tomorrow ${time}`;
+  if (days > 1 && days < 7) return `${t.toLocaleDateString(undefined, { weekday: 'short' })} ${time}`;
+  return `${t.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} ${time}`;
+}

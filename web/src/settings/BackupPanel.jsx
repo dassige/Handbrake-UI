@@ -2,10 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArchiveRestore, Download, HardDriveDownload, RotateCcw, Save, Trash2, Upload } from 'lucide-react';
 import { api } from '../api.js';
 import { bytes, dateTime } from '../format.js';
-import { Modal } from './Modal.jsx';
-import { useDialogs } from './Dialogs.jsx';
+import { useDialogs } from '../components/Dialogs.jsx';
 import { startDownload } from '../download/useDownload.jsx';
-import { Help } from '../help/Help.jsx';
+import { Card } from './fields.jsx';
 
 const COUNTS = [
   { key: 'presets', label: 'Presets', config: true },
@@ -16,8 +15,8 @@ const COUNTS = [
   { key: 'qualityScans', label: 'Quality check results' },
 ];
 
-/** Downloads or keeps backups of the settings and database, and restores them. */
-export function BackupDialog({ run, onError, onNotice, onClose }) {
+/** Downloads or keeps backups of the settings and database, and restores them (Settings → Backup and restore). */
+export function BackupPanel({ run, onError, onNotice }) {
   const dialogs = useDialogs();
   const [logs, setLogs] = useState(true);
   const [snapshots, setSnapshots] = useState(null);
@@ -90,7 +89,7 @@ export function BackupDialog({ run, onError, onNotice, onClose }) {
               ? 'Everything will be replaced with the backup: settings, presets, rename rules, jobs and their logs, rename history, merges and quality results.'
               : 'Settings, presets and rename rules will be replaced with the backup. Jobs and history stay as they are.'}
           </p>
-          <p className="muted small">The current data is saved on the server first, so you can go back to it from this window.</p>
+          <p className="muted small">The current data is saved on the server first, so you can go back to it from Settings → Backup and restore.</p>
         </>
       ),
       buttons: [
@@ -117,21 +116,9 @@ export function BackupDialog({ run, onError, onNotice, onClose }) {
   const v = m?.versions?.app?.version;
 
   return (
-    <Modal
-      title={<>Backup and restore<Help id="backup.overview" /></>}
-      ariaLabel="Backup and restore"
-      onClose={onClose}
-      wide
-      footer={
-        <>
-          {busy && <span className="muted small spacer">{busy}</span>}
-          <button className="btn" onClick={onClose}>Close</button>
-        </>
-      }
-    >
-      <section className="backup-section">
-        <h3>Make a backup</h3>
-        <p className="muted small">
+    <>
+      <Card title="Make a backup" help="backup.overview" aside={busy && <span className="muted small">{busy}</span>}>
+        <p className="set-hint">
           Settings, presets, rename rules, the job list and history, merges and quality results. Video files are not included.
         </p>
         <label className="check">
@@ -146,10 +133,9 @@ export function BackupDialog({ run, onError, onNotice, onClose }) {
             <Save size={15} /> Save on the server
           </button>
         </div>
-      </section>
+      </Card>
 
-      <section className="backup-section">
-        <h3>Restore</h3>
+      <Card title="Restore">
         <div className="backup-actions">
           <button className="btn" disabled={!!busy} onClick={() => fileInput.current?.click()}>
             <Upload size={15} /> Choose a backup file…
@@ -218,11 +204,10 @@ export function BackupDialog({ run, onError, onNotice, onClose }) {
             </div>
           </div>
         )}
-      </section>
+      </Card>
 
-      <section className="backup-section">
-        <h3>Backups on the server</h3>
-        {snapshots?.length === 0 && <p className="muted small">None yet. “Save on the server” and every restore add one here.</p>}
+      <Card title="Backups on the server">
+        {snapshots?.length === 0 && <p className="set-hint">None yet. “Save on the server” and every restore add one here.</p>}
         {snapshots?.length > 0 && (
           <ul className="backup-list">
             {snapshots.map((s) => (
@@ -245,7 +230,7 @@ export function BackupDialog({ run, onError, onNotice, onClose }) {
             ))}
           </ul>
         )}
-      </section>
-    </Modal>
+      </Card>
+    </>
   );
 }

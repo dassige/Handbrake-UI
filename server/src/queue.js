@@ -6,12 +6,13 @@ import {
   collectVideos, extensionForFormat, isInside, makeFileMatcher, plannedOutputPath,
   resolveUnderAny, uniquePath,
 } from './paths.js';
+import { inWindow, nextWindowStart, windowEnd } from './schedule.js';
 
 const ACTIVE = ['running', 'paused'];
 const FINISHED = ['done', 'failed', 'cancelled'];
 const LIST_COLUMNS = `id, status, phase, position, source_path, output_path, preset_id, preset_name,
   format, created_at, started_at, finished_at, paused_ms, progress, fps, avg_fps, eta, pass,
-  pass_count, source_size, output_size, source_info, scan_error, exit_code, error, attempts, rename_note, verify, verify_status`;
+  pass_count, source_size, output_size, source_info, scan_error, exit_code, error, attempts, rename_note, verify, verify_status, origin`;
 
 function rowToJob(r) {
   if (!r) return r;
@@ -45,11 +46,12 @@ function rowToJob(r) {
     renameNote: r.rename_note,
     verifyStatus: r.verify_status,
     verify: r.verify ? JSON.parse(r.verify) : null,
+    origin: r.origin ?? null,
   };
 }
 
 export class Queue {
-  constructor({ db, settings, presets, handbrake, verifier, events, dataDir, log }) {
+  constructor({ db, settings, presets, handbrake, verifier, events, dataDir, log, history = null, notifier = null }) {
     this.db = db;
     this.settings = settings;
     this.presets = presets;
@@ -65,6 +67,13 @@ export class Queue {
     this.scanning = false;
     this.lastEmit = 0;
     this.lastSave = 0;
+    this.history = history;
+    this.notifier = notifier;
+    // Start pressed with "Start now" outside the conversion window: ignore the window until the queue stops.
+    this.scheduleOverride = false;
+    // Jobs started since Start was pressed, for the "queue finished" notification.
+    this.run = null;
+    this.lastInWindow = null;
   }
 
   // ---------------------------------------------------------------- startup
@@ -119,13 +128,66 @@ export class Queue {
   }
 
   state() {
+    const counts = Object.fromEntries(
+      this.db.prepare('SELECT status, COUNT(*) AS n FROM jobs GROUP BY status').all().map((r) => [r.status, r.n]),
+    );
+    const schedule = this.settings.get('schedule');
+    const now = new Date();
+    const open = inWindow(schedule, now);
+    const running = this.settings.get('queueRunning');
     return {
-      running: this.settings.get('queueRunning'),
+      running,
       activeJobId: this.active?.id ?? null,
-      counts: Object.fromEntries(
-        this.db.prepare('SELECT status, COUNT(*) AS n FROM jobs GROUP BY status').all().map((r) => [r.status, r.n]),
-      ),
+      counts,
+      schedule: {
+        enabled: !!schedule?.enabled,
+        open,
+        override: this.scheduleOverride,
+        // Started, but holding the next job until the window opens.
+        waiting: running && !this.active && !open && !this.scheduleOverride && (counts.queued ?? 0) > 0,
+        nextStart: schedule?.enabled && !open ? nextWindowStart(schedule, now)?.getTime() ?? null : null,
+        closesAt: schedule?.enabled && open ? windowEnd(schedule, now)?.getTime() ?? null : null,
+      },
+      // Seconds of work per second of video, from recent conversions (for the finish time).
+      speeds: this.history?.speeds() ?? null,
     };
+  }
+
+  /** True when the queue may start a new job now (conversion window). */
+  mayStartNow() {
+    return this.scheduleOverride || inWindow(this.settings.get('schedule'));
+  }
+
+  /**
+   * Called every 30 s: starts the queue when the window opens (setting "autoStart")
+   * and wakes a queue that was waiting for it.
+   */
+  scheduleTick() {
+    const schedule = this.settings.get('schedule');
+    const open = inWindow(schedule);
+    const opened = this.lastInWindow === false && open;
+    const changed = this.lastInWindow !== null && this.lastInWindow !== open;
+    this.lastInWindow = open;
+    if (!schedule?.enabled) return;
+    if (opened && schedule.autoStart && !this.settings.get('queueRunning')) {
+      const queued = this.db.prepare(`SELECT COUNT(*) AS n FROM jobs WHERE status = 'queued'`).get().n;
+      if (queued) {
+        this.log.info(`Conversion window opened: starting the queue (${queued} job(s))`);
+        this.setRunning(true);
+        return;
+      }
+    }
+    if (changed) {
+      this.events.emit('queue', this.state());
+      this.tick();
+    }
+  }
+
+  /** The schedule was edited: a window that is open now does not count as "just opened". */
+  scheduleChanged() {
+    this.lastInWindow = inWindow(this.settings.get('schedule'));
+    this.events.emit('queue', this.state());
+    this.tick();
   }
 
   /** Latest job status per source path, for the file browser badges. */
@@ -173,7 +235,7 @@ export class Queue {
    * Adds files and folders (absolute paths under a source root).
    * Returns { added: [ids], skipped: [{ path, reason }] }.
    */
-  async add({ paths, presetId, position = 'end' }) {
+  async add({ paths, presetId, position = 'end', origin = null }) {
     if (!Array.isArray(paths) || !paths.length) throw badRequest('Nothing to add');
     const sourceRoots = this.settings.get('sourceRoots');
     const preset = this.presets.resolve(presetId);
@@ -211,12 +273,12 @@ export class Queue {
       let pos = this.nextPosition(position, toAdd.length);
       const insert = this.db.prepare(
         `INSERT INTO jobs (status, position, source_path, output_path, preset_id, preset_name, preset_json,
-          format, created_at, source_size) VALUES ('queued', ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          format, created_at, source_size, origin) VALUES ('queued', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       );
       return toAdd.map((f, i) => {
         const r = insert.run(
           pos++, f, plannedOutputPath(f, this.settings, format), preset.id, preset.name, preset.json,
-          format, Date.now(), sizes[i],
+          format, Date.now(), sizes[i], origin,
         );
         return Number(r.lastInsertRowid);
       });
@@ -378,7 +440,11 @@ export class Queue {
 
   // ---------------------------------------------------------------- queue control
 
-  setRunning(running) {
+  /** Starts or stops the queue. `now` ignores the conversion window until the queue stops. */
+  setRunning(running, { now = false } = {}) {
+    const wasRunning = this.settings.get('queueRunning');
+    if (running && !wasRunning) this.run = null;
+    this.scheduleOverride = !!running && (now || (this.scheduleOverride && wasRunning));
     this.settings.set('queueRunning', !!running);
     this.events.emit('queue', this.state());
     this.tick();
@@ -446,10 +512,15 @@ export class Queue {
     if (!next) {
       // Nothing left: stop, so files added later wait for a manual Start.
       this.settings.set('queueRunning', false);
-      this.events.emit('queue', { ...this.state(), finished: this.ranSinceStart === true });
+      this.scheduleOverride = false;
+      const finished = this.ranSinceStart === true;
+      this.events.emit('queue', { ...this.state(), finished });
       this.ranSinceStart = false;
+      if (finished) this.notifyRunFinished();
       return;
     }
+    // Outside the conversion window the next job waits (a running one was allowed to finish).
+    if (!this.mayStartNow()) return;
     this.starting = true;
     this.start(next.id)
       .catch((err) => this.log.error(err, `Job ${next.id} failed to start`))
@@ -466,6 +537,10 @@ export class Queue {
         .prepare(`UPDATE jobs SET status = 'failed', error = ?, finished_at = ?, attempts = attempts + 1 WHERE id = ?`)
         .run(msg, Date.now(), id);
       this.emitJob(id);
+      this.ranSinceStart = true;
+      this.run ??= { startedAt: Date.now(), ids: [] };
+      this.run.ids.push(id);
+      this.notifier?.notify('jobFailed', this.get(id));
     };
 
     const sourceStat = await fs.stat(row.source_path).catch(() => null);
@@ -509,6 +584,8 @@ export class Queue {
     });
     this.active = active;
     this.ranSinceStart = true;
+    this.run ??= { startedAt: Date.now(), ids: [] };
+    this.run.ids.push(id);
     this.log.info(`Job ${id}: encoding ${row.source_path} -> ${finalPath}`);
     this.emitJob(id);
     this.events.emit('queue', this.state());
@@ -597,6 +674,7 @@ export class Queue {
 
     await fs.rm(active.presetFile, { force: true }).catch(() => {});
     this.log.info(`Job ${id}: finished (code=${code}${signal ? ` signal=${signal}` : ''})`);
+    if (!active.shuttingDown) this.afterFinish(id);
     if (this.active === active) this.active = null;
     if (!active.shuttingDown) {
       this.emitJob(id);
@@ -684,6 +762,30 @@ export class Queue {
       this.log.error(err, `Job ${id}: automatic rename failed`);
       this.db.prepare('UPDATE jobs SET rename_note = ? WHERE id = ?').run(`Automatic rename failed: ${err.message}`, id);
     }
+  }
+
+  /** Records a finished job in the history and sends its notification. */
+  afterFinish(id) {
+    const row = this.db.prepare('SELECT * FROM jobs WHERE id = ?').get(id);
+    if (!row) return;
+    try {
+      this.history?.record(row);
+    } catch (err) {
+      this.log.error(err, `Job ${id}: could not record it in the history`);
+    }
+    const job = rowToJob(row);
+    if (job.status === 'failed') this.notifier?.notify('jobFailed', job);
+    else if (job.status === 'done') this.notifier?.notify(job.verifyStatus === 'error' ? 'checkFailed' : 'jobDone', job);
+  }
+
+  /** "Queue finished" notification with what this run did. */
+  notifyRunFinished() {
+    const run = this.run;
+    this.run = null;
+    if (!run?.ids.length) return;
+    const get = this.db.prepare(`SELECT ${LIST_COLUMNS} FROM jobs WHERE id = ?`);
+    const jobs = run.ids.map((id) => rowToJob(get.get(id))).filter(Boolean);
+    this.notifier?.notify('queueFinished', { jobs, startedAt: run.startedAt, finishedAt: Date.now() });
   }
 
   async markFailed(id, now, code, reason) {

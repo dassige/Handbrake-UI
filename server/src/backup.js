@@ -23,7 +23,7 @@ import { ZipError, extractEntry, readZipEntries } from './zipReader.js';
 
 export const FORMAT = 1;
 export const CONFIG_TABLES = ['settings', 'presets', 'rename_rules'];
-export const ALL_TABLES = [...CONFIG_TABLES, 'jobs', 'rename_history', 'merges', 'quality_scans'];
+export const ALL_TABLES = [...CONFIG_TABLES, 'jobs', 'rename_history', 'merges', 'quality_scans', 'job_history', 'watch_seen', 'watch_folders'];
 const KEEP_SNAPSHOTS = 10;
 const MAX_UPLOAD = 1024 * 1024 * 1024;
 const SNAPSHOT_NAME = /^[\w.-]+\.zip$/;
@@ -51,8 +51,8 @@ export function countRows(db, schema = 'main') {
 const columns = (db, schema, table) => db.prepare(`PRAGMA ${schema}.table_info(${table})`).all().map((c) => c.name);
 
 export class Backups {
-  constructor({ db, dataDir, settings, queue, merger, quality, uploads, renamer, events, log, versions }) {
-    Object.assign(this, { db, settings, queue, merger, quality, uploads, renamer, events, log, versions });
+  constructor({ db, dataDir, settings, queue, merger, quality, uploads, renamer, watcher, events, log, versions }) {
+    Object.assign(this, { db, settings, queue, merger, quality, uploads, renamer, watcher, events, log, versions });
     this.dir = path.join(dataDir, 'backups');
     this.logDir = path.join(dataDir, 'logs');
     this.tmpDir = path.join(dataDir, 'tmp');
@@ -331,6 +331,8 @@ export class Backups {
       this.settings.reload();
       this.settings.set('queueRunning', scope === 'all' ? false : wasRunning);
       this.renamer?.seed();
+      await this.watcher?.reconfigure();
+      this.queue.scheduleChanged?.();
 
       if (scope === 'all') {
         await fs.mkdir(this.logDir, { recursive: true });
@@ -342,7 +344,7 @@ export class Backups {
       }
 
       for (const e of ['jobs', 'presets', 'renameRules', 'merges', 'qualityScans']) this.events.emit(e);
-      this.events.emit('settings', this.settings.all());
+      this.events.emit('settings', this.settings.public());
       this.events.emit('queue', this.queue.state());
       this.log.info(`Restored ${scope === 'all' ? 'everything' : 'the configuration'} from ${source}; previous data saved as ${saved.name}`);
       if (source.startsWith('upload:')) await fs.rm(u.file, { force: true });

@@ -22,7 +22,10 @@
         "1. In **Rename**, give the converted files clean names: see [Renaming files](#rename.overview).",
         "Optionally, join several converted files into one (e.g. a film split in two parts) in **Merge**: see [Merging files](#merge.overview).",
         "To find old or low-quality files anywhere in your folders, use **Quality**: see [Quality check](#quality.overview).",
-        "Source files are never changed, so downloads can keep seeding. They are deleted only when you ask: see [Deleting source files](#delete.overview)."
+        "To convert without being there: a [conversion window](#settings.schedule) runs the queue at night, [watch folders](#settings.watch) add new downloads by themselves, and [notifications](#settings.notifications) tell you how it went. **Stats** shows what has been converted: see [Stats](#stats.overview).",
+        "Source files are never changed, so downloads can keep seeding. They are deleted only when you ask: see [Deleting source files](#delete.overview).",
+        "On a phone the app works the same way: views with two panels (Sources and Queue, files and the rename list…) show one panel at a time, with a switch above them; adding files jumps to the second panel. Drag and drop needs a mouse, so on a touch screen use the check boxes and **Add to queue**, and the **Up**, **Down**, **Move to top** and **Move to bottom** buttons in a job's details to reorder the queue.",
+        "Settings → **About** has the version, release notes, credits and the licence (MIT)."
       ],
       "see": [
         "convert.sources",
@@ -80,15 +83,19 @@
     "queue.state": {
       "title": "Starting and stopping the queue",
       "body": [
-        "The queue **never starts by itself**: adding or dropping files only puts them in the list. Press **Start** to begin converting.",
+        "The queue **never starts by itself** unless you ask for it: adding or dropping files only puts them in the list. Press **Start** to begin converting.",
         "- While it runs, files you add join the run.",
         "- When the last job is done the queue stops again, so the next files you add wait for **Start**.",
         "- **Stop after current** lets the job being converted finish, then stops. To stop at once, pause or cancel that job.",
-        "- If the server restarts during a run, the run continues after the restart. The job that was converting starts again from 0%, because HandBrake cannot resume an encode halfway."
+        "- If the server restarts during a run, the run continues after the restart. The job that was converting starts again from 0%, because HandBrake cannot resume an encode halfway.",
+        "Two settings can start it for you: the [conversion window](#settings.schedule) (start when the window opens) and [watch folders](#settings.watch) (start after adding new files).",
+        "With a conversion window, **Start** outside the window asks whether to **wait for the window** (the top bar then shows “Waiting for 23:00”) or **start now**, which ignores the window until the queue stops."
       ],
       "see": [
         "convert.queue",
-        "job.actions"
+        "job.actions",
+        "queue.eta",
+        "settings.schedule"
       ]
     },
     "job.statuses": {
@@ -220,11 +227,12 @@
     "presets": {
       "title": "Presets",
       "body": [
-        "A preset holds every conversion setting: video encoder and quality, size, frame rate, audio and subtitle tracks, container. Presets are made in the HandBrake desktop app and uploaded here.",
+        "A preset holds every conversion setting: video encoder and quality, size, frame rate, audio and subtitle tracks, container. Presets are made in the HandBrake desktop app and imported here, on the **Presets** page.",
         "1. In HandBrake: **Presets** → select your preset → **Export**.",
-        "1. Here: drop the `.json` file in **Presets**, or choose it.",
+        "1. Here: open **Presets** (top right), then press **Import** or drop the `.json` file anywhere on the page.",
         "- A file can hold several presets, also inside folders: each one is added.",
-        "- Uploading a preset with the same name again replaces the old one.",
+        "- Importing a preset with the same name again replaces the old one. To change a preset, edit it in HandBrake and import it again.",
+        "- The page shows every setting of the chosen preset, grouped like HandBrake’s tabs, plus the raw JSON and how the preset has performed (speed, size reduction). **Download** gives a file HandBrake can import.",
         "- The **default** preset (★) is used when you add files, unless you choose another one in the Queue.",
         "- Each job keeps a copy of its preset, so changing or deleting a preset never changes jobs already in the queue.",
         "The encoder always comes from the preset. Hardware encoders (`qsv_h264`, `qsv_h265`) convert on the Intel GPU: see [Quick Sync (GPU) presets](#presets.qsv). The encoders available on this server are listed in Settings → About."
@@ -261,6 +269,7 @@
       "body": [
         "Folders on the server (not on your computer). NAS shares mounted on the server work too.",
         "- **Sources folders**: where the files to convert are. Add as many as you need with **Add a sources folder**; the Sources panel shows one at a time and can't go above it. Removing a folder from the list deletes nothing.",
+        "- **Name** (optional) on a sources folder: a friendly name such as “Downloads”, shown instead of the path in the Sources panel, the folder lists and the Quality view. Each name can be used once, up to 40 characters; an empty name shows the folder’s own name.",
         "- **Protect** on a sources folder: stops its files and folders being deleted from the app, for example the folder a download client is still seeding from. In the Sources panel such a folder shows **Protected** instead of the Delete button, and the server refuses deletes there too.",
         "- **Target folder**: where converted files are written. The Rename and Merge views work only here.",
         "All must exist. The target cannot be inside a sources folder, and a sources folder cannot be inside another one. In Docker they must be inside the folder mounted into the container (`MEDIA_DIR`, usually `/mnt`).",
@@ -654,7 +663,7 @@
       "title": "Backup and restore",
       "body": [
         "A backup holds the app's own data: settings (folders, quality criteria…), presets, rename rule sets, the job list and history, rename history, merges and quality check results. Optionally it also holds the HandBrake log of each job. Video files are never part of it.",
-        "Open it from [Settings](#settings.folders) → **Backup and restore…**.",
+        "It is in [Settings](#settings.folders) → **Backup and restore**.",
         "- **Download backup** saves a ZIP file on your computer.",
         "- **Save on the server** keeps one in the app's data folder (`data/backups`). The newest 10 are kept.",
         "### Restoring",
@@ -663,10 +672,96 @@
         "1. Choose **Configuration only** (settings, presets and rename rules; jobs and history stay) or **Everything** (also jobs and their logs, histories, merges and quality results).",
         "1. Press **Restore…** and confirm. The page reloads afterwards.",
         "Before every restore the current data is saved on the server as **Before a restore**, so a restore can be undone by restoring that one.",
-        "A restore never starts the queue. **Everything** can't be restored while a conversion, merge, quality check or upload is running."
+        "A restore never starts the queue. **Everything** can't be restored while a conversion, merge, quality check or upload is running.",
+        "The e-mail password for [notifications](#settings.notifications) is part of the settings, so it is in every backup: keep backup files somewhere private."
       ],
       "see": [
         "settings.folders"
+      ]
+    },
+    "queue.eta": {
+      "title": "How long the queue still needs",
+      "body": [
+        "Above the jobs the Queue shows how much conversion time is left and when it will be done; each queued job shows its own estimate, and the top bar the total.",
+        "The estimate is each source’s length × how fast this server converted similar files before: the median of the last 20 conversions with the **same preset** (encode plus the [check after conversion](#verify.overview)). For a preset with no history, all presets together are used; with no history at all, the speed of the job converting now.",
+        "- A job whose source hasn’t been read yet gets the average length of the others (“some lengths guessed”).",
+        "- With a [conversion window](#settings.schedule), the finish time follows it: jobs only start inside the window, and one that is converting when it closes is finished first.",
+        "- Other work on the server (Emby transcoding, a quality check) slows conversions down, so treat the time as a guide."
+      ],
+      "see": [
+        "queue.state",
+        "stats.overview",
+        "settings.schedule"
+      ]
+    },
+    "settings.schedule": {
+      "title": "Conversion window",
+      "body": [
+        "Converts only at certain times, e.g. overnight, so encoding doesn’t slow down Emby or other services during the day.",
+        "- **Opens at / Closes at**: when the closing time is earlier than the opening time (23:00 → 07:00) the window runs overnight. The same time for both means all day.",
+        "- **Days** are the days the window **opens**: Friday with 23:00 → 07:00 ends on Saturday morning.",
+        "- Outside the window the queue doesn’t start a new job. A job that is converting when the window closes is finished first.",
+        "- **Start the queue by itself when the window opens**: if jobs are waiting and the queue is stopped, it starts when the window opens. Pressing Stop during the window is respected until the next opening.",
+        "The top bar shows the window’s state (open until …, or when it opens next); click it to come here.",
+        "The window follows the **server’s clock**. If the server’s time zone differs from yours, this page says so: set `TZ` in the server’s `.env` (e.g. `TZ=Pacific/Auckland`) and restart the container."
+      ],
+      "see": [
+        "queue.state",
+        "queue.eta",
+        "settings.watch"
+      ]
+    },
+    "settings.watch": {
+      "title": "Watch folders",
+      "body": [
+        "New videos that appear in a watch folder are added to the queue by themselves, with the preset chosen for that folder (or the default one).",
+        "Two ways to add one: **Watch** next to the folder path in the Sources panel (Convert) watches the open folder with the default preset, or **Add a watch folder…** here, which opens a folder browser (**Browse…** changes the folder of an existing row). In the Sources panel watched folders show an eye, and the open folder shows **Watched**; click it to come here.",
+        "- A watch folder must be inside one of the [sources folders](#settings.folders). Watch folders can’t be inside each other.",
+        "- Files already in a folder when you add it are **left alone**; drag them into the queue yourself if you want them. Each file is added **once**, even if you later remove its job.",
+        "- A file is added only after it has **stopped changing** for the quiet time you set (10 minutes by default), so downloads and copies in progress are not picked up. The folders are looked at every few minutes, because file system events don’t arrive over NFS or SMB.",
+        "- For a download client, watch the folder **completed** downloads are moved to, not the one it downloads into: a paused download could otherwise look finished.",
+        "- The usual rules for adding apply: exclude words such as `sample`, video extensions, and “Skip files that were already converted”.",
+        "- **Start the queue after adding files**: otherwise they wait for **Start**. With a [conversion window](#settings.schedule), the queue then waits for the window.",
+        "**Activity** shows files waiting to settle, the last files added or skipped, and problems such as a missing folder. **Look now** checks straight away."
+      ],
+      "see": [
+        "settings.schedule",
+        "settings.notifications",
+        "settings.adding"
+      ]
+    },
+    "settings.notifications": {
+      "title": "Notifications",
+      "body": [
+        "The server can tell you when the queue finishes, a conversion or its check fails, each file is converted, or a watch folder adds files. Choose the events at the top; they go to every channel that is on.",
+        "### Webhook",
+        "A JSON `POST` per message to a URL: an n8n **Webhook** node, a Home Assistant webhook trigger, ntfy, Gotify… The body has `event`, `title`, `message` (plain text), `url` (the app address, if set), `at` and `data` (the job or the run’s details). Extra headers, e.g. `Authorization: Bearer …`, go one per line.",
+        "### E-mail",
+        "Sent through your SMTP server. Typical settings: **STARTTLS** on port 587, **TLS** on 465. For Gmail and Outlook, use an **app password**, not your normal one.",
+        "- The password is stored on the server and never sent back to the browser; leave the box empty to keep it.",
+        "- It is part of the settings, so it is in [backups](#backup.overview).",
+        "**Send a test** uses what is on the screen, before you save. **Recently sent** lists the last messages and any error.",
+        "### This browser",
+        "The tab title always shows the progress (“42% · Show S01e02.mkv”, “✓ Queue finished”). Desktop notifications can appear while the tab is in the background; browsers allow them only on `https://` pages or `localhost`, so on a plain `http://` address use e-mail or a webhook instead."
+      ],
+      "see": [
+        "settings.watch",
+        "queue.state",
+        "backup.overview"
+      ]
+    },
+    "stats.overview": {
+      "title": "Stats",
+      "body": [
+        "What the server has converted over the chosen period: files, space saved, length of video converted and the work it took, and the speed (× real time: 2× means an hour of video took 30 minutes, check included).",
+        "- **Files converted per day** (or per month for long periods): hover a column for its details, or switch to **Table**.",
+        "- **Check after conversion**: how many converted files passed, had warnings or failed the [check](#verify.overview).",
+        "- **By preset**: compare presets on speed and size reduction.",
+        "Every conversion that started is recorded when it finishes. **Clear finished** in the Queue doesn’t remove it from these figures. The same history gives the [queue finish time](#queue.eta)."
+      ],
+      "see": [
+        "queue.eta",
+        "presets"
       ]
     }
   }

@@ -4,6 +4,9 @@ import { badRequest } from './errors.js';
 import { isInside } from './paths.js';
 import { VERIFY_MODES } from './verify.js';
 import { DEFAULT_QUALITY, normalizeQuality } from './quality.js';
+import { DEFAULT_SCHEDULE, normalizeSchedule } from './schedule.js';
+import { DEFAULT_WATCH, normalizeWatch } from './watch.js';
+import { DEFAULT_NOTIFICATIONS, mergeNotifications, normalizeNotifications, publicNotifications } from './notify.js';
 
 export const MAX_SOURCE_ROOTS = 20;
 
@@ -19,6 +22,8 @@ function defaults(config) {
     sourceRoots: [config.initialSourceRoot],
     // Sources folders whose files can't be deleted from the app (e.g. still seeding).
     protectedRoots: [],
+    // Friendly names shown instead of the paths: { "/mnt/downloads": "Downloads" }.
+    sourceNames: {},
     targetRoot: config.initialTargetRoot,
     outputLayout: 'parent',
     recursive: true,
@@ -34,6 +39,9 @@ function defaults(config) {
     renameSeparator: '_',
     verifyMode: 'full',
     quality: DEFAULT_QUALITY,
+    schedule: DEFAULT_SCHEDULE,
+    watch: DEFAULT_WATCH,
+    notifications: DEFAULT_NOTIFICATIONS,
   };
 }
 
@@ -63,10 +71,16 @@ export class Settings {
     }
     // Criteria added in later versions take their defaults.
     this.values.quality = { ...DEFAULT_QUALITY, ...this.values.quality, minKbps: { ...DEFAULT_QUALITY.minKbps, ...this.values.quality?.minKbps } };
+    this.values.schedule = { ...DEFAULT_SCHEDULE, ...this.values.schedule };
+    this.values.watch = { ...DEFAULT_WATCH, ...this.values.watch };
+    this.values.notifications = mergeNotifications(this.values.notifications);
     // Normalise separators and trailing slashes so path comparisons work.
     this.values.sourceRoots = this.values.sourceRoots.map((r) => path.resolve(r));
     this.values.protectedRoots = this.values.protectedRoots.map((r) => path.resolve(r));
     this.values.targetRoot = path.resolve(this.values.targetRoot);
+    this.values.sourceNames = Object.fromEntries(
+      Object.entries(this.values.sourceNames ?? {}).map(([k, v]) => [path.resolve(k), v]).filter(([k]) => this.values.sourceRoots.includes(k)),
+    );
   }
 
   get(key) {
@@ -75,6 +89,11 @@ export class Settings {
 
   all() {
     return { ...this.values };
+  }
+
+  /** What the browser gets: everything but the e-mail password. */
+  public() {
+    return { ...this.values, notifications: publicNotifications(this.values.notifications) };
   }
 
   /** Saves without validation (internal use). */
@@ -106,7 +125,15 @@ export class Settings {
     // Only folders that are in the list; a removed folder loses its flag.
     next.protectedRoots = [...new Set(next.protectedRoots.map((r) => path.resolve(String(r).trim())))]
       .filter((r) => next.sourceRoots.includes(r));
+    next.sourceNames = normalizeNames(next.sourceNames, next.sourceRoots);
     next.quality = normalizeQuality(next.quality);
+    try {
+      next.schedule = normalizeSchedule(next.schedule);
+    } catch (err) {
+      throw badRequest(err.message);
+    }
+    next.watch = await normalizeWatch(next.watch, next.sourceRoots);
+    next.notifications = normalizeNotifications(next.notifications, this.values.notifications);
     if (!OUTPUT_LAYOUTS.includes(next.outputLayout)) {
       throw badRequest(`outputLayout must be one of ${OUTPUT_LAYOUTS.join(', ')}`);
     }
@@ -135,6 +162,28 @@ export class Settings {
     }
     return this.all();
   }
+}
+
+export const MAX_NAME = 40;
+
+/** Friendly names for the sources folders: only listed folders, trimmed, unique, none empty. */
+function normalizeNames(names, roots) {
+  if (names == null) return {};
+  if (typeof names !== 'object' || Array.isArray(names)) throw badRequest('sourceNames must be an object');
+  const out = {};
+  const used = new Map();
+  for (const [key, value] of Object.entries(names)) {
+    const root = path.resolve(String(key).trim());
+    if (!roots.includes(root)) continue;
+    const name = String(value ?? '').trim().replace(/\s+/g, ' ');
+    if (!name) continue;
+    if (name.length > MAX_NAME) throw badRequest(`A folder name can be at most ${MAX_NAME} characters: ${name}`);
+    const lower = name.toLowerCase();
+    if (used.has(lower)) throw badRequest(`Two sources folders are both called "${name}"`);
+    used.set(lower, root);
+    out[root] = name;
+  }
+  return out;
 }
 
 async function existingFolder(value, label) {

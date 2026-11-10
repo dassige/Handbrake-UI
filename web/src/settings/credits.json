@@ -1,0 +1,16 @@
+{
+  "credits": [
+    { "name": "HandBrake (HandBrakeCLI)", "what": "the video conversion engine; built from source, unmodified", "license": "GPL-2.0", "url": "https://handbrake.fr/" },
+    { "name": "FFmpeg (ffprobe, ffmpeg)", "what": "reading video details, the check after conversion and the quality check", "license": "LGPL-2.1 / GPL-2.0", "url": "https://ffmpeg.org/" },
+    { "name": "MKVToolNix (mkvmerge)", "what": "merging converted files and their chapters", "license": "GPL-2.0", "url": "https://mkvtoolnix.download/" },
+    { "name": "Intel VPL GPU runtime, Media SDK and media driver", "what": "Quick Sync hardware encoding", "license": "MIT", "url": "https://github.com/intel/vpl-gpu-rt" },
+    { "name": "Node.js", "what": "the server runtime, with its built-in SQLite", "license": "MIT", "url": "https://nodejs.org/" },
+    { "name": "SQLite", "what": "the database", "license": "Public domain", "url": "https://sqlite.org/" },
+    { "name": "Fastify", "what": "the web server", "license": "MIT", "url": "https://fastify.dev/" },
+    { "name": "Nodemailer", "what": "e-mail notifications", "license": "MIT-0", "url": "https://nodemailer.com/" },
+    { "name": "React", "what": "the user interface", "license": "MIT", "url": "https://react.dev/" },
+    { "name": "Vite", "what": "building the user interface", "license": "MIT", "url": "https://vite.dev/" },
+    { "name": "Lucide", "what": "icons", "license": "ISC", "url": "https://lucide.dev/" },
+    { "name": "Advanced Renamer by Kim Jensen", "what": "the rename methods and the .aren presets the Rename view imports (not included)", "license": "Freeware", "url": "https://www.advancedrenamer.com/" }
+  ]
+}

@@ -24,6 +24,10 @@ import { Downloads } from './download.js';
 import { Backups } from './backup.js';
 import { registerBackupRoutes } from './backupRoutes.js';
 import { registerDownloadRoutes } from './downloadRoutes.js';
+import { History } from './history.js';
+import { Notifier } from './notify.js';
+import { Watcher } from './watch.js';
+import { registerAutomationRoutes } from './automationRoutes.js';
 
 /** version, date and commit from a package.json (managed by DGS AutoVersion); null when missing. */
 function readVersion(file) {
@@ -53,7 +57,10 @@ const handbrake = new HandBrake(config.handbrakeCli);
 const events = new Events();
 const presets = new Presets({ db, settings, handbrake, tmpDir: path.join(config.dataDir, 'tmp') });
 const verifier = new Verifier({ ffprobe: config.ffprobe, ffmpeg: config.ffmpeg });
-const queue = new Queue({ db, settings, presets, handbrake, verifier, events, dataDir: config.dataDir, log: app.log });
+const history = new History({ db });
+const notifier = new Notifier({ settings, log: app.log });
+const queue = new Queue({ db, settings, presets, handbrake, verifier, events, dataDir: config.dataDir, log: app.log, history, notifier });
+const watcher = new Watcher({ db, settings, queue, presets, notifier, events, log: app.log });
 const renamer = new Renamer({ db, settings, events, log: app.log });
 queue.renamer = renamer;
 const merger = new Merger({
@@ -65,7 +72,7 @@ const sourceFiles = new SourceFiles({ settings, queue, events, log: app.log });
 const downloads = new Downloads({ settings, log: app.log });
 const quality = new QualityScanner({ db, settings, verifier, events, queue, log: app.log });
 const backups = new Backups({
-  db, dataDir: config.dataDir, settings, queue, merger, quality, uploads, renamer, events, log: app.log, versions: version,
+  db, dataDir: config.dataDir, settings, queue, merger, quality, uploads, renamer, watcher, events, log: app.log, versions: version,
 });
 
 app.setErrorHandler((err, req, reply) => {
@@ -77,7 +84,8 @@ app.setErrorHandler((err, req, reply) => {
 // Per-request access logs are noise here (the UI polls); keep warnings and errors.
 await app.register(
   async (api) => {
-    registerRoutes(api, { settings, presets, queue, events, handbrake, renamer, version });
+    registerRoutes(api, { settings, presets, queue, events, handbrake, renamer, watcher, version, dataDir: config.dataDir });
+    registerAutomationRoutes(api, { history, watcher, notifier });
     registerRenameRoutes(api, { renamer });
     registerMergeRoutes(api, { merger });
     registerUploadRoutes(api, { uploads, sourceFiles });
@@ -105,6 +113,7 @@ async function stop(signal) {
   if (stopping) return;
   stopping = true;
   app.log.info(`${signal} received, stopping`);
+  watcher.stop();
   await queue.shutdown();
   events.close();
   await app.close();
@@ -121,3 +130,7 @@ await uploads.cleanup();
 setInterval(() => uploads.cleanup().catch((err) => app.log.warn(err.message)), 6 * 3600 * 1000).unref();
 await merger.recover();
 await queue.recover();
+// Conversion window: checked every 30 s.
+queue.scheduleTick();
+setInterval(() => queue.scheduleTick(), 30_000).unref();
+await watcher.reconfigure().catch((err) => app.log.warn(`Watch folders: ${err.message}`));
