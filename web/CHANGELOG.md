@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.2] - 2026/11/11
+
+- feat: improve topbar layout for better responsiveness and readability
+
 ## [2.1.1] - 2026/11/11
 
 - 

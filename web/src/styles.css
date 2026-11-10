@@ -70,12 +70,14 @@ h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 /* ------------------------------------------------------------------ layout */
 .app { display: flex; flex-direction: column; height: 100%; }
 .topbar {
-  display: flex; align-items: center; gap: 20px; padding: 10px 16px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding: 10px 16px;
   background: var(--panel); border-bottom: 1px solid var(--border);
 }
 .brand { display: flex; align-items: center; gap: 8px; font-weight: 650; font-size: 15px; color: var(--accent); }
 .brand span { color: var(--text); white-space: nowrap; }
-.queue-state { display: flex; align-items: center; gap: 10px; min-width: 0; white-space: nowrap; }
+/* No min-width: 0 here: if the row is too narrow the block wraps to its own line instead of
+   shrinking and spilling its unwrapped text over the buttons on the right. */
+.queue-state { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
 .counts { color: var(--muted); font-size: 13px; }
 .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
 .offline { display: inline-flex; gap: 4px; align-items: center; color: var(--warn); font-size: 12px; margin-right: 8px; }
@@ -261,12 +263,18 @@ select, textarea, input[type='text'], input:not([type]), input[type='number'], i
 .toast .icon-btn { color: inherit; width: 22px; height: 22px; }
 
 /* ------------------------------------------------------------------ narrow screens */
+/* Header: drop the Help/Presets/Settings labels first, then the counts, so it stays on one row
+   as long as possible; below that it wraps (see .queue-state). */
+@media (max-width: 1480px) {
+  .btn-label { display: none; }
+  .topbar-right .btn { padding: 6px 8px; }
+}
 @media (max-width: 1280px) {
   .counts { display: none; }
 }
 @media (max-width: 900px) {
   .panes { grid-template-columns: 1fr; grid-auto-rows: minmax(320px, 1fr); overflow: auto; }
-  .topbar { flex-wrap: wrap; gap: 10px; }
+  .topbar { gap: 10px; }
   .counts { display: none; }
 }
 
@@ -807,7 +815,7 @@ textarea.mono { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
   .btn-label { display: none; }
   .tabs { grid-area: tabs; overflow-x: auto; scrollbar-width: none; }
   .tabs button { flex: 1 0 auto; padding: 5px 10px; }
-  .queue-state { grid-area: state; gap: 8px; flex-wrap: wrap; white-space: normal; }
+  .queue-state { grid-area: state; gap: 8px; flex-wrap: wrap; white-space: normal; min-width: 0; }
   .banner { padding: 6px 12px; font-size: 13px; }
 
   /* Two-pane views: one pane at a time, chosen with the switch above them. */
