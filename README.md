@@ -16,7 +16,8 @@ the desktop app.
 > [Credits and licences](#credits-and-licences).
 
 **Contents:** [Features](#features) · [Screenshots](#screenshots) ·
-[Requirements](#requirements) · [Installation](#installation) ·
+[Requirements](#requirements) · [Hardware and performance](#hardware-and-performance) ·
+[Installation](#installation) ·
 [First steps](#first-steps) · [Configuration](#configuration) ·
 [Updating](#updating) · [Hardware encoding](#hardware-encoding-intel-quick-sync) ·
 [Security](#security) · [Troubleshooting](#troubleshooting) ·
@@ -144,13 +145,64 @@ All files shown are generated demo videos.
 |---|---|---|
 | **OS** | Linux (amd64 or arm64). Windows 10/11 or macOS with Docker Desktop | Linux, Windows 10/11 (macOS should work but is untested) |
 | **Software** | Docker Engine with Compose v2.24 or newer, git | Node.js 22.13 or newer (24 LTS recommended), git, HandBrakeCLI, FFmpeg (`ffmpeg` + `ffprobe`), MKVToolNix (`mkvmerge`) |
-| **CPU / RAM** | Any x86-64 or ARM64 CPU; 2 GB RAM. The first build compiles HandBrake: allow 4 GB RAM, ~10 GB free disk and 45–60 minutes on a 4-thread CPU | Any; encoding speed depends on the CPU |
+| **CPU / RAM** | Any x86-64 or ARM64 CPU; 2 GB RAM (see [Hardware and performance](#hardware-and-performance)). The first build compiles HandBrake: allow 4 GB RAM, ~10 GB free disk and 45–60 minutes on a 4-thread CPU | Any 64-bit CPU; 2 GB RAM. Encoding speed depends on the CPU |
 | **GPU (optional)** | Intel iGPU, 6th gen or newer, for Quick Sync (Linux hosts only) | CPU encoding; Quick Sync needs a HandBrakeCLI built with QSV |
 | **Browser** | Any recent Chrome, Edge, Firefox or Safari, desktop or mobile | same |
 
 FFmpeg is only needed for the check after conversion and the quality check,
 and MKVToolNix only for merging. The rest of the app works without them. The
 Docker image includes all of them.
+
+## Hardware and performance
+
+HandBrake Queue itself is light (a Node.js server using ~100 MB of RAM). The
+conversion speed depends on the CPU, or on the GPU with Intel Quick Sync.
+
+**What you need:**
+
+- **CPU:** any 64-bit x86 or ARM CPU. With 4 threads or more, x264 converts a
+  1080p episode to 720p in about real time. On slower CPUs the queue still works,
+  but it is better to leave it running overnight.
+- **RAM:** 2 GB. One 1080p → 720p x264 conversion uses about 1.1 GB, and the
+  app runs one conversion at a time.
+- **GPU (optional):** an Intel iGPU, 6th generation or newer, for Quick Sync
+  (Docker on Linux). At the same bitrate it is about 2–3× faster than x264 on
+  the same machine.
+- **Disk and network:** sources and targets can be on a local disk or a NAS
+  (NFS or SMB mount). A 1080p source is read at only a few MB/s, so a
+  1 Gbit/s network is more than enough.
+
+**Measured speeds.** These use the same test: a 2-minute clip of a 1080p
+HEVC 10-bit TV episode (23.976 fps, two AAC audio tracks), converted to 720p
+at 1500 kbps with the presets in [`presets/`](presets/), using HandBrake 1.11.2.
+The episode column is the time for a 43-minute episode. The check after
+conversion adds a little time on top.
+
+| Machine | CPU / GPU | RAM | Encoder | Speed | × real time | 43-min episode |
+|---|---|---|---|---|---|---|
+| Raspberry Pi 5 | Cortex-A76, 4 cores | 8 GB | x264 | 21.6 fps¹ | 0.9× | ~48 min |
+| ASUS Chromebox 4, repurposed: ChromeOS replaced by a Linux distro (Ubuntu 26.04)² | Core i3-10110U, 2 cores / 4 threads | 8 GB | x264 | 29 fps | 1.2× | ~36 min |
+| ASUS Chromebox 4, same | Intel UHD 620 (Quick Sync) | 8 GB | qsv_h264 | 62 fps | 2.6× | ~17 min |
+| Laptop, Windows 11 + Docker Desktop | Core i7-1355U, 10 cores / 12 threads | 64 GB | x264 | 76 fps | 3.2× | ~14 min |
+
+¹ Measured on a clip from a different 1080p episode with the same x264
+preset, so read it as ±10%. The Raspberry Pi 5 has no hardware H.264 encoder,
+so x264 is the only option there.
+
+² A Chromebox does not run HandBrake Queue as sold: ChromeOS has to be
+replaced by a regular Linux distribution, which on these machines usually
+means installing UEFI firmware first. With that done it is a small, quiet and
+low-power home server with an Intel iGPU for Quick Sync.
+
+**In real use:** the repurposed Chromebox 4 above runs HandBrake Queue with the
+Quick Sync preset. Its first 139 TV episodes (about 60 hours of 1080p HEVC
+video, read from a NAS over NFS) took 17.7 hours in total, an average of
+3.4× real time, or about 13 minutes per 43-minute episode. Quality was
+checked after each conversion.
+
+Your numbers will differ with the source (resolution, codec, 10-bit), the
+preset (encoder speed, filters such as decomb or denoise) and the cooling. The
+**Stats** view shows the average speed of your own conversions.
 
 ## Installation
 
@@ -457,8 +509,8 @@ scripts/deploy.sh user@server [folder]      # folder default: ~/handbrake-ui
 ```
 
 The first run clones the repository on the server. Defaults for the host,
-folder and SSH options can go in a git-ignored `.deploy.env` (see the comments
-at the top of [`scripts/deploy.sh`](scripts/deploy.sh)).
+folder and SSH options can go in a git-ignored `.deploy.env`: copy
+[`.deploy.env.example`](.deploy.env.example) and adjust it.
 
 **Without Docker:**
 
@@ -558,8 +610,10 @@ to the GitHub release of the running version.
 
 ## Credits and licences
 
-HandBrake Queue is © 2026 Gerry Dassi (DGSoft), released under the
-[MIT License](LICENSE).
+HandBrake Queue is © 2026 Gerry Dassi (DGSoft). It is free software: you can
+redistribute it and/or modify it under the terms of the
+[GNU General Public License, version 2](LICENSE) (GPL-2.0-only), as published
+by the Free Software Foundation.
 
 It runs or uses these projects, each under its own licence:
 
@@ -582,16 +636,20 @@ The same list is in the app (Settings → About, from
 `web/src/settings/credits.json`).
 
 HandBrakeCLI, FFmpeg and MKVToolNix are separate programs: the app starts them
-as external processes and does not link to them, so its own code stays under
-the MIT License. The Docker image you build *contains* them, so if you
-**redistribute that image** (e.g. push it to a public registry), you must
-follow their licences (GPL/LGPL), including offering their source code. The
-`Dockerfile` builds HandBrake from its official, unmodified source tag.
+as external processes and does not link to them. The Docker image you build
+*contains* them, so if you **redistribute that image** (e.g. push it to a
+public registry), you must follow the GPL/LGPL for everything in it, including
+offering the source code: this repository for HandBrake Queue, and the
+upstream sources for the rest. The `Dockerfile` builds HandBrake from its
+official, unmodified source tag.
+
+If you distribute a modified version of HandBrake Queue, the GPL requires you
+to publish your changes under the same licence.
 
 ## Disclaimer
 
-This software is provided "as is", without warranty of any kind (see
-[LICENSE](LICENSE)). It writes, renames and, when you ask, deletes files: keep
+This software is provided "as is", without warranty of any kind (see sections
+11 and 12 of the [LICENSE](LICENSE)). It writes, renames and, when you ask, deletes files: keep
 backups of media you care about, and try new settings on copies first.
 
 HandBrake is a trademark of its respective owners. This project is not

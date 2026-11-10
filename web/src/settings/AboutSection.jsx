@@ -121,12 +121,13 @@ export function AboutSection({ info, onError }) {
 
       <Card title="Licence">
         <p>
-          HandBrake Queue is free software under the <strong>MIT License</strong>. HandBrakeCLI, FFmpeg and MKVToolNix are separate
-          programs with their own licences (GPL/LGPL); the app runs them, it does not include their code.
+          HandBrake Queue is free software under the <strong>GNU General Public License, version 2</strong> (GPL-2.0-only).
+          HandBrakeCLI, FFmpeg and MKVToolNix are separate programs with their own licences (GPL/LGPL); the app runs them,
+          it does not include their code.
         </p>
         {about?.licenseText && (
           <details className="set-details">
-            <summary>Read the MIT License</summary>
+            <summary>Read the GNU GPL, version 2</summary>
             <pre className="code-block license-text">{about.licenseText}</pre>
           </details>
         )}
@@ -154,7 +155,7 @@ export function AboutSection({ info, onError }) {
         )}
       </Card>
 
-      <p className="set-hint about-copy">© {year} {about?.author ?? 'Gerry Dassi (DGSoft)'}. Released under the MIT License.</p>
+      <p className="set-hint about-copy">© {year} {about?.author ?? 'Gerry Dassi (DGSoft)'}. Released under the GNU GPL, version 2.</p>
     </>
   );
 }

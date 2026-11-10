@@ -12,7 +12,7 @@
 # [remote-dir] is relative to the remote home folder (default: handbrake-ui).
 # The first remote deploy clones the repository there.
 #
-# Environment (or put them in .deploy.env next to this repo's README, git-ignored):
+# Environment (or put them in .deploy.env, git-ignored; see .deploy.env.example):
 #   DEPLOY_HOST, DEPLOY_DIR  defaults for <ssh-host> and [remote-dir]
 #   BRANCH=main              branch to deploy
 #   SSH_OPTS="-J jumphost"   extra ssh options (remote mode)

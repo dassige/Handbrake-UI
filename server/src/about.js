@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 export const AUTHOR = 'Gerry Dassi (DGSoft)';
-export const LICENSE = 'MIT';
+export const LICENSE = 'GPL-2.0-only';
 export const REPOSITORY = 'https://github.com/dassige/Handbrake-UI';
 
 const ROOT = path.join(import.meta.dirname, '../..');

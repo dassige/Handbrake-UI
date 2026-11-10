@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.1] - 2026/11/11
+
+- chore: relicense under GPL-2.0-only; add hardware and performance guide
+
+- Replace the MIT licence with the GNU GPL, version 2 (verbatim text)
+  in LICENSE, README, Settings → About, help and package.json files
+- README: new "Hardware and performance" section with requirements and
+  measured speeds (Raspberry Pi 5, ASUS Chromebox 4 with x264 and
+  Quick Sync, i7 laptop with Docker Desktop) and real-world numbers
+- Add .deploy.env.example with the deploy.sh settings
+
 ## [3.0.0] - 2026/11/11
 
 - chore: prepare repository for public release (MIT)

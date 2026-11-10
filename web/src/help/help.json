@@ -25,7 +25,7 @@
         "To convert without being there: a [conversion window](#settings.schedule) runs the queue at night, [watch folders](#settings.watch) add new downloads by themselves, and [notifications](#settings.notifications) tell you how it went. **Stats** shows what has been converted: see [Stats](#stats.overview).",
         "Source files are never changed, so downloads can keep seeding. They are deleted only when you ask: see [Deleting source files](#delete.overview).",
         "On a phone the app works the same way: views with two panels (Sources and Queue, files and the rename list…) show one panel at a time, with a switch above them; adding files jumps to the second panel. Drag and drop needs a mouse, so on a touch screen use the check boxes and **Add to queue**, and the **Up**, **Down**, **Move to top** and **Move to bottom** buttons in a job's details to reorder the queue.",
-        "Settings → **About** has the version, release notes, credits and the licence (MIT)."
+        "Settings → **About** has the version, release notes, credits and the licence (GNU GPL, version 2)."
       ],
       "see": [
         "convert.sources",
