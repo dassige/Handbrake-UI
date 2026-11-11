@@ -1,0 +1,136 @@
+{
+  "followSettings": "Wie in den Einstellungen ({mode})",
+  "followQueue": "Wie für die Warteschlange festgelegt ({mode})",
+  "embed": {
+    "missing": "Nur fehlende Sprachen",
+    "missingHint": "Eine Untertiteldatei einbetten, wenn das konvertierte Video noch keine Untertitelspur in ihrer Sprache hat.",
+    "always": "Immer",
+    "alwaysHint": "Jede Untertiteldatei einbetten, auch in Sprachen, die das Video schon hat.",
+    "never": "Nie",
+    "neverHint": "Untertiteldateien nicht einbetten; sie können trotzdem neben das Video kopiert werden."
+  },
+  "copy": {
+    "always": "Immer",
+    "alwaysHint": "Jede Untertiteldatei neben das konvertierte Video kopieren, ob eingebettet oder nicht.",
+    "notEmbedded": "Nur nicht eingebettete",
+    "notEmbeddedHint": "Nur die Untertiteldateien kopieren, die nicht in das Video eingebettet wurden.",
+    "never": "Nie",
+    "neverHint": "Untertiteldateien nicht in den Zielordner kopieren."
+  },
+  "action": {
+    "both": "Einbetten + kopieren",
+    "embed": "Einbetten",
+    "copy": "Kopieren",
+    "none": "Nicht verwendet"
+  },
+  "why": {
+    "excluded": "Häkchen entfernt: wird für diesen Auftrag nicht verwendet.",
+    "never": "Das Einbetten ist ausgeschaltet.",
+    "always": "Eingebettet: „Immer“ ist gewählt.",
+    "missing": "Eingebettet: Das konvertierte Video hat keine Untertitelspur in dieser Sprache.",
+    "present": "Nicht eingebettet: Das konvertierte Video hat schon eine Untertitelspur in dieser Sprache.",
+    "unknownLang": "Nicht eingebettet: Die Sprache ist unbekannt und das Video hat bereits Untertitel. Wählen Sie eine Sprache, um zu entscheiden.",
+    "container": "Kann in dieses Format nicht eingebettet werden (WebM: keine; MP4: nur Textuntertitel). Kopieren ist weiterhin möglich."
+  },
+  "job": {
+    "title": "Untertiteldateien",
+    "notLooked": "Noch nicht gesucht: Das geschieht, nachdem die Quelle gelesen wurde.",
+    "none": "Keine Untertiteldateien neben der Quelle.",
+    "embed": "Einbetten",
+    "copy": "Kopieren",
+    "includeTitle": "Diese Untertiteldatei für diesen Auftrag verwenden",
+    "language": "Sprache",
+    "unknownLanguage": "Unbekannte Sprache",
+    "detectedAs": "Im Dateinamen als {lang} erkannt",
+    "forced": "Erzwungen",
+    "forcedTitle": "Erzwungene Untertitel: nur die Zeilen in einer Fremdsprache. Beim Einbetten wird die Spur als erzwungen und als Standard markiert.",
+    "sdh": "SDH",
+    "sdhTitle": "Für Gehörlose und Schwerhörige (mit Beschreibung von Geräuschen)",
+    "edited": "bearbeitet",
+    "edit": "Bearbeiten",
+    "view": "Ansehen",
+    "lookAgain": "Erneut nach Untertiteldateien suchen",
+    "lookAgainTitle": "Erneut nach Untertiteldateien neben der Quelle suchen (die hier getroffene Auswahl bleibt erhalten)",
+    "lookedAgain": "Erneut nach Untertiteldateien gesucht"
+  },
+  "result": {
+    "embedded": "Eingebettet:",
+    "copied": "Neben das Video kopiert:",
+    "download": "Herunterladen",
+    "writeAgain": "Untertiteldateien erneut schreiben",
+    "writeAgainTitle": "Schreibt die Untertiteldateien erneut neben das konvertierte Video, mit den aktuellen Änderungen (die zuvor geschriebenen werden ersetzt)",
+    "written": "Untertiteldateien geschrieben",
+    "readFailed": "{name} konnte nicht gelesen werden: {error}",
+    "muxFailed": "{name} konnte nicht eingebettet werden: {error}",
+    "copyFailed": "{name} konnte nicht kopiert werden: {error}",
+    "prepareFailed": "Untertiteldateien konnten nicht vorbereitet werden: {error}"
+  },
+  "editor": {
+    "title": "{name} bearbeiten",
+    "readOnly": "Der Auftrag wird konvertiert: Änderungen sind danach möglich.",
+    "sourceKept": "Die Originaldatei wird nicht verändert: Die Änderungen werden beim Auftrag gespeichert und auf die Kopie angewendet, die eingebettet oder neben das Video geschrieben wird.",
+    "offset": "Zeitverschiebung",
+    "offsetMs": "Verschiebung in Millisekunden",
+    "offsetHint": "Positiv: Die Untertitel erscheinen später. Negativ: früher.",
+    "fps": "Bildrate",
+    "fpsFrom": "Untertitel erstellt für",
+    "fpsTo": "Video",
+    "fpsNone": "Keine Änderung",
+    "fpsHint": "Für Untertitel, die anfangs synchron sind und dann immer weiter auseinanderlaufen: Sie wurden für ein Video mit anderer Bildrate getaktet (z. B. 25 → 23,976).",
+    "videoFps": "dieses Video: {fps} fps",
+    "codeset": "Zeichensatz",
+    "codesetAuto": "Automatisch",
+    "codesetAutoFound": "Automatisch (erkannt: {codeset})",
+    "codesetHint": "Wenn Umlaute und Akzente falsch aussehen, wählen Sie den Zeichensatz, in dem die Datei geschrieben wurde. Die Kopien sind immer UTF-8.",
+    "cleanup": "Bereinigen",
+    "cleanHi": "Text für Hörgeschädigte entfernen",
+    "cleanHiHint": "[Musik], (lacht), ♪ und Sprechernamen wie „JOHN:“",
+    "cleanTags": "Formatierung entfernen",
+    "cleanTagsHint": "Tags für Kursiv, Fett, Farben und Position",
+    "cleanAds": "Abspann und Werbung entfernen",
+    "cleanAdsHint": "Zeilen wie „Untertitel von …“ und Webadressen",
+    "cleanOverlaps": "Überlappende Zeilen korrigieren",
+    "cleanOverlapsHint": "Eine Zeile endet kurz vor dem Beginn der nächsten",
+    "reset": "Zurücksetzen",
+    "resetTitle": "Alle Änderungen entfernen",
+    "preview": "Vorschau",
+    "count_one": "{count} Zeile",
+    "count_other": "{count} Zeilen",
+    "removed_one": "{count} entfernt",
+    "removed_other": "{count} entfernt",
+    "firstMoved": "erste Zeile {from} → {to}",
+    "showOriginal": "Original anzeigen",
+    "search": "Im Text suchen",
+    "more_one": "… {count} weitere Zeile: Suchen Sie, um sie zu finden",
+    "more_other": "… {count} weitere Zeilen: Suchen Sie, um einzugrenzen",
+    "noMatch": "Keine Zeile enthält diesen Text.",
+    "empty": "Keine Zeilen.",
+    "saved": "Untertitel-Änderungen gespeichert"
+  },
+  "queue": {
+    "button": "Untertitel",
+    "title": "Was mit Untertiteldateien neben den Videos geschieht, für die gesamte Warteschlange",
+    "titleCustom": "Untertiteldateien für die gesamte Warteschlange: einbetten {embed}, kopieren {copy}",
+    "dialogTitle": "Untertiteldateien für die Warteschlange",
+    "intro": "Gilt für jeden Auftrag in der Warteschlange, jetzt und später hinzugefügt, der keine eigene Auswahl hat (festgelegt in seinen Details).",
+    "useSettings": "Einstellungen verwenden",
+    "jobsKeep": "Ein Auftrag, der gerade konvertiert wird, ist nicht betroffen.",
+    "saved": "Für die Warteschlange gespeichert"
+  },
+  "row": {
+    "title_one": "{count} Untertiteldatei: {list}",
+    "title_other": "{count} Untertiteldateien: {list}"
+  },
+  "browser": {
+    "title_one": "{count} Untertiteldatei neben diesem Video: {list}",
+    "title_other": "{count} Untertiteldateien neben diesem Video: {list}"
+  },
+  "rename": {
+    "along_one": "und {count} Untertiteldatei",
+    "along_other": "und {count} Untertiteldateien",
+    "taken": "{name} existiert bereits: nicht umbenannt"
+  },
+  "delete": {
+    "of": "Untertitel von {name}"
+  }
+}

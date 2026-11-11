@@ -45,6 +45,13 @@ export const api = {
   reorder: (ids) => post('/api/jobs/reorder', { ids }),
   removeJobs: (ids) => post('/api/jobs/remove', { ids }),
   clearJobs: (statuses) => post('/api/jobs/clear', { statuses }),
+  // Sidecar subtitles of a job (see server/src/subtitles/).
+  jobSubtitles: (id) => get(`/api/jobs/${id}/subtitles`),
+  // patch: { embed?, copy? (null: follow the queue/Settings), files?: [{ path, include?, lang?, forced?, sdh?, edits? }] }
+  updateJobSubtitles: (id, patch) => request('PATCH', `/api/jobs/${id}/subtitles`, patch),
+  detectJobSubtitles: (id) => post(`/api/jobs/${id}/subtitles/detect`),
+  previewJobSubtitle: (id, path, edits) => post(`/api/jobs/${id}/subtitles/preview`, { path, edits }),
+  writeJobSubtitles: (id) => post(`/api/jobs/${id}/subtitles/write`),
   // now: start even outside the conversion window
   startQueue: (now = false) => post('/api/queue/start', { now }),
   stopQueue: () => post('/api/queue/stop'),

@@ -5,7 +5,7 @@
     "newFolder": "Neuer Ordner",
     "elsewhere": "Um woanders hochzuladen, schließen Sie dieses Fenster und öffnen Sie zuerst den gewünschten Ordner unter Quellen.",
     "drop": "<strong>Videodateien hier ablegen</strong> oder klicken, um sie auf diesem Computer auszuwählen",
-    "notVideo": "keine Videodatei, übersprungen",
+    "notVideo": "keine Video- oder Untertiteldatei, übersprungen",
     "removeFile": "{name} entfernen",
     "keepOpen": "Lassen Sie diesen Browser-Tab geöffnet, bis die Uploads abgeschlossen sind. Sie können währenddessen weiterarbeiten. Wird ein Upload unterbrochen, laden Sie dieselbe Datei erneut in denselben Ordner hoch: Er wird dort fortgesetzt, wo er aufgehört hat.",
     "chosen_one": "{count} Datei · {size}",

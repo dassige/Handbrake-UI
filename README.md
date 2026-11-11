@@ -65,6 +65,15 @@ the desktop app.
   as long as the source, and have every audio and subtitle track HandBrake
   wrote. **Full** also decodes every frame. Results show as **Checked**,
   **Check warnings** or **Check failed**.
+- **Subtitle files next to the videos** (`Movie.en.srt`, `Movie.it.forced.srt`,
+  a `Subs` folder; SRT, ASS/SSA, WebVTT, VobSub `.idx`/`.sub`, PGS `.sup`) are
+  found by themselves. By default the ones in languages the video doesn't
+  have are embedded, and every one is copied next to the converted file,
+  named the way Plex, Jellyfin and Emby expect (`Movie.en.srt`). The choice
+  can be changed in Settings, for the whole queue or for a single job. An
+  editor shifts the timing, fixes the frame rate and the character set, and
+  removes hearing-impaired text, formatting and adverts; the original files
+  are never changed. Copies follow the video when it is renamed.
 - **Survives restarts.** An interrupted job goes back to the queue (HandBrake
   cannot resume an encode from the middle, so it starts again from 0%).
 

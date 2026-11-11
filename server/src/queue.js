@@ -6,13 +6,15 @@ import {
   collectVideos, extensionForFormat, isInside, makeFileMatcher, plannedOutputPath,
   resolveUnderAny, uniquePath,
 } from './paths.js';
+import { COPY_MODES, EMBED_MODES } from './subtitles/plan.js';
 import { inWindow, nextWindowStart, windowEnd } from './schedule.js';
 
 const ACTIVE = ['running', 'paused'];
 const FINISHED = ['done', 'failed', 'cancelled'];
 const LIST_COLUMNS = `id, status, phase, position, source_path, output_path, preset_id, preset_name,
   format, created_at, started_at, finished_at, paused_ms, progress, fps, avg_fps, eta, pass,
-  pass_count, source_size, output_size, source_info, scan_error, exit_code, error, attempts, rename_note, verify, verify_status, origin`;
+  pass_count, source_size, output_size, source_info, scan_error, exit_code, error, attempts, rename_note, verify, verify_status, origin,
+  subtitles, sub_embed, sub_copy, subtitle_result`;
 
 // Pause/resume send SIGSTOP/SIGCONT. Windows has no such signals: Node would
 // terminate HandBrakeCLI instead, so pausing is turned off there.
@@ -51,6 +53,10 @@ function rowToJob(r) {
     verifyStatus: r.verify_status,
     verify: r.verify ? JSON.parse(r.verify) : null,
     origin: r.origin ?? null,
+    subtitles: r.subtitles ? JSON.parse(r.subtitles) : null,
+    subEmbed: r.sub_embed ?? null,
+    subCopy: r.sub_copy ?? null,
+    subtitleResult: r.subtitle_result ? JSON.parse(r.subtitle_result) : null,
   };
 }
 
@@ -78,6 +84,8 @@ export class Queue {
     // Jobs started since Start was pressed, for the "queue finished" notification.
     this.run = null;
     this.lastInWindow = null;
+    // Sidecar subtitles (subtitles/service.js), set by index.js.
+    this.subs = null;
   }
 
   // ---------------------------------------------------------------- startup
@@ -99,6 +107,7 @@ export class Queue {
     }
     for (const j of stale.filter((x) => !x.recovered)) {
       await fs.rm(j.output_path + '.part', { force: true }).catch(() => {});
+      await fs.rm(j.output_path + '.subs.part', { force: true }).catch(() => {});
       this.db
         .prepare(`UPDATE jobs SET status = 'queued', phase = NULL, progress = 0, fps = NULL, eta = NULL,
           started_at = NULL, paused_ms = 0, error = 'Interrupted by a restart; queued again' WHERE id = ?`)
@@ -323,6 +332,7 @@ export class Queue {
         } catch (err) {
           this.db.prepare('UPDATE jobs SET scan_error = ? WHERE id = ?').run(err.message, id);
         }
+        await this.detectSidecars(id).catch((err) => this.log.warn(`Job ${id}: looking for subtitle files: ${err.message}`));
         this.emitJob(id);
       }
     } finally {
@@ -413,6 +423,9 @@ export class Queue {
         size, job.sourceInfo ? JSON.stringify(job.sourceInfo) : null,
       );
     const newId = Number(r.lastInsertRowid);
+    this.db
+      .prepare('UPDATE jobs SET subtitles = ?, sub_embed = ?, sub_copy = ? WHERE id = ?')
+      .run(job.subtitles ? JSON.stringify(job.subtitles) : null, job.subEmbed, job.subCopy, newId);
     if (!job.sourceInfo) {
       this.scanQueue.push(newId);
       this.runScans();
@@ -588,6 +601,7 @@ export class Queue {
     await fs.writeFile(presetFile, row.preset_json);
     const presetName = JSON.parse(row.preset_json).PresetList[0].PresetName;
     await fs.rm(this.logFile(id), { force: true });
+    const subs = await this.prepareSubtitles(row);
 
     this.db
       .prepare(`UPDATE jobs SET status = 'running', phase = 'scanning', output_path = ?, started_at = ?,
@@ -596,7 +610,7 @@ export class Queue {
         attempts = attempts + 1 WHERE id = ?`)
       .run(finalPath, Date.now(), sourceStat.size, id);
 
-    const active = { id, partPath, finalPath, presetFile, source: row.source_path, cancelled: false, pausedAt: null, single };
+    const active = { id, partPath, finalPath, presetFile, source: row.source_path, cancelled: false, pausedAt: null, single, subs };
     active.exited = new Promise((resolve) => {
       active.child = this.hb.encode({
         presetFile,
@@ -604,6 +618,7 @@ export class Queue {
         input: row.source_path,
         output: partPath,
         format: row.format,
+        extraArgs: subs?.args ?? [],
         nice: this.settings.get('niceLevel'),
         logFile: this.logFile(id),
         onProgress: (p) => this.onProgress(active, p),
@@ -672,6 +687,14 @@ export class Queue {
       this.db
         .prepare(`UPDATE jobs SET status = 'cancelled', phase = NULL, finished_at = ?, exit_code = ?, eta = NULL, fps = NULL WHERE id = ?`)
         .run(now, code, id);
+    } else if (code === 0 && partSize > 0 && (await this.muxImageSubtitles(active))) {
+      // Cancelled or stopped while mkvmerge was adding picture subtitles.
+      await fs.rm(partPath, { force: true }).catch(() => {});
+      if (active.cancelled) {
+        this.db
+          .prepare(`UPDATE jobs SET status = 'cancelled', phase = NULL, finished_at = ?, exit_code = ?, eta = NULL, fps = NULL WHERE id = ?`)
+          .run(now, code, id);
+      }
     } else if (code === 0 && partSize > 0) {
       try {
         await fs.rename(partPath, finalPath);
@@ -687,6 +710,7 @@ export class Queue {
         } else {
           await this.maybeAutoRename(id, finalPath);
         }
+        await this.copySubtitles(id, active.subs);
       } catch (err) {
         await this.markFailed(id, now, code, `Encoded, but could not rename the output: ${err.message}`);
       }
@@ -701,6 +725,7 @@ export class Queue {
     }
 
     await fs.rm(active.presetFile, { force: true }).catch(() => {});
+    for (const f of active.subs?.tmpFiles ?? []) await fs.rm(f, { force: true }).catch(() => {});
     this.log.info(`Job ${id}: finished (code=${code}${signal ? ` signal=${signal}` : ''})`);
     if (!active.shuttingDown) this.afterFinish(id);
     if (this.active === active) this.active = null;
@@ -725,6 +750,7 @@ export class Queue {
       output: active.finalPath,
       source: active.source,
       logFile: this.logFile(active.id),
+      extraSubtitles: active.subs?.muxed ?? 0,
       mode,
       nice: this.settings.get('niceLevel'),
       isStopped: () => active.cancelled || active.shuttingDown,
@@ -763,6 +789,7 @@ export class Queue {
           output: job.outputPath,
           source: job.sourcePath,
           logFile: this.logFile(id),
+          extraSubtitles: job.subtitleResult?.muxed ?? 0,
           mode,
           nice: this.settings.get('niceLevel'),
           onProgress: (p) => {
@@ -790,6 +817,176 @@ export class Queue {
       this.log.error(err, `Job ${id}: automatic rename failed`);
       this.db.prepare('UPDATE jobs SET rename_note = ? WHERE id = ?').run(`Automatic rename failed: ${err.message}`, id);
     }
+  }
+
+  // ---------------------------------------------------------------- sidecar subtitles
+
+  /** Looks for the job's subtitle files (again), keeping the choices made for files still there. */
+  async detectSidecars(id) {
+    if (!this.subs) return;
+    const row = this.db.prepare('SELECT source_path, subtitles FROM jobs WHERE id = ?').get(id);
+    if (!row) return;
+    const list = await this.subs.detect(row.source_path, row.subtitles ? JSON.parse(row.subtitles) : null);
+    this.db.prepare('UPDATE jobs SET subtitles = ? WHERE id = ?').run(JSON.stringify(list), id);
+  }
+
+  /** The job with its preset snapshot, as subtitles/plan.js needs it. */
+  subtitleJob(id) {
+    const row = this.db.prepare(`SELECT ${LIST_COLUMNS}, preset_json FROM jobs WHERE id = ?`).get(id);
+    if (!row) throw notFound(`Job ${id} not found`);
+    return { ...rowToJob(row), presetJson: row.preset_json };
+  }
+
+  /**
+   * Before an encode: finds the subtitle files again and writes the ones to embed for HandBrake.
+   * Never stops the encode: a problem becomes a note in the job's subtitle result.
+   */
+  async prepareSubtitles(row) {
+    this.db.prepare('UPDATE jobs SET subtitle_result = NULL WHERE id = ?').run(row.id);
+    if (!this.subs) return null;
+    try {
+      await this.detectSidecars(row.id);
+      const job = this.subtitleJob(row.id);
+      if (!job.subtitles?.length) return null;
+      const prepared = await this.subs.prepare(job);
+      this.saveSubtitleResult(row.id, {
+        embed: prepared.plan.embed,
+        copy: prepared.plan.copy,
+        files: prepared.plan.files.map(({ name, lang, forced, sdh, format, embed, copy, why }) => ({ name, lang, forced, sdh, format, embed, copy, why })),
+        embedded: prepared.plan.files.filter((f) => f.embed).map((f) => f.name),
+        muxed: 0,
+        copied: [],
+        errors: prepared.notes,
+      });
+      return prepared;
+    } catch (err) {
+      this.log.error(err, `Job ${row.id}: preparing subtitles failed`);
+      this.saveSubtitleResult(row.id, { files: [], embedded: [], copied: [], errors: [{ code: 'prepareFailed', error: err.message }] });
+      return null;
+    }
+  }
+
+  saveSubtitleResult(id, result) {
+    this.db.prepare('UPDATE jobs SET subtitle_result = ? WHERE id = ?').run(JSON.stringify(result), id);
+  }
+
+  updateSubtitleResult(id, fn) {
+    const row = this.db.prepare('SELECT subtitle_result FROM jobs WHERE id = ?').get(id);
+    const current = row?.subtitle_result ? JSON.parse(row.subtitle_result) : { files: [], embedded: [], copied: [], errors: [] };
+    this.saveSubtitleResult(id, fn(current));
+  }
+
+  /**
+   * After a successful encode: adds picture subtitles with mkvmerge (MKV only).
+   * Returns true when the job was cancelled or the server is stopping meanwhile.
+   */
+  async muxImageSubtitles(active) {
+    const images = active.subs?.images ?? [];
+    if (!images.length || active.cancelled || active.shuttingDown) return false;
+    active.phase = 'muxing';
+    this.events.emit('progress', { id: active.id, phase: 'muxing', progress: 1, eta: 0 });
+    try {
+      await this.subs.muxImages(active.partPath, images, { onChild: (child) => { active.child = child; } });
+      active.subs.muxed = images.length;
+      this.updateSubtitleResult(active.id, (r) => ({ ...r, muxed: images.length }));
+    } catch (err) {
+      if (active.cancelled || active.shuttingDown) return true;
+      this.log.error(err, `Job ${active.id}: adding picture subtitles failed`);
+      const names = new Set(images.map((f) => f.name));
+      this.updateSubtitleResult(active.id, (r) => ({
+        ...r,
+        embedded: (r.embedded ?? []).filter((n) => !names.has(n)),
+        errors: [...(r.errors ?? []), ...images.map((f) => ({ name: f.name, code: 'muxFailed', error: err.message }))],
+      }));
+      // Not embedded after all: copy them instead, unless copying is off.
+      for (const f of active.subs.plan.files) if (names.has(f.name) && active.subs.plan.copy !== 'never') f.copy = true;
+    }
+    return active.cancelled || active.shuttingDown;
+  }
+
+  /** After a successful encode (and the automatic rename): writes the sidecars to copy next to the output. */
+  async copySubtitles(id, prepared) {
+    const toCopy = prepared?.plan.files.filter((f) => f.copy) ?? [];
+    if (!toCopy.length) return;
+    const outputPath = this.db.prepare('SELECT output_path FROM jobs WHERE id = ?').get(id).output_path;
+    const { copied, errors } = await this.subs.copy(prepared.plan.files, outputPath);
+    if (copied.length) this.log.info(`Job ${id}: copied ${copied.length} subtitle file(s)`);
+    this.updateSubtitleResult(id, (r) => ({
+      ...r,
+      copied,
+      errors: [...(r.errors ?? []), ...errors.map((e) => ({ ...e, code: 'copyFailed' }))],
+    }));
+  }
+
+  /**
+   * Changes a job's subtitle choices: body { embed?, copy?, files? } where embed/copy may be null
+   * (follow the queue or Settings) and files: [{ path, include?, lang?, forced?, sdh?, edits? }].
+   */
+  updateSubtitles(id, { embed, copy, files } = {}) {
+    const job = this.subtitleJob(id);
+    if (ACTIVE.includes(job.status)) throw conflict('The job is converting; change its subtitles when it has finished');
+    const sets = [];
+    const args = [];
+    const mode = (value, list, name) => {
+      if (value != null && !list.includes(value)) throw badRequest(`${name} must be one of ${list.join(', ')}`);
+      return value ?? null;
+    };
+    if (embed !== undefined) {
+      sets.push('sub_embed = ?');
+      args.push(mode(embed, EMBED_MODES, 'embed'));
+    }
+    if (copy !== undefined) {
+      sets.push('sub_copy = ?');
+      args.push(mode(copy, COPY_MODES, 'copy'));
+    }
+    if (files !== undefined) {
+      sets.push('subtitles = ?');
+      args.push(JSON.stringify(this.subs.applyChanges(job.subtitles ?? [], files)));
+    }
+    if (sets.length) this.db.prepare(`UPDATE jobs SET ${sets.join(', ')} WHERE id = ?`).run(...args, id);
+    this.emitJob(id);
+    return this.subtitleInfo(id);
+  }
+
+  /** The job's sidecars with what would happen to each, for the Subtitles tab. */
+  subtitleInfo(id) {
+    const job = this.subtitleJob(id);
+    const plan = this.subs.plan(job);
+    return { embed: job.subEmbed, copy: job.subCopy, effective: { embed: plan.embed, copy: plan.copy, embedFrom: plan.embedFrom, copyFrom: plan.copyFrom }, files: plan.files };
+  }
+
+  async redetectSubtitles(id) {
+    const job = this.get(id);
+    if (ACTIVE.includes(job.status)) throw conflict('The job is converting; look again when it has finished');
+    await this.detectSidecars(id);
+    this.emitJob(id);
+    return this.subtitleInfo(id);
+  }
+
+  /** Cues before and after edits, for the subtitle editor. */
+  async subtitlePreview(id, { path: file, edits }) {
+    const job = this.subtitleJob(id);
+    const entry = job.subtitles?.find((f) => f.path === file);
+    if (!entry) throw notFound('This subtitle file is not one of the job\'s');
+    return this.subs.preview(entry, edits ?? entry.edits);
+  }
+
+  /** For a converted job: writes its sidecars next to the output again, with the current edits. */
+  async rewriteSubtitles(id) {
+    const job = this.subtitleJob(id);
+    if (job.status !== 'done') throw conflict('Only converted jobs can have their subtitles written again');
+    await fs.access(job.outputPath).catch(() => {
+      throw conflict(`The converted file is not there any more: ${job.outputPath}`);
+    });
+    const plan = this.subs.plan(job);
+    // The ones to copy, and the ones copied last time (rewritten with the current edits).
+    const previous = job.subtitleResult?.copied ?? [];
+    const before = new Set(previous.map((p) => p.from));
+    const files = plan.files.map((f) => ({ ...f, copy: f.include !== false && (f.copy || before.has(f.path)) }));
+    const { copied, errors } = await this.subs.copy(files, job.outputPath, { previous });
+    this.updateSubtitleResult(id, (r) => ({ ...r, copied, errors: errors.map((e) => ({ ...e, code: 'copyFailed' })) }));
+    this.emitJob(id);
+    return { copied: copied.length, errors };
   }
 
   /** Records a finished job in the history and sends its notification. */

@@ -304,7 +304,7 @@ export class Verifier {
    * Returns { status, mode, checks, checkedAt, tookMs } — status 'skipped' when stopped.
    */
   async verify({
-    output, source, sourceLength: givenLength, logFile, expected, mode = 'full', nice = 0, onProgress, onChild,
+    output, source, sourceLength: givenLength, logFile, expected, extraSubtitles = 0, mode = 'full', nice = 0, onProgress, onChild,
     isStopped = () => false, sourceLabel,
   }) {
     const started = Date.now();
@@ -324,7 +324,9 @@ export class Verifier {
       const sourceProbe = source ? await this.probe(source, opts).catch(() => null) : null;
       const sourceLength = givenLength ?? videoLength(sourceProbe);
       // expected: track counts given by the caller (e.g. a merge), instead of a HandBrake log.
-      const log = expected ?? (logFile ? parseHandBrakeLog(await fs.readFile(logFile, 'utf8').catch(() => '')) : null);
+      let log = expected ?? (logFile ? parseHandBrakeLog(await fs.readFile(logFile, 'utf8').catch(() => '')) : null);
+      // Picture subtitles added by mkvmerge after HandBrake (sidecar .idx/.sup) are not in its log.
+      if (log && extraSubtitles) log = { ...log, subtitleTracks: log.subtitleTracks + extraSubtitles };
       onProgress?.(0.02);
       const packets = await this.packets(output, opts);
       if (isStopped()) return done({ status: 'skipped', checks: [], note: 'Check stopped', noteCode: 'checkStopped' });

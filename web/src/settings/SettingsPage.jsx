@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ArchiveRestore, Bell, CalendarClock, Cpu, FolderOpen, FolderSearch, FolderTree, Gauge, Info, Languages, ListPlus, Wand2,
+  ArchiveRestore, Bell, CalendarClock, Captions, Cpu, FolderOpen, FolderSearch, FolderTree, Gauge, Info, Languages, ListPlus, Wand2,
 } from 'lucide-react';
 import { api } from '../api.js';
 import { t } from '../i18n/index.js';
@@ -13,6 +13,7 @@ import { NotificationsSection } from './NotificationsSection.jsx';
 import { BackupSection } from './BackupSection.jsx';
 import { AboutSection } from './AboutSection.jsx';
 import { LanguageSection } from './LanguageSection.jsx';
+import { SubtitlesSection } from './SubtitlesSection.jsx';
 
 // keys: the settings a section edits (for its "unsaved" dot and for saving only what changed).
 // Labels are translated when rendering: settings.nav.<id> and settings.nav.group.<group>.
@@ -30,6 +31,7 @@ export const SECTIONS = [
     group: 'converting',
     items: [
       { id: 'encoding', icon: Cpu, keys: ['niceLevel', 'verifyMode'], Component: EncodingSection },
+      { id: 'subtitles', icon: Captions, keys: ['subtitleEmbed', 'subtitleCopy', 'subtitleExtensions', 'subtitleCodeset'], Component: SubtitlesSection },
       { id: 'schedule', icon: CalendarClock, keys: ['schedule'], Component: ScheduleSection },
       { id: 'watch', icon: FolderSearch, keys: ['watch'], Component: WatchSection },
       { id: 'notifications', icon: Bell, keys: ['notifications'], Component: NotificationsSection },

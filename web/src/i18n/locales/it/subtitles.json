@@ -1,0 +1,136 @@
+{
+  "followSettings": "Come nelle Impostazioni ({mode})",
+  "followQueue": "Come impostato per la coda ({mode})",
+  "embed": {
+    "missing": "Solo le lingue mancanti",
+    "missingHint": "Incorpora un file di sottotitoli quando il video convertito non avrà già una traccia di sottotitoli in quella lingua.",
+    "always": "Sempre",
+    "alwaysHint": "Incorpora ogni file di sottotitoli, anche nelle lingue che il video ha già.",
+    "never": "Mai",
+    "neverHint": "Non incorporare i file di sottotitoli; possono comunque essere copiati accanto al video."
+  },
+  "copy": {
+    "always": "Sempre",
+    "alwaysHint": "Copia ogni file di sottotitoli accanto al video convertito, incorporato o no.",
+    "notEmbedded": "Solo quelli non incorporati",
+    "notEmbeddedHint": "Copia solo i file di sottotitoli che non sono stati incorporati nel video.",
+    "never": "Mai",
+    "neverHint": "Non copiare i file di sottotitoli nella cartella di destinazione."
+  },
+  "action": {
+    "both": "Incorpora + copia",
+    "embed": "Incorpora",
+    "copy": "Copia",
+    "none": "Non usato"
+  },
+  "why": {
+    "excluded": "Senza spunta: non usato per questo processo.",
+    "never": "L’incorporazione è disattivata.",
+    "always": "Incorporato: è scelto “Sempre”.",
+    "missing": "Incorporato: il video convertito non avrà una traccia di sottotitoli in questa lingua.",
+    "present": "Non incorporato: il video convertito ha già una traccia di sottotitoli in questa lingua.",
+    "unknownLang": "Non incorporato: la lingua è sconosciuta e il video ha già dei sottotitoli. Scegli una lingua per decidere.",
+    "container": "Non può essere incorporato in questo formato (WebM: nessuno; MP4: solo sottotitoli di testo). Può comunque essere copiato."
+  },
+  "job": {
+    "title": "File di sottotitoli",
+    "notLooked": "Non ancora cercati: succede dopo la lettura della sorgente.",
+    "none": "Nessun file di sottotitoli accanto alla sorgente.",
+    "embed": "Incorpora",
+    "copy": "Copia",
+    "includeTitle": "Usa questo file di sottotitoli per questo processo",
+    "language": "Lingua",
+    "unknownLanguage": "Lingua sconosciuta",
+    "detectedAs": "Trovata come {lang} nel nome del file",
+    "forced": "Forzati",
+    "forcedTitle": "Sottotitoli forzati: solo le battute in lingua straniera. Se incorporata, la traccia è contrassegnata come forzata e predefinita.",
+    "sdh": "SDH",
+    "sdhTitle": "Per non udenti e ipoudenti (con descrizioni dei suoni)",
+    "edited": "modificato",
+    "edit": "Modifica",
+    "view": "Vedi",
+    "lookAgain": "Cerca di nuovo i file di sottotitoli",
+    "lookAgainTitle": "Cerca di nuovo i file di sottotitoli accanto alla sorgente (le scelte fatte qui restano)",
+    "lookedAgain": "File di sottotitoli cercati di nuovo"
+  },
+  "result": {
+    "embedded": "Incorporati:",
+    "copied": "Copiati accanto al video:",
+    "download": "Scarica",
+    "writeAgain": "Scrivi di nuovo i file di sottotitoli",
+    "writeAgainTitle": "Scrive di nuovo i file di sottotitoli accanto al video convertito, con le modifiche attuali (sostituendo quelli scritti prima)",
+    "written": "File di sottotitoli scritti",
+    "readFailed": "Impossibile leggere {name}: {error}",
+    "muxFailed": "Impossibile incorporare {name}: {error}",
+    "copyFailed": "Impossibile copiare {name}: {error}",
+    "prepareFailed": "Impossibile preparare i file di sottotitoli: {error}"
+  },
+  "editor": {
+    "title": "Modifica {name}",
+    "readOnly": "Il processo sta convertendo: potrai modificare quando avrà finito.",
+    "sourceKept": "Il file originale non viene modificato: le modifiche restano con questo processo e vengono applicate alla copia incorporata o scritta accanto al video.",
+    "offset": "Sposta i tempi",
+    "offsetMs": "Spostamento in millisecondi",
+    "offsetHint": "Positivo: i sottotitoli compaiono dopo. Negativo: prima.",
+    "fps": "Frequenza fotogrammi",
+    "fpsFrom": "Sottotitoli fatti per",
+    "fpsTo": "Video",
+    "fpsNone": "Nessuna modifica",
+    "fpsHint": "Per sottotitoli che partono in sincrono e poi si sfasano sempre di più: sono stati sincronizzati per un video con un’altra frequenza fotogrammi (es. 25 → 23,976).",
+    "videoFps": "questo video: {fps} fps",
+    "codeset": "Set di caratteri",
+    "codesetAuto": "Automatico",
+    "codesetAutoFound": "Automatico (trovato: {codeset})",
+    "codesetHint": "Se le lettere accentate sono sbagliate, scegli il set di caratteri in cui è stato scritto il file. Le copie sono sempre in UTF-8.",
+    "cleanup": "Pulizia",
+    "cleanHi": "Rimuovi il testo per non udenti",
+    "cleanHiHint": "[musica], (ride), ♪ e nomi di chi parla come “GIOVANNI:”",
+    "cleanTags": "Rimuovi la formattazione",
+    "cleanTagsHint": "Tag di corsivo, grassetto, colori e posizione",
+    "cleanAds": "Rimuovi crediti e pubblicità",
+    "cleanAdsHint": "Righe come “Sottotitoli di…” e indirizzi web",
+    "cleanOverlaps": "Correggi le righe sovrapposte",
+    "cleanOverlapsHint": "Una riga finisce subito prima che inizi la successiva",
+    "reset": "Ripristina",
+    "resetTitle": "Rimuovi ogni modifica",
+    "preview": "Anteprima",
+    "count_one": "{count} riga",
+    "count_other": "{count} righe",
+    "removed_one": "{count} rimossa",
+    "removed_other": "{count} rimosse",
+    "firstMoved": "prima riga {from} → {to}",
+    "showOriginal": "Mostra l’originale",
+    "search": "Cerca nel testo",
+    "more_one": "… ancora {count} riga: cerca per trovarla",
+    "more_other": "… ancora {count} righe: cerca per restringere",
+    "noMatch": "Nessuna riga contiene questo testo.",
+    "empty": "Nessuna riga.",
+    "saved": "Modifiche ai sottotitoli salvate"
+  },
+  "queue": {
+    "button": "Sottotitoli",
+    "title": "Cosa succede ai file di sottotitoli accanto ai video, per tutta la coda",
+    "titleCustom": "File di sottotitoli per tutta la coda: incorpora {embed}, copia {copy}",
+    "dialogTitle": "File di sottotitoli per la coda",
+    "intro": "Vale per ogni processo della coda, adesso e aggiunto in seguito, che non ha una scelta propria (impostata nei suoi dettagli).",
+    "useSettings": "Usa le Impostazioni",
+    "jobsKeep": "Un processo in conversione ora non è interessato.",
+    "saved": "Salvato per la coda"
+  },
+  "row": {
+    "title_one": "{count} file di sottotitoli: {list}",
+    "title_other": "{count} file di sottotitoli: {list}"
+  },
+  "browser": {
+    "title_one": "{count} file di sottotitoli accanto a questo video: {list}",
+    "title_other": "{count} file di sottotitoli accanto a questo video: {list}"
+  },
+  "rename": {
+    "along_one": "e {count} file di sottotitoli",
+    "along_other": "e {count} file di sottotitoli",
+    "taken": "{name} esiste già: non rinominato"
+  },
+  "delete": {
+    "of": "sottotitoli di {name}"
+  }
+}

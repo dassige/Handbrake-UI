@@ -1,0 +1,136 @@
+{
+  "followSettings": "As in Settings ({mode})",
+  "followQueue": "As set for the queue ({mode})",
+  "embed": {
+    "missing": "Only missing languages",
+    "missingHint": "Embed a subtitle file when the converted video won't have a subtitle track in its language already.",
+    "always": "Always",
+    "alwaysHint": "Embed every subtitle file, even in languages the video already has.",
+    "never": "Never",
+    "neverHint": "Don't embed subtitle files; they can still be copied next to the video."
+  },
+  "copy": {
+    "always": "Always",
+    "alwaysHint": "Copy every subtitle file next to the converted video, embedded or not.",
+    "notEmbedded": "Only those not embedded",
+    "notEmbeddedHint": "Copy only the subtitle files that were not embedded into the video.",
+    "never": "Never",
+    "neverHint": "Don't copy subtitle files to the target folder."
+  },
+  "action": {
+    "both": "Embed + copy",
+    "embed": "Embed",
+    "copy": "Copy",
+    "none": "Not used"
+  },
+  "why": {
+    "excluded": "Unticked: not used for this job.",
+    "never": "Embedding is turned off.",
+    "always": "Embedded: \"Always\" is chosen.",
+    "missing": "Embedded: the converted video won't have a subtitle track in this language.",
+    "present": "Not embedded: the converted video already has a subtitle track in this language.",
+    "unknownLang": "Not embedded: its language is unknown and the video already has subtitles. Choose a language to decide.",
+    "container": "Can't be embedded into this format (WebM: none; MP4: text subtitles only). It can still be copied."
+  },
+  "job": {
+    "title": "Subtitle files",
+    "notLooked": "Not looked for yet: this happens after the source is read.",
+    "none": "No subtitle files next to the source.",
+    "embed": "Embed",
+    "copy": "Copy",
+    "includeTitle": "Use this subtitle file for this job",
+    "language": "Language",
+    "unknownLanguage": "Unknown language",
+    "detectedAs": "Found as {lang} in the file name",
+    "forced": "Forced",
+    "forcedTitle": "Forced subtitles: only the lines in a foreign language. When embedded, the track is marked forced and default.",
+    "sdh": "SDH",
+    "sdhTitle": "For the deaf and hard of hearing (with sound descriptions)",
+    "edited": "edited",
+    "edit": "Edit",
+    "view": "View",
+    "lookAgain": "Look for subtitle files again",
+    "lookAgainTitle": "Look again for subtitle files next to the source (keeps the choices made here)",
+    "lookedAgain": "Subtitle files looked for again"
+  },
+  "result": {
+    "embedded": "Embedded:",
+    "copied": "Copied next to the video:",
+    "download": "Download",
+    "writeAgain": "Write subtitle files again",
+    "writeAgainTitle": "Writes the subtitle files next to the converted video again, with the current edits (replacing the ones written before)",
+    "written": "Subtitle files written",
+    "readFailed": "{name} could not be read: {error}",
+    "muxFailed": "{name} could not be embedded: {error}",
+    "copyFailed": "{name} could not be copied: {error}",
+    "prepareFailed": "Subtitle files could not be prepared: {error}"
+  },
+  "editor": {
+    "title": "Edit {name}",
+    "readOnly": "The job is converting: changes can be made when it has finished.",
+    "sourceKept": "The original file is not changed: the edits are kept with this job and applied to the copy that is embedded or written next to the video.",
+    "offset": "Shift the timing",
+    "offsetMs": "Shift in milliseconds",
+    "offsetHint": "Positive: the subtitles appear later. Negative: earlier.",
+    "fps": "Frame rate",
+    "fpsFrom": "Subtitles made for",
+    "fpsTo": "Video",
+    "fpsNone": "No change",
+    "fpsHint": "For subtitles that start in sync and drift further apart: they were timed for a video with another frame rate (e.g. 25 → 23.976).",
+    "videoFps": "this video: {fps} fps",
+    "codeset": "Character set",
+    "codesetAuto": "Automatic",
+    "codesetAutoFound": "Automatic (found: {codeset})",
+    "codesetHint": "If accented letters look wrong, choose the character set the file was written in. The copies are always UTF-8.",
+    "cleanup": "Clean up",
+    "cleanHi": "Remove hearing-impaired text",
+    "cleanHiHint": "[music], (laughs), ♪ and speaker names such as \"JOHN:\"",
+    "cleanTags": "Remove formatting",
+    "cleanTagsHint": "Italic, bold, colours and position tags",
+    "cleanAds": "Remove credits and adverts",
+    "cleanAdsHint": "Lines such as \"Subtitles by…\" and web addresses",
+    "cleanOverlaps": "Fix overlapping lines",
+    "cleanOverlapsHint": "A line ends just before the next one starts",
+    "reset": "Reset",
+    "resetTitle": "Remove every edit",
+    "preview": "Preview",
+    "count_one": "{count} line",
+    "count_other": "{count} lines",
+    "removed_one": "{count} removed",
+    "removed_other": "{count} removed",
+    "firstMoved": "first line {from} → {to}",
+    "showOriginal": "Show the original",
+    "search": "Search the text",
+    "more_one": "… {count} more line: search to find it",
+    "more_other": "… {count} more lines: search to narrow down",
+    "noMatch": "No line contains this text.",
+    "empty": "No lines.",
+    "saved": "Subtitle edits saved"
+  },
+  "queue": {
+    "button": "Subtitles",
+    "title": "What happens to subtitle files next to the videos, for the whole queue",
+    "titleCustom": "Subtitle files for the whole queue: embed {embed}, copy {copy}",
+    "dialogTitle": "Subtitle files for the queue",
+    "intro": "Applies to every job in the queue, now and added later, that has no choice of its own (set in its details).",
+    "useSettings": "Use Settings",
+    "jobsKeep": "A job converting now is not affected.",
+    "saved": "Saved for the queue"
+  },
+  "row": {
+    "title_one": "{count} subtitle file: {list}",
+    "title_other": "{count} subtitle files: {list}"
+  },
+  "browser": {
+    "title_one": "{count} subtitle file next to this video: {list}",
+    "title_other": "{count} subtitle files next to this video: {list}"
+  },
+  "rename": {
+    "along_one": "and {count} subtitle file",
+    "along_other": "and {count} subtitle files",
+    "taken": "{name} exists already: not renamed"
+  },
+  "delete": {
+    "of": "subtitles of {name}"
+  }
+}

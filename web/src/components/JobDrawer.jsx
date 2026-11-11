@@ -8,6 +8,7 @@ import { StatusBadge, VerifyBadge } from './StatusBadge.jsx';
 import { JobActions } from './JobRow.jsx';
 import { has, t } from '../i18n/index.js';
 import { checkDetail, checkLabel, checkNote, renameNote } from '../i18n/serverText.js';
+import { JobSubtitles } from '../subtitles/JobSubtitles.jsx';
 
 function Row({ label, children }) {
   if (children == null || children === '' || children === false) return null;
@@ -126,7 +127,7 @@ function CheckSection({ job, run }) {
   );
 }
 
-export function JobDrawer({ job, presets, run, onRename, onClose, onSelect, canPause = true, canConvertNow = false }) {
+export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSelect, canPause = true, canConvertNow = false }) {
   const [showLog, setShowLog] = useState(job.status === 'failed');
   const [outputEdit, setOutputEdit] = useState(null);
   const info = job.sourceInfo;
@@ -254,6 +255,8 @@ export function JobDrawer({ job, presets, run, onRename, onClose, onSelect, canP
             </a>
           )}
         </section>
+
+        <JobSubtitles job={job} settings={settings} run={run} />
 
         <section>
           <SectionTitle help="presets">{t('job.preset.title')}</SectionTitle>

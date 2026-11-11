@@ -8,6 +8,9 @@ import { DEFAULT_SCHEDULE, normalizeSchedule } from './schedule.js';
 import { DEFAULT_WATCH, normalizeWatch } from './watch.js';
 import { DEFAULT_BACKUP_SCHEDULE, normalizeBackupSchedule } from './backupSchedule.js';
 import { DEFAULT_NOTIFICATIONS, mergeNotifications, normalizeNotifications, publicNotifications } from './notify.js';
+import { DEFAULT_SUBTITLE_EXTENSIONS, KNOWN_SUBTITLE_EXTENSIONS } from './subtitles/detect.js';
+import { COPY_MODES, DEFAULT_COPY, DEFAULT_EMBED, EMBED_MODES } from './subtitles/plan.js';
+import { validCodeset } from './subtitles/text.js';
 
 export const MAX_SOURCE_ROOTS = 20;
 
@@ -42,6 +45,14 @@ function defaults(config) {
     autoRenameRuleId: null,
     renameSeparator: '_',
     verifyMode: 'full',
+    // Sidecar subtitles (subtitles/): embed never | missing | always; copy never | notEmbedded | always.
+    subtitleEmbed: DEFAULT_EMBED,
+    subtitleCopy: DEFAULT_COPY,
+    subtitleExtensions: DEFAULT_SUBTITLE_EXTENSIONS,
+    // Read when a subtitle file is neither UTF-8 nor has a BOM.
+    subtitleCodeset: 'windows-1252',
+    // Set from the queue for every job that has no choice of its own (null: follow the above).
+    queueSubtitles: { embed: null, copy: null },
     quality: DEFAULT_QUALITY,
     schedule: DEFAULT_SCHEDULE,
     watch: DEFAULT_WATCH,
@@ -81,6 +92,7 @@ export class Settings {
     this.values.watch = { ...DEFAULT_WATCH, ...this.values.watch };
     this.values.notifications = mergeNotifications(this.values.notifications);
     this.values.backupSchedule = { ...DEFAULT_BACKUP_SCHEDULE, ...this.values.backupSchedule };
+    this.values.queueSubtitles = { embed: null, copy: null, ...this.values.queueSubtitles };
     // Normalise separators and trailing slashes so path comparisons work.
     this.values.sourceRoots = this.values.sourceRoots.map((r) => path.resolve(r));
     this.values.protectedRoots = this.values.protectedRoots.map((r) => path.resolve(r));
@@ -161,6 +173,18 @@ export class Settings {
       .map((e) => e.replace(/^\./, '').toLowerCase());
     if (!next.videoExtensions.length) throw badRequest('At least one video extension is required');
     next.excludePatterns = cleanList(next.excludePatterns, 'excludePatterns');
+    if (!EMBED_MODES.includes(next.subtitleEmbed)) throw badRequest(`subtitleEmbed must be one of ${EMBED_MODES.join(', ')}`);
+    if (!COPY_MODES.includes(next.subtitleCopy)) throw badRequest(`subtitleCopy must be one of ${COPY_MODES.join(', ')}`);
+    next.subtitleExtensions = cleanList(next.subtitleExtensions, 'subtitleExtensions').map((e) => e.replace(/^\./, '').toLowerCase());
+    for (const e of next.subtitleExtensions) {
+      if (!KNOWN_SUBTITLE_EXTENSIONS.includes(e)) throw badRequest(`Unsupported subtitle extension: ${e} (supported: ${KNOWN_SUBTITLE_EXTENSIONS.join(', ')})`);
+    }
+    if (typeof next.subtitleCodeset !== 'string' || !validCodeset(next.subtitleCodeset)) throw badRequest(`Unknown codeset: ${next.subtitleCodeset}`);
+    const qs = next.queueSubtitles ?? {};
+    if (typeof qs !== 'object') throw badRequest('queueSubtitles must be an object');
+    if (qs.embed != null && !EMBED_MODES.includes(qs.embed)) throw badRequest(`queueSubtitles.embed must be one of ${EMBED_MODES.join(', ')}`);
+    if (qs.copy != null && !COPY_MODES.includes(qs.copy)) throw badRequest(`queueSubtitles.copy must be one of ${COPY_MODES.join(', ')}`);
+    next.queueSubtitles = { embed: qs.embed ?? null, copy: qs.copy ?? null };
     next.niceLevel = Number(next.niceLevel);
     if (!Number.isInteger(next.niceLevel) || next.niceLevel < 0 || next.niceLevel > 19) {
       throw badRequest('niceLevel must be a whole number between 0 and 19');

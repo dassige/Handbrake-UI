@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.3.0] - 2026/11/12
+
+- feat: sidecar subtitle files: embed, copy, rename along, edit
+
+Subtitle files next to a source video are found, embedded into the converted
+video when its language is missing, and copied next to it as Video.en.srt.
+Settings, the whole queue or a single job choose what happens. An editor
+fixes timing, frame rate, character set and clean-up without changing the
+originals.
+
 ## [3.2.1] - 2026/11/12
 
 - feat: convert one queued file now; remembered sorting on every file list

@@ -1,0 +1,136 @@
+{
+  "followSettings": "Comme dans les Paramètres ({mode})",
+  "followQueue": "Comme défini pour la file d'attente ({mode})",
+  "embed": {
+    "missing": "Seulement les langues manquantes",
+    "missingHint": "Intègre un fichier de sous-titres quand la vidéo convertie n'aura pas déjà une piste de sous-titres dans sa langue.",
+    "always": "Toujours",
+    "alwaysHint": "Intègre tous les fichiers de sous-titres, même dans les langues que la vidéo a déjà.",
+    "never": "Jamais",
+    "neverHint": "N'intègre aucun fichier de sous-titres ; ils peuvent quand même être copiés à côté de la vidéo."
+  },
+  "copy": {
+    "always": "Toujours",
+    "alwaysHint": "Copie tous les fichiers de sous-titres à côté de la vidéo convertie, intégrés ou non.",
+    "notEmbedded": "Seulement ceux non intégrés",
+    "notEmbeddedHint": "Copie uniquement les fichiers de sous-titres qui n'ont pas été intégrés à la vidéo.",
+    "never": "Jamais",
+    "neverHint": "Ne copie aucun fichier de sous-titres dans le dossier cible."
+  },
+  "action": {
+    "both": "Intégrer + copier",
+    "embed": "Intégrer",
+    "copy": "Copier",
+    "none": "Non utilisé"
+  },
+  "why": {
+    "excluded": "Décoché : non utilisé pour cette tâche.",
+    "never": "L'intégration est désactivée.",
+    "always": "Intégré : « Toujours » est choisi.",
+    "missing": "Intégré : la vidéo convertie n'aura pas de piste de sous-titres dans cette langue.",
+    "present": "Non intégré : la vidéo convertie a déjà une piste de sous-titres dans cette langue.",
+    "unknownLang": "Non intégré : sa langue est inconnue et la vidéo a déjà des sous-titres. Choisissez une langue pour trancher.",
+    "container": "Ne peut pas être intégré à ce format (WebM : aucun ; MP4 : sous-titres texte uniquement). Peut quand même être copié."
+  },
+  "job": {
+    "title": "Fichiers de sous-titres",
+    "notLooked": "Pas encore recherchés : cela se fait après la lecture de la source.",
+    "none": "Aucun fichier de sous-titres à côté de la source.",
+    "embed": "Intégrer",
+    "copy": "Copier",
+    "includeTitle": "Utiliser ce fichier de sous-titres pour cette tâche",
+    "language": "Langue",
+    "unknownLanguage": "Langue inconnue",
+    "detectedAs": "Trouvée comme {lang} dans le nom du fichier",
+    "forced": "Forcés",
+    "forcedTitle": "Sous-titres forcés : seulement les répliques en langue étrangère. Une fois intégrée, la piste est marquée forcée et par défaut.",
+    "sdh": "SDH",
+    "sdhTitle": "Pour les sourds et malentendants (avec descriptions des sons)",
+    "edited": "modifié",
+    "edit": "Modifier",
+    "view": "Voir",
+    "lookAgain": "Rechercher à nouveau les fichiers de sous-titres",
+    "lookAgainTitle": "Recherche à nouveau les fichiers de sous-titres à côté de la source (conserve les choix faits ici)",
+    "lookedAgain": "Fichiers de sous-titres recherchés à nouveau"
+  },
+  "result": {
+    "embedded": "Intégrés :",
+    "copied": "Copiés à côté de la vidéo :",
+    "download": "Télécharger",
+    "writeAgain": "Écrire à nouveau les fichiers de sous-titres",
+    "writeAgainTitle": "Écrit à nouveau les fichiers de sous-titres à côté de la vidéo convertie, avec les modifications actuelles (en remplaçant ceux écrits précédemment)",
+    "written": "Fichiers de sous-titres écrits",
+    "readFailed": "{name} n'a pas pu être lu : {error}",
+    "muxFailed": "{name} n'a pas pu être intégré : {error}",
+    "copyFailed": "{name} n'a pas pu être copié : {error}",
+    "prepareFailed": "Les fichiers de sous-titres n'ont pas pu être préparés : {error}"
+  },
+  "editor": {
+    "title": "Modifier {name}",
+    "readOnly": "La tâche est en cours de conversion : les modifications seront possibles une fois terminée.",
+    "sourceKept": "Le fichier d'origine n'est pas modifié : les modifications sont conservées avec cette tâche et appliquées à la copie intégrée ou écrite à côté de la vidéo.",
+    "offset": "Décaler le minutage",
+    "offsetMs": "Décalage en millisecondes",
+    "offsetHint": "Positif : les sous-titres apparaissent plus tard. Négatif : plus tôt.",
+    "fps": "Fréquence d'images",
+    "fpsFrom": "Sous-titres faits pour",
+    "fpsTo": "Vidéo",
+    "fpsNone": "Aucun changement",
+    "fpsHint": "Pour des sous-titres qui démarrent synchronisés puis se décalent de plus en plus : ils ont été minutés pour une vidéo d'une autre fréquence d'images (p. ex. 25 → 23,976).",
+    "videoFps": "cette vidéo : {fps} i/s",
+    "codeset": "Jeu de caractères",
+    "codesetAuto": "Automatique",
+    "codesetAutoFound": "Automatique (trouvé : {codeset})",
+    "codesetHint": "Si les lettres accentuées s'affichent mal, choisissez le jeu de caractères dans lequel le fichier a été écrit. Les copies sont toujours en UTF-8.",
+    "cleanup": "Nettoyer",
+    "cleanHi": "Supprimer le texte pour malentendants",
+    "cleanHiHint": "[musique], (rires), ♪ et noms de personnages comme « JEAN : »",
+    "cleanTags": "Supprimer la mise en forme",
+    "cleanTagsHint": "Balises d'italique, de gras, de couleur et de position",
+    "cleanAds": "Supprimer les crédits et les publicités",
+    "cleanAdsHint": "Lignes comme « Sous-titres par… » et adresses web",
+    "cleanOverlaps": "Corriger les lignes qui se chevauchent",
+    "cleanOverlapsHint": "Une ligne se termine juste avant le début de la suivante",
+    "reset": "Réinitialiser",
+    "resetTitle": "Supprimer toutes les modifications",
+    "preview": "Aperçu",
+    "count_one": "{count} ligne",
+    "count_other": "{count} lignes",
+    "removed_one": "{count} supprimée",
+    "removed_other": "{count} supprimées",
+    "firstMoved": "première ligne {from} → {to}",
+    "showOriginal": "Afficher l'original",
+    "search": "Rechercher dans le texte",
+    "more_one": "… {count} ligne de plus : recherchez pour la trouver",
+    "more_other": "… {count} lignes de plus : recherchez pour affiner",
+    "noMatch": "Aucune ligne ne contient ce texte.",
+    "empty": "Aucune ligne.",
+    "saved": "Modifications des sous-titres enregistrées"
+  },
+  "queue": {
+    "button": "Sous-titres",
+    "title": "Ce qu'il advient des fichiers de sous-titres à côté des vidéos, pour toute la file d'attente",
+    "titleCustom": "Fichiers de sous-titres pour toute la file d'attente : intégrer {embed}, copier {copy}",
+    "dialogTitle": "Fichiers de sous-titres de la file d'attente",
+    "intro": "S'applique à chaque tâche de la file d'attente, actuelle ou ajoutée plus tard, qui n'a pas de choix propre (défini dans ses détails).",
+    "useSettings": "Utiliser les Paramètres",
+    "jobsKeep": "Une tâche en cours de conversion n'est pas concernée.",
+    "saved": "Enregistré pour la file d'attente"
+  },
+  "row": {
+    "title_one": "{count} fichier de sous-titres : {list}",
+    "title_other": "{count} fichiers de sous-titres : {list}"
+  },
+  "browser": {
+    "title_one": "{count} fichier de sous-titres à côté de cette vidéo : {list}",
+    "title_other": "{count} fichiers de sous-titres à côté de cette vidéo : {list}"
+  },
+  "rename": {
+    "along_one": "et {count} fichier de sous-titres",
+    "along_other": "et {count} fichiers de sous-titres",
+    "taken": "{name} existe déjà : non renommé"
+  },
+  "delete": {
+    "of": "sous-titres de {name}"
+  }
+}

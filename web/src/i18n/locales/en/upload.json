@@ -5,7 +5,7 @@
     "newFolder": "New folder",
     "elsewhere": "To upload somewhere else, close this window and open that folder in Sources first.",
     "drop": "<strong>Drop video files here</strong> or click to choose them on this computer",
-    "notVideo": "not a video file, skipped",
+    "notVideo": "not a video or subtitle file, skipped",
     "removeFile": "Remove {name}",
     "keepOpen": "Keep this browser tab open until the uploads finish. You can keep working meanwhile. If an upload is interrupted, upload the same file to the same folder again: it continues where it stopped.",
     "chosen_one": "{count} file · {size}",

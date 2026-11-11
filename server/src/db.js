@@ -156,6 +156,10 @@ const MIGRATIONS = [
   ['jobs', 'verify_status', 'TEXT'], // ok | warning | error | skipped | running
   ['jobs', 'origin', 'TEXT'], // 'watch' when a watch folder added the job
   ['presets', 'updated_at', 'INTEGER'], // last saved in the preset editor (NULL: as imported)
+  ['jobs', 'subtitles', 'TEXT'], // JSON: sidecar subtitle files and the choices made for them (NULL: not looked for yet)
+  ['jobs', 'sub_embed', 'TEXT'], // this job's embed mode (NULL: the queue's or Settings')
+  ['jobs', 'sub_copy', 'TEXT'], // this job's copy mode (NULL: the queue's or Settings')
+  ['jobs', 'subtitle_result', 'TEXT'], // JSON: what was embedded and copied
 ];
 
 export function openDb(file) {

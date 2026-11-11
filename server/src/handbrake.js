@@ -302,7 +302,7 @@ export class HandBrake {
    * Starts an encode. Returns the child process; events are delivered through
    * the callbacks. onExit(code, signal) is called once.
    */
-  encode({ presetFile, presetName, input, output, format, nice, logFile, onProgress, onExit }) {
+  encode({ presetFile, presetName, input, output, format, extraArgs = [], nice, logFile, onProgress, onExit }) {
     const args = [
       '--json',
       '--preset-import-file', presetFile,
@@ -310,6 +310,8 @@ export class HandBrake {
       '-i', input,
       '-o', output,
       '--format', format,
+      // e.g. sidecar subtitles: --srt-file, --ssa-file (subtitles/plan.js)
+      ...extraArgs,
     ];
     const useNice = process.platform !== 'win32' && nice > 0;
     const cmd = useNice ? 'nice' : this.cli;

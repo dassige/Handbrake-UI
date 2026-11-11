@@ -147,7 +147,8 @@
         "job.actions",
         "job.files",
         "verify.results",
-        "job.log"
+        "job.log",
+        "subtitles.job"
       ]
     },
     "job.files": {
@@ -163,6 +164,76 @@
         "settings.layout",
         "job.details",
         "download.overview"
+      ]
+    },
+    "subtitles.overview": {
+      "title": "Subtitle files next to the videos",
+      "body": [
+        "Videos often come with separate subtitle files (\"sidecars\"). HandBrake Queue finds them, and can **embed** them into the converted video, **copy** them next to it, or both.",
+        "### Which files are found",
+        "- Files named after the video in the same folder: `Movie.srt`, `Movie.en.srt`, `Movie.ita.forced.srt`, `Movie.en.sdh.srt`.",
+        "- Files in a `Subs` or `Subtitles` folder next to the video: `Subs/2_English.srt`, or `Subs/Movie/3_Italian.srt` for a folder per episode.",
+        "- When the folder has only one video, any subtitle file in it (e.g. `english.srt`).",
+        "- Formats: SRT, ASS/SSA and WebVTT (text), VobSub `.idx` + `.sub` and Blu-ray `.sup` (pictures). The list is in [Settings](#settings.subtitles).",
+        "The language and the **forced** and **SDH** flags are read from the file name; they can be changed in the [job's details](#subtitles.job).",
+        "### What happens to them",
+        "The choice is made at three levels; the most specific one wins:",
+        "1. A job's own choice, in its [details](#subtitles.job).",
+        "1. The choice for the whole queue: the **Subtitles** button above the queue. See [Subtitles for the queue](#subtitles.queue).",
+        "1. [Settings → Subtitles](#settings.subtitles): by default, files in languages the video doesn't have are embedded and every file is copied.",
+        "The original subtitle files are never changed or moved: edits are applied to the copies."
+      ],
+      "see": [
+        "settings.subtitles",
+        "subtitles.job",
+        "subtitles.queue",
+        "subtitles.editor"
+      ]
+    },
+    "subtitles.job": {
+      "title": "A job's subtitle files",
+      "body": [
+        "**Subtitle files** in the job's details lists the files found next to the source, and what will happen to each: **Embed**, **Copy**, **Embed + copy** or **Not used**. Hover over it to see why.",
+        "- **Embed** and **Copy** choose for this job only; the first option follows the queue or [Settings](#settings.subtitles).",
+        "- Untick a file to leave it out.",
+        "- Set the **language** when it isn't known or is wrong, and tick **Forced** (only the lines in a foreign language) or **SDH** (for the deaf and hard of hearing). An embedded forced file becomes the default track.",
+        "- **Edit** opens the [subtitle editor](#subtitles.editor) for text files.",
+        "- **Look for subtitle files again** finds files added after the job; the choices already made are kept. Files are also looked for again when the conversion starts.",
+        "After the conversion the section shows what was embedded and copied, with a download link for each copy. **Write subtitle files again** writes the copies again with the current edits, replacing the ones written before: useful to fix the timing after watching the video.",
+        "Nothing can be changed while the job is converting."
+      ],
+      "see": [
+        "subtitles.overview",
+        "subtitles.editor",
+        "job.details"
+      ]
+    },
+    "subtitles.editor": {
+      "title": "Editing a subtitle file",
+      "body": [
+        "The editor fixes common problems in a text subtitle file. The original file is not changed: the edits are kept with the job and applied to the copy that is embedded or written next to the video.",
+        "- **Shift the timing**: all lines appear later (positive) or earlier (negative), in milliseconds.",
+        "- **Frame rate**: for subtitles that start in sync and drift further apart, because they were timed for a video with another frame rate (e.g. made for 25 fps, video at 23.976).",
+        "- **Character set**: if accented letters look wrong, choose the one the file was written in. The copies are always UTF-8.",
+        "- **Clean up**: remove hearing-impaired text (`[music]`, `(laughs)`, speaker names), formatting tags, credits and adverts (\"Subtitles by…\", web addresses), and fix lines that overlap.",
+        "The **Preview** shows the result as you change things; tick **Show the original** to compare, and search the text to find a line. **Save** keeps the edits; **Reset** removes them all."
+      ],
+      "see": [
+        "subtitles.job",
+        "subtitles.overview"
+      ]
+    },
+    "subtitles.queue": {
+      "title": "Subtitles for the queue",
+      "body": [
+        "The **Subtitles** button above the queue sets what happens to subtitle files for the whole queue, instead of [Settings](#settings.subtitles): for example, don't copy them for tonight's conversions.",
+        "- It applies to every job, queued now or added later, that has no choice of its own.",
+        "- A job's own choice, made in its [details](#subtitles.job), always wins.",
+        "- **Use Settings** goes back to the choice in Settings. A dot on the button shows that the queue has its own choice."
+      ],
+      "see": [
+        "subtitles.overview",
+        "subtitles.job"
       ]
     },
     "job.source": {
@@ -342,6 +413,22 @@
         "verify.overview"
       ]
     },
+    "settings.subtitles": {
+      "title": "Subtitle settings",
+      "body": [
+        "- **Embedding**: **Only missing languages** (default) embeds a subtitle file when the converted video won't have a subtitle track in that language. Which tracks the video keeps comes from the preset's **Subtitles** tab. **Always** embeds every file; **Never** none.",
+        "- A file with no known language is embedded only when the converted video has no subtitles at all.",
+        "- **Copying**: **Always** (default) writes every file next to the converted video; **Only those not embedded** skips the embedded ones; **Never** writes none.",
+        "- Copies are UTF-8 and named after the converted video, as Plex, Jellyfin and Emby expect: `Movie.en.srt`, `Movie.it.forced.srt`. They follow the video when it is [renamed](#rename.overview).",
+        "- **Subtitle file extensions**: which files are looked for. Leave the list empty to ignore subtitle files.",
+        "- **Character set of older files**: used to read files that are not UTF-8, often older `.srt` files. If accents look wrong in one file, choose its character set in the [editor](#subtitles.editor).",
+        "- MP4 can hold text subtitles only (pictures are copied instead); WebM can't hold any, so they are only copied."
+      ],
+      "see": [
+        "subtitles.overview",
+        "subtitles.queue"
+      ]
+    },
     "settings.renaming": {
       "title": "Renaming settings",
       "body": [
@@ -381,6 +468,7 @@
         "- **Warnings** explain what the rules couldn't find, e.g. no episode number, no year, or no show name.",
         "- **TV · S06e01** or **Movie · 2024** shows what was recognised; **no change** means the name is already right.",
         "- If two files would get the same name, or the name is taken by another file in the folder, a number is added: `name_1.mkv` (see [Renaming settings](#settings.renaming)).",
+        "- Subtitle files named after a video (`Old.en.srt`) are renamed with it (`New.en.srt`): the row says **and 2 subtitle files**. **Undo** in the history restores them too.",
         "Files in different folders are grouped under their folder."
       ],
       "see": [
@@ -583,7 +671,7 @@
         "1. Press **Upload**, or drop files from your computer onto the Sources panel.",
         "1. Optionally press **New folder** to create a sub-folder and upload into it.",
         "1. Press **Upload**. The files go one at a time; a panel in the corner shows the progress and you can keep working.",
-        "Only video files are accepted (the extensions in [Adding folders](#settings.adding)). An existing file is never replaced: you choose to skip it or upload a copy named “name (1)”. The upload stops before it starts if the server lacks the space.",
+        "Only video files are accepted (the extensions in [Adding folders](#settings.adding)), and [subtitle files](#subtitles.overview) to go with them. An existing file is never replaced: you choose to skip it or upload a copy named “name (1)”. The upload stops before it starts if the server lacks the space.",
         "### Interruptions",
         "Keep the browser tab open until the uploads finish. A dropped connection is retried by itself. If the tab was closed, upload the same file to the same folder again: it continues where it stopped. Unfinished uploads are hidden files, removed by themselves after a week; **Cancel** removes one straight away."
       ],
@@ -672,6 +760,7 @@
         "1. In **Convert**, tick the files or folders in [Sources](#convert.sources).",
         "1. Press **Delete** (or the Delete key).",
         "1. The confirmation shows exactly what will go: how many files, how much space, and everything inside a chosen folder. Press **Delete** to confirm; **Cancel** is the default.",
+        "A video's [subtitle files](#subtitles.overview) (e.g. `Movie.en.srt`, or the ones in its `Subs` folder) are deleted with it; the confirmation lists them.",
         "Deleting cannot be undone. If a download client such as Deluge is still seeding the files, it will report them as missing.",
         "### What is refused",
         "- Files that are queued, converting or paused, and folders that contain one. Remove them from the queue first.",

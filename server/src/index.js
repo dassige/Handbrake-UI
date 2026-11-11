@@ -29,6 +29,7 @@ import { Notifier } from './notify.js';
 import { Watcher } from './watch.js';
 import { registerAutomationRoutes } from './automationRoutes.js';
 import { BackupScheduler } from './backupSchedule.js';
+import { Subtitles } from './subtitles/service.js';
 
 /** version, date and commit from a package.json (managed by DGS AutoVersion); null when missing. */
 function readVersion(file) {
@@ -62,14 +63,16 @@ const history = new History({ db });
 const notifier = new Notifier({ settings, log: app.log });
 const queue = new Queue({ db, settings, presets, handbrake, verifier, events, dataDir: config.dataDir, log: app.log, history, notifier });
 const watcher = new Watcher({ db, settings, queue, presets, notifier, events, log: app.log });
-const renamer = new Renamer({ db, settings, events, log: app.log });
+const subtitles = new Subtitles({ settings, tmpDir: path.join(config.dataDir, 'tmp'), mkvmerge: config.mkvmerge, log: app.log });
+queue.subs = subtitles;
+const renamer = new Renamer({ db, settings, events, log: app.log, subtitles });
 queue.renamer = renamer;
 const merger = new Merger({
   db, settings, events, verifier, log: app.log, tmpDir: path.join(config.dataDir, 'tmp'),
   mkvmerge: config.mkvmerge, ffprobe: config.ffprobe,
 });
 const uploads = new Uploads({ db, settings, events, log: app.log });
-const sourceFiles = new SourceFiles({ settings, queue, events, log: app.log });
+const sourceFiles = new SourceFiles({ settings, queue, events, log: app.log, subtitles });
 const downloads = new Downloads({ settings, log: app.log });
 const quality = new QualityScanner({ db, settings, verifier, events, queue, log: app.log });
 const backups = new Backups({
@@ -87,7 +90,7 @@ app.setErrorHandler((err, req, reply) => {
 // Per-request access logs are noise here (the UI polls); keep warnings and errors.
 await app.register(
   async (api) => {
-    registerRoutes(api, { settings, presets, queue, events, handbrake, renamer, watcher, backupScheduler, version, dataDir: config.dataDir });
+    registerRoutes(api, { settings, presets, queue, events, handbrake, renamer, watcher, backupScheduler, subtitles, version, dataDir: config.dataDir });
     registerAutomationRoutes(api, { history, watcher, notifier });
     registerRenameRoutes(api, { renamer });
     registerMergeRoutes(api, { merger });

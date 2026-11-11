@@ -18,6 +18,7 @@
     "output": "Ausgabestruktur",
     "language": "Sprache",
     "encoding": "Encodierung und Prüfung",
+    "subtitles": "Untertitel",
     "schedule": "Zeitfenster",
     "watch": "Überwachte Ordner",
     "notifications": "Benachrichtigungen",
@@ -79,6 +80,17 @@
       "off": "Aus",
       "offHint": "Dateien gelten als konvertiert, sobald HandBrake fertig ist."
     }
+  },
+  "subtitles": {
+    "embedTitle": "Untertiteldateien einbetten",
+    "intro": "Untertiteldateien, die zu einem Video gehören (z. B. Movie.en.srt, Movie.it.forced.srt oder ein Ordner „Subs“), können in das konvertierte Video eingebettet und/oder neben es kopiert werden. Das ist die Vorgabe: Die Warteschlange und jeder Auftrag können anders entscheiden. Die Originaldateien werden nie verändert.",
+    "copyTitle": "In den Zielordner kopieren",
+    "copyNames": "Kopien werden nach dem konvertierten Video benannt, wie Medienserver es erwarten: Movie.en.srt, Movie.it.forced.srt. Sie werden mit dem Video umbenannt.",
+    "findTitle": "Dateien finden",
+    "extensions": "Dateiendungen von Untertiteldateien",
+    "extensionsHint": "Unterstützt: srt, ass, ssa, vtt, idx (VobSub, mit zugehöriger .sub), sup (Blu-ray). Leer lassen, um Untertiteldateien zu ignorieren.",
+    "codeset": "Zeichensatz älterer Dateien",
+    "codesetHint": "Wird für Untertiteldateien verwendet, die nicht UTF-8 sind (oft ältere .srt-Dateien). Jede Datei lässt sich auch in den Details ihres Auftrags festlegen."
   },
   "quality": {
     "title": "Auflösung und Bitrate",

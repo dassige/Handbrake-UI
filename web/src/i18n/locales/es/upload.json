@@ -5,7 +5,7 @@
     "newFolder": "Nueva carpeta",
     "elsewhere": "Para subir a otro sitio, cierre esta ventana y abra antes esa carpeta en Orígenes.",
     "drop": "<strong>Suelte aquí los archivos de video</strong> o haga clic para elegirlos en este equipo",
-    "notVideo": "no es un archivo de video, se omite",
+    "notVideo": "no es un archivo de video ni de subtítulos, se omite",
     "removeFile": "Quitar {name}",
     "keepOpen": "Mantenga abierta esta pestaña del navegador hasta que terminen las subidas. Mientras tanto puede seguir trabajando. Si una subida se interrumpe, suba de nuevo el mismo archivo a la misma carpeta: continuará donde se detuvo.",
     "chosen_one": "{count} archivo · {size}",

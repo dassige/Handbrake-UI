@@ -147,7 +147,8 @@
         "job.actions",
         "job.files",
         "verify.results",
-        "job.log"
+        "job.log",
+        "subtitles.job"
       ]
     },
     "job.files": {
@@ -163,6 +164,76 @@
         "settings.layout",
         "job.details",
         "download.overview"
+      ]
+    },
+    "subtitles.overview": {
+      "title": "Fichiers de sous-titres à côté des vidéos",
+      "body": [
+        "Les vidéos arrivent souvent avec des fichiers de sous-titres séparés (« sidecars »). HandBrake Queue les trouve et peut les **intégrer** à la vidéo convertie, les **copier** à côté, ou les deux.",
+        "### Quels fichiers sont trouvés",
+        "- Les fichiers nommés d'après la vidéo, dans le même dossier : `Movie.srt`, `Movie.en.srt`, `Movie.ita.forced.srt`, `Movie.en.sdh.srt`.",
+        "- Les fichiers d'un dossier `Subs` ou `Subtitles` à côté de la vidéo : `Subs/2_English.srt`, ou `Subs/Movie/3_Italian.srt` pour un dossier par épisode.",
+        "- Quand le dossier ne contient qu'une vidéo, tout fichier de sous-titres qui s'y trouve (p. ex. `english.srt`).",
+        "- Formats : SRT, ASS/SSA et WebVTT (texte), VobSub `.idx` + `.sub` et Blu-ray `.sup` (images). La liste se trouve dans les [Paramètres](#settings.subtitles).",
+        "La langue et les indicateurs **forcés** et **SDH** sont lus dans le nom du fichier ; ils peuvent être modifiés dans les [détails de la tâche](#subtitles.job).",
+        "### Ce qu'il en advient",
+        "Le choix se fait à trois niveaux ; le plus précis l'emporte :",
+        "1. Le choix propre à une tâche, dans ses [détails](#subtitles.job).",
+        "1. Le choix pour toute la file d'attente : le bouton **Sous-titres** au-dessus de la file. Voir [Sous-titres de la file d'attente](#subtitles.queue).",
+        "1. [Paramètres → Sous-titres](#settings.subtitles) : par défaut, les fichiers dans des langues que la vidéo n'a pas sont intégrés et tous les fichiers sont copiés.",
+        "Les fichiers de sous-titres d'origine ne sont jamais modifiés ni déplacés : les modifications s'appliquent aux copies."
+      ],
+      "see": [
+        "settings.subtitles",
+        "subtitles.job",
+        "subtitles.queue",
+        "subtitles.editor"
+      ]
+    },
+    "subtitles.job": {
+      "title": "Fichiers de sous-titres d'une tâche",
+      "body": [
+        "**Fichiers de sous-titres** dans les détails de la tâche liste les fichiers trouvés à côté de la source et ce qu'il adviendra de chacun : **Intégrer**, **Copier**, **Intégrer + copier** ou **Non utilisé**. Survolez-le pour savoir pourquoi.",
+        "- **Intégrer** et **Copier** choisissent pour cette tâche seulement ; la première option suit la file d'attente ou les [Paramètres](#settings.subtitles).",
+        "- Décochez un fichier pour l'écarter.",
+        "- Définissez la **langue** quand elle est inconnue ou erronée, et cochez **Forcés** (seulement les répliques en langue étrangère) ou **SDH** (pour les sourds et malentendants). Un fichier forcé intégré devient la piste par défaut.",
+        "- **Modifier** ouvre l'[éditeur de sous-titres](#subtitles.editor) pour les fichiers texte.",
+        "- **Rechercher à nouveau les fichiers de sous-titres** trouve les fichiers ajoutés après la tâche ; les choix déjà faits sont conservés. Les fichiers sont aussi recherchés à nouveau au démarrage de la conversion.",
+        "Après la conversion, la section montre ce qui a été intégré et copié, avec un lien de téléchargement pour chaque copie. **Écrire à nouveau les fichiers de sous-titres** réécrit les copies avec les modifications actuelles, en remplaçant celles écrites précédemment : utile pour corriger le minutage après avoir regardé la vidéo.",
+        "Rien ne peut être modifié pendant la conversion de la tâche."
+      ],
+      "see": [
+        "subtitles.overview",
+        "subtitles.editor",
+        "job.details"
+      ]
+    },
+    "subtitles.editor": {
+      "title": "Modifier un fichier de sous-titres",
+      "body": [
+        "L'éditeur corrige les problèmes courants d'un fichier de sous-titres texte. Le fichier d'origine n'est pas modifié : les modifications sont conservées avec la tâche et appliquées à la copie intégrée ou écrite à côté de la vidéo.",
+        "- **Décaler le minutage** : toutes les lignes apparaissent plus tard (positif) ou plus tôt (négatif), en millisecondes.",
+        "- **Fréquence d'images** : pour des sous-titres qui démarrent synchronisés puis se décalent de plus en plus, parce qu'ils ont été minutés pour une vidéo d'une autre fréquence d'images (p. ex. faits pour 25 i/s, vidéo à 23,976).",
+        "- **Jeu de caractères** : si les lettres accentuées s'affichent mal, choisissez celui dans lequel le fichier a été écrit. Les copies sont toujours en UTF-8.",
+        "- **Nettoyer** : supprimer le texte pour malentendants (`[musique]`, `(rires)`, noms de personnages), les balises de mise en forme, les crédits et publicités (« Sous-titres par… », adresses web), et corriger les lignes qui se chevauchent.",
+        "L'**Aperçu** montre le résultat au fil de vos changements ; cochez **Afficher l'original** pour comparer, et recherchez dans le texte pour trouver une ligne. **Enregistrer** conserve les modifications ; **Réinitialiser** les supprime toutes."
+      ],
+      "see": [
+        "subtitles.job",
+        "subtitles.overview"
+      ]
+    },
+    "subtitles.queue": {
+      "title": "Sous-titres de la file d'attente",
+      "body": [
+        "Le bouton **Sous-titres** au-dessus de la file définit ce qu'il advient des fichiers de sous-titres pour toute la file d'attente, à la place des [Paramètres](#settings.subtitles) : par exemple, ne pas les copier pour les conversions de cette nuit.",
+        "- Il s'applique à chaque tâche, en attente ou ajoutée plus tard, qui n'a pas de choix propre.",
+        "- Le choix propre à une tâche, fait dans ses [détails](#subtitles.job), l'emporte toujours.",
+        "- **Utiliser les Paramètres** revient au choix des Paramètres. Un point sur le bouton indique que la file a son propre choix."
+      ],
+      "see": [
+        "subtitles.overview",
+        "subtitles.job"
       ]
     },
     "job.source": {
@@ -342,6 +413,22 @@
         "verify.overview"
       ]
     },
+    "settings.subtitles": {
+      "title": "Réglages des sous-titres",
+      "body": [
+        "- **Intégration** : **Seulement les langues manquantes** (par défaut) intègre un fichier de sous-titres quand la vidéo convertie n'aura pas de piste de sous-titres dans cette langue. Les pistes que la vidéo conserve dépendent de l'onglet **Sous-titres** du préréglage. **Toujours** intègre tous les fichiers ; **Jamais** aucun.",
+        "- Un fichier dont la langue est inconnue n'est intégré que si la vidéo convertie n'a aucun sous-titre.",
+        "- **Copie** : **Toujours** (par défaut) écrit tous les fichiers à côté de la vidéo convertie ; **Seulement ceux non intégrés** ignore ceux qui sont intégrés ; **Jamais** n'en écrit aucun.",
+        "- Les copies sont en UTF-8 et portent le nom de la vidéo convertie, comme l'attendent Plex, Jellyfin et Emby : `Movie.en.srt`, `Movie.it.forced.srt`. Elles suivent la vidéo quand elle est [renommée](#rename.overview).",
+        "- **Extensions des fichiers de sous-titres** : quels fichiers sont recherchés. Laissez la liste vide pour ignorer les fichiers de sous-titres.",
+        "- **Jeu de caractères des fichiers anciens** : utilisé pour lire les fichiers qui ne sont pas en UTF-8, souvent d'anciens `.srt`. Si les accents s'affichent mal dans un fichier, choisissez son jeu de caractères dans l'[éditeur](#subtitles.editor).",
+        "- Le MP4 ne peut contenir que des sous-titres texte (les images sont copiées à la place) ; le WebM n'en accepte aucun, ils sont donc seulement copiés."
+      ],
+      "see": [
+        "subtitles.overview",
+        "subtitles.queue"
+      ]
+    },
     "settings.renaming": {
       "title": "Réglages de renommage",
       "body": [
@@ -381,6 +468,7 @@
         "- Les **avertissements** expliquent ce que les règles n'ont pas trouvé, p. ex. pas de numéro d'épisode, pas d'année ou pas de nom de série.",
         "- **Série · S06e01** ou **Film · 2024** montre ce qui a été reconnu ; **aucun changement** signifie que le nom est déjà bon.",
         "- Si deux fichiers obtiennent le même nom, ou si le nom est pris par un autre fichier du dossier, un numéro est ajouté : `name_1.mkv` (voir [Réglages de renommage](#settings.renaming)).",
+        "- Les fichiers de sous-titres nommés d'après une vidéo (`Old.en.srt`) sont renommés avec elle (`New.en.srt`) : la ligne indique **et 2 fichiers de sous-titres**. **Annuler** dans l'historique les restaure aussi.",
         "Les fichiers de dossiers différents sont regroupés sous leur dossier."
       ],
       "see": [
@@ -583,7 +671,7 @@
         "1. Appuyez sur **Téléverser**, ou déposez des fichiers de votre ordinateur sur le panneau Sources.",
         "1. Si vous le souhaitez, appuyez sur **Nouveau dossier** pour créer un sous-dossier et y téléverser.",
         "1. Appuyez sur **Téléverser**. Les fichiers partent un par un ; un panneau dans le coin affiche la progression et vous pouvez continuer à travailler.",
-        "Seuls les fichiers vidéo sont acceptés (les extensions de [Ajout de dossiers](#settings.adding)). Un fichier existant n'est jamais remplacé : vous choisissez de l'ignorer ou de téléverser une copie nommée « name (1) ». Le téléversement s'arrête avant de commencer si le serveur manque d'espace.",
+        "Seuls les fichiers vidéo sont acceptés (les extensions de [Ajout de dossiers](#settings.adding)), ainsi que les [fichiers de sous-titres](#subtitles.overview) qui les accompagnent. Un fichier existant n'est jamais remplacé : vous choisissez de l'ignorer ou de téléverser une copie nommée « name (1) ». Le téléversement s'arrête avant de commencer si le serveur manque d'espace.",
         "### Interruptions",
         "Gardez l'onglet du navigateur ouvert jusqu'à la fin des téléversements. Une connexion coupée est retentée automatiquement. Si l'onglet a été fermé, téléversez de nouveau le même fichier dans le même dossier : il reprend là où il s'était arrêté. Les téléversements inachevés sont des fichiers cachés, supprimés automatiquement au bout d'une semaine ; **Annuler** en supprime un immédiatement."
       ],
@@ -672,6 +760,7 @@
         "1. Dans **Convertir**, cochez les fichiers ou dossiers dans [Sources](#convert.sources).",
         "1. Appuyez sur **Supprimer** (ou sur la touche Suppr).",
         "1. La confirmation indique exactement ce qui va disparaître : combien de fichiers, combien d'espace, et tout ce que contient un dossier choisi. Appuyez sur **Supprimer** pour confirmer ; **Annuler** est le choix par défaut.",
+        "Les [fichiers de sous-titres](#subtitles.overview) d'une vidéo (p. ex. `Movie.en.srt`, ou ceux de son dossier `Subs`) sont supprimés avec elle ; la confirmation les liste.",
         "La suppression est irréversible. Si un client de téléchargement tel que Deluge partage encore les fichiers, il les signalera comme manquants.",
         "### Ce qui est refusé",
         "- Les fichiers en attente, en cours de conversion ou en pause, et les dossiers qui en contiennent un. Retirez-les d'abord de la file d'attente.",

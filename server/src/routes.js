@@ -10,7 +10,7 @@ const id = (req) => {
   return n;
 };
 
-export function registerRoutes(app, { settings, presets, queue, events, handbrake, renamer, watcher, backupScheduler, version, dataDir }) {
+export function registerRoutes(app, { settings, presets, queue, events, handbrake, renamer, watcher, backupScheduler, subtitles, version, dataDir }) {
   // ------------------------------------------------------------- status
   let hbInfo = null;
   app.get('/api/info', async () => {
@@ -89,6 +89,9 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
     items.sort((a, b) => (a.type === b.type ? naturalCompare(a.name, b.name) : a.type === 'dir' ? -1 : 1));
 
     if (kind === 'source') {
+      // Sidecar subtitles of each video: [{ lang, forced, sdh, format }].
+      const subs = (await subtitles?.folderSummary(dir, entries).catch(() => null)) ?? new Map();
+      for (const i of items) if (i.type === 'file' && subs.has(i.name)) i.subtitles = subs.get(i.name);
       const fileStatus = queue.statusForPaths(items.filter((i) => i.type === 'file').map((i) => i.path));
       const dirStatus = queue.statusForDirs(items.filter((i) => i.type === 'dir').map((i) => i.path));
       for (const i of items) i.jobs = i.type === 'file' ? fileStatus[i.path] ?? null : dirStatus[i.path] ?? null;
@@ -208,6 +211,16 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
   action('verify', (jobId) => queue.verifyJob(jobId));
   // Converts this queued job alone while the queue is stopped.
   action('convert-now', (jobId) => queue.convertNow(jobId));
+
+  // ------------------------------------------------------------- sidecar subtitles
+  app.get('/api/jobs/:id/subtitles', async (req) => queue.subtitleInfo(id(req)));
+  // body: { embed?, copy? (null: follow the queue/Settings), files?: [{ path, include?, lang?, forced?, sdh?, edits? }] }
+  app.patch('/api/jobs/:id/subtitles', async (req) => queue.updateSubtitles(id(req), req.body ?? {}));
+  action('subtitles/detect', (jobId) => queue.redetectSubtitles(jobId));
+  // body: { path, edits }: cues before and after the edits
+  action('subtitles/preview', (jobId, body) => queue.subtitlePreview(jobId, body));
+  // Converted job: writes its subtitle files next to the output again, with the current edits.
+  action('subtitles/write', (jobId) => queue.rewriteSubtitles(jobId));
 
   // body.now: start even outside the conversion window.
   app.post('/api/queue/start', async (req) => {

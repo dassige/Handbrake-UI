@@ -5,7 +5,7 @@
     "newFolder": "Nouveau dossier",
     "elsewhere": "Pour téléverser ailleurs, fermez cette fenêtre et ouvrez d'abord ce dossier dans Sources.",
     "drop": "<strong>Déposez des fichiers vidéo ici</strong> ou cliquez pour les choisir sur cet ordinateur",
-    "notVideo": "pas un fichier vidéo, ignoré",
+    "notVideo": "pas un fichier vidéo ni de sous-titres, ignoré",
     "removeFile": "Retirer {name}",
     "keepOpen": "Gardez cet onglet du navigateur ouvert jusqu'à la fin des téléversements. Vous pouvez continuer à travailler en attendant. Si un téléversement est interrompu, téléversez à nouveau le même fichier dans le même dossier : il reprend là où il s'était arrêté.",
     "chosen_one": "{count} fichier · {size}",

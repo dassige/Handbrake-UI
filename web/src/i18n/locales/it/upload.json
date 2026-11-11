@@ -5,7 +5,7 @@
     "newFolder": "Nuova cartella",
     "elsewhere": "Per caricare altrove, chiudi questa finestra e prima apri quella cartella in Sorgenti.",
     "drop": "<strong>Rilascia qui i file video</strong> o fai clic per sceglierli su questo computer",
-    "notVideo": "non è un file video, saltato",
+    "notVideo": "non è un file video o di sottotitoli, saltato",
     "removeFile": "Rimuovi {name}",
     "keepOpen": "Tieni aperta questa scheda del browser finché i caricamenti non sono finiti. Nel frattempo puoi continuare a lavorare. Se un caricamento si interrompe, carica di nuovo lo stesso file nella stessa cartella: riprende da dove si era fermato.",
     "chosen_one": "{count} file · {size}",

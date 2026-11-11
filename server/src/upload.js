@@ -41,8 +41,12 @@ export class Uploads {
     if (!(await fs.stat(abs)).isDirectory()) throw badRequest(`Not a folder: ${dir}`);
     if (name === undefined) return { dir: abs };
     const clean = checkName(name);
-    if (!makeFileMatcher(this.settings).isVideo(clean)) {
-      throw badRequest(`${clean}: not a video file (see the video extensions in Settings)`);
+    // Videos, and subtitle files to go with them (with the .sub data of VobSub .idx files).
+    const subExts = this.settings.get('subtitleExtensions') ?? [];
+    const ext = path.extname(clean).slice(1).toLowerCase();
+    const isSubtitle = subExts.includes(ext) || (ext === 'sub' && subExts.includes('idx'));
+    if (!makeFileMatcher(this.settings).isVideo(clean) && !isSubtitle) {
+      throw badRequest(`${clean}: not a video or subtitle file (see the video and subtitle extensions in Settings)`);
     }
     return { dir: abs, name: clean };
   }

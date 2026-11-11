@@ -18,7 +18,7 @@ export function HistoryDialog({ run, onClose, onUndone }) {
   }, []);
 
   async function undo(h) {
-    if (!(await dialogs.confirm({ title: t('rename.history.undoTitle'), message: t('rename.history.undoMessage', { count: h.items.length }), confirmLabel: t('rename.history.restoreNames') }))) return;
+    if (!(await dialogs.confirm({ title: t('rename.history.undoTitle'), message: t('rename.history.undoMessage', { count: h.items.filter((i) => !i.companion).length }), confirmLabel: t('rename.history.restoreNames') }))) return;
     const r = await run(() => api.undoRename(h.id), (x) => (x.errors.length
       ? t('rename.history.restoredWithErrors', { count: x.restored, errors: x.errors.length })
       : t('rename.history.restored', { count: x.restored })));
@@ -39,7 +39,7 @@ export function HistoryDialog({ run, onClose, onUndone }) {
               <button className="step-toggle" onClick={() => setOpen(open === h.id ? null : h.id)}>
                 {open === h.id ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                 <strong>{dateTime(h.createdAt)}</strong>
-                <span>{t('common.files.count', { count: h.items.length })}</span>
+                <span>{t('common.files.count', { count: h.items.filter((i) => !i.companion).length })}</span>
                 <span className="muted">{h.ruleName ?? ''}</span>
                 {h.auto && <span className="badge queued">{t('rename.history.automatic')}</span>}
                 {h.undoneAt && <span className="badge">{t('rename.history.undone', { time: dateTime(h.undoneAt) })}</span>}

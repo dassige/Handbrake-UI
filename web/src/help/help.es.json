@@ -147,7 +147,8 @@
         "job.actions",
         "job.files",
         "verify.results",
-        "job.log"
+        "job.log",
+        "subtitles.job"
       ]
     },
     "job.files": {
@@ -163,6 +164,76 @@
         "settings.layout",
         "job.details",
         "download.overview"
+      ]
+    },
+    "subtitles.overview": {
+      "title": "Archivos de subtítulos junto a los videos",
+      "body": [
+        "Los videos suelen venir con archivos de subtítulos aparte («sidecars»). HandBrake Queue los encuentra y puede **integrarlos** en el video convertido, **copiarlos** junto a él, o ambas cosas.",
+        "### Qué archivos se encuentran",
+        "- Archivos con el nombre del video en la misma carpeta: `Movie.srt`, `Movie.en.srt`, `Movie.ita.forced.srt`, `Movie.en.sdh.srt`.",
+        "- Archivos en una carpeta `Subs` o `Subtitles` junto al video: `Subs/2_English.srt`, o `Subs/Movie/3_Italian.srt` si hay una carpeta por episodio.",
+        "- Cuando la carpeta tiene un solo video, cualquier archivo de subtítulos que contenga (p. ej., `english.srt`).",
+        "- Formatos: SRT, ASS/SSA y WebVTT (texto), VobSub `.idx` + `.sub` y Blu-ray `.sup` (imágenes). La lista está en [Ajustes](#settings.subtitles).",
+        "El idioma y las marcas **forzados** y **SDH** se leen del nombre del archivo; se pueden cambiar en los [detalles del trabajo](#subtitles.job).",
+        "### Qué ocurre con ellos",
+        "La elección se hace en tres niveles; gana el más específico:",
+        "1. La elección propia de un trabajo, en sus [detalles](#subtitles.job).",
+        "1. La elección para toda la cola: el botón **Subtítulos** sobre la cola. Consulte [Subtítulos de la cola](#subtitles.queue).",
+        "1. [Ajustes → Subtítulos](#settings.subtitles): por defecto, se integran los archivos en idiomas que el video no tiene y se copian todos.",
+        "Los archivos de subtítulos originales nunca se modifican ni se mueven: las ediciones se aplican a las copias."
+      ],
+      "see": [
+        "settings.subtitles",
+        "subtitles.job",
+        "subtitles.queue",
+        "subtitles.editor"
+      ]
+    },
+    "subtitles.job": {
+      "title": "Archivos de subtítulos de un trabajo",
+      "body": [
+        "**Archivos de subtítulos** en los detalles del trabajo lista los archivos encontrados junto al origen y lo que ocurrirá con cada uno: **Integrar**, **Copiar**, **Integrar + copiar** o **No se usa**. Pase el cursor por encima para ver el motivo.",
+        "- **Integrar** y **Copiar** eligen solo para este trabajo; la primera opción sigue la cola o [Ajustes](#settings.subtitles).",
+        "- Desmarque un archivo para dejarlo fuera.",
+        "- Indique el **idioma** cuando no se conozca o sea erróneo, y marque **Forzados** (solo las líneas en un idioma extranjero) o **SDH** (para personas sordas o con dificultades auditivas). Un archivo forzado integrado pasa a ser la pista predeterminada.",
+        "- **Editar** abre el [editor de subtítulos](#subtitles.editor) para los archivos de texto.",
+        "- **Buscar archivos de subtítulos de nuevo** encuentra los archivos añadidos después del trabajo; se conservan las elecciones ya hechas. Los archivos también se buscan de nuevo cuando empieza la conversión.",
+        "Tras la conversión, la sección muestra lo que se integró y se copió, con un enlace de descarga para cada copia. **Escribir los archivos de subtítulos de nuevo** vuelve a escribir las copias con las ediciones actuales, reemplazando las escritas antes: útil para corregir los tiempos después de ver el video.",
+        "No se puede cambiar nada mientras el trabajo se está convirtiendo."
+      ],
+      "see": [
+        "subtitles.overview",
+        "subtitles.editor",
+        "job.details"
+      ]
+    },
+    "subtitles.editor": {
+      "title": "Edición de un archivo de subtítulos",
+      "body": [
+        "El editor corrige problemas habituales de un archivo de subtítulos de texto. El archivo original no se modifica: las ediciones se guardan con el trabajo y se aplican a la copia que se integra o se escribe junto al video.",
+        "- **Desplazar los tiempos**: todas las líneas aparecen más tarde (positivo) o antes (negativo), en milisegundos.",
+        "- **Velocidad de fotogramas**: para subtítulos que empiezan sincronizados y se van desfasando, porque se temporizaron para un video con otra velocidad de fotogramas (p. ej., hechos para 25 fps, video a 23,976).",
+        "- **Juego de caracteres**: si las letras con acento se ven mal, elija aquel en el que se escribió el archivo. Las copias siempre son UTF-8.",
+        "- **Limpieza**: quita el texto para personas con dificultades auditivas (`[música]`, `(ríe)`, nombres de personajes), las etiquetas de formato, los créditos y la publicidad («Subtítulos por…», direcciones web) y corrige las líneas superpuestas.",
+        "La **Vista previa** muestra el resultado a medida que cambia las opciones; marque **Mostrar el original** para comparar y busque en el texto para encontrar una línea. **Guardar** conserva las ediciones; **Restablecer** las quita todas."
+      ],
+      "see": [
+        "subtitles.job",
+        "subtitles.overview"
+      ]
+    },
+    "subtitles.queue": {
+      "title": "Subtítulos de la cola",
+      "body": [
+        "El botón **Subtítulos** sobre la cola define qué ocurre con los archivos de subtítulos en toda la cola, en lugar de [Ajustes](#settings.subtitles): por ejemplo, no copiarlos en las conversiones de esta noche.",
+        "- Se aplica a todos los trabajos, en cola ahora o añadidos más tarde, que no tengan una elección propia.",
+        "- La elección propia de un trabajo, hecha en sus [detalles](#subtitles.job), siempre gana.",
+        "- **Usar Ajustes** vuelve a la elección de Ajustes. Un punto en el botón indica que la cola tiene su propia elección."
+      ],
+      "see": [
+        "subtitles.overview",
+        "subtitles.job"
       ]
     },
     "job.source": {
@@ -342,6 +413,22 @@
         "verify.overview"
       ]
     },
+    "settings.subtitles": {
+      "title": "Ajustes de subtítulos",
+      "body": [
+        "- **Integración**: **Solo idiomas que faltan** (predeterminado) integra un archivo de subtítulos cuando el video convertido no tendrá una pista de subtítulos en ese idioma. Las pistas que conserva el video dependen de la pestaña **Subtítulos** del preajuste. **Siempre** integra todos los archivos; **Nunca**, ninguno.",
+        "- Un archivo sin idioma conocido se integra solo cuando el video convertido no tiene ningún subtítulo.",
+        "- **Copia**: **Siempre** (predeterminado) escribe todos los archivos junto al video convertido; **Solo los no integrados** omite los integrados; **Nunca** no escribe ninguno.",
+        "- Las copias son UTF-8 y llevan el nombre del video convertido, como esperan Plex, Jellyfin y Emby: `Movie.en.srt`, `Movie.it.forced.srt`. Siguen al video cuando se [renombra](#rename.overview).",
+        "- **Extensiones de archivos de subtítulos**: qué archivos se buscan. Deje la lista vacía para ignorar los archivos de subtítulos.",
+        "- **Juego de caracteres de los archivos antiguos**: se usa para leer archivos que no son UTF-8, a menudo `.srt` antiguos. Si los acentos se ven mal en un archivo, elija su juego de caracteres en el [editor](#subtitles.editor).",
+        "- MP4 solo admite subtítulos de texto (las imágenes se copian en su lugar); WebM no admite ninguno, así que solo se copian."
+      ],
+      "see": [
+        "subtitles.overview",
+        "subtitles.queue"
+      ]
+    },
     "settings.renaming": {
       "title": "Ajustes de renombrado",
       "body": [
@@ -381,6 +468,7 @@
         "- Los **avisos** explican lo que las reglas no pudieron encontrar, p. ej., falta el número de episodio, el año o el nombre de la serie.",
         "- **Serie · S06e01** o **Película · 2024** muestra lo que se reconoció; **sin cambios** significa que el nombre ya es correcto.",
         "- Si dos archivos recibirían el mismo nombre, o el nombre lo tiene otro archivo de la carpeta, se añade un número: `name_1.mkv` (consulte [Ajustes de renombrado](#settings.renaming)).",
+        "- Los archivos de subtítulos con el nombre de un video (`Old.en.srt`) se renombran con él (`New.en.srt`): la fila indica **y 2 archivos de subtítulos**. **Deshacer** en el historial también los restaura.",
         "Los archivos de carpetas distintas se agrupan bajo su carpeta."
       ],
       "see": [
@@ -583,7 +671,7 @@
         "1. Pulse **Subir**, o suelte archivos de su equipo sobre el panel Orígenes.",
         "1. Si lo desea, pulse **Nueva carpeta** para crear una subcarpeta y subir los archivos a ella.",
         "1. Pulse **Subir**. Los archivos se envían de uno en uno; un panel en la esquina muestra el progreso y puede seguir trabajando.",
-        "Solo se aceptan archivos de video (las extensiones de [Añadir carpetas](#settings.adding)). Un archivo existente nunca se reemplaza: usted elige omitirlo o subir una copia llamada «name (1)». La subida se detiene antes de empezar si el servidor no tiene espacio suficiente.",
+        "Solo se aceptan archivos de video (las extensiones de [Añadir carpetas](#settings.adding)) y los [archivos de subtítulos](#subtitles.overview) que los acompañan. Un archivo existente nunca se reemplaza: usted elige omitirlo o subir una copia llamada «name (1)». La subida se detiene antes de empezar si el servidor no tiene espacio suficiente.",
         "### Interrupciones",
         "Mantenga abierta la pestaña del navegador hasta que terminen las subidas. Una conexión interrumpida se reintenta sola. Si se cerró la pestaña, suba de nuevo el mismo archivo a la misma carpeta: continúa donde se detuvo. Las subidas sin terminar son archivos ocultos, que se eliminan solos al cabo de una semana; **Cancelar** elimina uno de inmediato."
       ],
@@ -672,6 +760,7 @@
         "1. En **Convertir**, marque los archivos o carpetas en [Orígenes](#convert.sources).",
         "1. Pulse **Eliminar** (o la tecla Supr).",
         "1. La confirmación muestra exactamente qué se va a eliminar: cuántos archivos, cuánto espacio y todo lo que hay dentro de una carpeta elegida. Pulse **Eliminar** para confirmar; **Cancelar** es la opción predeterminada.",
+        "Los [archivos de subtítulos](#subtitles.overview) de un video (p. ej., `Movie.en.srt`, o los de su carpeta `Subs`) se eliminan con él; la confirmación los lista.",
         "Eliminar no se puede deshacer. Si un cliente de descargas como Deluge sigue compartiendo los archivos, los notificará como ausentes.",
         "### Qué se rechaza",
         "- Los archivos que están en cola, convirtiéndose o en pausa, y las carpetas que contienen alguno. Quítelos antes de la cola.",

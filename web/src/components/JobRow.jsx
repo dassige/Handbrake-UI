@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowDown, ArrowDownToLine, ArrowUp, ArrowUpToLine, GripVertical, Pause, Play, RotateCcw, SkipForward, Square, Trash2, Wand2 } from 'lucide-react';
+import { ArrowDown, ArrowDownToLine, ArrowUp, ArrowUpToLine, Captions, GripVertical, Pause, Play, RotateCcw, SkipForward, Square, Trash2, Wand2 } from 'lucide-react';
 import { api } from '../api.js';
 import { bytes, dirName, duration, elapsed, fileName, humanDuration, percent, ratio, relTo, ago } from '../format.js';
 import { StatusBadge, VerifyBadge } from './StatusBadge.jsx';
@@ -88,6 +88,17 @@ export function JobActions({ job, run, queueIndex = -1, labels = false, onRename
   );
 }
 
+/** Sidecar subtitle files of the job (those that are used), e.g. "CC 2". */
+function SubtitleBadge({ job }) {
+  const used = (job.subtitles ?? []).filter((f) => f.include !== false);
+  if (!used.length) return null;
+  return (
+    <span className="badge subs" title={t('subtitles.row.title', { count: used.length, list: used.map((f) => f.name).join(', ') })}>
+      <Captions size={12} /> {used.length}
+    </span>
+  );
+}
+
 export function JobRow({
   job, settings, selected, onSelect, run, onRename, queueIndex, dropBefore,
   onJobDragStart, onJobDragEnd, onJobDragOver, onJobDrop, estimate, canPause, canConvertNow,
@@ -150,6 +161,7 @@ export function JobRow({
           <StatusBadge status={job.status} phase={job.phase} />
           {job.status === 'done' && <VerifyBadge status={job.verifyStatus} />}
           <span className="job-name" title={job.sourcePath}>{fileName(job.sourcePath)}</span>
+          <SubtitleBadge job={job} />
         </div>
         <div className="job-sub" title={job.outputPath}>
           <span className="muted">{job.presetName}</span>

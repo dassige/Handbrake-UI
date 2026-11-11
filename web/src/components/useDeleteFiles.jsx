@@ -72,6 +72,7 @@ export function useDeleteFiles({ onError, onNotice }) {
                     {fileName(i.path)}{i.type === 'dir' ? '/' : ''}{' '}
                     <span className="muted">
                       {i.type === 'dir' ? `${t('common.files.count', { count: i.files })}, ` : ''}{bytes(i.bytes)}
+                      {i.sidecarOf ? ` · ${t('subtitles.delete.of', { name: fileName(i.sidecarOf) })}` : ''}
                     </span>
                   </li>
                 ))}

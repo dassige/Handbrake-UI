@@ -47,7 +47,9 @@ function rowToRule(r) {
 }
 
 export class Renamer {
-  constructor({ db, settings, events, log }) {
+  constructor({ db, settings, events, log, subtitles = null }) {
+    // Subtitle files named after a video are renamed with it (subtitles/service.js).
+    this.subtitles = subtitles;
     this.db = db;
     this.settings = settings;
     this.events = events;
@@ -201,6 +203,12 @@ export class Renamer {
       };
     });
     await this.resolveCollisions(rows);
+    // Subtitle files that will follow each renamed video.
+    const listed = new Set(rows.map((r) => r.path));
+    await Promise.all(rows.map(async (row) => {
+      const list = row.status === 'rename' ? await this.companionPairs(row, listed) : [];
+      row.companions = list.map((c) => ({ oldName: path.basename(c.from), newName: path.basename(c.to), error: c.error ?? null }));
+    }));
     // Date and size, for sorting the list in the web app.
     await Promise.all(rows.map(async (row) => {
       const st = await fs.stat(row.path).catch(() => null);
@@ -260,7 +268,16 @@ export class Renamer {
     }
     await this.resolveCollisions(rows);
     const pairs = rows.filter((r) => r.status === 'rename').map((r) => ({ from: r.path, to: path.join(r.dir, r.newName) }));
+    const listed = new Set(rows.map((r) => r.path));
+    const skipped = [];
+    for (const r of rows.filter((x) => x.status === 'rename')) {
+      for (const c of await this.companionPairs(r, listed)) {
+        if (c.error) skipped.push({ path: c.from, error: c.error });
+        else pairs.push(c);
+      }
+    }
     const result = await this.renameMany(pairs);
+    result.errors.push(...skipped);
     if (result.renamed.length) {
       this.db
         .prepare('INSERT INTO rename_history (created_at, rule_name, auto, items) VALUES (?, ?, ?, ?)')
@@ -290,7 +307,7 @@ export class Renamer {
         const clash = await fs.access(s.to).then(() => true, () => false);
         if (clash) throw new Error(`${path.basename(s.to)} appeared meanwhile`);
         await fs.rename(s.tmp, s.to);
-        renamed.push({ from: s.from, to: s.to });
+        renamed.push({ from: s.from, to: s.to, ...(s.companion ? { companion: true } : {}) });
       } catch (err) {
         errors.push({ path: s.from, error: err.message });
         await fs.rename(s.tmp, s.from).catch((e) => this.log.error(e, `Could not restore ${s.from} from ${s.tmp}`));
@@ -298,10 +315,50 @@ export class Renamer {
     }
     if (renamed.length) {
       const stmt = this.db.prepare('UPDATE jobs SET output_path = ?, rename_note = NULL WHERE output_path = ?');
-      for (const r of renamed) stmt.run(r.to, r.from);
+      for (const r of renamed) if (!r.companion) stmt.run(r.to, r.from);
+      this.followCopiedSubtitles(renamed);
       this.events.emit('jobs');
     }
     return { renamed, errors };
+  }
+
+  /**
+   * The subtitle files named after a renamed video ("Old.en.srt" → "New.en.srt"), unless they are
+   * in the batch themselves. A pair whose new name is taken by another file gets an error instead.
+   */
+  async companionPairs(row, listed) {
+    if (!this.subtitles) return [];
+    const newBase = splitName(row.newName)[0];
+    const list = (await this.subtitles.companions(row.path)).filter((c) => !listed.has(c.path));
+    const moving = new Set(list.map((c) => c.path.toLowerCase()));
+    const out = [];
+    for (const c of list) {
+      const to = path.join(row.dir, newBase + c.suffix);
+      const taken = !moving.has(to.toLowerCase()) && to.toLowerCase() !== c.path.toLowerCase()
+        && (await fs.access(to).then(() => true, () => false));
+      out.push({ from: c.path, to, companion: true, ...(taken ? { error: `${path.basename(to)} already exists` } : {}) });
+    }
+    return out;
+  }
+
+  /** Copied subtitle files recorded with a job follow their renames ("Write again" finds them). */
+  followCopiedSubtitles(renamed) {
+    const moved = renamed.filter((r) => r.companion);
+    if (!moved.length) return;
+    const rows = this.db.prepare('SELECT id, subtitle_result FROM jobs WHERE subtitle_result IS NOT NULL').all();
+    const map = new Map(moved.map((r) => [r.from, r.to]));
+    const update = this.db.prepare('UPDATE jobs SET subtitle_result = ? WHERE id = ?');
+    for (const r of rows) {
+      const result = JSON.parse(r.subtitle_result);
+      let changed = false;
+      for (const c of result.copied ?? []) {
+        if (map.has(c.to)) {
+          c.to = map.get(c.to);
+          changed = true;
+        }
+      }
+      if (changed) update.run(JSON.stringify(result), r.id);
+    }
   }
 
   // ---------------------------------------------------------------- history
@@ -332,12 +389,12 @@ export class Renamer {
       );
       if (!toExists) errors.push({ path: it.to, error: 'file no longer exists' });
       else if (fromExists) errors.push({ path: it.from, error: 'the original name is in use again' });
-      else pairs.push({ from: it.to, to: it.from });
+      else pairs.push({ from: it.to, to: it.from, ...(it.companion ? { companion: true } : {}) });
     }
     const result = await this.renameMany(pairs);
     this.db.prepare('UPDATE rename_history SET undone_at = ? WHERE id = ?').run(Date.now(), id);
     this.events.emit('renameHistory');
-    return { restored: result.renamed.length, errors: [...errors, ...result.errors] };
+    return { restored: result.renamed.filter((r) => !r.companion).length, errors: [...errors, ...result.errors] };
   }
 
   // ---------------------------------------------------------------- after conversion
@@ -356,7 +413,7 @@ export class Renamer {
     if (row.status === 'unchanged') return { path: file, note: null };
     const result = await this.apply({ items: [{ path: file, newName: row.newName }], ruleName: rule.name, auto: true });
     if (result.errors.length) return { path: file, note: `Automatic rename failed: ${result.errors[0].error}` };
-    return { path: result.renamed[0].to, note: null };
+    return { path: result.renamed.find((r) => !r.companion)?.to ?? file, note: null };
   }
 }
 

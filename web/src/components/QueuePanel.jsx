@@ -7,6 +7,7 @@ import { JobRow, DRAG_JOB } from './JobRow.jsx';
 import { Help } from '../help/Help.jsx';
 import { useDialogs } from './Dialogs.jsx';
 import { t } from '../i18n/index.js';
+import { QueueSubtitlesButton } from '../subtitles/QueueSubtitles.jsx';
 
 const FILTERS = [
   { key: 'all', labelKey: 'queue.filters.all', match: () => true },
@@ -91,6 +92,7 @@ export function QueuePanel({
               <option value="next">{t('queue.position.next')}</option>
             </select>
           </label>
+          <QueueSubtitlesButton settings={settings} run={run} />
         </div>
       </div>
 

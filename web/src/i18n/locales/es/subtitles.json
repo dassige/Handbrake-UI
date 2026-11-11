@@ -1,0 +1,136 @@
+{
+  "followSettings": "Como en Ajustes ({mode})",
+  "followQueue": "Como se indicó para la cola ({mode})",
+  "embed": {
+    "missing": "Solo idiomas que faltan",
+    "missingHint": "Integra un archivo de subtítulos cuando el video convertido aún no tendrá una pista de subtítulos en su idioma.",
+    "always": "Siempre",
+    "alwaysHint": "Integra todos los archivos de subtítulos, incluso en idiomas que el video ya tiene.",
+    "never": "Nunca",
+    "neverHint": "No integra archivos de subtítulos; aun así se pueden copiar junto al video."
+  },
+  "copy": {
+    "always": "Siempre",
+    "alwaysHint": "Copia todos los archivos de subtítulos junto al video convertido, estén integrados o no.",
+    "notEmbedded": "Solo los no integrados",
+    "notEmbeddedHint": "Copia solo los archivos de subtítulos que no se integraron en el video.",
+    "never": "Nunca",
+    "neverHint": "No copia archivos de subtítulos a la carpeta de destino."
+  },
+  "action": {
+    "both": "Integrar + copiar",
+    "embed": "Integrar",
+    "copy": "Copiar",
+    "none": "No se usa"
+  },
+  "why": {
+    "excluded": "Sin marcar: no se usa en este trabajo.",
+    "never": "La integración está desactivada.",
+    "always": "Integrado: está elegido «Siempre».",
+    "missing": "Integrado: el video convertido no tendrá una pista de subtítulos en este idioma.",
+    "present": "No integrado: el video convertido ya tiene una pista de subtítulos en este idioma.",
+    "unknownLang": "No integrado: su idioma es desconocido y el video ya tiene subtítulos. Elija un idioma para decidir.",
+    "container": "No se puede integrar en este formato (WebM: ninguno; MP4: solo subtítulos de texto). Aun así se puede copiar."
+  },
+  "job": {
+    "title": "Archivos de subtítulos",
+    "notLooked": "Aún no se han buscado: se hace después de leer el origen.",
+    "none": "No hay archivos de subtítulos junto al origen.",
+    "embed": "Integrar",
+    "copy": "Copiar",
+    "includeTitle": "Usar este archivo de subtítulos en este trabajo",
+    "language": "Idioma",
+    "unknownLanguage": "Idioma desconocido",
+    "detectedAs": "Detectado como {lang} en el nombre del archivo",
+    "forced": "Forzados",
+    "forcedTitle": "Subtítulos forzados: solo las líneas en un idioma extranjero. Al integrarse, la pista se marca como forzada y predeterminada.",
+    "sdh": "SDH",
+    "sdhTitle": "Para personas sordas o con dificultades auditivas (con descripción de sonidos)",
+    "edited": "editado",
+    "edit": "Editar",
+    "view": "Ver",
+    "lookAgain": "Buscar archivos de subtítulos de nuevo",
+    "lookAgainTitle": "Vuelve a buscar archivos de subtítulos junto al origen (conserva las elecciones hechas aquí)",
+    "lookedAgain": "Archivos de subtítulos buscados de nuevo"
+  },
+  "result": {
+    "embedded": "Integrados:",
+    "copied": "Copiados junto al video:",
+    "download": "Descargar",
+    "writeAgain": "Escribir los archivos de subtítulos de nuevo",
+    "writeAgainTitle": "Vuelve a escribir los archivos de subtítulos junto al video convertido, con las ediciones actuales (reemplaza los escritos antes)",
+    "written": "Archivos de subtítulos escritos",
+    "readFailed": "No se pudo leer {name}: {error}",
+    "muxFailed": "No se pudo integrar {name}: {error}",
+    "copyFailed": "No se pudo copiar {name}: {error}",
+    "prepareFailed": "No se pudieron preparar los archivos de subtítulos: {error}"
+  },
+  "editor": {
+    "title": "Editar {name}",
+    "readOnly": "El trabajo se está convirtiendo: se podrá cambiar cuando termine.",
+    "sourceKept": "El archivo original no se modifica: las ediciones se guardan con este trabajo y se aplican a la copia que se integra o se escribe junto al video.",
+    "offset": "Desplazar los tiempos",
+    "offsetMs": "Desplazamiento en milisegundos",
+    "offsetHint": "Positivo: los subtítulos aparecen más tarde. Negativo: antes.",
+    "fps": "Velocidad de fotogramas",
+    "fpsFrom": "Subtítulos hechos para",
+    "fpsTo": "Video",
+    "fpsNone": "Sin cambios",
+    "fpsHint": "Para subtítulos que empiezan sincronizados y se van desfasando: se temporizaron para un video con otra velocidad de fotogramas (p. ej., 25 → 23,976).",
+    "videoFps": "este video: {fps} fps",
+    "codeset": "Juego de caracteres",
+    "codesetAuto": "Automático",
+    "codesetAutoFound": "Automático (detectado: {codeset})",
+    "codesetHint": "Si las letras con acento se ven mal, elija el juego de caracteres en el que se escribió el archivo. Las copias siempre son UTF-8.",
+    "cleanup": "Limpieza",
+    "cleanHi": "Quitar texto para personas con dificultades auditivas",
+    "cleanHiHint": "[música], (ríe), ♪ y nombres de personajes como \"JUAN:\"",
+    "cleanTags": "Quitar el formato",
+    "cleanTagsHint": "Etiquetas de cursiva, negrita, color y posición",
+    "cleanAds": "Quitar créditos y publicidad",
+    "cleanAdsHint": "Líneas como \"Subtítulos por…\" y direcciones web",
+    "cleanOverlaps": "Corregir líneas superpuestas",
+    "cleanOverlapsHint": "Una línea termina justo antes de que empiece la siguiente",
+    "reset": "Restablecer",
+    "resetTitle": "Quitar todas las ediciones",
+    "preview": "Vista previa",
+    "count_one": "{count} línea",
+    "count_other": "{count} líneas",
+    "removed_one": "{count} quitada",
+    "removed_other": "{count} quitadas",
+    "firstMoved": "primera línea {from} → {to}",
+    "showOriginal": "Mostrar el original",
+    "search": "Buscar en el texto",
+    "more_one": "… {count} línea más: busque para encontrarla",
+    "more_other": "… {count} líneas más: busque para acotar",
+    "noMatch": "Ninguna línea contiene este texto.",
+    "empty": "No hay líneas.",
+    "saved": "Ediciones de subtítulos guardadas"
+  },
+  "queue": {
+    "button": "Subtítulos",
+    "title": "Qué ocurre con los archivos de subtítulos junto a los videos, en toda la cola",
+    "titleCustom": "Archivos de subtítulos de toda la cola: integrar {embed}, copiar {copy}",
+    "dialogTitle": "Archivos de subtítulos de la cola",
+    "intro": "Se aplica a todos los trabajos de la cola, actuales y añadidos más tarde, que no tengan una elección propia (se define en sus detalles).",
+    "useSettings": "Usar Ajustes",
+    "jobsKeep": "Un trabajo que se está convirtiendo no se ve afectado.",
+    "saved": "Guardado para la cola"
+  },
+  "row": {
+    "title_one": "{count} archivo de subtítulos: {list}",
+    "title_other": "{count} archivos de subtítulos: {list}"
+  },
+  "browser": {
+    "title_one": "{count} archivo de subtítulos junto a este video: {list}",
+    "title_other": "{count} archivos de subtítulos junto a este video: {list}"
+  },
+  "rename": {
+    "along_one": "y {count} archivo de subtítulos",
+    "along_other": "y {count} archivos de subtítulos",
+    "taken": "{name} ya existe: no se renombra"
+  },
+  "delete": {
+    "of": "subtítulos de {name}"
+  }
+}

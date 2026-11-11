@@ -17,7 +17,11 @@ export function UploadDialog({ dir: initialDir, root, settings, initialFiles = [
   const [over, setOver] = useState(false);
   const [busy, setBusy] = useState(false);
   const input = useRef(null);
-  const exts = useMemo(() => new Set(settings?.videoExtensions ?? []), [settings]);
+  // Videos, and subtitle files to go with them (.sub: the pictures of a VobSub .idx).
+  const exts = useMemo(() => {
+    const subs = settings?.subtitleExtensions ?? [];
+    return new Set([...(settings?.videoExtensions ?? []), ...subs, ...(subs.includes('idx') ? ['sub'] : [])]);
+  }, [settings]);
   const isVideo = (f) => exts.has(extOf(f.name));
   const videos = files.filter(isVideo);
   const total = videos.reduce((s, f) => s + f.size, 0);

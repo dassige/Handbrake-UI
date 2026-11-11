@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowUp, ChevronRight, Download, Eye, FileVideo, Folder, FolderOpen, ListPlus, Lock, RefreshCw, Trash2, Upload } from 'lucide-react';
+import { ArrowUp, Captions, ChevronRight, Download, Eye, FileVideo, Folder, FolderOpen, ListPlus, Lock, RefreshCw, Trash2, Upload } from 'lucide-react';
 import { rootLabel, watchedFolder } from '../roots.js';
 import { api } from '../api.js';
 import { bytes, dateTime } from '../format.js';
@@ -10,8 +10,23 @@ import { useDeleteFiles } from './useDeleteFiles.jsx';
 import { t } from '../i18n/index.js';
 import { sortList, useRememberedSort } from '../sort.js';
 import { SortControl } from './SortControl.jsx';
+import { langName, langShort } from '../subtitles/languages.js';
 
 export const DRAG_PATHS = 'application/x-hbui-paths';
+
+/** Sidecar subtitle files next to a video: "CC EN IT", every file in the tooltip. */
+function SubtitlesBadge({ list }) {
+  const langs = [...new Set(list.map((s) => (s.lang ? langShort(s.lang) : '?')))];
+  const title = t('subtitles.browser.title', {
+    count: list.length,
+    list: list.map((s) => [s.lang ? langName(s.lang) : t('subtitles.job.unknownLanguage'), s.forced && t('subtitles.job.forced'), s.sdh && t('subtitles.job.sdh')].filter(Boolean).join(' ')).join(', '),
+  });
+  return (
+    <span className="badge subs" title={title} aria-label={title}>
+      <Captions size={12} /> {langs.length <= 3 ? langs.join(' ') : list.length}
+    </span>
+  );
+}
 const SORT_KEYS = ['name', 'date', 'type', 'size'];
 
 const storeKey = (kind) => `hbui.browserRoot.${kind}`;
@@ -362,6 +377,7 @@ export function SourceBrowser({
                 <>
                   {item.excluded && <span className="badge cancelled" title={t('sources.excludedTitle')}>{t('sources.excluded')}</span>}
                   {item.jobs && <StatusBadge status={item.jobs} />}
+                  {item.subtitles?.length > 0 && <SubtitlesBadge list={item.subtitles} />}
                   <span className="muted" title={dateTime(item.mtime)}>{bytes(item.size)}</span>
                 </>
               )}

@@ -6,12 +6,14 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { badRequest } from './errors.js';
-import { resolveUnderAny } from './paths.js';
+import { makeFileMatcher, resolveUnderAny } from './paths.js';
 
 const MAX_PATHS = 1000;
 
 export class SourceFiles {
-  constructor({ settings, queue, events, log }) {
+  constructor({ settings, queue, events, log, subtitles = null }) {
+    // A deleted video takes its sidecar subtitle files with it (subtitles/service.js).
+    this.subtitles = subtitles;
     this.settings = settings;
     this.queue = queue;
     this.events = events;
@@ -56,6 +58,19 @@ export class SourceFiles {
       const dir = st.isDirectory();
       const { files, bytes } = dir ? await measure(abs) : { files: 1, bytes: st.size };
       items.push({ path: abs, type: dir ? 'dir' : 'file', files, bytes });
+    }
+    if (this.subtitles) {
+      const chosen = new Set(items.map((i) => i.path));
+      const { isVideo } = makeFileMatcher(this.settings);
+      for (const it of items.filter((i) => i.type === 'file' && isVideo(i.path))) {
+        for (const p of await this.subtitles.sidecarPaths(it.path)) {
+          if (chosen.has(p)) continue;
+          const size = await fs.lstat(p).then((st) => st.size, () => null);
+          if (size == null) continue;
+          chosen.add(p);
+          items.push({ path: p, type: 'file', files: 1, bytes: size, sidecarOf: it.path });
+        }
+      }
     }
     // A file inside a folder that is also chosen goes with the folder.
     const dirs = items.filter((i) => i.type === 'dir').map((i) => i.path + path.sep);

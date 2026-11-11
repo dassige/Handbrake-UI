@@ -147,7 +147,8 @@
         "job.actions",
         "job.files",
         "verify.results",
-        "job.log"
+        "job.log",
+        "subtitles.job"
       ]
     },
     "job.files": {
@@ -163,6 +164,76 @@
         "settings.layout",
         "job.details",
         "download.overview"
+      ]
+    },
+    "subtitles.overview": {
+      "title": "Untertiteldateien neben den Videos",
+      "body": [
+        "Videos haben oft separate Untertiteldateien („Sidecars“). HandBrake Queue findet sie und kann sie in das konvertierte Video **einbetten**, neben es **kopieren** oder beides.",
+        "### Welche Dateien gefunden werden",
+        "- Dateien, die wie das Video benannt sind und im selben Ordner liegen: `Movie.srt`, `Movie.en.srt`, `Movie.ita.forced.srt`, `Movie.en.sdh.srt`.",
+        "- Dateien in einem Ordner `Subs` oder `Subtitles` neben dem Video: `Subs/2_English.srt` oder `Subs/Movie/3_Italian.srt` bei einem Ordner pro Folge.",
+        "- Enthält der Ordner nur ein Video, jede Untertiteldatei darin (z. B. `english.srt`).",
+        "- Formate: SRT, ASS/SSA und WebVTT (Text), VobSub `.idx` + `.sub` und Blu-ray `.sup` (Bilder). Die Liste steht in den [Einstellungen](#settings.subtitles).",
+        "Die Sprache sowie die Markierungen **Erzwungen** und **SDH** werden aus dem Dateinamen gelesen; sie lassen sich in den [Details des Auftrags](#subtitles.job) ändern.",
+        "### Was mit ihnen geschieht",
+        "Die Entscheidung fällt auf drei Ebenen; die genaueste gewinnt:",
+        "1. Die eigene Auswahl eines Auftrags, in seinen [Details](#subtitles.job).",
+        "1. Die Auswahl für die gesamte Warteschlange: die Schaltfläche **Untertitel** über der Warteschlange. Siehe [Untertitel für die Warteschlange](#subtitles.queue).",
+        "1. [Einstellungen → Untertitel](#settings.subtitles): Standardmäßig werden Dateien in Sprachen, die das Video nicht hat, eingebettet und jede Datei wird kopiert.",
+        "Die originalen Untertiteldateien werden nie verändert oder verschoben: Änderungen werden auf die Kopien angewendet."
+      ],
+      "see": [
+        "settings.subtitles",
+        "subtitles.job",
+        "subtitles.queue",
+        "subtitles.editor"
+      ]
+    },
+    "subtitles.job": {
+      "title": "Untertiteldateien eines Auftrags",
+      "body": [
+        "**Untertiteldateien** in den Details des Auftrags listet die neben der Quelle gefundenen Dateien auf und was mit jeder geschehen wird: **Einbetten**, **Kopieren**, **Einbetten + kopieren** oder **Nicht verwendet**. Zeigen Sie mit der Maus darauf, um den Grund zu sehen.",
+        "- **Einbetten** und **Kopieren** gelten nur für diesen Auftrag; die erste Option folgt der Warteschlange oder den [Einstellungen](#settings.subtitles).",
+        "- Entfernen Sie bei einer Datei das Häkchen, um sie auszulassen.",
+        "- Legen Sie die **Sprache** fest, wenn sie unbekannt oder falsch ist, und setzen Sie ein Häkchen bei **Erzwungen** (nur die Zeilen in einer Fremdsprache) oder **SDH** (für Gehörlose und Schwerhörige). Eine eingebettete erzwungene Datei wird zur Standardspur.",
+        "- **Bearbeiten** öffnet den [Untertitel-Editor](#subtitles.editor) für Textdateien.",
+        "- **Erneut nach Untertiteldateien suchen** findet Dateien, die nach dem Auftrag hinzugekommen sind; die bereits getroffene Auswahl bleibt erhalten. Auch beim Start der Konvertierung wird erneut gesucht.",
+        "Nach der Konvertierung zeigt der Abschnitt, was eingebettet und kopiert wurde, mit einem Download-Link für jede Kopie. **Untertiteldateien erneut schreiben** schreibt die Kopien mit den aktuellen Änderungen erneut und ersetzt die zuvor geschriebenen: nützlich, um die Zeitverschiebung zu korrigieren, nachdem Sie das Video angesehen haben.",
+        "Während der Konvertierung lässt sich nichts ändern."
+      ],
+      "see": [
+        "subtitles.overview",
+        "subtitles.editor",
+        "job.details"
+      ]
+    },
+    "subtitles.editor": {
+      "title": "Eine Untertiteldatei bearbeiten",
+      "body": [
+        "Der Editor behebt häufige Probleme in einer Untertiteldatei mit Text. Die Originaldatei wird nicht verändert: Die Änderungen werden beim Auftrag gespeichert und auf die Kopie angewendet, die eingebettet oder neben das Video geschrieben wird.",
+        "- **Zeitverschiebung**: Alle Zeilen erscheinen später (positiv) oder früher (negativ), in Millisekunden.",
+        "- **Bildrate**: für Untertitel, die anfangs synchron sind und dann immer weiter auseinanderlaufen, weil sie für ein Video mit anderer Bildrate getaktet wurden (z. B. für 25 fps erstellt, Video mit 23,976).",
+        "- **Zeichensatz**: Wenn Umlaute und Akzente falsch aussehen, wählen Sie den, in dem die Datei geschrieben wurde. Die Kopien sind immer UTF-8.",
+        "- **Bereinigen**: Text für Hörgeschädigte (`[Musik]`, `(lacht)`, Sprechernamen), Formatierungs-Tags, Abspann und Werbung („Untertitel von …“, Webadressen) entfernen und überlappende Zeilen korrigieren.",
+        "Die **Vorschau** zeigt das Ergebnis, während Sie etwas ändern; setzen Sie ein Häkchen bei **Original anzeigen**, um zu vergleichen, und suchen Sie im Text, um eine Zeile zu finden. **Speichern** behält die Änderungen; **Zurücksetzen** entfernt sie alle."
+      ],
+      "see": [
+        "subtitles.job",
+        "subtitles.overview"
+      ]
+    },
+    "subtitles.queue": {
+      "title": "Untertitel für die Warteschlange",
+      "body": [
+        "Die Schaltfläche **Untertitel** über der Warteschlange legt für die gesamte Warteschlange fest, was mit Untertiteldateien geschieht, anstelle der [Einstellungen](#settings.subtitles): zum Beispiel, sie für die Konvertierungen heute Nacht nicht zu kopieren.",
+        "- Sie gilt für jeden Auftrag, jetzt eingereiht oder später hinzugefügt, der keine eigene Auswahl hat.",
+        "- Die eigene Auswahl eines Auftrags, getroffen in seinen [Details](#subtitles.job), gewinnt immer.",
+        "- **Einstellungen verwenden** kehrt zur Auswahl in den Einstellungen zurück. Ein Punkt auf der Schaltfläche zeigt, dass die Warteschlange eine eigene Auswahl hat."
+      ],
+      "see": [
+        "subtitles.overview",
+        "subtitles.job"
       ]
     },
     "job.source": {
@@ -342,6 +413,22 @@
         "verify.overview"
       ]
     },
+    "settings.subtitles": {
+      "title": "Untertiteleinstellungen",
+      "body": [
+        "- **Einbetten**: **Nur fehlende Sprachen** (Standard) bettet eine Untertiteldatei ein, wenn das konvertierte Video keine Untertitelspur in dieser Sprache hat. Welche Spuren das Video behält, bestimmt der Tab **Untertitel** der Voreinstellung. **Immer** bettet jede Datei ein; **Nie** keine.",
+        "- Eine Datei ohne bekannte Sprache wird nur eingebettet, wenn das konvertierte Video überhaupt keine Untertitel hat.",
+        "- **Kopieren**: **Immer** (Standard) schreibt jede Datei neben das konvertierte Video; **Nur nicht eingebettete** überspringt die eingebetteten; **Nie** schreibt keine.",
+        "- Kopien sind UTF-8 und nach dem konvertierten Video benannt, wie Plex, Jellyfin und Emby es erwarten: `Movie.en.srt`, `Movie.it.forced.srt`. Sie folgen dem Video, wenn es [umbenannt](#rename.overview) wird.",
+        "- **Dateiendungen von Untertiteldateien**: nach welchen Dateien gesucht wird. Lassen Sie die Liste leer, um Untertiteldateien zu ignorieren.",
+        "- **Zeichensatz älterer Dateien**: wird zum Lesen von Dateien verwendet, die nicht UTF-8 sind, oft ältere `.srt`-Dateien. Sehen Umlaute und Akzente in einer Datei falsch aus, wählen Sie ihren Zeichensatz im [Editor](#subtitles.editor).",
+        "- MP4 kann nur Textuntertitel enthalten (Bilder werden stattdessen kopiert); WebM kann keine enthalten, sie werden also nur kopiert."
+      ],
+      "see": [
+        "subtitles.overview",
+        "subtitles.queue"
+      ]
+    },
     "settings.renaming": {
       "title": "Einstellungen zum Umbenennen",
       "body": [
@@ -381,6 +468,7 @@
         "- **Warnungen** erklären, was die Regeln nicht finden konnten, z. B. keine Folgennummer, kein Jahr oder keinen Serienname.",
         "- **Serie · S06e01** oder **Film · 2024** zeigt, was erkannt wurde; **keine Änderung** bedeutet, dass der Name schon stimmt.",
         "- Würden zwei Dateien denselben Namen erhalten, oder ist der Name von einer anderen Datei im Ordner belegt, wird eine Zahl angehängt: `name_1.mkv` (siehe [Einstellungen zum Umbenennen](#settings.renaming)).",
+        "- Untertiteldateien, die nach einem Video benannt sind (`Old.en.srt`), werden mit ihm umbenannt (`New.en.srt`): Die Zeile zeigt **und 2 Untertiteldateien**. **Rückgängig** im Verlauf stellt sie ebenfalls wieder her.",
         "Dateien in verschiedenen Ordnern werden unter ihrem Ordner gruppiert."
       ],
       "see": [
@@ -583,7 +671,7 @@
         "1. Klicken Sie auf **Hochladen** oder legen Sie Dateien von Ihrem Computer auf dem Bereich „Quellen“ ab.",
         "1. Klicken Sie optional auf **Neuer Ordner**, um einen Unterordner zu erstellen und dorthin hochzuladen.",
         "1. Klicken Sie auf **Hochladen**. Die Dateien werden nacheinander gesendet; ein Fenster in der Ecke zeigt den Fortschritt, und Sie können weiterarbeiten.",
-        "Akzeptiert werden nur Videodateien (die Endungen aus [Ordner hinzufügen](#settings.adding)). Eine vorhandene Datei wird nie ersetzt: Sie wählen, ob sie übersprungen oder eine Kopie namens „name (1)“ hochgeladen wird. Der Upload wird gar nicht erst gestartet, wenn dem Server der Platz fehlt.",
+        "Akzeptiert werden nur Videodateien (die Endungen aus [Ordner hinzufügen](#settings.adding)) sowie dazugehörige [Untertiteldateien](#subtitles.overview). Eine vorhandene Datei wird nie ersetzt: Sie wählen, ob sie übersprungen oder eine Kopie namens „name (1)“ hochgeladen wird. Der Upload wird gar nicht erst gestartet, wenn dem Server der Platz fehlt.",
         "### Unterbrechungen",
         "Lassen Sie den Browser-Tab geöffnet, bis die Uploads abgeschlossen sind. Eine abgebrochene Verbindung wird von selbst erneut versucht. Wurde der Tab geschlossen, laden Sie dieselbe Datei erneut in denselben Ordner hoch: Sie wird dort fortgesetzt, wo sie aufgehört hat. Unfertige Uploads sind versteckte Dateien, die nach einer Woche von selbst entfernt werden; **Abbrechen** entfernt einen sofort."
       ],
@@ -672,6 +760,7 @@
         "1. Setzen Sie unter **Konvertieren** in den [Quellen](#convert.sources) Häkchen bei den Dateien oder Ordnern.",
         "1. Klicken Sie auf **Löschen** (oder drücken Sie die Entf-Taste).",
         "1. Die Bestätigung zeigt genau, was verschwindet: wie viele Dateien, wie viel Speicherplatz und alles in einem gewählten Ordner. Klicken Sie zur Bestätigung auf **Löschen**; **Abbrechen** ist vorausgewählt.",
+        "Die [Untertiteldateien](#subtitles.overview) eines Videos (z. B. `Movie.en.srt` oder die in seinem Ordner `Subs`) werden mit ihm gelöscht; die Bestätigung listet sie auf.",
         "Das Löschen lässt sich nicht rückgängig machen. Seedet ein Download-Client wie Deluge die Dateien noch, meldet er sie als fehlend.",
         "### Was abgelehnt wird",
         "- Dateien, die in der Warteschlange stehen, konvertiert werden oder angehalten sind, und Ordner, die eine enthalten. Entfernen Sie sie zuerst aus der Warteschlange.",

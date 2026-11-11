@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { usePaneSwitch } from '../components/PaneSwitch.jsx';
-import { AlertTriangle, History, ListX, RotateCcw, SlidersHorizontal, Wand2, Upload } from 'lucide-react';
+import { AlertTriangle, Captions, History, ListX, RotateCcw, SlidersHorizontal, Upload, Wand2 } from 'lucide-react';
 import { api } from '../api.js';
 import { SourceBrowser, DRAG_PATHS } from '../components/SourceBrowser.jsx';
 import { relTo } from '../format.js';
@@ -117,7 +117,7 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
     if (!(await dialogs.confirm({ title: t('rename.view.confirmTitle'), message: t('rename.view.confirmMessage', { count: toRename.length }), confirmLabel: t('common.rename') }))) return;
     const r = await run(
       () => api.applyRename(toRename.map((x) => ({ path: x.path, newName: x.newName })), rule?.name),
-      (x) => t('rename.view.renamed', { count: x.renamed.length }),
+      (x) => t('rename.view.renamed', { count: x.renamed.filter((y) => !y.companion).length }),
     );
     if (!r) return;
     if (r.errors.length) onError(new Error(t('rename.view.notRenamed', { count: r.errors.length, list: r.errors.map((e) => `${e.path.split(/[\\/]/).pop()}: ${e.error}`).join('; ') })));
@@ -262,6 +262,14 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
                         {r.warnings.length > 0 && (
                           <div className={blocking.length ? 'warn-text' : 'muted small'}>
                             <AlertTriangle size={12} /> {r.warnings.map(renameWarning).join('; ')}
+                          </div>
+                        )}
+                        {r.companions?.length > 0 && isTicked(r) && (
+                          <div className="muted small" title={r.companions.map((c) => `${c.oldName} → ${c.newName}`).join('\n')}>
+                            <Captions size={12} /> {t('subtitles.rename.along', { count: r.companions.filter((c) => !c.error).length })}
+                            {r.companions.some((c) => c.error) && (
+                              <span className="warn-text"> · {r.companions.filter((c) => c.error).map((c) => t('subtitles.rename.taken', { name: c.newName })).join('; ')}</span>
+                            )}
                           </div>
                         )}
                       </td>

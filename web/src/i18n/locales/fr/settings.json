@@ -18,6 +18,7 @@
     "output": "Organisation de la sortie",
     "language": "Langue",
     "encoding": "Encodage et vérification",
+    "subtitles": "Sous-titres",
     "schedule": "Plage de conversion",
     "watch": "Dossiers surveillés",
     "notifications": "Notifications",
@@ -79,6 +80,17 @@
       "off": "Désactivée",
       "offHint": "Les fichiers sont considérés comme convertis dès que HandBrake a terminé."
     }
+  },
+  "subtitles": {
+    "embedTitle": "Intégration des fichiers de sous-titres",
+    "intro": "Les fichiers de sous-titres livrés avec une vidéo (p. ex. Movie.en.srt, Movie.it.forced.srt, ou un dossier Subs) peuvent être intégrés à la vidéo convertie et/ou copiés à côté. C'est le réglage par défaut : la file d'attente et chaque tâche peuvent en choisir un autre. Les fichiers d'origine ne sont jamais modifiés.",
+    "copyTitle": "Copie dans le dossier cible",
+    "copyNames": "Les copies portent le nom de la vidéo convertie, comme l'attendent les serveurs multimédias : Movie.en.srt, Movie.it.forced.srt. Elles sont renommées avec la vidéo.",
+    "findTitle": "Les trouver",
+    "extensions": "Extensions des fichiers de sous-titres",
+    "extensionsHint": "Pris en charge : srt, ass, ssa, vtt, idx (VobSub, avec son .sub), sup (Blu-ray). Laissez vide pour ignorer les fichiers de sous-titres.",
+    "codeset": "Jeu de caractères des fichiers anciens",
+    "codesetHint": "Utilisé pour les fichiers de sous-titres qui ne sont pas en UTF-8 (souvent d'anciens .srt). Chaque fichier peut aussi être réglé dans les détails de sa tâche."
   },
   "quality": {
     "title": "Résolution et débit",
