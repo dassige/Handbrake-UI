@@ -63,13 +63,15 @@ export default function App() {
   const [mergePaths, setMergePaths] = useState([]);
   const settingsDirty = useRef(false);
   const onSettingsDirty = useCallback((d) => (settingsDirty.current = d), []);
+  const presetsDirty = useRef(false);
+  const onPresetsDirty = useCallback((d) => (presetsDirty.current = d), []);
 
   const go = useCallback((v, sub = null) => {
     setRoute({ view: v, sub });
     history.replaceState(null, '', v === 'convert' ? '#' : `#${v}${sub != null ? `/${encodeURIComponent(sub)}` : ''}`);
   }, []);
 
-  /** Changes view; leaving Settings with unsaved changes asks first. */
+  /** Changes view; leaving Settings or the preset editor with unsaved changes asks first. */
   const switchView = useCallback(
     async (v, sub = null) => {
       if (view === 'settings' && v !== 'settings' && settingsDirty.current) {
@@ -81,6 +83,16 @@ export default function App() {
         });
         if (!ok) return;
         settingsDirty.current = false;
+      }
+      if (view === 'presets' && v !== 'presets' && presetsDirty.current) {
+        const ok = await dialogs.confirm({
+          title: 'Unsaved preset',
+          message: 'Leave the preset editor without saving? Your changes will be lost.',
+          confirmLabel: 'Leave without saving',
+          danger: true,
+        });
+        if (!ok) return;
+        presetsDirty.current = false;
       }
       go(v, sub);
     },
@@ -138,7 +150,7 @@ export default function App() {
     async (paths) => {
       if (!paths.length) return;
       if (!effectivePresetId) {
-        toasts.error('Import a HandBrake preset first');
+        toasts.error('Make or import a preset first');
         switchView('presets');
         return;
       }
@@ -288,8 +300,8 @@ export default function App() {
       )}
       {presets.length === 0 && view !== 'presets' && (
         <div className="banner">
-          No presets yet. <button className="link" onClick={() => switchView('presets')}>Import a preset</button>{' '}
-          exported from HandBrake to start converting.
+          No presets yet. <button className="link" onClick={() => switchView('presets')}>Make or import a preset</button>{' '}
+          to start converting.
         </div>
       )}
 
@@ -316,6 +328,7 @@ export default function App() {
           onSelect={(id) => go('presets', id)}
           run={run}
           onError={onError}
+          onDirtyChange={onPresetsDirty}
         />
       ) : view === 'stats' ? (
         <StatsView changeTick={data.changeTick} onError={onError} />

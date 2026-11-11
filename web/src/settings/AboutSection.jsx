@@ -8,7 +8,7 @@ import content from './credits.json';
 const WEB_VERSION = typeof __WEB_VERSION__ === 'undefined' ? {} : __WEB_VERSION__;
 
 const SUMMARY =
-  'Turns a headless Linux box into a HandBrake conversion server: pick videos on the server (or upload them), queue them with presets exported from the HandBrake desktop app, and get checked, renamed results. It runs the official HandBrakeCLI and is not affiliated with the HandBrake project.';
+  'Turns a headless Linux box into a HandBrake conversion server: pick videos on the server (or upload them), queue them with HandBrake presets (made in its preset editor or imported from the desktop app), and get checked, renamed results. It runs the official HandBrakeCLI and is not affiliated with the HandBrake project.';
 
 function External({ href, children }) {
   return (

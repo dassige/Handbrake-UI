@@ -1,83 +1,31 @@
-// The HandBrake preset keys, grouped like the desktop app's tabs.
+// The HandBrake preset keys, grouped like the desktop app's tabs, for the read-only preset view.
 //
 // Each field: { key, label, options?: { value: label }, format?: (value, preset) => string,
-// show?: (preset) => boolean }. Today they drive the read-only preset view; `options`
-// lists the valid choices so the same table can drive an editor later.
+// show?: (preset) => boolean }. The editor (PresetEditor.jsx) uses the same labels from hbOptions.js.
 // Keys not listed here are shown under "Other settings", so nothing is hidden.
+
+import {
+  AUDIO_ENCODERS, BURN, CONTAINERS, CROP_MODE, FRAMERATE_MODE, MIXDOWNS, PAR, QUALITY_TYPE, TRACK_BEHAVIOR, VIDEO_ENCODERS,
+  COMB_DETECT, DEINTERLACE, DENOISE, PAD_MODES, SHARPEN, muxer, parseRotate,
+} from './hbOptions.js';
+
+export { AUDIO_ENCODERS, CONTAINERS, MIXDOWNS, VIDEO_ENCODERS };
 
 const yes = (v) => (v ? 'Yes' : 'No');
 const list = (v) => (Array.isArray(v) && v.length ? v.join(', ') : '—');
 const px = (v) => (v ? `${v} px` : 'source');
-
-export const CONTAINERS = { av_mkv: 'MKV', av_mp4: 'MP4', av_webm: 'WebM' };
-
-export const VIDEO_ENCODERS = {
-  x264: 'H.264 (x264)',
-  x264_10bit: 'H.264 10-bit (x264)',
-  x265: 'H.265 (x265)',
-  x265_10bit: 'H.265 10-bit (x265)',
-  x265_12bit: 'H.265 12-bit (x265)',
-  qsv_h264: 'H.264 (Intel Quick Sync)',
-  qsv_h265: 'H.265 (Intel Quick Sync)',
-  qsv_h265_10bit: 'H.265 10-bit (Intel Quick Sync)',
-  qsv_av1: 'AV1 (Intel Quick Sync)',
-  qsv_av1_10bit: 'AV1 10-bit (Intel Quick Sync)',
-  nvenc_h264: 'H.264 (NVIDIA NVENC)',
-  nvenc_h265: 'H.265 (NVIDIA NVENC)',
-  nvenc_av1: 'AV1 (NVIDIA NVENC)',
-  vce_h264: 'H.264 (AMD VCE)',
-  vce_h265: 'H.265 (AMD VCE)',
-  svt_av1: 'AV1 (SVT-AV1)',
-  svt_av1_10bit: 'AV1 10-bit (SVT-AV1)',
-  mpeg4: 'MPEG-4 (FFmpeg)',
-  mpeg2: 'MPEG-2 (FFmpeg)',
-  VP8: 'VP8',
-  VP9: 'VP9',
-  theora: 'Theora',
-};
-
-export const AUDIO_ENCODERS = {
-  av_aac: 'AAC (FFmpeg)',
-  ca_aac: 'AAC (Core Audio)',
-  ca_haac: 'HE-AAC (Core Audio)',
-  fdk_aac: 'AAC (FDK)',
-  fdk_haac: 'HE-AAC (FDK)',
-  ac3: 'AC3',
-  eac3: 'E-AC3',
-  mp3: 'MP3',
-  vorbis: 'Vorbis',
-  opus: 'Opus',
-  flac16: 'FLAC 16-bit',
-  flac24: 'FLAC 24-bit',
-  'copy:aac': 'AAC passthru',
-  'copy:ac3': 'AC3 passthru',
-  'copy:eac3': 'E-AC3 passthru',
-  'copy:dts': 'DTS passthru',
-  'copy:dtshd': 'DTS-HD passthru',
-  'copy:truehd': 'TrueHD passthru',
-  'copy:mp3': 'MP3 passthru',
-  'copy:flac': 'FLAC passthru',
-  'copy:opus': 'Opus passthru',
-  copy: 'Auto passthru',
-  none: 'None',
-};
-
-export const MIXDOWNS = {
-  none: 'None', mono: 'Mono', left_only: 'Mono (left only)', right_only: 'Mono (right only)', stereo: 'Stereo',
-  dpl1: 'Dolby Surround', dpl2: 'Dolby Pro Logic II', '5point1': '5.1 channels', '6point1': '6.1 channels',
-  '7point1': '7.1 channels', '5_2_liss': '7.1 (5F/2R/LFE)',
-};
-
-const QUALITY_TYPE = { 0: 'Target size', 1: 'Average bitrate', 2: 'Constant quality' };
-const FRAMERATE_MODE = { vfr: 'Variable', cfr: 'Constant', pfr: 'Peak' };
-const CROP_MODE = { 0: 'Automatic', 1: 'Conservative', 2: 'None', 3: 'Custom' };
-const PAR = { auto: 'Automatic', loose: 'Loose', none: 'None (square pixels)', custom: 'Custom' };
-const TRACK_BEHAVIOR = { none: 'None', first: 'First matching language', all: 'All matching languages' };
-const BURN = { none: 'None', foreign: 'Foreign audio track', first: 'First track', 'foreign_first': 'Foreign audio, then first track' };
-const DEINTERLACE = { off: 'Off', yadif: 'Yadif', bwdif: 'Bwdif', decomb: 'Decomb' };
-const DENOISE = { off: 'Off', nlmeans: 'NLMeans', hqdn3d: 'HQDN3D' };
-const SHARPEN = { off: 'Off', unsharp: 'Unsharp', lapsharp: 'Lapsharp' };
+const named = (pairs) => Object.fromEntries(pairs);
+const DEINTERLACE_LABEL = named(DEINTERLACE);
+const COMB_LABEL = named(COMB_DETECT);
+const PAD_LABEL = named(PAD_MODES);
+const DENOISE_LABEL = named(DENOISE);
+const SHARPEN_LABEL = named(SHARPEN);
+const isMp4 = (p) => muxer(p.FileFormat) === 'mp4';
 const OFF_DEFAULT = (v) => (v === 'off' || v === '' || v == null ? 'Off' : v === 'none' ? 'None' : String(v));
+const rotate = (v) => {
+  const r = parseRotate(v);
+  return [r.angle ? `${r.angle}°` : null, r.hflip ? 'flipped' : null].filter(Boolean).join(', ') || 'None';
+};
 
 export const PRESET_SECTIONS = [
   {
@@ -85,8 +33,8 @@ export const PRESET_SECTIONS = [
     title: 'Summary',
     fields: [
       { key: 'FileFormat', label: 'Container', options: CONTAINERS },
-      { key: 'Optimize', label: 'Web optimised', format: yes, show: (p) => p.FileFormat === 'av_mp4' },
-      { key: 'Mp4iPodCompatible', label: 'iPod 5G support', format: yes, show: (p) => p.FileFormat === 'av_mp4' },
+      { key: 'Optimize', label: 'Web optimised', format: yes, show: isMp4 },
+      { key: 'Mp4iPodCompatible', label: 'iPod 5G support', format: yes, show: isMp4 },
       { key: 'AlignAVStart', label: 'Align A/V start', format: yes },
       { key: 'ChapterMarkers', label: 'Chapter markers', format: yes },
       { key: 'MetadataPassthru', label: 'Pass metadata through', format: yes },
@@ -107,8 +55,8 @@ export const PRESET_SECTIONS = [
         key: 'PictureTopCrop', label: 'Crop (T/B/L/R)', show: (p) => p.PictureCropMode === 3,
         format: (_, p) => [p.PictureTopCrop, p.PictureBottomCrop, p.PictureLeftCrop, p.PictureRightCrop].join(' / '),
       },
-      { key: 'PicturePadMode', label: 'Borders', format: OFF_DEFAULT },
-      { key: 'PictureRotate', label: 'Rotate / flip', format: (v) => v || 'None' },
+      { key: 'PicturePadMode', label: 'Borders', format: (v) => PAD_LABEL[v] ?? OFF_DEFAULT(v) },
+      { key: 'PictureRotate', label: 'Rotate / flip', format: rotate },
     ],
   },
   {
@@ -116,14 +64,14 @@ export const PRESET_SECTIONS = [
     title: 'Filters',
     fields: [
       { key: 'PictureDetelecine', label: 'Detelecine', format: OFF_DEFAULT },
-      { key: 'PictureDeinterlaceFilter', label: 'Deinterlace', options: DEINTERLACE },
+      { key: 'PictureDeinterlaceFilter', label: 'Deinterlace', options: DEINTERLACE_LABEL },
       { key: 'PictureDeinterlacePreset', label: 'Deinterlace preset', show: (p) => p.PictureDeinterlaceFilter && p.PictureDeinterlaceFilter !== 'off' },
-      { key: 'PictureCombDetectPreset', label: 'Interlace detection', show: (p) => p.PictureDeinterlaceFilter && p.PictureDeinterlaceFilter !== 'off' },
-      { key: 'PictureDenoiseFilter', label: 'Denoise', options: DENOISE },
+      { key: 'PictureCombDetectPreset', label: 'Interlace detection', options: COMB_LABEL, show: (p) => p.PictureDeinterlaceFilter && p.PictureDeinterlaceFilter !== 'off' },
+      { key: 'PictureDenoiseFilter', label: 'Denoise', options: DENOISE_LABEL },
       { key: 'PictureDenoisePreset', label: 'Denoise preset', show: (p) => p.PictureDenoiseFilter && p.PictureDenoiseFilter !== 'off' },
       { key: 'PictureDenoiseTune', label: 'Denoise tune', show: (p) => p.PictureDenoiseFilter && p.PictureDenoiseFilter !== 'off' },
       { key: 'PictureChromaSmoothPreset', label: 'Chroma smooth', format: OFF_DEFAULT },
-      { key: 'PictureSharpenFilter', label: 'Sharpen', options: SHARPEN },
+      { key: 'PictureSharpenFilter', label: 'Sharpen', options: SHARPEN_LABEL },
       { key: 'PictureSharpenPreset', label: 'Sharpen preset', show: (p) => p.PictureSharpenFilter && p.PictureSharpenFilter !== 'off' },
       { key: 'PictureDeblockPreset', label: 'Deblock', format: OFF_DEFAULT },
       { key: 'PictureColorspacePreset', label: 'Colourspace', format: OFF_DEFAULT },

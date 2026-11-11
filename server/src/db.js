@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS jobs (
   preset_id    INTEGER,
   preset_name  TEXT NOT NULL,
   preset_json  TEXT NOT NULL,    -- snapshot taken when the job was added
-  format       TEXT NOT NULL,    -- av_mkv | av_mp4 | av_webm
+  format       TEXT NOT NULL,    -- the preset's FileFormat: av_mkv | av_mp4 | av_webm | av_mov
   created_at   INTEGER NOT NULL,
   started_at   INTEGER,
   finished_at  INTEGER,
@@ -155,6 +155,7 @@ const MIGRATIONS = [
   ['jobs', 'verify', 'TEXT'], // JSON result of the check after conversion
   ['jobs', 'verify_status', 'TEXT'], // ok | warning | error | skipped | running
   ['jobs', 'origin', 'TEXT'], // 'watch' when a watch folder added the job
+  ['presets', 'updated_at', 'INTEGER'], // last saved in the preset editor (NULL: as imported)
 ];
 
 export function openDb(file) {

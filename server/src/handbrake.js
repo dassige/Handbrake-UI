@@ -54,9 +54,170 @@ export class JsonBlockParser {
   }
 }
 
+/**
+ * The indented list that follows a "header" line in HandBrakeCLI --help, e.g. the
+ * encoders under "Select video encoder:". Each item is alone on a line, indented by 20+ spaces.
+ */
+export function parseHelpList(text, header) {
+  const lines = text.split(/\r?\n/);
+  const start = lines.findIndex((l) => l.includes(header));
+  const items = [];
+  for (let i = start + 1; start >= 0 && i < lines.length; i++) {
+    const m = /^\s{20,}([A-Za-z0-9_:.-]+)\s*$/.exec(lines[i]);
+    if (!m) break;
+    items.push(m[1]);
+  }
+  return items;
+}
+
+/** The values printed by --encoder-preset-list (and the tune/profile/level lists). */
+export function parseEncoderList(text) {
+  const lines = text.split(/\r?\n/);
+  const start = lines.findIndex((l) => /^Available --encoder-\w+ values for/.test(l));
+  if (start < 0) return null;
+  const items = [];
+  for (let i = start + 1; i < lines.length; i++) {
+    const m = /^ {4}(\S.*?)\s*$/.exec(lines[i]);
+    if (!m) break;
+    if (m[1] === 'Option not supported by encoder') return [];
+    items.push(m[1]);
+  }
+  return items;
+}
+
+/**
+ * The built-in presets printed by --preset-list: folders end with "/", presets are
+ * indented one level (4 spaces) below their folder and their description one more.
+ * Log lines from libhb are not indented and are skipped.
+ */
+export function parseBuiltinPresets(text) {
+  const out = [];
+  const folders = [];
+  let last = null;
+  for (const raw of text.split(/\r?\n/)) {
+    const m = /^((?: {4})*)(\S.*?)\s*$/.exec(raw);
+    if (!m) continue;
+    const depth = m[1].length / 4;
+    const line = m[2];
+    if (line.endsWith('/') && depth <= folders.length && !line.startsWith('[')) {
+      folders.length = depth;
+      folders.push(line.slice(0, -1));
+      last = null;
+    } else if (depth > 0 && depth === folders.length) {
+      last = { category: folders.join(' / '), name: line, description: '' };
+      out.push(last);
+    } else if (depth > 0 && depth === folders.length + 1 && last) {
+      last.description = last.description ? `${last.description} ${line}` : line;
+    }
+  }
+  return out;
+}
+
 export class HandBrake {
   constructor(cli) {
     this.cli = cli;
+    this.capsPromise = null;
+  }
+
+  /** Runs HandBrakeCLI and returns stdout + stderr whatever the exit code; rejects only when it can't run. */
+  async output(args, timeout = 30_000) {
+    try {
+      const { stdout, stderr } = await execFileP(this.cli, args, { maxBuffer: 8 << 20, timeout });
+      return stdout + stderr;
+    } catch (err) {
+      if (err.code === 'ENOENT' || err.killed || err.stdout == null) throw err;
+      return `${err.stdout}${err.stderr}`;
+    }
+  }
+
+  /** Whether HandBrakeCLI can be run at all (cached). */
+  available() {
+    this.availablePromise ??= this.output(['--version']).then(
+      () => true,
+      (err) => {
+        if (err.code !== 'ENOENT') this.availablePromise = null;
+        return false;
+      },
+    );
+    return this.availablePromise;
+  }
+
+  /**
+   * What the installed HandBrakeCLI can do, for the preset editor: video encoders with their
+   * presets, tunes, profiles and levels, audio encoders, containers and mixdowns.
+   * Asked once (about 4 runs per video encoder) and cached; null when the CLI is missing.
+   */
+  capabilities() {
+    this.capsPromise ??= this.readCapabilities().catch((err) => {
+      this.capsPromise = null;
+      if (err.code === 'ENOENT') return null;
+      throw err;
+    });
+    return this.capsPromise;
+  }
+
+  async readCapabilities() {
+    const help = await this.output(['--help']);
+    const version = /HandBrake\s+(\S+)/.exec(await this.output(['--version']))?.[1] ?? 'unknown';
+    const videoNames = parseHelpList(help, 'Select video encoder:');
+    const kinds = ['preset', 'tune', 'profile', 'level'];
+    const tasks = videoNames.flatMap((name) => kinds.map((kind) => ({ name, kind })));
+    const results = new Map();
+    // A few at a time: each run initialises libhb, which probes the GPUs.
+    let next = 0;
+    await Promise.all(
+      Array.from({ length: 4 }, async () => {
+        while (next < tasks.length) {
+          const t = tasks[next++];
+          const list = parseEncoderList(await this.output([`--encoder-${t.kind}-list`, t.name]));
+          results.set(`${t.name}:${t.kind}`, list ?? []);
+        }
+      }),
+    );
+    return {
+      source: 'handbrake',
+      version,
+      videoEncoders: videoNames.map((name) => ({
+        name,
+        presets: results.get(`${name}:preset`),
+        tunes: results.get(`${name}:tune`),
+        profiles: results.get(`${name}:profile`),
+        levels: results.get(`${name}:level`),
+      })),
+      audioEncoders: parseHelpList(help, 'Select audio encoder(s):'),
+      containers: parseHelpList(help, 'Select container format:'),
+      mixdowns: parseHelpList(help, 'Format(s) for audio downmixing/upmixing:'),
+    };
+  }
+
+  /** HandBrake's built-in presets ({ category, name, description }), or null when the CLI is missing. */
+  async builtinPresets() {
+    try {
+      return parseBuiltinPresets(await this.output(['--preset-list']));
+    } catch (err) {
+      if (err.code === 'ENOENT') return null;
+      throw err;
+    }
+  }
+
+  /**
+   * Writes preset `name` (built in, or from importFile) as HandBrake exports it: upgraded to
+   * this version's format, with every setting filled in. Returns the parsed export file.
+   */
+  async exportPreset({ name, importFile, outFile }) {
+    const args = [];
+    if (importFile) args.push('--preset-import-file', importFile);
+    args.push('--preset', name, '--preset-export', name, '--preset-export-file', outFile);
+    const text = await this.output(args);
+    let data;
+    try {
+      data = JSON.parse(await fs.promises.readFile(outFile, 'utf8'));
+    } catch {
+      const reason = /^.*(?:invalid|error|failed).*$/im.exec(text)?.[0]?.trim();
+      throw new Error(reason || `HandBrakeCLI could not export preset "${name}"`);
+    }
+    if (!Array.isArray(data?.PresetList) || !data.PresetList[0]) throw new Error('HandBrakeCLI wrote an empty preset file');
+    return data;
   }
 
   /** Version string and video encoders, or { error } when the CLI is missing. */

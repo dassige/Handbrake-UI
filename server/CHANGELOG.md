@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.0] - 2026/11/11
+
+- feat: preset editor like the HandBrake desktop app
+
+Presets can now be made and changed in the app, not only imported.
+
+- New: start from a HandBrake built-in preset (listed by the server's
+  HandBrakeCLI) or from one of yours; Duplicate copies the chosen one
+- Edit: name, category and description, then the desktop app's tabs:
+  Summary, Dimensions, Filters, Video, Audio, Subtitles, plus the raw
+  JSON; Save, Save as new, and a guard for unsaved changes
+- Encoders and their preset/tune/profile/level lists come from the
+  installed HandBrakeCLI (read about 15 s after the server starts);
+  a generic list is used when the CLI is missing
+- Opening a preset lets HandBrakeCLI upgrade it to the current format
+  and fill in every setting; saving checks it with HandBrakeCLI again
+- Combinations HandBrake refuses (e.g. H.265 in WebM, Vorbis in MP4)
+  block saving; an encoder the server lacks shows as a warning
+- Server: GET /api/presets/options, /api/presets/builtin,
+  /api/presets/:id/editable; POST /api/presets/new;
+  PUT /api/presets/:id; presets get an updated_at column
+- Output extensions for MOV and the generic container names
+  (mp4, mkv, webm, mov)
+- Fix labels in the read-only preset view: Yadif, the 7.1 mixdown,
+  anamorphic "None"
+- Help: new "Editing a preset" and "New preset" topics; README and
+  About text updated
+- Tests for the CLI output parsers and for create/edit/normalise
+
 ## [3.0.1] - 2026/11/11
 
 - chore: relicense under GPL-2.0-only; add hardware and performance guide

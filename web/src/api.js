@@ -27,6 +27,13 @@ export const api = {
   setDefaultPreset: (id) => post(`/api/presets/${id}/default`),
   deletePreset: (id) => request('DELETE', `/api/presets/${id}`),
   presetExportUrl: (id) => `/api/presets/${id}/export`,
+  presetOptions: () => get('/api/presets/options'),
+  builtinPresets: () => get('/api/presets/builtin'),
+  editablePreset: (id) => get(`/api/presets/${id}/editable`),
+  // body: { name, category, description, preset | builtin | fromId, version }
+  createPreset: (body) => post('/api/presets/new', body),
+  // body: { preset, version, name, category, description }
+  updatePreset: (id, body) => request('PUT', `/api/presets/${id}`, body),
 
   jobs: () => get('/api/jobs'),
   addJobs: (paths, presetId, position) => post('/api/jobs', { paths, presetId, position }),

@@ -87,7 +87,13 @@ export async function collectVideos(dir, { recursive, matcher }) {
   return out;
 }
 
-const FORMAT_EXT = { av_mkv: '.mkv', av_mp4: '.mp4', av_webm: '.webm' };
+// HandBrake's container names: the muxers (av_*) and the generic names newer presets may use.
+const FORMAT_EXT = {
+  av_mkv: '.mkv', mkv: '.mkv', libmkv: '.mkv',
+  av_mp4: '.mp4', mp4: '.mp4', mp4v2: '.mp4', m4v: '.m4v',
+  av_webm: '.webm', webm: '.webm',
+  av_mov: '.mov', mov: '.mov',
+};
 
 export function extensionForFormat(format) {
   return FORMAT_EXT[format] ?? '.mkv';

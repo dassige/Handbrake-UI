@@ -2,9 +2,9 @@
 
 A web UI that turns a headless Linux box (or a Windows PC) into a HandBrake
 conversion server. Browse the folders on the server or upload videos from your
-computer, drag them into a queue, and they are converted with presets exported
-from the HandBrake desktop app. Everything happens in the browser: phone,
-tablet or computer.
+computer, drag them into a queue, and they are converted with HandBrake presets,
+made in the app's preset editor or imported from the HandBrake desktop app.
+Everything happens in the browser: phone, tablet or computer.
 
 It runs the official `HandBrakeCLI`, so a preset gives the same result as in
 the desktop app.
@@ -27,6 +27,13 @@ the desktop app.
 
 **Converting**
 
+- **Preset editor, like the desktop app.** Make a preset from one of
+  HandBrake's built-in presets (e.g. Fast 1080p30) or from one of yours, and
+  change it in the same tabs as HandBrake: Summary, Dimensions, Filters, Video,
+  Audio and Subtitles, plus the raw JSON. The encoders and their
+  preset/tune/profile/level lists come from the server's HandBrakeCLI, so only
+  what it can run is offered; combinations HandBrake would refuse (e.g. H.265
+  in WebM) are flagged before saving. **Save as new** keeps the original.
 - **Presets from the desktop app.** In HandBrake, use Presets → Export, then
   import the `.json` on the **Presets** page. Files with several presets or
   folders are supported. The page shows every setting of a preset, grouped like
@@ -117,7 +124,7 @@ All files shown are generated demo videos.
 <table>
   <tr>
     <td width="50%"><a href="docs/screenshots/job-details.png"><img src="docs/screenshots/job-details.png" alt="Job details: the check after conversion, files, sizes and preset"></a><br><b>Job details</b>: the check after conversion, sizes, tracks and the HandBrake log</td>
-    <td width="50%"><a href="docs/screenshots/presets.png"><img src="docs/screenshots/presets.png" alt="Presets page showing every setting of an imported preset"></a><br><b>Presets</b> imported from the desktop app, with every setting and how they performed</td>
+    <td width="50%"><a href="docs/screenshots/presets.png"><img src="docs/screenshots/presets.png" alt="Presets page showing every setting of an imported preset"></a><br><b>Presets</b> made in the editor or imported from the desktop app, with every setting and how they performed</td>
   </tr>
   <tr>
     <td><a href="docs/screenshots/quality.png"><img src="docs/screenshots/quality.png" alt="Quality check listing files with old formats, low resolution or low bitrate"></a><br><b>Quality check</b>: old formats, low resolution and low bitrate at a glance</td>
@@ -438,9 +445,10 @@ paths (`\\nas\videos`) for network folders.
 
 ## First steps
 
-1. **Import a preset.** In the HandBrake desktop app, use Presets → Export to
-   save a preset as `.json`, or take one from [`presets/`](presets). Open
-   **Presets** in the app and import it.
+1. **Make or import a preset.** Open **Presets** and press **New** to start
+   from one of HandBrake's built-in presets, then adjust it in the editor. Or,
+   in the HandBrake desktop app, use Presets → Export to save a preset as
+   `.json` (or take one from [`presets/`](presets)) and **Import** it.
 2. **Check the folders.** In **Settings → Folders**, check the sources and
    target folders, add more sources folders and give them friendly names.
 3. **Queue and convert.** On **Convert**, drag files or folders from the

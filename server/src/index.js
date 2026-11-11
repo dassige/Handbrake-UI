@@ -139,3 +139,5 @@ queue.scheduleTick();
 setInterval(() => queue.scheduleTick(), 30_000).unref();
 await watcher.reconfigure().catch((err) => app.log.warn(`Watch folders: ${err.message}`));
 await backupScheduler.start().catch((err) => app.log.warn(`Scheduled backups: ${err.message}`));
+// The preset editor's encoder lists take ~4 HandBrakeCLI runs per encoder: read them ahead of time.
+setTimeout(() => handbrake.capabilities().catch((err) => app.log.warn(`HandBrakeCLI options: ${err.message}`)), 15_000).unref();

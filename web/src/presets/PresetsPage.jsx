@@ -1,14 +1,21 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Copy, Download, FileJson, Star, Trash2, Upload } from 'lucide-react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Copy, CopyPlus, Download, FileJson, Pencil, Plus, Star, Trash2, Upload } from 'lucide-react';
 import { api } from '../api.js';
 import { bytes, dateTime, humanDuration } from '../format.js';
 import { Help } from '../help/Help.jsx';
 import { useDialogs } from '../components/Dialogs.jsx';
 import { startDownload } from '../download/useDownload.jsx';
 import { AUDIO_ENCODERS, CONTAINERS, MIXDOWNS, PRESET_SECTIONS, formatValue, otherKeys, rawValue } from './presetFields.js';
+// Loaded when first needed: the editor is most of the presets code.
+const PresetEditor = lazy(() => import('./PresetEditor.jsx').then((m) => ({ default: m.PresetEditor })));
+const NewPresetDialog = lazy(() => import('./NewPresetDialog.jsx').then((m) => ({ default: m.NewPresetDialog })));
+const loading = <div className="page-content"><p className="muted">Loading the editor…</p></div>;
 
-/** Presets as a page: the list on the left, everything about the chosen one on the right. */
-export function PresetsPage({ presets, selectedId, onSelect, run, onError }) {
+/**
+ * Presets as a page: the list on the left, everything about the chosen one on the right.
+ * "Edit" turns the right side into the preset editor (PresetEditor.jsx).
+ */
+export function PresetsPage({ presets, selectedId, onSelect, run, onError, onDirtyChange }) {
   const dialogs = useDialogs();
   const input = useRef(null);
   const [over, setOver] = useState(false);
@@ -16,8 +23,14 @@ export function PresetsPage({ presets, selectedId, onSelect, run, onError }) {
   const [detail, setDetail] = useState(null);
   const [tab, setTab] = useState('settings');
   const [usage, setUsage] = useState(null);
+  const [editing, setEditing] = useState(false);
+  const [editTab, setEditTab] = useState('summary');
+  const [newDialog, setNewDialog] = useState(null); // { fromId } while "New preset" is open
+  const editorDirty = useRef(false);
 
   const current = presets.find((p) => p.id === selectedId) ?? presets.find((p) => p.isDefault) ?? presets[0] ?? null;
+  // A preset just created here: the list is refreshed a moment later (server event).
+  const arriving = selectedId != null && !presets.some((p) => p.id === selectedId);
 
   useEffect(() => {
     if (!current) {
@@ -29,12 +42,21 @@ export function PresetsPage({ presets, selectedId, onSelect, run, onError }) {
     return () => {
       live = false;
     };
-    // createdAt changes when the preset is imported again.
-  }, [current?.id, current?.createdAt, onError]);
+    // createdAt changes when the preset is imported again, updatedAt when it is saved in the editor.
+  }, [current?.id, current?.createdAt, current?.updatedAt, onError]);
 
   useEffect(() => {
     api.stats(0).then((s) => setUsage(Object.fromEntries(s.presets.map((p) => [p.name, p]))), () => {});
   }, [presets]);
+
+  // The preset being edited was deleted (here or in another tab).
+  useEffect(() => {
+    if (editing && !current && !arriving) setEditing(false);
+    if (!editing || !arriving) return undefined;
+    // Deleted in another tab rather than just created: stop waiting.
+    const t = setTimeout(() => setEditing(false), 5000);
+    return () => clearTimeout(t);
+  }, [editing, current, arriving]);
 
   // On a phone the section list is a horizontal strip: keep the chosen one in view.
   const navRef = useRef(null);
@@ -51,6 +73,44 @@ export function PresetsPage({ presets, selectedId, onSelect, run, onError }) {
     }
     return [...m.entries()];
   }, [presets]);
+  const categories = useMemo(() => [...new Set(presets.map((p) => p.category).filter(Boolean))].sort(), [presets]);
+
+  const setDirty = useCallback(
+    (d) => {
+      editorDirty.current = d;
+      onDirtyChange?.(d);
+    },
+    [onDirtyChange],
+  );
+
+  /** Leaving the editor with unsaved changes asks first. */
+  async function leaveEditor() {
+    if (!editing) return true;
+    if (editorDirty.current) {
+      const ok = await dialogs.confirm({
+        title: 'Unsaved changes',
+        message: 'Discard your changes to this preset?',
+        confirmLabel: 'Discard changes',
+        cancelLabel: 'Keep editing',
+        danger: true,
+      });
+      if (!ok) return false;
+    }
+    setDirty(false);
+    setEditing(false);
+    return true;
+  }
+
+  async function select(id) {
+    if (id === current?.id) return;
+    if (await leaveEditor()) onSelect(id);
+  }
+
+  function edit(id = current?.id) {
+    setEditTab('summary');
+    setEditing(true);
+    if (id !== current?.id) onSelect(id);
+  }
 
   async function upload(files) {
     setBusy(true);
@@ -61,7 +121,7 @@ export function PresetsPage({ presets, selectedId, onSelect, run, onError }) {
           () => api.uploadPreset(f.name, content),
           (x) => `${f.name}: ${x.map((p) => `${p.name} ${p.action}`).join(', ')}`,
         );
-        if (r?.[0]) onSelect(r[0].id);
+        if (r?.[0] && !editing) onSelect(r[0].id);
       }
     } finally {
       setBusy(false);
@@ -77,6 +137,10 @@ export function PresetsPage({ presets, selectedId, onSelect, run, onError }) {
       danger: true,
     });
     if (ok && (await run(() => api.deletePreset(p.id), `Deleted ${p.name}`))) onSelect(null);
+  }
+
+  async function openNew(fromId = null) {
+    if (await leaveEditor()) setNewDialog({ fromId });
   }
 
   const dropProps = {
@@ -100,8 +164,11 @@ export function PresetsPage({ presets, selectedId, onSelect, run, onError }) {
   return (
     <main className={`page presets-page ${over ? 'drop-active' : ''}`} {...dropProps}>
       <nav ref={navRef} className="page-nav preset-nav" aria-label="Presets">
-        <div className="page-nav-title-row">
-          <h2 className="page-nav-title">Presets<Help id="presets" /></h2>
+        <h2 className="page-nav-title">Presets<Help id="presets" /></h2>
+        <div className="preset-nav-actions">
+          <button className="btn small" onClick={() => openNew()} title="Make a new preset from a HandBrake preset or one of yours">
+            <Plus size={14} /> New
+          </button>
           <button className="btn small" onClick={() => input.current?.click()} disabled={busy} title="Import presets exported from HandBrake">
             <Upload size={14} /> Import
           </button>
@@ -116,7 +183,7 @@ export function PresetsPage({ presets, selectedId, onSelect, run, onError }) {
                 type="button"
                 className={`page-nav-item preset-item ${current?.id === p.id ? 'active' : ''}`}
                 aria-current={current?.id === p.id ? 'page' : undefined}
-                onClick={() => onSelect(p.id)}
+                onClick={() => select(p.id)}
               >
                 <span className="preset-item-text">
                   <span className="preset-item-name">{p.name}</span>
@@ -124,6 +191,7 @@ export function PresetsPage({ presets, selectedId, onSelect, run, onError }) {
                     {[p.summary.videoEncoder, p.summary.quality, p.summary.maxSize].filter(Boolean).join(' · ')}
                   </span>
                 </span>
+                {editing && current?.id === p.id && <Pencil size={13} className="preset-editing" aria-label="Editing" />}
                 {p.isDefault && <Star size={14} className="preset-star" aria-label="Default preset" />}
               </button>
             ))}
@@ -138,79 +206,134 @@ export function PresetsPage({ presets, selectedId, onSelect, run, onError }) {
       </nav>
 
       <section className="page-body">
-        <div className="page-content">
-          {!current ? (
-            <div className="empty-page">
-              <FileJson size={40} className="muted" />
-              <h1>No presets yet</h1>
-              <p className="muted">
-                In the HandBrake desktop app: <strong>Presets</strong> → select your preset → <strong>Export</strong>. Then drop the
-                file here or press <strong>Import</strong>.
-              </p>
-              <button className="btn primary" onClick={() => input.current?.click()} disabled={busy}>
-                <Upload size={15} /> Import a preset
-              </button>
-            </div>
-          ) : (
-            <>
-              <header className="page-head preset-head-row">
-                <div>
-                  <h1>
-                    {current.name}
-                    {current.isDefault && <span className="badge done">default</span>}
-                  </h1>
-                  <p className="muted small">
-                    {current.category ? `${current.category} · ` : ''}Imported {dateTime(current.createdAt)}
-                    {current.fileName ? ` from ${current.fileName}` : ''}
-                  </p>
-                  {current.description && <p className="preset-desc">“{current.description}”</p>}
+        {editing && arriving ? (
+          <div className="page-content"><p className="muted">Opening the new preset…</p></div>
+        ) : editing && current ? (
+          <Suspense fallback={loading}>
+            <PresetEditor
+              key={current.id}
+              presetId={current.id}
+              categories={categories}
+              tab={editTab}
+              onTab={setEditTab}
+              run={run}
+              onError={onError}
+              onDirtyChange={setDirty}
+              onClose={() => {
+                setDirty(false);
+                setEditing(false);
+              }}
+              onSaved={(id) => {
+                setDirty(false);
+                setEditing(false);
+                onSelect(id);
+              }}
+            />
+          </Suspense>
+        ) : (
+          <div className="page-content">
+            {!current ? (
+              <div className="empty-page">
+                <FileJson size={40} className="muted" />
+                <h1>No presets yet</h1>
+                <p className="muted">
+                  Start from one of HandBrake’s own presets with <strong>New</strong>, or import yours: in the HandBrake
+                  desktop app, <strong>Presets</strong> → select your preset → <strong>Export</strong>, then drop the file here
+                  or press <strong>Import</strong>.
+                </p>
+                <div className="set-actions">
+                  <button className="btn primary" onClick={() => openNew()}>
+                    <Plus size={15} /> New preset
+                  </button>
+                  <button className="btn" onClick={() => input.current?.click()} disabled={busy}>
+                    <Upload size={15} /> Import a preset
+                  </button>
                 </div>
-                <div className="page-head-actions">
-                  {!current.isDefault && (
-                    <button className="btn small" onClick={() => run(() => api.setDefaultPreset(current.id), `${current.name} is now the default`)}>
-                      <Star size={14} /> Make default
+              </div>
+            ) : (
+              <>
+                <header className="page-head preset-head-row">
+                  <div>
+                    <h1>
+                      {current.name}
+                      {current.isDefault && <span className="badge done">default</span>}
+                    </h1>
+                    <p className="muted small">
+                      {current.category ? `${current.category} · ` : ''}
+                      {current.fileName ? `Imported ${dateTime(current.createdAt)} from ${current.fileName}` : `Created ${dateTime(current.createdAt)}`}
+                      {current.updatedAt ? ` · edited ${dateTime(current.updatedAt)}` : ''}
+                    </p>
+                    {current.description && <p className="preset-desc">“{current.description}”</p>}
+                  </div>
+                  <div className="page-head-actions">
+                    <button className="btn small primary" onClick={() => edit()} title="Change this preset's settings">
+                      <Pencil size={14} /> Edit
                     </button>
-                  )}
-                  <button className="btn small" onClick={() => startDownload(api.presetExportUrl(current.id))} title="Download as a file HandBrake can import">
-                    <Download size={14} /> Download
-                  </button>
-                  <button className="btn small danger" onClick={() => remove(current)}>
-                    <Trash2 size={14} /> Delete
-                  </button>
+                    <button className="btn small" onClick={() => openNew(current.id)} title="Make a new preset with these settings">
+                      <CopyPlus size={14} /> Duplicate
+                    </button>
+                    {!current.isDefault && (
+                      <button className="btn small" onClick={() => run(() => api.setDefaultPreset(current.id), `${current.name} is now the default`)}>
+                        <Star size={14} /> Make default
+                      </button>
+                    )}
+                    <button className="btn small" onClick={() => startDownload(api.presetExportUrl(current.id))} title="Download as a file HandBrake can import">
+                      <Download size={14} /> Download
+                    </button>
+                    <button className="btn small danger" onClick={() => remove(current)}>
+                      <Trash2 size={14} /> Delete
+                    </button>
+                  </div>
+                </header>
+
+                <div className="preset-facts">
+                  <Fact label="Video" value={[current.summary.videoEncoder, current.summary.quality].filter(Boolean).join(' · ')} />
+                  <Fact label="Size" value={current.summary.maxSize ? `max ${current.summary.maxSize}` : 'source'} />
+                  <Fact label="Container" value={CONTAINERS[current.summary.format] ?? current.summary.format} />
+                  <Fact
+                    label="Used"
+                    value={u?.done ? `${u.done} file${u.done === 1 ? '' : 's'}` : 'not yet'}
+                    sub={u?.done ? [u.speed ? `${u.speed.toFixed(1)}× real time` : null, u.reduction != null ? `${Math.round(u.reduction * 100)}% smaller` : null].filter(Boolean).join(' · ') : null}
+                  />
                 </div>
-              </header>
 
-              <div className="preset-facts">
-                <Fact label="Video" value={[current.summary.videoEncoder, current.summary.quality].filter(Boolean).join(' · ')} />
-                <Fact label="Size" value={current.summary.maxSize ? `max ${current.summary.maxSize}` : 'source'} />
-                <Fact label="Container" value={CONTAINERS[current.summary.format] ?? current.summary.format} />
-                <Fact
-                  label="Used"
-                  value={u?.done ? `${u.done} file${u.done === 1 ? '' : 's'}` : 'not yet'}
-                  sub={u?.done ? [u.speed ? `${u.speed.toFixed(1)}× real time` : null, u.reduction != null ? `${Math.round(u.reduction * 100)}% smaller` : null].filter(Boolean).join(' · ') : null}
-                />
-              </div>
+                <div className="seg" role="tablist" aria-label="Preset view">
+                  <button role="tab" aria-selected={tab === 'settings'} className={tab === 'settings' ? 'active' : ''} onClick={() => setTab('settings')}>Settings</button>
+                  <button role="tab" aria-selected={tab === 'json'} className={tab === 'json' ? 'active' : ''} onClick={() => setTab('json')}>JSON</button>
+                </div>
 
-              <div className="seg" role="tablist" aria-label="Preset view">
-                <button role="tab" aria-selected={tab === 'settings'} className={tab === 'settings' ? 'active' : ''} onClick={() => setTab('settings')}>Settings</button>
-                <button role="tab" aria-selected={tab === 'json'} className={tab === 'json' ? 'active' : ''} onClick={() => setTab('json')}>JSON</button>
-              </div>
-
-              {!preset ? (
-                <p className="muted">Loading…</p>
-              ) : tab === 'json' ? (
-                <JsonView json={detail.json} run={run} />
-              ) : (
-                <PresetDetails preset={preset} usage={u} />
-              )}
-              <p className="set-hint preset-foot">
-                To change a preset, edit it in HandBrake and import it again: a preset with the same name replaces this one. Jobs
-                already in the queue keep the settings they were added with.
-              </p>
-            </>
-          )}
-        </div>
+                {!preset ? (
+                  <p className="muted">Loading…</p>
+                ) : tab === 'json' ? (
+                  <JsonView json={detail.json} run={run} />
+                ) : (
+                  <PresetDetails preset={preset} usage={u} />
+                )}
+                <p className="set-hint preset-foot">
+                  Press <strong>Edit</strong> to change this preset, or edit it in HandBrake and import it again: a preset with the
+                  same name replaces this one. Jobs already in the queue keep the settings they were added with.
+                </p>
+              </>
+            )}
+          </div>
+        )}
       </section>
+
+      {newDialog && (
+        <Suspense fallback={null}>
+          <NewPresetDialog
+            presets={presets}
+            fromId={newDialog.fromId}
+            categories={categories}
+            run={run}
+            onClose={() => setNewDialog(null)}
+            onCreated={(id) => {
+              setNewDialog(null);
+              edit(id);
+            }}
+          />
+        </Suspense>
+      )}
     </main>
   );
 }
@@ -289,8 +412,8 @@ function AudioTable({ tracks }) {
           <tr key={i}>
             <td>{i + 1}</td>
             <td>{AUDIO_ENCODERS[a.AudioEncoder] ?? a.AudioEncoder}</td>
-            <td>{MIXDOWNS[a.AudioMixdown] ?? a.AudioMixdown ?? '—'}</td>
-            <td>{a.AudioBitrate ? `${a.AudioBitrate} kbps` : '—'}</td>
+            <td>{a.AudioEncoder?.startsWith('copy') ? '—' : MIXDOWNS[a.AudioMixdown] ?? a.AudioMixdown ?? '—'}</td>
+            <td>{a.AudioTrackQualityEnable ? `quality ${a.AudioTrackQuality}` : a.AudioBitrate > 0 ? `${a.AudioBitrate} kbps` : '—'}</td>
             <td>{!a.AudioSamplerate || a.AudioSamplerate === 'auto' ? 'Auto' : `${a.AudioSamplerate} kHz`}</td>
             <td>{a.AudioTrackDRCSlider ?? 0} / {a.AudioTrackGainSlider ?? 0} dB</td>
           </tr>

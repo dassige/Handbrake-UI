@@ -13,7 +13,7 @@
     "app.overview": {
       "title": "How HandBrake Queue works",
       "body": [
-        "HandBrake Queue converts videos on the server, using HandBrakeCLI with presets exported from the HandBrake desktop app. Videos that are on your computer can be [uploaded](#upload.overview) first.",
+        "HandBrake Queue converts videos on the server, using HandBrakeCLI with HandBrake presets: made in the [preset editor](#presets.editor) or imported from the HandBrake desktop app. Videos that are on your computer can be [uploaded](#upload.overview) first.",
         "### The usual workflow",
         "1. Upload a [preset](#presets) exported from HandBrake.",
         "1. In **Convert**, drag files or folders from [Sources](#convert.sources) into the [Queue](#convert.queue).",
@@ -228,20 +228,27 @@
     "presets": {
       "title": "Presets",
       "body": [
-        "A preset holds every conversion setting: video encoder and quality, size, frame rate, audio and subtitle tracks, container. Presets are made in the HandBrake desktop app and imported here, on the **Presets** page.",
+        "A preset holds every conversion setting: video encoder and quality, size, frame rate, filters, audio and subtitle tracks, container. You can make and change presets here, on the **Presets** page, or import presets made in the HandBrake desktop app.",
+        "### Making a preset",
+        "- **New** starts from one of HandBrake’s own presets (e.g. “Fast 1080p30”) or from one of yours: see [New preset](#presets.new).",
+        "- **Edit** opens the chosen preset in the [preset editor](#presets.editor), with the same tabs as HandBrake: Summary, Dimensions, Filters, Video, Audio and Subtitles.",
+        "- **Duplicate** makes a copy under a new name.",
+        "### Importing from HandBrake",
         "1. In HandBrake: **Presets** → select your preset → **Export**.",
-        "1. Here: open **Presets** (top right), then press **Import** or drop the `.json` file anywhere on the page.",
+        "1. Here: press **Import** or drop the `.json` file anywhere on the page.",
         "- A file can hold several presets, also inside folders: each one is added.",
-        "- Importing a preset with the same name again replaces the old one. To change a preset, edit it in HandBrake and import it again.",
+        "- Importing a preset with the same name and category again replaces the old one, edits made here included.",
+        "### Using presets",
         "- The page shows every setting of the chosen preset, grouped like HandBrake’s tabs, plus the raw JSON and how the preset has performed (speed, size reduction). **Download** gives a file HandBrake can import.",
         "- The **default** preset (★) is used when you add files, unless you choose another one in the Queue.",
         "- Each job keeps a copy of its preset, so changing or deleting a preset never changes jobs already in the queue.",
-        "The encoder always comes from the preset. Hardware encoders (`qsv_h264`, `qsv_h265`) convert on the Intel GPU: see [Quick Sync (GPU) presets](#presets.qsv). The encoders available on this server are listed in Settings → About."
+        "Hardware encoders (`qsv_h264`, `qsv_h265`) convert on the Intel GPU: see [Quick Sync (GPU) presets](#presets.qsv). The encoders available on this server are listed in Settings → About and in the editor’s Video tab."
       ],
       "see": [
+        "presets.editor",
+        "presets.new",
         "presets.qsv",
-        "convert.queue",
-        "job.source"
+        "convert.queue"
       ]
     },
     "presets.qsv": {
@@ -783,6 +790,45 @@
       "see": [
         "backup.overview",
         "settings.notifications"
+      ]
+    },
+    "presets.editor": {
+      "title": "Editing a preset",
+      "body": [
+        "The editor works like the HandBrake desktop app. The name, category and description are at the top; the settings are in tabs:",
+        "- **Summary**: the container (MP4, MKV, WebM, MOV), web optimisation, chapter markers and metadata.",
+        "- **Dimensions**: rotation and flipping, cropping (automatic removes black bars), the **resolution limit** (bigger sources are scaled down to it), anamorphic and borders.",
+        "- **Filters**: detelecine, interlace detection and deinterlacing, deblock, denoise, chroma smooth, sharpen, colourspace and greyscale. A filter set to **Custom** takes HandBrake’s own `key=value:key=value` settings.",
+        "- **Video**: the encoder, frame rate, quality (constant quality or average bitrate) and the encoder’s preset, tune, profile, level and advanced options.",
+        "- **Audio**: which source tracks are kept (by language), the encoders each track gets, auto passthru and track names.",
+        "- **Subtitles**: which subtitle tracks are kept, foreign audio scan, closed captions and burn-in.",
+        "- **JSON**: every setting as HandBrake stores it, for the few the tabs don’t show. **Apply to the form** takes your JSON edits.",
+        "The encoders and their preset, tune, profile and level lists come from this server’s HandBrakeCLI, so the editor offers only what it can run. Encoders that can’t go into the chosen container are greyed out.",
+        "### Saving",
+        "- **Save** replaces the preset. **Save as new…** keeps it as it was and saves your changes as a new preset.",
+        "- When you open a preset, the server lets HandBrakeCLI read it, so presets from older HandBrake versions are upgraded and every setting is filled in. Saving checks the preset with HandBrakeCLI again.",
+        "- Problems are listed above the tabs. A red one (e.g. an H.265 encoder with a WebM container) must be fixed before saving; a yellow one is a warning, e.g. an encoder this server doesn’t have.",
+        "- Jobs already in the queue keep the settings they were added with. Watch folders use the new settings for files they add from now on.",
+        "- Leaving with unsaved changes asks first."
+      ],
+      "see": [
+        "presets",
+        "presets.new",
+        "presets.qsv"
+      ]
+    },
+    "presets.new": {
+      "title": "New preset",
+      "body": [
+        "**New** (Presets page) makes a preset and opens it in the [editor](#presets.editor).",
+        "- **A HandBrake preset**: one of the presets built into HandBrake, such as “Fast 1080p30”, “H.265 MKV 1080p30” or the device presets. The list comes from this server’s HandBrakeCLI.",
+        "- **One of your presets**: a copy, like **Duplicate**.",
+        "Give it a name (and optionally a category, which groups presets in the list, and a description). Two presets can share a name only in different categories.",
+        "The new preset is saved straight away: change it in the editor, or delete it if you change your mind."
+      ],
+      "see": [
+        "presets",
+        "presets.editor"
       ]
     }
   }

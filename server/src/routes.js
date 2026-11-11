@@ -106,9 +106,30 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
 
   // ------------------------------------------------------------- presets
   app.get('/api/presets', async () => presets.list());
+  // For the preset editor: the encoders and option lists of the installed HandBrakeCLI.
+  app.get('/api/presets/options', async () => presets.capabilities());
+  // HandBrake's built-in presets, to start a new preset from (available: false without the CLI).
+  app.get('/api/presets/builtin', async () => {
+    const list = await presets.builtins();
+    return { available: list != null, presets: list ?? [] };
+  });
   app.get('/api/presets/:id', async (req) => {
     const p = presets.get(id(req));
     return { ...p, json: JSON.parse(p.json) };
+  });
+  // The preset normalised to the installed HandBrake's format, for editing.
+  app.get('/api/presets/:id/editable', async (req) => presets.editable(id(req)));
+  // body: { name, category?, description?, preset? | builtin? | fromId?, version? }
+  app.post('/api/presets/new', async (req) => {
+    const result = await presets.create(req.body ?? {});
+    events.emit('presets');
+    return result;
+  });
+  // body: { preset?, version?, name?, category?, description? }
+  app.put('/api/presets/:id', async (req) => {
+    const result = await presets.update(id(req), req.body ?? {});
+    events.emit('presets');
+    return result;
   });
   app.post('/api/presets', async (req) => {
     const { fileName, content } = req.body ?? {};

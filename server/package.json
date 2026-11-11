@@ -1,6 +1,6 @@
 {
   "name": "handbrake-ui-server",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "private": true,
   "license": "GPL-2.0-only",
   "type": "module",
@@ -18,6 +18,6 @@
     "fastify": "^5.12.8",
     "nodemailer": "^10.4.0"
   },
-  "versionDate": "2026/11/11 12:20",
-  "git-parentCommit-ID": "b6701dd68bf025f376b576035d417b40d6aeec30"
+  "versionDate": "2026/11/11 14:39",
+  "git-parentCommit-ID": "83138337a37e9f5b78e170f7aa7ba61bc2f74c0c"
 }
