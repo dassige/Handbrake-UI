@@ -125,6 +125,8 @@ h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 }
 .icon-btn:hover { background: var(--neutral-soft); color: var(--text); }
 .icon-btn.danger:hover { background: var(--bad-soft); color: var(--bad); }
+/* Cancel / stop: a solid square, so it can't be mistaken for a checkbox. */
+.stop-icon { color: var(--bad); fill: currentColor; }
 .link {
   border: 0; background: none; padding: 0; color: var(--info); cursor: pointer;
   display: inline-flex; align-items: center; gap: 4px;

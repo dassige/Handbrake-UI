@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.3.5] - 2026/11/12
+
+- feat: implement StopIcon for cancel actions and update styles
+
 ## [3.3.4] - 2026/11/12
 
 - feat: app icon, logo and README banner

@@ -48,7 +48,7 @@ function MergeItem({ m, settings, run }) {
         </button>
         <span className="job-actions">
           {active ? (
-            <button className="icon-btn danger" title={t('merge.item.cancel')} onClick={() => run(() => api.mergeCancel(m.id))}><Square size={15} /></button>
+            <button className="icon-btn danger" title={t('merge.item.cancel')} onClick={() => run(() => api.mergeCancel(m.id))}><Square size={15} className="stop-icon" /></button>
           ) : (
             <button className="icon-btn" title={t('merge.item.remove')} onClick={() => run(() => api.mergeRemove(m.id))}><Trash2 size={15} /></button>
           )}

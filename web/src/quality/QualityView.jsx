@@ -251,7 +251,7 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
                     {/* While listing, the server's "current" is its own English "Listing files…": the bar says it already. */}
                     <span className="file-name">{meta.total == null ? '' : meta.current ?? ''}</span>
                     <button className="btn small danger" onClick={() => run(() => api.cancelQualityScan(meta.id))}>
-                      <Square size={13} /> {t('common.stop')}
+                      <Square size={13} className="stop-icon" /> {t('common.stop')}
                     </button>
                   </div>
                 </>

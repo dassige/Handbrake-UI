@@ -10,6 +10,9 @@ import { containerProblem } from '../subtitles/modes.js';
 
 export const DRAG_JOB = 'application/x-hbui-job';
 
+/** Solid red square: the outline one looked like a checkbox. */
+const StopIcon = (props) => <Square {...props} className="stop-icon" />;
+
 /** Re-renders every second while the job is running (for elapsed time). */
 function useClock(active) {
   const [, setT] = useState(0);
@@ -52,7 +55,7 @@ export function JobActions({ job, run, queueIndex = -1, labels = false, onRename
       )}
       {['running', 'paused', 'queued'].includes(s) && job.phase !== 'verifying' && (
         btn({
-          icon: Square,
+          icon: StopIcon,
           danger: true,
           label: t('common.cancel'),
           title: s === 'queued' ? t('job.actions.cancelQueuedTitle') : t('job.actions.cancelRunningTitle'),
