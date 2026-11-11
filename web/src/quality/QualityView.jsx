@@ -7,18 +7,20 @@ import { StatusBadge } from '../components/StatusBadge.jsx';
 import { useDialogs } from '../components/Dialogs.jsx';
 import { bytes, dateTime, dirName, duration, fileName, relTo } from '../format.js';
 import { Help } from '../help/Help.jsx';
+import { intlLocale, rich, t } from '../i18n/index.js';
+import { qualityIssue } from '../i18n/serverText.js';
 import { rootLabel } from '../roots.js';
 
 const KINDS = [
-  { id: 'format', label: 'Old format' },
-  { id: 'resolution', label: 'Low resolution' },
-  { id: 'bitrate', label: 'Low bitrate' },
-  { id: 'interlaced', label: 'Interlaced' },
-  { id: 'error', label: 'Unreadable' },
+  { id: 'format', labelKey: 'quality.kinds.format' },
+  { id: 'resolution', labelKey: 'quality.kinds.resolution' },
+  { id: 'bitrate', labelKey: 'quality.kinds.bitrate' },
+  { id: 'interlaced', labelKey: 'quality.kinds.interlaced' },
+  { id: 'error', labelKey: 'quality.kinds.error' },
 ];
 
 const SORTS = {
-  name: (a, b) => a.path.localeCompare(b.path, undefined, { numeric: true, sensitivity: 'base' }),
+  name: (a, b) => a.path.localeCompare(b.path, intlLocale(), { numeric: true, sensitivity: 'base' }),
   height: (a, b) => (a.video?.height ?? 0) - (b.video?.height ?? 0),
   kbps: (a, b) => (a.video?.kbps ?? 0) - (b.video?.kbps ?? 0),
   size: (a, b) => (a.size ?? 0) - (b.size ?? 0),
@@ -29,13 +31,14 @@ const PAGE = 500;
 
 function videoText(f) {
   if (f.error) return '—';
-  if (!f.video) return 'no video';
+  if (!f.video) return t('quality.noVideo');
   return `${f.video.codec} · ${f.video.width}×${f.video.height}${f.video.fps ? ` · ${f.video.fps} fps` : ''}`;
 }
 
 function csv(rows, roots) {
   const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-  const head = ['Path', 'Folder', 'Container', 'Video codec', 'Width', 'Height', 'Video kbps', 'Audio', 'Length', 'Size bytes', 'Issues'];
+  const head = ['path', 'folder', 'container', 'videoCodec', 'width', 'height', 'videoKbps', 'audio', 'length', 'sizeBytes', 'issues']
+    .map((k) => t(`quality.csv.${k}`));
   const lines = rows.map((f) => [
     f.path,
     roots.find((r) => f.path.startsWith(r)) ?? '',
@@ -47,10 +50,13 @@ function csv(rows, roots) {
     (f.audio ?? []).map((a) => `${a.codec}${a.channels ? ` ${a.channels}ch` : ''}`).join(' + '),
     f.duration ? duration(f.duration) : '',
     f.size,
-    f.issues.map((i) => i.text).join('; '),
+    f.issues.map(qualityIssue).join('; '),
   ].map(q).join(','));
   return [head.map(q).join(','), ...lines].join('\r\n');
 }
+
+/** A scan's error: the server's own English one for a restart is shown translated. */
+const scanError = (e) => (e === 'Interrupted by a restart' ? t('quality.interrupted') : e);
 
 /** Finds old formats, low resolutions and low bitrates in the chosen folders. */
 export function QualityView({ settings, scans, tick, changeTick, run, onError, onAddToQueue, onOpenSettings }) {
@@ -107,9 +113,9 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
   async function remove() {
     if (!meta) return;
     const ok = await dialogs.confirm({
-      title: 'Delete result',
-      message: 'Delete this quality check result? The files are not touched.',
-      confirmLabel: 'Delete',
+      title: t('quality.deleteTitle'),
+      message: t('quality.deleteMessage'),
+      confirmLabel: t('common.delete'),
       danger: true,
     });
     if (ok && (await run(() => api.removeQualityScan(meta.id)))) setScanId(null);
@@ -165,7 +171,7 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
   );
   const rootOf = (p) => roots.filter((r) => p === r || p.startsWith(`${r}/`) || p.startsWith(`${r}\\`)).sort((a, b) => b.length - a.length)[0];
 
-  const [paneClass, paneSwitch, showPane] = usePaneSwitch(['Folders', 'Results']);
+  const [paneClass, paneSwitch, showPane] = usePaneSwitch([t('quality.folders'), t('quality.results')]);
 
   return (
     <main className={`panes quality-panes ${paneClass}`}>
@@ -179,35 +185,36 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
         }}
         onError={onError}
         root="any"
-        title="Folders"
-        addLabel="Check quality"
+        title={t('quality.folders')}
+        addLabel={t('quality.checkQuality')}
+        addTitle={t('quality.checkQualityTitle')}
         help="quality.folders"
-        hint="Select folders or files and press Check quality; sub-folders are included."
+        hint={t('quality.browserHint')}
       />
       <section className="pane quality">
         <div className="pane-head">
-          <h2>Quality check<Help id="quality.overview" /></h2>
+          <h2>{t('quality.title')}<Help id="quality.overview" /></h2>
           <div className="pane-tools">
             {scans.length > 0 && (
               <label className="field-inline">
-                Result
+                {t('quality.result')}
                 <select value={effectiveId ?? ''} onChange={(e) => setScanId(Number(e.target.value))}>
                   {scans.map((s) => (
                     <option key={s.id} value={s.id}>
                       {dateTime(s.createdAt)} · {s.paths.map((p) => fileName(p) || p).join(', ').slice(0, 60)}
-                      {s.status === 'running' ? ' (running)' : s.status !== 'done' ? ` (${s.status})` : ''}
+                      {s.status !== 'done' ? ` (${t(`quality.scanStatus.${s.status}`)})` : ''}
                     </option>
                   ))}
                 </select>
               </label>
             )}
             {meta && !running && (
-              <button className="icon-btn danger" title="Delete this result" onClick={remove}>
+              <button className="icon-btn danger" title={t('quality.deleteResult')} onClick={remove}>
                 <Trash2 size={16} />
               </button>
             )}
-            <button className="btn ghost small" onClick={onOpenSettings} title="Change what counts as low quality">
-              <Gauge size={14} /> Criteria
+            <button className="btn ghost small" onClick={onOpenSettings} title={t('quality.criteriaTitle')}>
+              <Gauge size={14} /> {t('quality.criteria')}
             </button>
           </div>
         </div>
@@ -215,10 +222,8 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
         {!meta && (
           <div className="drop-hint">
             <Gauge size={28} />
-            <p>Choose folders on the left and press <strong>Check quality</strong>.</p>
-            <p className="small">
-              Every video inside them (sub-folders included) is read with ffprobe and compared with the criteria in Settings.
-            </p>
+            <p>{rich('quality.emptyHint')}</p>
+            <p className="small">{t('quality.emptyDetail')}</p>
           </div>
         )}
 
@@ -226,51 +231,54 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
           <>
             <div className="quality-summary">
               <div className="small">
-                <span className="muted">Checked: </span>
+                <span className="muted">{t('quality.checked')} </span>
                 {meta.paths.map((p) => <code key={p} className="path">{p}</code>)}
               </div>
               {running && (
                 <>
                   <div className="progress big">
                     <div className="bar" style={{ width: `${meta.total ? (meta.scanned / meta.total) * 100 : 0}%` }} />
-                    <span>{meta.total == null ? 'Listing files…' : `${meta.scanned} of ${meta.total} files`}</span>
+                    <span>{meta.total == null ? t('quality.listing') : t('quality.progress', { scanned: meta.scanned, count: meta.total })}</span>
                   </div>
                   <div className="quality-current small muted">
-                    <span className="file-name">{meta.current ?? ''}</span>
+                    {/* While listing, the server's "current" is its own English "Listing files…": the bar says it already. */}
+                    <span className="file-name">{meta.total == null ? '' : meta.current ?? ''}</span>
                     <button className="btn small danger" onClick={() => run(() => api.cancelQualityScan(meta.id))}>
-                      <Square size={13} /> Stop
+                      <Square size={13} /> {t('common.stop')}
                     </button>
                   </div>
                 </>
               )}
               {!running && (
                 <p className="small">
-                  {meta.status === 'failed' && <span className="text-bad">Failed: {meta.error}. </span>}
-                  {meta.status === 'cancelled' && <span className="warn-text">Stopped{meta.error ? ` (${meta.error})` : ''}; showing the files checked so far. </span>}
-                  {scan && (
-                    <>
-                      <strong>{counts.flagged}</strong> of {counts.all} files need attention · checked {dateTime(meta.finishedAt)}
-                    </>
+                  {meta.status === 'failed' && <span className="text-bad">{t('quality.failed', { error: scanError(meta.error) })} </span>}
+                  {meta.status === 'cancelled' && (
+                    <span className="warn-text">
+                      {meta.error ? t('quality.stoppedWhy', { reason: scanError(meta.error) }) : t('quality.stopped')}{' '}
+                    </span>
                   )}
+                  {scan && rich('quality.summary', { flagged: counts.flagged, count: counts.all, date: dateTime(meta.finishedAt) })}
                 </p>
               )}
             </div>
 
             <div className="filters">
-              {[{ id: 'flagged', label: 'Need attention' }, { id: 'all', label: 'All' }, ...KINDS].map((k) => (
+              {[{ id: 'flagged', labelKey: 'quality.needAttention' }, { id: 'all', labelKey: 'quality.all' }, ...KINDS].map((k) => (
                 (k.id === 'all' || k.id === 'flagged' || counts[k.id] > 0) && (
                   <button key={k.id} className={`chip ${filter === k.id ? 'active' : ''}`} onClick={() => setFilter(k.id)}>
-                    {k.label} <span className="chip-count">{counts[k.id] ?? 0}</span>
+                    {t(k.labelKey)} <span className="chip-count">{counts[k.id] ?? 0}</span>
                   </button>
                 )
               ))}
               <span className="spacer" />
-              <input className="quality-search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Filter by name" />
+              <input className="quality-search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('quality.filterPlaceholder')} />
             </div>
 
             <div className="rename-list">
               {rows.length === 0 && (
-                <p className="empty">{!scan ? 'Loading…' : results.length ? 'No files match this filter.' : running ? 'No files checked yet.' : 'No video files found.'}</p>
+                <p className="empty">
+                  {!scan ? t('common.loading') : results.length ? t('quality.noMatch') : running ? t('quality.noneChecked') : t('quality.noVideos')}
+                </p>
               )}
               {rows.length > 0 && (
                 <table className="rename-table quality-table">
@@ -281,14 +289,14 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
                           type="checkbox"
                           checked={allTicked}
                           onChange={() => setSelected(allTicked ? new Set() : new Set(rows.map((f) => f.path)))}
-                          aria-label="Select all"
+                          aria-label={t('common.selectAll')}
                         />
                       </th>
-                      <th>{sortHead('name', 'File')}</th>
-                      <th>{sortHead('height', 'Video')}</th>
+                      <th>{sortHead('name', t('quality.columns.file'))}</th>
+                      <th>{sortHead('height', t('quality.columns.video'))}</th>
                       <th className="num">{sortHead('kbps', 'kbps')}</th>
-                      <th className="num">{sortHead('size', 'Size')}</th>
-                      <th>{sortHead('issues', 'Issues')}<Help id="quality.issues" /></th>
+                      <th className="num">{sortHead('size', t('quality.columns.size'))}</th>
+                      <th>{sortHead('issues', t('quality.columns.issues'))}<Help id="quality.issues" /></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -297,7 +305,7 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
                       return (
                         <tr key={f.path} className={selected.has(f.path) ? 'ticked' : ''} onClick={() => toggle(f.path)}>
                           <td>
-                            <input type="checkbox" checked={selected.has(f.path)} onChange={() => toggle(f.path)} onClick={(e) => e.stopPropagation()} aria-label={`Select ${fileName(f.path)}`} />
+                            <input type="checkbox" checked={selected.has(f.path)} onChange={() => toggle(f.path)} onClick={(e) => e.stopPropagation()} aria-label={t('quality.selectFile', { name: fileName(f.path) })} />
                           </td>
                           <td className="names">
                             <div className="q-name" title={f.path}>
@@ -314,14 +322,14 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
                           </td>
                           <td className="num small">
                             {f.video?.kbps ?? '—'}
-                            {f.video?.kbpsEstimated && <span className="muted" title="Estimated from the file size"> ~</span>}
+                            {f.video?.kbpsEstimated && <span className="muted" title={t('quality.estimated')}> ~</span>}
                           </td>
                           <td className="num small nowrap">{bytes(f.size)}</td>
                           <td>
                             <div className="q-issues">
-                              {f.issues.length === 0 && <span className="badge done">OK</span>}
+                              {f.issues.length === 0 && <span className="badge done">{t('common.ok')}</span>}
                               {f.issues.map((i) => (
-                                <span key={i.text} className={`badge q-${i.kind}`}>{i.text}</span>
+                                <span key={i.text} className={`badge q-${i.kind}`}>{qualityIssue(i)}</span>
                               ))}
                             </div>
                           </td>
@@ -333,25 +341,25 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
               )}
               {rows.length > shown && (
                 <p className="empty">
-                  Showing {shown} of {rows.length}.{' '}
-                  <button className="link" onClick={() => setShown((n) => n + PAGE)}>Show more</button>
+                  {t('quality.showing', { shown, count: rows.length })}{' '}
+                  <button className="link" onClick={() => setShown((n) => n + PAGE)}>{t('quality.showMore')}</button>
                 </p>
               )}
             </div>
 
             <div className="rename-foot">
-              <span className="muted small">{selected.size ? `${selectedRows.length} selected` : `${rows.length} file${rows.length === 1 ? '' : 's'}`}</span>
+              <span className="muted small">{selected.size ? t('quality.selected', { count: selectedRows.length }) : t('common.files.count', { count: rows.length })}</span>
               <span className="spacer" />
-              <button className="btn small" disabled={!rows.length} onClick={exportCsv} title="Download the selected files (or all those listed) as a spreadsheet">
-                <Download size={14} /> Export CSV
+              <button className="btn small" disabled={!rows.length} onClick={exportCsv} title={t('quality.exportTitle')}>
+                <Download size={14} /> {t('quality.exportCsv')}
               </button>
               <button
                 className="btn primary small"
                 disabled={!queueable.length}
-                title={selectedRows.length && !queueable.length ? 'Only files in a sources folder can be converted' : 'Convert the selected files with the chosen preset'}
+                title={selectedRows.length && !queueable.length ? t('quality.onlySources') : t('quality.convertSelected')}
                 onClick={() => onAddToQueue(queueable.map((f) => f.path))}
               >
-                <ListPlus size={14} /> Add to queue{queueable.length ? ` (${queueable.length})` : ''}
+                <ListPlus size={14} /> {queueable.length ? t('quality.addToQueueCount', { count: queueable.length }) : t('quality.addToQueue')}
               </button>
             </div>
           </>

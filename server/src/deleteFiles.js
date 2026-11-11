@@ -34,18 +34,23 @@ export class SourceFiles {
       }
       const { root, path: abs } = resolved;
       if (this.settings.get('protectedRoots').includes(root)) {
-        blocked.push({ path: abs, reason: `Files in ${root} are protected from deletion (Settings → Folders)` });
+        blocked.push({ path: abs, code: 'protected', params: { root }, reason: `Files in ${root} are protected from deletion (Settings → Folders)` });
         continue;
       }
       if (abs === root) {
-        blocked.push({ path: abs, reason: 'A sources folder itself cannot be deleted (remove it in Settings instead)' });
+        blocked.push({ path: abs, code: 'sourcesFolder', params: {}, reason: 'A sources folder itself cannot be deleted (remove it in Settings instead)' });
         continue;
       }
       const st = await fs.lstat(abs);
       const pending = this.queue.pendingSourcesUnder(abs);
       if (pending.length) {
         const what = pending.length === 1 ? path.basename(pending[0].path) : `${pending.length} files inside`;
-        blocked.push({ path: abs, reason: `${what} ${pending.length === 1 ? 'is' : 'are'} queued or converting; remove ${pending.length === 1 ? 'it' : 'them'} from the queue first` });
+        blocked.push({
+          path: abs,
+          code: pending.length === 1 ? 'pendingFile' : 'pendingFiles',
+          params: { name: path.basename(pending[0].path), count: pending.length },
+          reason: `${what} ${pending.length === 1 ? 'is' : 'are'} queued or converting; remove ${pending.length === 1 ? 'it' : 'them'} from the queue first`,
+        });
         continue;
       }
       const dir = st.isDirectory();

@@ -3,17 +3,19 @@ import { ChevronLeft, CircleHelp, Search } from 'lucide-react';
 import { Modal } from '../components/Modal.jsx';
 import content from './help.json';
 import { searchHelp } from './search.js';
+import { intlLocale, t, translatedHelp } from '../i18n/index.js';
 
 /**
- * Help topics live in help.json: { title, body: string[], see?: string[] }.
+ * Help topics live in help.json (English) and help.<lang>.json (the same ids, translated; a
+ * missing topic falls back to English): { title, body: string[], see?: string[] }.
  * Each body entry is one block — a paragraph, "- " bullet, "1. " numbered item or "### " heading —
  * with inline **bold**, `code`, [link](#topic.id) and [link](https://…).
  * Same format as dgsoft-image-manager; server/test/help.test.js checks ids and links.
  */
-const topics = content.topics;
-const isTopic = (id) => Object.hasOwn(topics, id);
+const isTopic = (id) => Object.hasOwn(content.topics, id);
+/** The topics in the current language (call while rendering). */
+const helpTopics = () => translatedHelp(content.topics);
 const SEARCH = '@search';
-const collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true });
 
 const HelpContext = createContext({ open: () => {}, search: () => {} });
 
@@ -32,11 +34,12 @@ export function HelpProvider({ children }) {
   };
   const push = (id) => setStack((s) => [...s, id]);
   const current = stack.at(-1);
+  const topics = helpTopics();
   const topic = current && current !== SEARCH ? topics[current] : null;
   const value = useMemo(() => ({ open, search }), [open, search]);
 
   const back = stack.length > 1 && (
-    <button className="icon-btn" onClick={() => setStack((s) => s.slice(0, -1))} aria-label="Back">
+    <button className="icon-btn" onClick={() => setStack((s) => s.slice(0, -1))} aria-label={t('common.back')}>
       <ChevronLeft size={16} />
     </button>
   );
@@ -45,7 +48,7 @@ export function HelpProvider({ children }) {
     <HelpContext.Provider value={value}>
       {children}
       {current === SEARCH && (
-        <Modal className="help-layer" ariaLabel="Search help" title={<span className="help-title">{back}Search help</span>} onClose={close}>
+        <Modal className="help-layer" ariaLabel={t('help.searchHelp')} title={<span className="help-title">{back}{t('help.searchHelp')}</span>} onClose={close}>
           <HelpSearch query={query} onQuery={setQuery} onTopic={push} />
         </Modal>
       )}
@@ -56,7 +59,7 @@ export function HelpProvider({ children }) {
             <div className="help-see">
               {topic.see?.some(isTopic) && (
                 <>
-                  <span className="small muted">Related:</span>
+                  <span className="small muted">{t('help.related')}</span>
                   {topic.see.filter(isTopic).map((id) => (
                     <button key={id} className="chip" onClick={() => push(id)}>{topics[id].title}</button>
                   ))}
@@ -64,7 +67,7 @@ export function HelpProvider({ children }) {
               )}
               <span className="spacer" />
               <button className="btn ghost small" onClick={() => push(SEARCH)}>
-                <Search size={14} /> Search help
+                <Search size={14} /> {t('help.searchHelp')}
               </button>
             </div>
           </div>
@@ -78,17 +81,21 @@ export function HelpProvider({ children }) {
 export function HelpSearchButton() {
   const search = useHelpSearch();
   return (
-    <button className="btn ghost" onClick={search} title="Search help" aria-label="Search help">
-      <CircleHelp size={16} /> <span className="btn-label">Help</span>
+    <button className="btn ghost" onClick={search} title={t('help.searchHelp')} aria-label={t('help.searchHelp')}>
+      <CircleHelp size={16} /> <span className="btn-label">{t('help.help')}</span>
     </button>
   );
 }
 
 function HelpSearch({ query, onQuery, onTopic }) {
-  const searchable = useMemo(
-    () => Object.keys(topics).map((id) => ({ id, title: topics[id].title, body: topics[id].body })).sort((a, b) => collator.compare(a.title, b.title)),
-    [],
-  );
+  const topics = helpTopics();
+  const locale = intlLocale();
+  const searchable = useMemo(() => {
+    const collator = new Intl.Collator(locale, { sensitivity: 'base', numeric: true });
+    return Object.keys(topics).map((id) => ({ id, title: topics[id].title, body: topics[id].body })).sort((a, b) => collator.compare(a.title, b.title));
+    // topics changes only with the language
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale]);
   const hits = useMemo(() => searchHelp(query, searchable), [query, searchable]);
   const typed = query.trim() !== '';
   return (
@@ -99,19 +106,19 @@ function HelpSearch({ query, onQuery, onTopic }) {
           autoFocus
           value={query}
           onChange={(e) => onQuery(e.target.value)}
-          placeholder="Words to find, e.g. audio check"
-          aria-label="Search help"
+          placeholder={t('help.searchPlaceholder')}
+          aria-label={t('help.searchHelp')}
         />
         <Help id="help.search" />
       </div>
       <p className="small muted" role="status">
         {!typed
-          ? `All ${searchable.length} topics, A to Z`
+          ? t('help.allTopics', { count: searchable.length })
           : hits.length
-            ? `${hits.length} topic${hits.length === 1 ? ' has' : 's have'} every word, best first`
-            : 'No topic has every word: try fewer or other words.'}
+            ? t('help.hits', { count: hits.length })
+            : t('help.noHits')}
       </p>
-      <ul className="help-hits" aria-label="Help topics">
+      <ul className="help-hits" aria-label={t('help.topics')}>
         {typed
           ? hits.map((h) => (
               <li key={h.id}>
@@ -140,13 +147,13 @@ function Marked({ pieces }) {
 /** The small round “?” placed next to a title, section, field or button. */
 export function Help({ id }) {
   const { open } = useContext(HelpContext);
-  const title = topics[id]?.title ?? id;
+  const title = helpTopics()[id]?.title ?? id;
   return (
     <button
       type="button"
       className="help-btn"
-      title={`Help: ${title}`}
-      aria-label={`Help: ${title}`}
+      title={t('help.helpFor', { title })}
+      aria-label={t('help.helpFor', { title })}
       // Help buttons sit inside clickable rows and labels: don't let the click reach them.
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => {

@@ -1,0 +1,124 @@
+{
+  "actions": {
+    "pause": "Pausar",
+    "resume": "Reanudar",
+    "skipCheck": "Omitir comprobación",
+    "skipCheckTitle": "Conservar el archivo convertido y omitir el resto de la comprobación",
+    "cancelQueuedTitle": "Cancelar (se mantiene en la lista)",
+    "cancelRunningTitle": "Detener y cancelar esta conversión",
+    "cancelConversion": "Cancelar conversión",
+    "cancelMessage": "¿Cancelar esta conversión? Se perderá el progreso.",
+    "keepGoing": "Continuar",
+    "moveTop": "Mover al principio",
+    "up": "Subir",
+    "upTitle": "Subir un puesto",
+    "down": "Bajar",
+    "downTitle": "Bajar un puesto",
+    "moveBottom": "Mover al final",
+    "renameTitle": "Renombrar el archivo convertido",
+    "again": "Convertir de nuevo",
+    "againTitle": "Convertir de nuevo (trabajo nuevo; la salida recibe un sufijo)",
+    "retryTitle": "Volver a poner en la cola",
+    "removeTitle": "Quitar de la lista (los archivos no se tocan)"
+  },
+  "row": {
+    "checking": "comprobando el archivo convertido · {percent}",
+    "eta": "fin estimado {time}",
+    "elapsed": "transcurrido {time}",
+    "pass": "pasada {pass}/{total}",
+    "finishing": "Finalizando el archivo…",
+    "reading": "Leyendo el origen…",
+    "took": "en {time}",
+    "fpsAvg": "{fps} fps de media",
+    "toConvert": "≈ {duration} de conversión",
+    "dragToReorder": "Arrastre para reordenar"
+  },
+  "drawer": {
+    "label": "Detalles del trabajo",
+    "waitingForOutput": "Esperando la salida…",
+    "noLog": "No hay registro para este trabajo.",
+    "showLog": "Mostrar el registro de HandBrake",
+    "hideLog": "Ocultar el registro de HandBrake",
+    "convertAgainWith": "Convertir de nuevo con",
+    "choosePreset": "elija un preajuste…",
+    "addedToQueue": "Añadido a la cola"
+  },
+  "check": {
+    "title": "Comprobación",
+    "checking": "Comprobando el archivo convertido…",
+    "notChecked": "Sin comprobar.",
+    "quick": "Comprobación rápida",
+    "full": "Comprobación completa",
+    "again": "Comprobar de nuevo",
+    "started": "Comprobando el archivo…"
+  },
+  "progress": {
+    "title": "Progreso",
+    "checking": "Comprobando {percent}",
+    "phase": "Fase",
+    "speed": "Velocidad",
+    "speedValue": "{fps} fps (media {avg})",
+    "timeLeft": "Tiempo restante",
+    "elapsed": "Transcurrido",
+    "pass": "Pasada",
+    "passValue": "{pass} de {total}"
+  },
+  "phases": {
+    "paused": "en pausa",
+    "verifying": "comprobando el archivo convertido",
+    "reading": "leyendo",
+    "scanning": "analizando",
+    "encoding": "codificando",
+    "muxing": "multiplexando",
+    "merging": "uniendo"
+  },
+  "rename": {
+    "title": "Renombrar"
+  },
+  "error": {
+    "error": "Error",
+    "note": "Nota"
+  },
+  "files": {
+    "title": "Archivos",
+    "source": "Origen",
+    "output": "Salida",
+    "edit": "editar",
+    "suffixNote": "(se añade un sufijo si el archivo ya existe cuando empieza)",
+    "outputUpdated": "Ruta de salida actualizada",
+    "sizes": "Tamaños",
+    "smaller": "({percent} % más pequeño)",
+    "larger": "({percent} % más grande)",
+    "copyTitle": "Copiar la ruta de salida",
+    "copy": "copiar la ruta de salida",
+    "downloadTitle": "Descargar el archivo convertido a este equipo",
+    "download": "descargar el archivo convertido"
+  },
+  "preset": {
+    "title": "Preajuste",
+    "changed": "Preajuste cambiado",
+    "deleted": "{name} (eliminado)"
+  },
+  "source": {
+    "title": "Origen",
+    "duration": "Duración",
+    "video": "Video",
+    "audio": "Audio",
+    "subtitles": "Subtítulos",
+    "chapters": "Capítulos",
+    "none": "ninguno",
+    "scanError": "No se pudieron leer los detalles del origen: {error}",
+    "reading": "Leyendo los detalles del origen…"
+  },
+  "timing": {
+    "title": "Tiempos",
+    "added": "Añadido",
+    "started": "Iniciado",
+    "finished": "Terminado",
+    "encodeTime": "Tiempo de codificación",
+    "averageSpeed": "Velocidad media",
+    "fps": "{fps} fps",
+    "attempts": "Intentos",
+    "exitCode": "Código de salida"
+  }
+}

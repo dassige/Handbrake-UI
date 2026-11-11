@@ -304,6 +304,19 @@
         "job.files"
       ]
     },
+    "settings.language": {
+      "title": "Language",
+      "body": [
+        "The app, its help included, can be shown in English, Italian (Italiano), German (Deutsch), French (Français) or Spanish (Español). Each language is listed in its own name, so it is easy to find whatever language the app is in now.",
+        "- **Automatic**: each browser shows the app in its own language (the first one in the browser's language preferences that the app has), English otherwise. Two people can use the app in two languages at the same time.",
+        "- **A language**: every browser shows the app in that language.",
+        "The choice is saved on the server, like the other settings, and applies as soon as you press **Save changes**. The browser remembers the last language, so the app opens in it straight away next time.",
+        "File and folder names, preset names, and error messages from the server, HandBrake or ffmpeg are shown as they are (usually in English). E-mail and push [notifications](#settings.notifications) are always in English."
+      ],
+      "see": [
+        "settings.notifications"
+      ]
+    },
     "settings.adding": {
       "title": "Adding folders",
       "body": [

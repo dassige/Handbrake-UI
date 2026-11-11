@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.2.0] - 2026/11/11
+
+- feat: the app in five languages (English, Italian, German, French, Spanish)
+
+The web app, its help included, can now be shown in English, Italian,
+German, French or Spanish.
+
+- Settings → Language: one language for every browser, or Automatic
+  (each browser uses its own language when the app has it, English
+  otherwise); applies after saving, also live in other open browsers
+- The browser remembers the last language, so the app opens in it
+  without flashing English first; other languages load only when used
+- Every page, dialog, toast, tooltip and the in-app help are
+  translated; preset editor terms follow HandBrake's own translations;
+  dates and numbers use the language's format
+- Server data shown in the app is translated too: quality issues,
+  check results, merge problems, skip and delete reasons, backup
+  warnings and rename notes (the server adds a code and params next
+  to its English text; results stored before this stay in English)
+- Server: new language setting (auto, en, it, de, fr, es)
+- Stay in English: e-mail and push notifications, server error
+  messages, HandBrake/ffmpeg output, README and changelogs
+- Fix: an open Settings page showed a false "Unsaved changes" bar
+  when a setting was saved in another browser
+- Help: new "Language" topic; README lists the languages and explains
+  where the translations live
+- Tests: every key used in the code exists, and every language has
+  every string and help topic with the same placeholders and links
+
 ## [3.1.0] - 2026/11/11
 
 - feat: preset editor like the HandBrake desktop app

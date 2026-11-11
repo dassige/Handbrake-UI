@@ -1,0 +1,199 @@
+{
+  "quoted": "“{text}”",
+  "flags": {
+    "regex": "regex",
+    "ext": "est",
+    "nameExt": "nome+est"
+  },
+  "fields": {
+    "type": "Tipo",
+    "typeAuto": "Auto (serie TV o film)",
+    "typeTv": "Serie TV",
+    "typeMovie": "Film",
+    "tvTemplate": "Modello serie TV — {tokens}",
+    "movieTemplate": "Modello film — {tokens}",
+    "titleCase": "Iniziali Maiuscole",
+    "apostrophes": "Correggi gli apostrofi (L Uomo → L'Uomo, Wouldn T → Wouldn't)",
+    "showYear": "Mantieni l’anno nel nome della serie (remake)",
+    "extraReleaseTags": "Altri tag di release da eliminare (separati da virgola)",
+    "extraTags": "Altri tag (separati da virgola)",
+    "find": "Trova",
+    "replaceWith": "Sostituisci con (gruppi regex: $1, $2…)",
+    "regex": "Espressione regolare",
+    "caseSensitive": "Distingui maiuscole/minuscole",
+    "occurrence": "Occorrenza",
+    "occurrenceAll": "Tutte",
+    "occurrenceFirst": "Prima",
+    "occurrenceLast": "Ultima",
+    "applyTo": "Applica a",
+    "applyToName": "Nome",
+    "applyToExt": "Estensione",
+    "applyToBoth": "Nome ed estensione",
+    "pattern": "Modello",
+    "text": "Testo",
+    "keepText": "Mantieni il testo stesso",
+    "fromPosition": "Dalla posizione (1 = primo)",
+    "count": "Quantità",
+    "backwards": "Conta dalla fine",
+    "position": "Posizione (0 = inizio)",
+    "toPosition": "Alla posizione",
+    "characters": "Caratteri da togliere alle due estremità",
+    "case": "Maiuscole/minuscole",
+    "caseTitle": "Iniziali Maiuscole",
+    "caseUpper": "MAIUSCOLO",
+    "caseLower": "minuscolo",
+    "caseSentence": "Come una frase"
+  },
+  "steps": {
+    "smart": {
+      "label": "Riconosci episodio / film",
+      "help": "Trova S01E02 o 1x02 (serie TV) o un anno (film), elimina i tag di release e costruisce il nome da un modello. I blocchi [ ] spariscono quando un campo al loro interno è vuoto.",
+      "modeAuto": "auto",
+      "modeTv": "TV",
+      "modeMovie": "film"
+    },
+    "cleanTags": {
+      "label": "Rimuovi i tag di release",
+      "help": "Taglia il nome al primo tag di release (1080p, WEB-DL, x265, ITA…).",
+      "builtIn": "elenco di tag integrato"
+    },
+    "replace": {
+      "label": "Sostituisci",
+      "first": "prima",
+      "last": "ultima"
+    },
+    "removePattern": {
+      "label": "Rimuovi modello"
+    },
+    "removeAfter": {
+      "label": "Rimuovi tutto dopo un testo",
+      "summary": "dopo {text}",
+      "summaryInclusive": "dopo {text} (incluso)"
+    },
+    "remove": {
+      "label": "Rimuovi caratteri",
+      "summary": "{count} dalla posizione {start}",
+      "summaryFromEnd": "{count} dalla posizione {start} (dalla fine)"
+    },
+    "add": {
+      "label": "Aggiungi testo",
+      "summary": "{text} in posizione {position}",
+      "summaryFromEnd": "{text} in posizione {position} dalla fine"
+    },
+    "move": {
+      "label": "Sposta caratteri",
+      "summary": "{count} caratteri da {from} a {to}"
+    },
+    "trim": {
+      "label": "Togli caratteri alle estremità"
+    },
+    "case": {
+      "label": "Cambia maiuscole/minuscole",
+      "title": "iniziali",
+      "upper": "maiuscolo",
+      "lower": "minuscolo",
+      "sentence": "frase"
+    },
+    "apostrophes": {
+      "label": "Correggi gli apostrofi",
+      "help": "L Uomo → L'Uomo, Dell Oca → Dell'Oca, Wouldn T → Wouldn't, Holston S → Holston's",
+      "summary": "L Uomo → L'Uomo"
+    },
+    "collapseSpaces": {
+      "label": "Comprimi gli spazi",
+      "summary": "più spazi → uno"
+    }
+  },
+  "view": {
+    "convertedFiles": "File convertiti",
+    "renameList": "Elenco da rinominare",
+    "renameListCount": "Elenco da rinominare ({count})",
+    "addLabel": "Aggiungi da rinominare",
+    "browserHint": "Trascina file o cartelle nell’elenco da rinominare. Ctrl/Maiusc-clic per selezionarne più di uno.",
+    "rules": "Regole",
+    "editRules": "Modifica regole",
+    "history": "Cronologia",
+    "showName": "Nome della serie",
+    "showNameTitle": "Usalo quando il nome della serie manca o è sbagliato, es. “S04E07 Reacher Title”",
+    "autoDetected": "rilevato automaticamente",
+    "showNameScope": "Quali righe ricevono il nome della serie digitato",
+    "onlyMissing": "solo dove manca",
+    "allRows": "per tutte le righe",
+    "resetEdits": "Annulla le modifiche",
+    "resetEditsTitle": "Dimentica i nomi digitati a mano",
+    "clearList": "Svuota elenco",
+    "reading": "Lettura…",
+    "noVideos": "Nessun file video trovato.",
+    "empty": "Trascina qui file o cartelle convertiti, oppure usa “Rinomina” sui processi terminati.",
+    "namesColumn": "Nome attuale → nuovo nome",
+    "renameFile": "Rinomina {name}",
+    "tvChip": "TV · S{season}e{episode}",
+    "movieChip": "Film · {year}",
+    "noChange": "nessuna modifica",
+    "undoEdit": "annulla modifica",
+    "dropHere": "Rilascia per aggiungere all’elenco da rinominare",
+    "counts": "da rinominare: {rename} · invariati: {unchanged}",
+    "needALook": "da controllare: {count}",
+    "updating": "aggiornamento…",
+    "renameButton_one": "Rinomina {count} file",
+    "renameButton_other": "Rinomina {count} file",
+    "renameButtonNone": "Rinomina i file",
+    "confirmTitle": "Rinomina i file",
+    "confirmMessage_one": "Rinominare {count} file?",
+    "confirmMessage_other": "Rinominare {count} file?",
+    "renamed_one": "Rinominato {count} file · annulla da Cronologia",
+    "renamed_other": "Rinominati {count} file · annulla da Cronologia",
+    "notRenamed": "{count} non rinominati: {list}",
+    "addTitle": "Doppio clic o trascina per aggiungere all’elenco da rinominare"
+  },
+  "rules": {
+    "title": "Regole di rinomina",
+    "use": "Usa questo set di regole",
+    "revert": "Ripristina",
+    "builtin": "integrato",
+    "new": "Nuovo",
+    "importTitle": "Importa una preimpostazione .aren di Advanced Renamer o un set di regole esportato",
+    "importHint": "L’importazione accetta preimpostazioni di Advanced Renamer (.aren) e set di regole esportati da qui.",
+    "exportJson": "Esporta come JSON",
+    "description": "Descrizione",
+    "readOnly": "I set di regole integrati sono di sola lettura. Usa {icon} Duplica per creare una copia modificabile.",
+    "steps": "Passi",
+    "active": "Attivo",
+    "moveUp": "Sposta su",
+    "moveDown": "Sposta giù",
+    "deleteStep": "Elimina passo",
+    "addStep": "Aggiungi passo",
+    "choose": "scegli…",
+    "note": "Nota",
+    "notePlaceholder": "descrizione facoltativa",
+    "tryIt": "Prova",
+    "samplesPlaceholder": "Un nome di file per riga",
+    "showNameOptional": "Nome della serie (facoltativo)",
+    "autoDetected": "rilevato automaticamente",
+    "selectOrCreate": "Seleziona o crea un set di regole.",
+    "discardMessage": "Scartare le modifiche non salvate a questo set di regole?",
+    "discardChanges": "Scarta le modifiche",
+    "keepEditing": "Continua a modificare",
+    "saved": "Set di regole salvato",
+    "newName": "Nuovo set di regole",
+    "copyName": "{name} (copia)",
+    "copyCreated": "Copia creata",
+    "imported": "Importato “{name}” ({count} passi)",
+    "importedSkipped": "Importato “{name}” ({count} passi); saltati: {skipped}",
+    "deleteTitle": "Elimina set di regole",
+    "deleteMessage": "Eliminare il set di regole “{name}”?",
+    "deleted": "Set di regole eliminato"
+  },
+  "history": {
+    "title": "Cronologia delle rinomine",
+    "empty": "Ancora niente rinominato.",
+    "automatic": "automatica",
+    "undone": "annullata {time}",
+    "undo": "Annulla",
+    "undoTitle": "Annulla la rinomina",
+    "undoMessage": "Ripristinare i nomi originali di {count} file?",
+    "restoreNames": "Ripristina i nomi",
+    "restored": "Ripristinati {count} file",
+    "restoredWithErrors": "Ripristinati {count} file; impossibile ripristinarne {errors}"
+  }
+}

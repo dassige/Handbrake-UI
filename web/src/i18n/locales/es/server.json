@@ -1,0 +1,157 @@
+{
+  "skip": {
+    "noVideoInFolder": "sin archivos de video en la carpeta",
+    "notVideo": "no es un archivo de video",
+    "alreadyQueued": "ya en la cola",
+    "alreadyConverted": "ya convertido",
+    "notAdded": "no añadido"
+  },
+  "quality": {
+    "issue": {
+      "cannotRead": "No se puede leer: {message}",
+      "oldContainer": "Contenedor antiguo: .{container}",
+      "noVideo": "Sin pista de video",
+      "oldVideoCodec": "Códec de video antiguo: {codec}",
+      "oldAudioCodec": "Códec de audio antiguo: {codecs}",
+      "lowResolution": "Resolución baja: {width}×{height} (inferior a {minHeight}p)",
+      "lowBitrate": "Tasa de bits baja: {kbps} kbps, inferior a {min} kbps para video {resolution}",
+      "lowBitrateEstimated": "Tasa de bits baja: {kbps} (est.) kbps, inferior a {min} kbps para video {resolution}",
+      "lowBitrateCodec": "Tasa de bits baja: {kbps} kbps, inferior a {min} kbps para {codec} {resolution}",
+      "lowBitrateCodecEstimated": "Tasa de bits baja: {kbps} (est.) kbps, inferior a {min} kbps para {codec} {resolution}",
+      "interlaced": "Entrelazado"
+    },
+    "resolutionClass": {
+      "sd": "SD (inferior a 720p)",
+      "hd": "720p",
+      "fhd": "1080p",
+      "uhd": "4K"
+    }
+  },
+  "check": {
+    "label": {
+      "readable": "Legible",
+      "internal": "Comprobación",
+      "video": "Video",
+      "length": "Duración",
+      "lengthMatches": {
+        "source": "La duración coincide con el origen",
+        "parts": "La duración coincide con las partes"
+      },
+      "audioCount": "Pistas de audio",
+      "audioLength": "Duración del audio",
+      "subtitles": "Pistas de subtítulos",
+      "decode": "Decodificación completa",
+      "sourceErrors": "Origen"
+    },
+    "detail": {
+      "message": "{message}",
+      "format": "{format}",
+      "readableYes": "sí",
+      "cannotRead": "No se puede leer el archivo: {message}",
+      "noVideo": "El archivo no tiene flujo de video",
+      "videoOk": "{codec} {width}×{height}",
+      "lengthUnknown": {
+        "source": "Salida {output}; se desconoce la duración del origen",
+        "parts": "Salida {output}; se desconoce la duración de las partes"
+      },
+      "lengthOk": {
+        "source": "{output} (origen {source})",
+        "parts": "{output} (partes {source})"
+      },
+      "lengthShorter": {
+        "source": "La salida es {diff} más corta que el origen: {output} frente a {source}",
+        "parts": "La salida es {diff} más corta que las partes: {output} frente a {source}"
+      },
+      "lengthLonger": {
+        "source": "La salida es {diff} más larga que el origen: {output} frente a {source}",
+        "parts": "La salida es {diff} más larga que las partes: {output} frente a {source}"
+      },
+      "audioCountOk": "{count} ({languages})",
+      "audioCountNone": "{count} (ninguna)",
+      "audioCountMismatch": "HandBrake escribió {expected}, el archivo tiene {actual}",
+      "audioCountNoLog": "{count} (no hay registro de HandBrake con el que comparar)",
+      "audioTrackEmpty": "la pista {track} está vacía",
+      "audioTrackShort": "la pista {track} ({language}) termina {diff} antes",
+      "audioLengthOk": "Todas las pistas duran lo mismo que el video",
+      "subtitleItem": "{language} {codec}",
+      "subtitleItemNoLines": "{language} {codec} (sin líneas)",
+      "subtitlesOk": "{count}: {list}",
+      "subtitlesOkBurned": "{count}: {list}; {burned} incrustada en la imagen",
+      "subtitlesNone": "{count}",
+      "subtitlesNoneBurned": "{count}; {burned} incrustada en la imagen",
+      "subtitlesMismatch": "HandBrake escribió {expected}, el archivo tiene {actual}",
+      "subtitlesMismatchBurned": "HandBrake escribió {expected}, el archivo tiene {actual}; {burned} incrustada en la imagen",
+      "decodeOk": "Todos los fotogramas de video y audio se decodifican sin errores",
+      "decodeErrors_one": "{count} error de decodificación, p. ej., {example}",
+      "decodeErrors_other": "{count} errores de decodificación, p. ej., {example}",
+      "decodeStopped": "Detenido ({signal})",
+      "ffmpegExit": "ffmpeg terminó con el código {code}",
+      "sourceErrors_one": "HandBrake encontró {count} error de decodificación en el origen; el daño puede verse también en la salida",
+      "sourceErrors_other": "HandBrake encontró {count} errores de decodificación en el origen; el daño puede verse también en la salida"
+    },
+    "note": {
+      "ffprobeMissing": "ffprobe no está instalado",
+      "toolsMissing": "ffmpeg/ffprobe no están instalados",
+      "checkStopped": "Comprobación detenida",
+      "checkSkipped": "Comprobación omitida",
+      "interrupted": "Comprobación interrumpida por un reinicio"
+    }
+  },
+  "rename": {
+    "noShowName": "falta el nombre de la serie: escríbalo en «Nombre de la serie»",
+    "noEpisode": "no se encontró el número de episodio (S01E02 o 1x02)",
+    "noYear": "no se encontró el año",
+    "textAfterYear": "se descartó el texto que seguía al año: «{text}»",
+    "nameTaken": "el nombre ya existe; se usa «{name}»",
+    "stepFailed": "falló el paso «{step}»: {message}"
+  },
+  "renameNote": {
+    "needsRename": "Requiere renombrado: {warnings}",
+    "checkFailed": "No se renombró automáticamente: la comprobación encontró problemas",
+    "failed": "Falló el renombrado automático: {message}",
+    "merged": "Unido en {name}; esta parte se eliminó"
+  },
+  "merge": {
+    "part": "{name} (parte {part})",
+    "track": {
+      "video": "la pista de video {track}",
+      "audio": "la pista de audio {track}",
+      "subtitle": "la pista de subtítulos {track}"
+    },
+    "layoutDiff": {
+      "video_one": "{count} pista de video en lugar de {expected}",
+      "video_other": "{count} pistas de video en lugar de {expected}",
+      "audio_one": "{count} pista de audio en lugar de {expected}",
+      "audio_other": "{count} pistas de audio en lugar de {expected}",
+      "subtitle_one": "{count} pista de subtítulos en lugar de {expected}",
+      "subtitle_other": "{count} pistas de subtítulos en lugar de {expected}"
+    },
+    "problem": {
+      "tooFew": "Elija al menos dos archivos para unir.",
+      "noLength": "{name}: no se puede leer su duración.",
+      "noVideo": "{name}: no tiene video.",
+      "layout": "{part} tiene una disposición de pistas distinta: {diff}. Todas las partes necesitan las mismas pistas (conviértalas con el mismo preajuste).",
+      "layoutOrder": "{part} tiene una disposición de pistas distinta: las pistas están en otro orden. Todas las partes necesitan las mismas pistas (conviértalas con el mismo preajuste).",
+      "codec": "{part}: {track} es {codec}, la parte 1 tiene {firstCodec}.",
+      "audioFormat": "{part}: {track} tiene {channels} canales a {rate} Hz, la parte 1 tiene {firstChannels} a {firstRate} Hz.",
+      "pictureSize": "{part}: la imagen es de {size}, la de la parte 1 es de {firstSize}. Los reproductores suelen arreglárselas, pero algunos pueden fallar en las uniones entre partes.",
+      "videoSettings": "{part}: el video se codificó con ajustes ligeramente distintos. La mayoría de los reproductores se las arreglan; revise las uniones después de unir.",
+      "language": "{part}: {track} está en «{lang}», la parte 1 en «{firstLang}». La pista unida conserva el idioma de la parte 1."
+    }
+  },
+  "delete": {
+    "protected": "Los archivos de {root} están protegidos contra la eliminación (Ajustes → Carpetas)",
+    "sourcesFolder": "Una carpeta de origen en sí no se puede eliminar (quítela en Ajustes)",
+    "pendingFile": "{name} está en cola o convirtiéndose; quítelo primero de la cola",
+    "pendingFiles": "{count} archivos que contiene están en cola o convirtiéndose; quítelos primero de la cola"
+  },
+  "backup": {
+    "busy": {
+      "conversion": "hay una conversión en curso",
+      "merge": "hay una unión en curso",
+      "quality": "hay un control de calidad en curso",
+      "upload": "hay una subida en curso"
+    },
+    "missingFolder": "La carpeta {folder} no existe en este servidor; corríjala en Ajustes después de restaurar."
+  }
+}

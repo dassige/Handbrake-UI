@@ -1,0 +1,68 @@
+{
+  "dialogs": {
+    "confirmTitle": "Conferma",
+    "alertTitle": "Avviso",
+    "typeValue": "Inserisci un valore"
+  },
+  "paneSwitch": {
+    "label": "Pannello"
+  },
+  "toasts": {
+    "dismiss": "Chiudi"
+  },
+  "status": {
+    "queued": "In coda",
+    "running": "In conversione",
+    "paused": "In pausa",
+    "done": "Convertito",
+    "failed": "Non riuscito",
+    "cancelled": "Annullato",
+    "scanning": "Scansione",
+    "finishing": "Finalizzazione",
+    "checkPaused": "Verifica in pausa",
+    "checking": "Verifica in corso"
+  },
+  "verify": {
+    "ok": "Verificato",
+    "warning": "Verifica con avvisi",
+    "error": "Verifica non riuscita",
+    "skipped": "Non verificato",
+    "running": "Verifica in corso"
+  },
+  "folderBadges": {
+    "converting_one": "{count} in conversione",
+    "converting_other": "{count} in conversione",
+    "queued_one": "{count} in coda",
+    "queued_other": "{count} in coda",
+    "converted_one": "{count} convertito",
+    "converted_other": "{count} convertiti",
+    "failed_one": "{count} non riuscito",
+    "failed_other": "{count} non riusciti"
+  },
+  "folderPicker": {
+    "title": "Scegli una cartella",
+    "choose": "Scegli questa cartella",
+    "roots": "Cartella sorgenti",
+    "crumbs": "Cartella",
+    "up": "Cartella superiore",
+    "empty": "Nessuna sottocartella."
+  },
+  "delete": {
+    "notDeleted": "Non eliminati:",
+    "notDeletedList": "Non eliminati: {list}",
+    "more_one": "… e {count} altro",
+    "more_other": "… e altri {count}",
+    "nothingTitle": "Non si può eliminare niente",
+    "title": "Eliminare dal server?",
+    "items_one": "{count} elemento",
+    "items_other": "{count} elementi",
+    "summary": "Da eliminare definitivamente: {what} ({files}, {size}).",
+    "summaryFolder": "Da eliminare definitivamente: {what} ({files}, {size}), compreso tutto il contenuto della cartella.",
+    "summaryFolders": "Da eliminare definitivamente: {what} ({files}, {size}), compreso tutto il contenuto di {folders}.",
+    "warning": "Non si può annullare. Se un client di download (es. Deluge) sta ancora distribuendo questi file, li segnalerà come mancanti.",
+    "deleteItems_one": "Elimina {count} elemento",
+    "deleteItems_other": "Elimina {count} elementi",
+    "deleted_one": "Eliminato {count} elemento",
+    "deleted_other": "Eliminati {count} elementi"
+  }
+}

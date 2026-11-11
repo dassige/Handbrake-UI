@@ -7,6 +7,7 @@ import { FolderBadges, StatusBadge } from './StatusBadge.jsx';
 import { Help } from '../help/Help.jsx';
 import { downloadTitle, useDownload } from '../download/useDownload.jsx';
 import { useDeleteFiles } from './useDeleteFiles.jsx';
+import { t } from '../i18n/index.js';
 
 export const DRAG_PATHS = 'application/x-hbui-paths';
 
@@ -38,11 +39,15 @@ export function browserRoots(settings, kind) {
  * Folder browser for the source roots, the target root or all of them; items can be
  * dragged out or added with a button. With onUpload, it also takes files dropped from
  * the computer and shows an Upload button: onUpload(dir, root, files).
+ * addLabel is the add button's text; addTitle the tooltip of a file row ("Double-click or drag to …").
  */
 export function SourceBrowser({
-  settings, changeTick, onAdd, onError, root = 'source', title = 'Sources', addLabel = 'Add to queue',
-  hint = 'Drag files or folders to the queue. Ctrl/Shift-click to select several.', help, onUpload, allowDelete, onNotice, onWatch,
+  settings, changeTick, onAdd, onError, root = 'source', title = t('sources.title'), addLabel, addTitle,
+  hint = t('sources.hint'), help, onUpload, allowDelete, onNotice, onWatch,
 }) {
+  const addText = addLabel ?? t('sources.addLabel');
+  // Without addTitle, a custom addLabel is fitted into the English-style sentence (callers should pass addTitle).
+  const rowAddTitle = addTitle ?? (addLabel ? t('sources.addTitleAction', { action: addLabel.toLowerCase() }) : t('sources.addTitle'));
   const [dir, setDir] = useState(null); // null = the chosen root
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -123,7 +128,7 @@ export function SourceBrowser({
     e.dataTransfer.effectAllowed = 'copy';
     const ghost = document.createElement('div');
     ghost.className = 'drag-ghost';
-    ghost.textContent = paths.length === 1 ? item.name : `${paths.length} items`;
+    ghost.textContent = paths.length === 1 ? item.name : t('sources.dragItems', { count: paths.length });
     document.body.appendChild(ghost);
     e.dataTransfer.setDragImage(ghost, 10, 10);
     setTimeout(() => ghost.remove(), 0);
@@ -164,7 +169,7 @@ export function SourceBrowser({
       {fileDrop && (
         <div className="drop-overlay">
           <Upload size={28} />
-          <span>Drop to upload into {listing ? listing.crumbs.at(-1)?.name : 'this folder'}</span>
+          <span>{listing ? t('sources.dropUploadInto', { folder: listing.crumbs.at(-1)?.name }) : t('sources.dropUploadHere')}</span>
         </div>
       )}
       <div className="pane-head">
@@ -175,13 +180,14 @@ export function SourceBrowser({
               className="root-select"
               value={sourceRoot}
               onChange={(e) => chooseRoot(e.target.value)}
-              title="Which folder to browse"
-              aria-label="Folder to browse"
+              title={t('sources.rootTitle')}
+              aria-label={t('sources.rootLabel')}
             >
               {roots.map((r) => (
                 <option key={r} value={r} title={r}>
-                  {rootLabel(settings, r)}
-                  {root === 'source' && settings.protectedRoots?.includes(r) ? ' (protected)' : ''}
+                  {root === 'source' && settings.protectedRoots?.includes(r)
+                    ? t('sources.rootProtected', { name: rootLabel(settings, r) })
+                    : rootLabel(settings, r)}
                 </option>
               ))}
             </select>
@@ -190,21 +196,21 @@ export function SourceBrowser({
             <button
               className="btn ghost small"
               disabled={!listing}
-              title="Upload videos from this computer into the open folder"
+              title={t('sources.uploadTitle')}
               onClick={() => onUpload(listing.path, listing.root, [])}
             >
-              <Upload size={14} /> Upload
+              <Upload size={14} /> {t('common.upload')}
             </button>
           )}
-          <button className="icon-btn" title="Refresh" onClick={() => load(dir, { keepSelection: true })}>
+          <button className="icon-btn" title={t('common.refresh')} onClick={() => load(dir, { keepSelection: true })}>
             <RefreshCw size={16} className={loading ? 'spin' : ''} />
           </button>
         </div>
       </div>
 
-      <nav className="crumbs" aria-label="Folder">
+      <nav className="crumbs" aria-label={t('sources.crumbs')}>
         {listing?.parent && (
-          <button className="icon-btn" title="Up one folder" onClick={() => setDir(listing.parent)}>
+          <button className="icon-btn" title={t('sources.up')} onClick={() => setDir(listing.parent)}>
             <ArrowUp size={15} />
           </button>
         )}
@@ -223,17 +229,17 @@ export function SourceBrowser({
             <button
               className={`watch-pill ${settings.watch.enabled ? 'on' : ''}`}
               onClick={() => onWatch(listing.path)}
-              title={settings.watch.enabled ? 'New videos in this folder are added to the queue by themselves. Click for the settings.' : 'A watch folder, but watching is off in Settings'}
+              title={settings.watch.enabled ? t('sources.watch.watchedTitle') : t('sources.watch.watchedOffTitle')}
             >
-              <Eye size={13} /> {settings.watch.enabled ? 'Watched' : 'Watched (off)'}
+              <Eye size={13} /> {settings.watch.enabled ? t('sources.watch.watched') : t('sources.watch.watchedOff')}
             </button>
           ) : (
             <button
               className="btn ghost small watch-btn"
               onClick={() => onWatch(listing.path)}
-              title="Add new videos that appear in this folder to the queue by themselves"
+              title={t('sources.watch.watchTitle')}
             >
-              <Eye size={14} /> Watch
+              <Eye size={14} /> {t('sources.watch.watch')}
             </button>
           )
         )}
@@ -246,34 +252,34 @@ export function SourceBrowser({
             checked={allSelected}
             onChange={() => setSelected(allSelected ? new Set() : new Set(items.map((i) => i.path)))}
           />
-          {selected.size ? `${selected.size} selected` : 'Select all'}
+          {selected.size ? t('sources.selected', { count: selected.size }) : t('common.selectAll')}
         </label>
         <div className="select-actions">
           {allowDelete && !isProtected && (
             <button
               className="btn ghost small danger"
               disabled={!selected.size}
-              title="Delete the selected files and folders from the server (asks first)"
+              title={t('sources.deleteTitle')}
               onClick={deleteSelected}
             >
-              <Trash2 size={14} /> Delete
+              <Trash2 size={14} /> {t('common.delete')}
             </button>
           )}
           {allowDelete && isProtected && (
-            <span className="protected-note" title="This sources folder is protected: its files can't be deleted from the app. Change it in Settings → Folders.">
-              <Lock size={13} /> Protected
+            <span className="protected-note" title={t('sources.protectedTitle')}>
+              <Lock size={13} /> {t('sources.protected')}
             </span>
           )}
           <button
             className="btn ghost small"
             disabled={!selected.size}
-            title="Download the selected files and folders to this computer"
+            title={t('sources.downloadTitle')}
             onClick={() => download(items.filter((i) => selected.has(i.path)))}
           >
-            <Download size={14} /> Download
+            <Download size={14} /> {t('common.download')}
           </button>
           <button className="btn primary small" disabled={!selected.size} onClick={() => onAdd([...selected])}>
-            <ListPlus size={14} /> {addLabel}
+            <ListPlus size={14} /> {addText}
           </button>
         </div>
       </div>
@@ -290,7 +296,7 @@ export function SourceBrowser({
           }
         }}
       >
-        {items.length === 0 && !loading && <li className="empty">No folders or video files here.</li>}
+        {items.length === 0 && !loading && <li className="empty">{t('sources.empty')}</li>}
         {items.map((item) => (
           <li
             key={item.path}
@@ -301,14 +307,14 @@ export function SourceBrowser({
             onDragStart={(e) => onDragStart(e, item)}
             onClick={(e) => onRowClick(e, item)}
             onDoubleClick={() => (item.type === 'dir' ? setDir(item.path) : onAdd([item.path]))}
-            title={item.type === 'dir' ? 'Double-click to open · drag it to add every video inside' : `Double-click or drag to ${addLabel.toLowerCase()}`}
+            title={item.type === 'dir' ? t('sources.dirTitle') : rowAddTitle}
           >
             <input
               type="checkbox"
               checked={selected.has(item.path)}
               onClick={(e) => e.stopPropagation()}
               onChange={() => toggle(item)}
-              aria-label={`Select ${item.name}`}
+              aria-label={t('sources.selectItem', { name: item.name })}
             />
             {item.type === 'dir' ? (
               <button
@@ -317,7 +323,7 @@ export function SourceBrowser({
                   e.stopPropagation();
                   setDir(item.path);
                 }}
-                title="Open folder"
+                title={t('sources.openFolder')}
               >
                 {item.jobs ? <FolderOpen size={17} /> : <Folder size={17} />}
               </button>
@@ -326,7 +332,7 @@ export function SourceBrowser({
             )}
             <span className="file-name">{item.name}</span>
             {item.type === 'dir' && watchedFolder(settings, item.path) && (
-              <Eye size={14} className="watched-icon" aria-label="Watch folder" title="Watch folder" />
+              <Eye size={14} className="watched-icon" aria-label={t('sources.watch.watchFolder')} title={t('sources.watch.watchFolder')} />
             )}
             <span className="file-meta">
               <button
@@ -345,7 +351,7 @@ export function SourceBrowser({
                 <FolderBadges counts={item.jobs} />
               ) : (
                 <>
-                  {item.excluded && <span className="badge cancelled" title="Matches an exclude pattern; skipped when adding a folder">excluded</span>}
+                  {item.excluded && <span className="badge cancelled" title={t('sources.excludedTitle')}>{t('sources.excluded')}</span>}
                   {item.jobs && <StatusBadge status={item.jobs} />}
                   <span className="muted" title={dateTime(item.mtime)}>{bytes(item.size)}</span>
                 </>

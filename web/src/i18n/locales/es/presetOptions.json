@@ -1,0 +1,117 @@
+{
+  "default": "Por defecto",
+  "custom": "Personalizado",
+  "automatic": "Automático",
+  "auto": "Auto",
+  "sameAsSource": "Igual que el origen",
+  "qualityScale": "Calidad",
+  "framerateMode": {
+    "variable": "Variable",
+    "constant": "Constante",
+    "peak": "Máxima"
+  },
+  "qualityType": {
+    "targetSize": "Tamaño objetivo",
+    "averageBitrate": "Tasa de bits media",
+    "constantQuality": "Calidad constante"
+  },
+  "colorRange": {
+    "limited": "Limitado",
+    "full": "Completo"
+  },
+  "hdrMetadata": {
+    "all": "Todos",
+    "hdr10plus": "Solo HDR10+",
+    "dolbyVision": "Solo Dolby Vision"
+  },
+  "cropMode": {
+    "conservative": "Conservador"
+  },
+  "par": {
+    "loose": "Flexible (preajustes antiguos)",
+    "strict": "Estricto (preajustes antiguos)"
+  },
+  "padMode": {
+    "letterbox": "Alto (letterbox)",
+    "pillarbox": "Ancho (pillarbox)",
+    "fill": "Ancho y alto"
+  },
+  "padColor": {
+    "black": "Negro",
+    "darkGrey": "Gris oscuro",
+    "grey": "Gris",
+    "white": "Blanco"
+  },
+  "strength": {
+    "ultralight": "Ultraligero",
+    "light": "Ligero",
+    "medium": "Medio",
+    "strong": "Fuerte",
+    "stronger": "Más fuerte",
+    "veryStrong": "Muy fuerte"
+  },
+  "combDetect": {
+    "lessSensitive": "Menos sensible",
+    "fast": "Rápido"
+  },
+  "deinterlacePreset": {
+    "skipSpatial": "Omitir comprobación espacial"
+  },
+  "deblockTune": {
+    "small": "Pequeño (4×4)",
+    "medium": "Medio (8×8)",
+    "large": "Grande (16×16)"
+  },
+  "filterTune": {
+    "film": "Película",
+    "grain": "Grano",
+    "highMotion": "Mucho movimiento",
+    "animation": "Animación",
+    "tape": "Cinta",
+    "sprite": "Sprite"
+  },
+  "chromaSmoothTune": {
+    "tiny": "Mínimo",
+    "small": "Pequeño",
+    "medium": "Medio",
+    "wide": "Amplio",
+    "veryWide": "Muy amplio"
+  },
+  "unsharpTune": {
+    "ultrafine": "Ultrafino",
+    "fine": "Fino",
+    "medium": "Medio",
+    "coarse": "Grueso",
+    "veryCoarse": "Muy grueso"
+  },
+  "tuneFlag": {
+    "fastDecode": "Decodificación rápida",
+    "zeroLatency": "Latencia cero"
+  },
+  "audioEncoder": {
+    "passthru": "{format} passthru",
+    "autoPassthru": "Auto passthru"
+  },
+  "mixdown": {
+    "mono": "Mono",
+    "leftOnly": "Mono (solo izquierdo)",
+    "rightOnly": "Mono (solo derecho)",
+    "stereo": "Estéreo",
+    "channels": "{layout} canales"
+  },
+  "trackBehavior": {
+    "first": "Primer idioma seleccionado que coincide",
+    "all": "Todos los idiomas seleccionados que coinciden",
+    "firstShort": "Primer idioma que coincide",
+    "allShort": "Todos los idiomas que coinciden"
+  },
+  "burnBehavior": {
+    "foreign": "Pista de subtítulos de audio extranjero",
+    "first": "Primera pista seleccionada",
+    "foreignFirst": "Audio extranjero y, si no, primera pista seleccionada"
+  },
+  "audioNaming": {
+    "unnamed": "Solo pistas sin nombre",
+    "all": "Todas las pistas"
+  }
+}

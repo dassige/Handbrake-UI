@@ -13,6 +13,9 @@ export const MAX_SOURCE_ROOTS = 20;
 
 export const OUTPUT_LAYOUTS = ['parent', 'mirror', 'flat'];
 
+// Web app language; 'auto' follows each browser's language. Notifications stay in English.
+export const LANGUAGES = ['auto', 'en', 'it', 'de', 'fr', 'es'];
+
 export const DEFAULT_VIDEO_EXTENSIONS = [
   'mkv', 'mp4', 'm4v', 'avi', 'mov', 'wmv', 'ts', 'm2ts', 'mts',
   'mpg', 'mpeg', 'flv', 'webm', 'vob', '3gp', 'divx', 'ogm',
@@ -44,6 +47,7 @@ function defaults(config) {
     watch: DEFAULT_WATCH,
     notifications: DEFAULT_NOTIFICATIONS,
     backupSchedule: DEFAULT_BACKUP_SCHEDULE,
+    language: 'auto',
   };
 }
 
@@ -141,6 +145,7 @@ export class Settings {
     if (!OUTPUT_LAYOUTS.includes(next.outputLayout)) {
       throw badRequest(`outputLayout must be one of ${OUTPUT_LAYOUTS.join(', ')}`);
     }
+    if (!LANGUAGES.includes(next.language)) throw badRequest(`language must be one of ${LANGUAGES.join(', ')}`);
     if (!VERIFY_MODES.includes(next.verifyMode)) throw badRequest(`verifyMode must be one of ${VERIFY_MODES.join(', ')}`);
     if (next.autoRenameRuleId != null) {
       next.autoRenameRuleId = Number(next.autoRenameRuleId);

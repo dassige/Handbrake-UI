@@ -1,0 +1,38 @@
+{
+  "attention": {
+    "events": {
+      "queueFinished": "The queue finished",
+      "jobFailed": "A conversion failed",
+      "checkFailed": "A check after conversion failed",
+      "jobDone": "Each converted file"
+    },
+    "title": {
+      "paused": "Paused · {name} — {app}",
+      "checking": "Checking · {name} — {app}",
+      "progress": "{percent}% · {name} — {app}",
+      "starting": "Starting · {name} — {app}",
+      "waiting": "Waiting for {time} — {app}",
+      "finished": "✓ Queue finished — {app}"
+    },
+    "notify": {
+      "queueFinished": "Queue finished",
+      "queueFinishedBody_one": "{count} converted",
+      "queueFinishedBody_other": "{count} converted",
+      "queueFinishedBodyFailed_one": "{count} converted · {failed} failed",
+      "queueFinishedBodyFailed_other": "{count} converted · {failed} failed",
+      "jobFailed": "Conversion failed",
+      "checkFailed": "Check failed",
+      "jobDone": "Converted"
+    }
+  },
+  "live": {
+    "queueFinished": "Queue finished: every job is done. Press Start for the next ones."
+  },
+  "roots": {
+    "target": "Target"
+  },
+  "api": {
+    "networkError": "Network error",
+    "cancelled": "Cancelled"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "title": "Statistiche",
+  "period": "Periodo",
+  "ranges": {
+    "days7": "7 giorni",
+    "days30": "30 giorni",
+    "days90": "90 giorni",
+    "months12": "12 mesi",
+    "allTime": "Da sempre"
+  },
+  "tiles": {
+    "filesConverted": "File convertiti",
+    "failed": "non riusciti: {count}",
+    "cancelled": "annullati: {count}",
+    "watched": "{count} da cartelle monitorate",
+    "noneFailed": "nessuno non riuscito",
+    "spaceSaved": "Spazio risparmiato",
+    "smaller": "{percent} in meno · {source} → {output}",
+    "videoConverted": "Video convertito",
+    "ofWork": "in {time} di lavoro",
+    "speed": "Velocità",
+    "realTime": "rispetto al tempo reale",
+    "realTimeFps": "rispetto al tempo reale · {fps} fps in media"
+  },
+  "perBucket": {
+    "day": "File convertiti al giorno",
+    "month": "File convertiti al mese"
+  },
+  "chart": "Grafico",
+  "table": "Tabella",
+  "nothingConverted": "Niente convertito in questo periodo.",
+  "checks": {
+    "title": "Verifica dopo la conversione",
+    "none": "Nessun file verificato in questo periodo.",
+    "summary": "superati: {ok}, con avvisi: {warning}, non riusciti: {error}",
+    "ok": "Verificati",
+    "warning": "Avvisi",
+    "error": "Non riusciti",
+    "unchecked": "Convertiti senza verifica: {count}."
+  },
+  "biggestSavings": "Maggiori risparmi",
+  "nothingYet": "Ancora niente.",
+  "byPreset": "Per preimpostazione",
+  "columns": {
+    "preset": "Preimpostazione",
+    "converted": "Convertiti",
+    "failed": "Non riusciti",
+    "video": "Video",
+    "work": "Lavoro",
+    "speed": "Velocità",
+    "avgFps": "Fps medi",
+    "saved": "Risparmiato",
+    "smaller": "Riduzione",
+    "month": "Mese",
+    "day": "Giorno"
+  },
+  "historySince": "Cronologia dal {date}. Rimuovere i processi dalla coda non li toglie da questi dati.",
+  "tip": {
+    "converted": "convertiti: {count}",
+    "convertedFailed": "convertiti: {count} · non riusciti: {failed}",
+    "savedWork": "{saved} risparmiati · {time} di lavoro",
+    "column": "{date}: convertiti {count}"
+  }
+}

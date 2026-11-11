@@ -1,0 +1,16 @@
+{
+  "dialog": {
+    "summary_one": "{count} file, {size} in tutto.",
+    "summary_other": "{count} file, {size} in tutto.",
+    "summaryFolders_one": "{count} file, {size} in tutto, dalle cartelle scelte e dalle loro sottocartelle.",
+    "summaryFolders_other": "{count} file, {size} in tutto, dalle cartelle scelte e dalle loro sottocartelle.",
+    "separateHint": "I file separati si possono sospendere e riprendere nel browser; il browser potrebbe chiedere una volta se questo sito può scaricare più file.",
+    "zipHint": "Un unico file ZIP (<code>{name}</code>) mantiene le cartelle, ma un download ZIP interrotto deve ripartire dall’inizio.",
+    "separate": "File separati",
+    "zip": "Un unico ZIP ({size})"
+  },
+  "title": {
+    "folder": "Scarica la cartella “{name}” come ZIP",
+    "file": "Scarica “{name}”"
+  }
+}

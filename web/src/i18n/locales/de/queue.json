@@ -1,0 +1,46 @@
+{
+  "title": "Warteschlange",
+  "filters": {
+    "all": "Alle",
+    "active": "Aktiv",
+    "done": "Konvertiert",
+    "failed": "Fehlgeschlagen / abgebrochen",
+    "checkFailed": "Prüfung fehlgeschlagen",
+    "checkFailedTitle": "Konvertierte Dateien, deren Prüfung nach der Konvertierung fehlgeschlagen ist"
+  },
+  "preset": "Voreinstellung",
+  "presetTitle": "Voreinstellung für Dateien, die Sie hinzufügen",
+  "presetDefault": "{name} (Standard)",
+  "positionTitle": "Wo neue Dateien in die Warteschlange kommen",
+  "position": {
+    "end": "ans Ende",
+    "next": "als Nächstes"
+  },
+  "checkAllAgain": "Alle erneut prüfen",
+  "checkAllAgainTitle": "Diese konvertierten Dateien nacheinander erneut prüfen",
+  "renameThese": "Diese umbenennen",
+  "renameTheseTitle": "Die konvertierten Dateien in der Ansicht „Umbenennen“ öffnen",
+  "mergeThese": "Diese zusammenführen",
+  "mergeTheseTitle": "Die konvertierten Dateien in der Ansicht „Zusammenführen“ öffnen",
+  "clearFinished": "Erledigte entfernen",
+  "clearFinishedTitle": "Konvertierte, fehlgeschlagene und abgebrochene Aufträge aus der Liste entfernen (Dateien bleiben unberührt)",
+  "clearDialog": {
+    "title": "Erledigte Aufträge entfernen",
+    "message_one": "{count} erledigten Auftrag aus der Liste entfernen? Dateien werden nicht gelöscht.",
+    "message_other": "{count} erledigte Aufträge aus der Liste entfernen? Dateien werden nicht gelöscht."
+  },
+  "noMatch": "Keine Aufträge passen zu diesem Filter.",
+  "dragHere": "Ziehen Sie Dateien oder Ordner aus „Quellen“ hierher.",
+  "dropToAdd": "Hier ablegen, um zur Warteschlange hinzuzufügen",
+  "estimate": {
+    "left": "≈ {duration} Konvertierung verbleibend",
+    "notEstimated_one": "{count} Auftrag noch nicht geschätzt",
+    "notEstimated_other": "{count} Aufträge noch nicht geschätzt",
+    "doneAround": "fertig etwa: {time}",
+    "ifStartedDoneAround": "wenn gestartet, fertig etwa: {time}",
+    "waitingWindow": "Warte auf das Zeitfenster: Start {time}",
+    "windowClosed": "Zeitfenster geschlossen: Der aktuelle Auftrag wird beendet, der Rest wartet bis {time}",
+    "windowOpenUntil": "Zeitfenster offen bis {time}",
+    "guessed": "(einige Längen geschätzt)"
+  }
+}

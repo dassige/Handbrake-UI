@@ -1,0 +1,68 @@
+{
+  "dialog": {
+    "title": "Téléverser des vidéos",
+    "uploadTo": "Téléverser dans",
+    "newFolder": "Nouveau dossier",
+    "elsewhere": "Pour téléverser ailleurs, fermez cette fenêtre et ouvrez d'abord ce dossier dans Sources.",
+    "drop": "<strong>Déposez des fichiers vidéo ici</strong> ou cliquez pour les choisir sur cet ordinateur",
+    "notVideo": "pas un fichier vidéo, ignoré",
+    "removeFile": "Retirer {name}",
+    "keepOpen": "Gardez cet onglet du navigateur ouvert jusqu'à la fin des téléversements. Vous pouvez continuer à travailler en attendant. Si un téléversement est interrompu, téléversez à nouveau le même fichier dans le même dossier : il reprend là où il s'était arrêté.",
+    "chosen_one": "{count} fichier · {size}",
+    "chosen_other": "{count} fichiers · {size}",
+    "noFiles": "Aucun fichier choisi"
+  },
+  "newFolder": {
+    "title": "Nouveau dossier",
+    "message": "Créer un dossier dans <code>{path}</code>.",
+    "label": "Nom du dossier",
+    "create": "Créer",
+    "noSlashes": "Pas de barres obliques, s'il vous plaît",
+    "noDot": "Le nom ne peut pas commencer par un point",
+    "typeName": "Saisissez un nom"
+  },
+  "existing": {
+    "title": "Certains fichiers sont déjà là",
+    "message_one": "Un fichier portant ce nom se trouve déjà dans le dossier. Les fichiers existants ne sont jamais remplacés.",
+    "message_other": "{count} fichiers portant ces noms se trouvent déjà dans le dossier. Les fichiers existants ne sont jamais remplacés.",
+    "more_one": "… et {count} autre",
+    "more_other": "… et {count} autres",
+    "skip": "Les ignorer",
+    "copies": "Téléverser comme copies, « nom (1) »"
+  },
+  "noSpace": {
+    "title": "Espace insuffisant",
+    "message": "Ces fichiers nécessitent {need}, mais le serveur n'a que {free} de libre dans ce dossier."
+  },
+  "panel": {
+    "label": "Téléversements",
+    "uploading_one": "Téléversement · {count} restant",
+    "uploading_other": "Téléversement · {count} restants",
+    "finished_one": "Téléversements terminés · {count} fait",
+    "finished_other": "Téléversements terminés · {count} faits",
+    "failed_one": "{count} en échec",
+    "failed_other": "{count} en échec",
+    "collapse": "Réduire",
+    "expand": "Développer",
+    "cancelTitle": "Annuler ce téléversement",
+    "cancelLabel": "Annuler {name}",
+    "retryTitle": "Réessayer",
+    "retryLabel": "Réessayer {name}",
+    "waiting": "En attente · {size}",
+    "progress": "{sent} sur {size}",
+    "progressSpeed_one": "{sent} sur {size} · {speed}/s · {count} min restante",
+    "progressSpeed_other": "{sent} sur {size} · {speed}/s · {count} min restantes",
+    "uploaded": "Téléversé · {size}",
+    "cancelled": "Annulé"
+  },
+  "cancel": {
+    "title": "Annuler le téléversement",
+    "message": "Arrêter le téléversement de « {name} » et supprimer la partie déjà envoyée ?",
+    "confirm": "Annuler le téléversement",
+    "keep": "Continuer le téléversement"
+  },
+  "errors": {
+    "retrying": "{error} ; nouvelle tentative…",
+    "failed": "{name} : {error}"
+  }
+}

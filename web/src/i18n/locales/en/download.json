@@ -1,0 +1,16 @@
+{
+  "dialog": {
+    "summary_one": "{count} file, {size} in all.",
+    "summary_other": "{count} files, {size} in all.",
+    "summaryFolders_one": "{count} file, {size} in all, from the chosen folders and their sub-folders.",
+    "summaryFolders_other": "{count} files, {size} in all, from the chosen folders and their sub-folders.",
+    "separateHint": "Separate files can be paused and resumed in the browser; your browser may ask once whether this site may download several files.",
+    "zipHint": "One ZIP file (<code>{name}</code>) keeps the folders, but an interrupted ZIP download must start again from the beginning.",
+    "separate": "Separate files",
+    "zip": "One ZIP ({size})"
+  },
+  "title": {
+    "folder": "Download the folder “{name}” as a ZIP",
+    "file": "Download “{name}”"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "views": {
+    "label": "Vista",
+    "convert": "Convertir",
+    "rename": "Renombrar",
+    "merge": "Unir",
+    "quality": "Calidad",
+    "stats": "Estadísticas",
+    "presets": "Preajustes",
+    "settings": "Ajustes"
+  },
+  "panes": {
+    "sources": "Orígenes",
+    "queue": "Cola",
+    "queueCount": "Cola ({n})"
+  },
+  "leave": {
+    "settingsTitle": "Ajustes sin guardar",
+    "settingsMessage": "¿Salir de Ajustes sin guardar? Se perderán los cambios.",
+    "presetTitle": "Preajuste sin guardar",
+    "presetMessage": "¿Salir del editor de preajustes sin guardar? Se perderán los cambios.",
+    "confirm": "Salir sin guardar"
+  },
+  "add": {
+    "noPreset": "Primero cree o importe un preajuste",
+    "skippedReason_one": "{reason} ({count})",
+    "skippedReason_other": "{reason} ({count})",
+    "added_one": "Se añadió {count} archivo",
+    "added_other": "Se añadieron {count} archivos",
+    "addedSkipped_one": "Se añadió {count} archivo · omitidos: {skipped}",
+    "addedSkipped_other": "Se añadieron {count} archivos · omitidos: {skipped}",
+    "nothing": "No se añadió nada",
+    "nothingSkipped": "No se añadió nada: {skipped}"
+  },
+  "watch": {
+    "title": "¿Vigilar esta carpeta?",
+    "message": "Los videos nuevos que aparezcan en {path} se añadirán a la cola automáticamente.",
+    "messagePreset": "Los videos nuevos que aparezcan en {path} se añadirán a la cola automáticamente, con el preajuste predeterminado ({preset}).",
+    "note": "Los archivos que ya contiene no se tocan. Cambie el preajuste y las demás opciones en Ajustes → Carpetas vigiladas.",
+    "noteOff": "Los archivos que ya contiene no se tocan. La vigilancia está desactivada, así que esto la activa. Cambie el preajuste y las demás opciones en Ajustes → Carpetas vigiladas.",
+    "confirm": "Vigilar",
+    "done": "Vigilando la carpeta"
+  },
+  "outsideWindow": {
+    "title": "Fuera de la franja de conversión",
+    "opensAt": "La franja de conversión se abre {time}.",
+    "opensLater": "La franja de conversión se abre más tarde.",
+    "note": "«Iniciar ahora» convierte toda la cola de inmediato, sin tener en cuenta la franja hasta que la cola se detenga.",
+    "startNow": "Iniciar ahora",
+    "wait": "Esperar a la franja",
+    "startsAt": "La cola empieza {time}"
+  },
+  "state": {
+    "running": "Cola en marcha",
+    "stopped": "Cola detenida",
+    "waitingFor": "Esperando hasta {time}",
+    "stopTitle": "Terminar el trabajo actual y luego detener",
+    "startTitle": "Empezar a convertir los trabajos en cola",
+    "stopAfterCurrent": "Detener tras el actual",
+    "queued_one": "{count} en cola",
+    "queued_other": "{count} en cola",
+    "done_one": "{count} terminado",
+    "done_other": "{count} terminados",
+    "failed_one": "{count} con error",
+    "failed_other": "{count} con error",
+    "left": "≈ {duration} restantes",
+    "doneAround": "Terminará hacia {time}"
+  },
+  "window": {
+    "openUntilTitle": "Franja de conversión abierta hasta {time}",
+    "openTitle": "Franja de conversión abierta",
+    "closedTitle": "Franja de conversión cerrada; se abre {time}",
+    "until": "hasta {time}",
+    "open": "abierta"
+  },
+  "offline": "sin conexión",
+  "offlineTitle": "Actualizaciones en directo desconectadas; reintentando",
+  "handbrakeMissing": "HandBrakeCLI no está disponible: {error}",
+  "noPresets": "Aún no hay preajustes. {link} para empezar a convertir.",
+  "noPresetsLink": "Cree o importe un preajuste"
+}

@@ -1,0 +1,38 @@
+{
+  "attention": {
+    "events": {
+      "queueFinished": "La cola ha terminado",
+      "jobFailed": "Una conversión ha fallado",
+      "checkFailed": "Una comprobación tras la conversión ha fallado",
+      "jobDone": "Cada archivo convertido"
+    },
+    "title": {
+      "paused": "En pausa · {name} — {app}",
+      "checking": "Comprobando · {name} — {app}",
+      "progress": "{percent} % · {name} — {app}",
+      "starting": "Iniciando · {name} — {app}",
+      "waiting": "Esperando hasta {time} — {app}",
+      "finished": "✓ Cola terminada — {app}"
+    },
+    "notify": {
+      "queueFinished": "Cola terminada",
+      "queueFinishedBody_one": "{count} convertido",
+      "queueFinishedBody_other": "{count} convertidos",
+      "queueFinishedBodyFailed_one": "{count} convertido · {failed} con error",
+      "queueFinishedBodyFailed_other": "{count} convertidos · {failed} con error",
+      "jobFailed": "Conversión fallida",
+      "checkFailed": "Comprobación fallida",
+      "jobDone": "Convertido"
+    }
+  },
+  "live": {
+    "queueFinished": "Cola terminada: todos los trabajos están hechos. Pulse Iniciar para los siguientes."
+  },
+  "roots": {
+    "target": "Destino"
+  },
+  "api": {
+    "networkError": "Error de red",
+    "cancelled": "Cancelado"
+  }
+}

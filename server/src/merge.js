@@ -43,44 +43,54 @@ const countOf = (tracks, type) => tracks.filter((t) => t.type === type).length;
 const plural = (n, w) => `${n} ${w} track${n === 1 ? '' : 's'}`;
 
 /**
- * Can these parts be appended? Returns [{ level: 'error'|'warning', message }].
+ * Can these parts be appended? Returns [{ level: 'error'|'warning', message, code, params }]
+ * (code + params let the web app show the message in its own language).
  * Errors block the merge: the result would not play properly.
  */
 export function compatibility(parts) {
   const problems = [];
-  if (parts.length < 2) problems.push({ level: 'error', message: 'Choose at least two files to merge.' });
+  if (parts.length < 2) problems.push({ level: 'error', code: 'tooFew', params: {}, message: 'Choose at least two files to merge.' });
   const first = parts[0];
   if (!first) return problems;
   for (const [i, p] of parts.entries()) {
-    if (!p.duration) problems.push({ level: 'error', message: `${p.name}: cannot read its length.` });
-    if (!p.tracks.some((t) => t.type === 'video')) problems.push({ level: 'error', message: `${p.name}: has no video.` });
+    if (!p.duration) problems.push({ level: 'error', code: 'noLength', params: { name: p.name }, message: `${p.name}: cannot read its length.` });
+    if (!p.tracks.some((t) => t.type === 'video')) problems.push({ level: 'error', code: 'noVideo', params: { name: p.name }, message: `${p.name}: has no video.` });
     if (i === 0) continue;
     const label = `${p.name} (part ${i + 1})`;
+    const at = { name: p.name, part: i + 1 };
     const layout = (ts) => ts.map((t) => t.type).join(',');
     if (layout(p.tracks) !== layout(first.tracks)) {
-      const diff = ['video', 'audio', 'subtitle']
-        .filter((ty) => countOf(p.tracks, ty) !== countOf(first.tracks, ty))
-        .map((ty) => `${plural(countOf(p.tracks, ty), typeLabel[ty])} instead of ${countOf(first.tracks, ty)}`);
+      const types = ['video', 'audio', 'subtitle'].filter((ty) => countOf(p.tracks, ty) !== countOf(first.tracks, ty));
+      const diff = types.map((ty) => `${plural(countOf(p.tracks, ty), typeLabel[ty])} instead of ${countOf(first.tracks, ty)}`);
       problems.push({
         level: 'error',
+        code: types.length ? 'layout' : 'layoutOrder',
+        params: { ...at, diff: types.map((type) => ({ type, count: countOf(p.tracks, type), expected: countOf(first.tracks, type) })) },
         message: `${label} has a different track layout: ${diff.join(', ') || 'tracks in a different order'}. Every part needs the same tracks (convert them with the same preset).`,
       });
       continue;
     }
     p.tracks.forEach((t, k) => {
       const f = first.tracks[k];
-      const what = `${typeLabel[t.type]} track ${countOf(p.tracks.slice(0, k + 1), t.type)}`;
+      const track = countOf(p.tracks.slice(0, k + 1), t.type);
+      const what = `${typeLabel[t.type]} track ${track}`;
+      const tr = { ...at, type: t.type, track };
       if (t.codecId !== f.codecId) {
-        problems.push({ level: 'error', message: `${label}: ${what} is ${t.codec}, part 1 has ${f.codec}.` });
+        problems.push({ level: 'error', code: 'codec', params: { ...tr, codec: t.codec, firstCodec: f.codec }, message: `${label}: ${what} is ${t.codec}, part 1 has ${f.codec}.` });
       } else if (t.type === 'audio' && (t.channels !== f.channels || t.rate !== f.rate)) {
-        problems.push({ level: 'error', message: `${label}: ${what} has ${t.channels} channels at ${t.rate} Hz, part 1 has ${f.channels} at ${f.rate} Hz.` });
+        problems.push({
+          level: 'error',
+          code: 'audioFormat',
+          params: { ...tr, channels: t.channels, rate: t.rate, firstChannels: f.channels, firstRate: f.rate },
+          message: `${label}: ${what} has ${t.channels} channels at ${t.rate} Hz, part 1 has ${f.channels} at ${f.rate} Hz.`,
+        });
       } else if (t.type === 'video' && t.size !== f.size) {
-        problems.push({ level: 'warning', message: `${label}: the picture is ${t.size}, part 1 is ${f.size}. Players usually cope, but some may glitch where the parts join.` });
+        problems.push({ level: 'warning', code: 'pictureSize', params: { ...at, size: t.size, firstSize: f.size }, message: `${label}: the picture is ${t.size}, part 1 is ${f.size}. Players usually cope, but some may glitch where the parts join.` });
       } else if (t.type === 'video' && t.privateData && f.privateData && t.privateData !== f.privateData) {
-        problems.push({ level: 'warning', message: `${label}: the video was encoded with slightly different settings. Most players cope; check the joins after merging.` });
+        problems.push({ level: 'warning', code: 'videoSettings', params: at, message: `${label}: the video was encoded with slightly different settings. Most players cope; check the joins after merging.` });
       }
       if (t.lang !== f.lang && t.type !== 'video') {
-        problems.push({ level: 'warning', message: `${label}: ${what} is “${t.lang}”, part 1 is “${f.lang}”. The merged track keeps part 1's language.` });
+        problems.push({ level: 'warning', code: 'language', params: { ...tr, lang: t.lang, firstLang: f.lang }, message: `${label}: ${what} is “${t.lang}”, part 1 is “${f.lang}”. The merged track keeps part 1's language.` });
       }
     });
   }

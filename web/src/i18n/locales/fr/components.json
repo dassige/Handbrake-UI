@@ -1,0 +1,68 @@
+{
+  "dialogs": {
+    "confirmTitle": "Veuillez confirmer",
+    "alertTitle": "Avis",
+    "typeValue": "Veuillez saisir une valeur"
+  },
+  "paneSwitch": {
+    "label": "Panneau"
+  },
+  "toasts": {
+    "dismiss": "Fermer"
+  },
+  "status": {
+    "queued": "En attente",
+    "running": "Conversion",
+    "paused": "En pause",
+    "done": "Converti",
+    "failed": "Échec",
+    "cancelled": "Annulé",
+    "scanning": "Analyse",
+    "finishing": "Finalisation",
+    "checkPaused": "Vérification en pause",
+    "checking": "Vérification"
+  },
+  "verify": {
+    "ok": "Vérifié",
+    "warning": "Avertissements de vérification",
+    "error": "Vérification échouée",
+    "skipped": "Non vérifié",
+    "running": "Vérification"
+  },
+  "folderBadges": {
+    "converting_one": "{count} en conversion",
+    "converting_other": "{count} en conversion",
+    "queued_one": "{count} en attente",
+    "queued_other": "{count} en attente",
+    "converted_one": "{count} converti",
+    "converted_other": "{count} convertis",
+    "failed_one": "{count} en échec",
+    "failed_other": "{count} en échec"
+  },
+  "folderPicker": {
+    "title": "Choisir un dossier",
+    "choose": "Choisir ce dossier",
+    "roots": "Dossier de sources",
+    "crumbs": "Dossier",
+    "up": "Dossier parent",
+    "empty": "Aucun sous-dossier ici."
+  },
+  "delete": {
+    "notDeleted": "Non supprimés :",
+    "notDeletedList": "Non supprimés : {list}",
+    "more_one": "… et {count} autre",
+    "more_other": "… et {count} autres",
+    "nothingTitle": "Rien ne peut être supprimé",
+    "title": "Supprimer du serveur ?",
+    "items_one": "{count} élément",
+    "items_other": "{count} éléments",
+    "summary": "Suppression définitive de {what} : {files}, {size}.",
+    "summaryFolder": "Suppression définitive de {what} : {files}, {size}, y compris tout le contenu du dossier.",
+    "summaryFolders": "Suppression définitive de {what} : {files}, {size}, y compris tout le contenu de {folders}.",
+    "warning": "Cette action est irréversible. Si un client de téléchargement (p. ex. Deluge) partage encore ces fichiers, il les signalera comme manquants.",
+    "deleteItems_one": "Supprimer {count} élément",
+    "deleteItems_other": "Supprimer {count} éléments",
+    "deleted_one": "{count} élément supprimé",
+    "deleted_other": "{count} éléments supprimés"
+  }
+}

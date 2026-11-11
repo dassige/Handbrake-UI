@@ -1,0 +1,64 @@
+{
+  "title": "Statistik",
+  "period": "Zeitraum",
+  "ranges": {
+    "days7": "7 Tage",
+    "days30": "30 Tage",
+    "days90": "90 Tage",
+    "months12": "12 Monate",
+    "allTime": "Gesamt"
+  },
+  "tiles": {
+    "filesConverted": "Konvertierte Dateien",
+    "failed": "{count} fehlgeschlagen",
+    "cancelled": "{count} abgebrochen",
+    "watched": "{count} aus überwachten Ordnern",
+    "noneFailed": "keine fehlgeschlagen",
+    "spaceSaved": "Gesparter Speicherplatz",
+    "smaller": "{percent} kleiner · {source} → {output}",
+    "videoConverted": "Konvertiertes Video",
+    "ofWork": "in {time} Arbeitszeit",
+    "speed": "Geschwindigkeit",
+    "realTime": "Echtzeit",
+    "realTimeFps": "Echtzeit · durchschnittlich {fps} fps"
+  },
+  "perBucket": {
+    "day": "Konvertierte Dateien pro Tag",
+    "month": "Konvertierte Dateien pro Monat"
+  },
+  "chart": "Diagramm",
+  "table": "Tabelle",
+  "nothingConverted": "In diesem Zeitraum wurde nichts konvertiert.",
+  "checks": {
+    "title": "Prüfung nach der Konvertierung",
+    "none": "Keine geprüften Dateien in diesem Zeitraum.",
+    "summary": "{ok} bestanden, {warning} mit Warnungen, {error} fehlgeschlagen",
+    "ok": "Geprüft",
+    "warning": "Warnungen",
+    "error": "Fehlgeschlagen",
+    "unchecked": "{count} ohne Prüfung konvertiert."
+  },
+  "biggestSavings": "Größte Einsparungen",
+  "nothingYet": "Noch nichts.",
+  "byPreset": "Nach Voreinstellung",
+  "columns": {
+    "preset": "Voreinstellung",
+    "converted": "Konvertiert",
+    "failed": "Fehlgeschlagen",
+    "video": "Video",
+    "work": "Arbeitszeit",
+    "speed": "Geschwindigkeit",
+    "avgFps": "Ø fps",
+    "saved": "Gespart",
+    "smaller": "Kleiner",
+    "month": "Monat",
+    "day": "Tag"
+  },
+  "historySince": "Verlauf seit {date}. Das Entfernen von Aufträgen aus der Warteschlange löscht sie nicht aus diesen Zahlen.",
+  "tip": {
+    "converted": "{count} konvertiert",
+    "convertedFailed": "{count} konvertiert · {failed} fehlgeschlagen",
+    "savedWork": "{saved} gespart · {time} Arbeitszeit",
+    "column": "{date}: {count} konvertiert"
+  }
+}

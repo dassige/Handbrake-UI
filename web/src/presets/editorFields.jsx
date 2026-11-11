@@ -1,4 +1,5 @@
 import { useId } from 'react';
+import { t } from '../i18n/index.js';
 
 /**
  * A labelled <select>. options: [{ value, label, disabled? }]; values may be numbers or strings.
@@ -7,7 +8,7 @@ import { useId } from 'react';
  */
 export function Sel({ label, value, options, onChange, hint, disabled, className = '', unknownLabel }) {
   const known = options.some((o) => o.value === value);
-  const list = known || value === undefined ? options : [{ value, label: unknownLabel?.(value) ?? `${value} (not offered)` }, ...options];
+  const list = known || value === undefined ? options : [{ value, label: unknownLabel?.(value) ?? t('presets.editor.notOffered', { value }) }, ...options];
   return (
     <label className={`set-field ${className}`}>
       {label && <span className="set-label">{label}</span>}

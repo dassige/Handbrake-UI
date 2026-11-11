@@ -6,14 +6,15 @@ import { DRAG_PATHS } from './SourceBrowser.jsx';
 import { JobRow, DRAG_JOB } from './JobRow.jsx';
 import { Help } from '../help/Help.jsx';
 import { useDialogs } from './Dialogs.jsx';
+import { t } from '../i18n/index.js';
 
 const FILTERS = [
-  { key: 'all', label: 'All', match: () => true },
-  { key: 'active', label: 'Active', match: (j) => ['running', 'paused', 'queued'].includes(j.status) },
-  { key: 'done', label: 'Converted', match: (j) => j.status === 'done' },
-  { key: 'failed', label: 'Failed / cancelled', match: (j) => ['failed', 'cancelled'].includes(j.status) },
+  { key: 'all', labelKey: 'queue.filters.all', match: () => true },
+  { key: 'active', labelKey: 'queue.filters.active', match: (j) => ['running', 'paused', 'queued'].includes(j.status) },
+  { key: 'done', labelKey: 'queue.filters.done', match: (j) => j.status === 'done' },
+  { key: 'failed', labelKey: 'queue.filters.failed', match: (j) => ['failed', 'cancelled'].includes(j.status) },
   // Converted, but the check after conversion found problems (shown in red when there are any).
-  { key: 'checkFailed', label: 'Check failed', match: (j) => j.status === 'done' && j.verifyStatus === 'error', alert: true },
+  { key: 'checkFailed', labelKey: 'queue.filters.checkFailed', match: (j) => j.status === 'done' && j.verifyStatus === 'error', alert: true },
 ];
 
 export function QueuePanel({
@@ -69,23 +70,23 @@ export function QueuePanel({
       onDrop={onDrop}
     >
       <div className="pane-head">
-        <h2>Queue<Help id="convert.queue" /></h2>
+        <h2>{t('queue.title')}<Help id="convert.queue" /></h2>
         <div className="pane-tools">
-          <label className="field-inline" title="Preset used for files you add">
-            Preset<Help id="presets" />
+          <label className="field-inline" title={t('queue.presetTitle')}>
+            {t('queue.preset')}<Help id="presets" />
             <select value={presetId ?? ''} onChange={(e) => onPresetChange(Number(e.target.value))} disabled={!presets.length}>
               {presets.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.category ? `${p.category} / ` : ''}{p.name}{p.isDefault ? ' (default)' : ''}
+                  {p.category ? `${p.category} / ` : ''}{p.isDefault ? t('queue.presetDefault', { name: p.name }) : p.name}
                 </option>
               ))}
             </select>
           </label>
-          <label className="field-inline" title="Where new files go in the queue">
-            Add
+          <label className="field-inline" title={t('queue.positionTitle')}>
+            {t('common.add')}
             <select value={position} onChange={(e) => onPositionChange(e.target.value)}>
-              <option value="end">at the end</option>
-              <option value="next">next</option>
+              <option value="end">{t('queue.position.end')}</option>
+              <option value="next">{t('queue.position.next')}</option>
             </select>
           </label>
         </div>
@@ -97,9 +98,9 @@ export function QueuePanel({
             key={f.key}
             className={`chip ${filter === f.key ? 'active' : ''} ${f.alert && counts[f.key] ? 'alert' : ''}`}
             onClick={() => setFilter(f.key)}
-            title={f.key === 'checkFailed' ? 'Converted files whose check after conversion failed' : undefined}
+            title={f.key === 'checkFailed' ? t('queue.filters.checkFailedTitle') : undefined}
           >
-            {f.label} <span className="chip-count">{counts[f.key]}</span>
+            {t(f.labelKey)} <span className="chip-count">{counts[f.key]}</span>
           </button>
         ))}
         <Help id="job.statuses" />
@@ -107,44 +108,44 @@ export function QueuePanel({
         {filter === 'checkFailed' && counts.checkFailed > 0 && (
           <button
             className="btn ghost small"
-            title="Check these converted files again, one after the other"
+            title={t('queue.checkAllAgainTitle')}
             onClick={async () => {
               for (const j of visible) await run(() => api.jobAction(j.id, 'verify'));
             }}
             disabled={visible.some((j) => j.verifyStatus === 'running')}
           >
-            <ShieldCheck size={14} /> Check all again
+            <ShieldCheck size={14} /> {t('queue.checkAllAgain')}
           </button>
         )}
         {filter === 'done' && counts.done > 0 && (
           <button
             className="btn ghost small"
-            title="Open the converted files in the Rename view"
+            title={t('queue.renameTheseTitle')}
             onClick={() => onRename(visible.map((j) => j.outputPath))}
           >
-            <Wand2 size={14} /> Rename these
+            <Wand2 size={14} /> {t('queue.renameThese')}
           </button>
         )}
         {filter === 'done' && counts.done > 1 && onMerge && (
           <button
             className="btn ghost small"
-            title="Open the converted files in the Merge view"
+            title={t('queue.mergeTheseTitle')}
             onClick={() => onMerge(visible.map((j) => j.outputPath))}
           >
-            <Combine size={14} /> Merge these
+            <Combine size={14} /> {t('queue.mergeThese')}
           </button>
         )}
         <button
           className="btn ghost small"
           disabled={!finishedCount}
-          title="Remove converted, failed and cancelled jobs from the list (files are not touched)"
+          title={t('queue.clearFinishedTitle')}
           onClick={async () => {
-            if (await dialogs.confirm({ title: 'Clear finished jobs', message: `Remove ${finishedCount} finished job(s) from the list? Files are not deleted.`, confirmLabel: 'Clear' })) {
+            if (await dialogs.confirm({ title: t('queue.clearDialog.title'), message: t('queue.clearDialog.message', { count: finishedCount }), confirmLabel: t('common.clear') })) {
               run(() => api.clearJobs(['done', 'failed', 'cancelled']));
             }
           }}
         >
-          <Trash2 size={14} /> Clear finished
+          <Trash2 size={14} /> {t('queue.clearFinished')}
         </button>
       </div>
 
@@ -154,7 +155,7 @@ export function QueuePanel({
         {visible.length === 0 && (
           <div className="drop-hint">
             <Upload size={28} />
-            <p>{jobs.length ? 'No jobs match this filter.' : 'Drag files or folders here from Sources.'}</p>
+            <p>{jobs.length ? t('queue.noMatch') : t('queue.dragHere')}</p>
           </div>
         )}
         {visible.map((job) => (
@@ -194,7 +195,7 @@ export function QueuePanel({
             }}
           />
         ))}
-        {dropActive && <div className="drop-overlay">Drop to add to the queue</div>}
+        {dropActive && <div className="drop-overlay">{t('queue.dropToAdd')}</div>}
       </div>
     </section>
   );
@@ -205,17 +206,17 @@ function EstimateBar({ estimate, queue }) {
   if (!estimate) return null;
   const sched = queue?.schedule;
   const parts = [];
-  if (estimate.seconds > 0) parts.push(`≈ ${humanDuration(estimate.seconds)} of conversion left`);
-  if (estimate.unknown) parts.push(`${estimate.unknown} job${estimate.unknown === 1 ? '' : 's'} not estimated yet`);
+  if (estimate.seconds > 0) parts.push(t('queue.estimate.left', { duration: humanDuration(estimate.seconds) }));
+  if (estimate.unknown) parts.push(t('queue.estimate.notEstimated', { count: estimate.unknown }));
   let when = null;
   if (estimate.finishAt && !estimate.unknown) {
-    when = queue?.running ? `done around ${clockTime(estimate.finishAt)}` : `if started, done around ${clockTime(estimate.finishAt)}`;
+    when = t(queue?.running ? 'queue.estimate.doneAround' : 'queue.estimate.ifStartedDoneAround', { time: clockTime(estimate.finishAt) });
   }
   let note = null;
   if (sched?.enabled && !sched.override) {
-    if (sched.waiting && sched.nextStart) note = `Waiting for the conversion window: starts ${clockTime(sched.nextStart)}`;
-    else if (queue?.running && !sched.open && sched.nextStart) note = `Window closed: the current job finishes, the rest waits until ${clockTime(sched.nextStart)}`;
-    else if (queue?.running && sched.open && sched.closesAt) note = `Window open until ${clockTime(sched.closesAt)}`;
+    if (sched.waiting && sched.nextStart) note = t('queue.estimate.waitingWindow', { time: clockTime(sched.nextStart) });
+    else if (queue?.running && !sched.open && sched.nextStart) note = t('queue.estimate.windowClosed', { time: clockTime(sched.nextStart) });
+    else if (queue?.running && sched.open && sched.closesAt) note = t('queue.estimate.windowOpenUntil', { time: clockTime(sched.closesAt) });
   }
   if (!parts.length && !note) return null;
   return (
@@ -224,7 +225,7 @@ function EstimateBar({ estimate, queue }) {
       <span>
         {parts.join(' · ')}
         {when && <>{parts.length ? ' · ' : ''}<strong>{when}</strong></>}
-        {estimate.estimated > 0 && !estimate.unknown && <span className="muted"> (some lengths guessed)</span>}
+        {estimate.estimated > 0 && !estimate.unknown && <span className="muted"> {t('queue.estimate.guessed')}</span>}
       </span>
       {note && <span className="estimate-note"><CalendarClock size={14} /> {note}</span>}
       <Help id="queue.eta" />

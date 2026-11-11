@@ -1,0 +1,81 @@
+{
+  "views": {
+    "label": "Ansicht",
+    "convert": "Konvertieren",
+    "rename": "Umbenennen",
+    "merge": "Zusammenführen",
+    "quality": "Qualität",
+    "stats": "Statistik",
+    "presets": "Voreinstellungen",
+    "settings": "Einstellungen"
+  },
+  "panes": {
+    "sources": "Quellen",
+    "queue": "Warteschlange",
+    "queueCount": "Warteschlange ({n})"
+  },
+  "leave": {
+    "settingsTitle": "Nicht gespeicherte Einstellungen",
+    "settingsMessage": "Einstellungen ohne Speichern verlassen? Ihre Änderungen gehen verloren.",
+    "presetTitle": "Nicht gespeicherte Voreinstellung",
+    "presetMessage": "Den Voreinstellungseditor ohne Speichern verlassen? Ihre Änderungen gehen verloren.",
+    "confirm": "Ohne Speichern verlassen"
+  },
+  "add": {
+    "noPreset": "Erstellen oder importieren Sie zuerst eine Voreinstellung",
+    "skippedReason_one": "{count} {reason}",
+    "skippedReason_other": "{count} {reason}",
+    "added_one": "{count} Datei hinzugefügt",
+    "added_other": "{count} Dateien hinzugefügt",
+    "addedSkipped_one": "{count} Datei hinzugefügt · übersprungen: {skipped}",
+    "addedSkipped_other": "{count} Dateien hinzugefügt · übersprungen: {skipped}",
+    "nothing": "Nichts hinzugefügt",
+    "nothingSkipped": "Nichts hinzugefügt: {skipped}"
+  },
+  "watch": {
+    "title": "Diesen Ordner überwachen?",
+    "message": "Neue Videos, die in {path} erscheinen, werden automatisch zur Warteschlange hinzugefügt.",
+    "messagePreset": "Neue Videos, die in {path} erscheinen, werden automatisch mit der Standardvoreinstellung ({preset}) zur Warteschlange hinzugefügt.",
+    "note": "Dateien, die schon darin liegen, bleiben unberührt. Voreinstellung und weitere Optionen ändern Sie unter Einstellungen → Überwachte Ordner.",
+    "noteOff": "Dateien, die schon darin liegen, bleiben unberührt. Die Überwachung ist ausgeschaltet und wird hiermit eingeschaltet. Voreinstellung und weitere Optionen ändern Sie unter Einstellungen → Überwachte Ordner.",
+    "confirm": "Überwachen",
+    "done": "Ordner wird überwacht"
+  },
+  "outsideWindow": {
+    "title": "Außerhalb des Zeitfensters",
+    "opensAt": "Das Zeitfenster öffnet: {time}.",
+    "opensLater": "Das Zeitfenster öffnet später.",
+    "note": "„Jetzt starten“ konvertiert sofort die ganze Warteschlange und ignoriert das Zeitfenster, bis die Warteschlange stoppt.",
+    "startNow": "Jetzt starten",
+    "wait": "Auf das Zeitfenster warten",
+    "startsAt": "Die Warteschlange startet: {time}"
+  },
+  "state": {
+    "running": "Warteschlange läuft",
+    "stopped": "Warteschlange gestoppt",
+    "waitingFor": "Wartet bis {time}",
+    "stopTitle": "Aktuellen Auftrag abschließen, dann stoppen",
+    "startTitle": "Wartende Aufträge konvertieren",
+    "stopAfterCurrent": "Nach aktuellem stoppen",
+    "queued_one": "{count} wartend",
+    "queued_other": "{count} wartend",
+    "done_one": "{count} fertig",
+    "done_other": "{count} fertig",
+    "failed_one": "{count} fehlgeschlagen",
+    "failed_other": "{count} fehlgeschlagen",
+    "left": "≈ {duration} verbleibend",
+    "doneAround": "Fertig etwa: {time}"
+  },
+  "window": {
+    "openUntilTitle": "Zeitfenster offen bis {time}",
+    "openTitle": "Zeitfenster offen",
+    "closedTitle": "Zeitfenster geschlossen; öffnet: {time}",
+    "until": "bis {time}",
+    "open": "offen"
+  },
+  "offline": "offline",
+  "offlineTitle": "Live-Aktualisierung getrennt; neuer Versuch läuft",
+  "handbrakeMissing": "HandBrakeCLI ist nicht verfügbar: {error}",
+  "noPresets": "Noch keine Voreinstellungen. {link}, um mit dem Konvertieren zu beginnen.",
+  "noPresetsLink": "Erstellen oder importieren Sie eine Voreinstellung"
+}

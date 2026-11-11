@@ -9,22 +9,20 @@ import { VerifyBadge } from '../components/StatusBadge.jsx';
 import { bytes, dateTime, duration, fileName, relTo } from '../format.js';
 import { Help } from '../help/Help.jsx';
 import { useDialogs } from '../components/Dialogs.jsx';
+import { t } from '../i18n/index.js';
+import { checkDetail, checkLabel, mergeProblem } from '../i18n/serverText.js';
 
 const DRAG_PART = 'application/x-hbui-part';
 
-const STATUS = {
-  queued: ['queued', 'Waiting'],
-  running: ['running', 'Merging'],
-  done: ['done', 'Merged'],
-  failed: ['failed', 'Failed'],
-  cancelled: ['cancelled', 'Cancelled'],
-};
+// Each status is also the badge's class; its label is merge.status.<status> (plus .verifying / .reading).
+const STATUSES = ['queued', 'running', 'done', 'failed', 'cancelled'];
 
 function MergeStatus({ m }) {
-  let [cls, label] = STATUS[m.status] ?? ['', m.status];
-  if (m.status === 'running' && m.phase === 'verifying') label = 'Checking';
-  if (m.status === 'running' && m.phase === 'reading') label = 'Reading parts';
-  return <span className={`badge ${cls}`}>{label}</span>;
+  if (!STATUSES.includes(m.status)) return <span className="badge">{m.status}</span>;
+  let key = m.status;
+  if (m.status === 'running' && m.phase === 'verifying') key = 'verifying';
+  if (m.status === 'running' && m.phase === 'reading') key = 'reading';
+  return <span className={`badge ${m.status}`}>{t(`merge.status.${key}`)}</span>;
 }
 
 function MergeItem({ m, settings, run }) {
@@ -41,9 +39,9 @@ function MergeItem({ m, settings, run }) {
         </button>
         <span className="job-actions">
           {active ? (
-            <button className="icon-btn danger" title="Cancel this merge" onClick={() => run(() => api.mergeCancel(m.id))}><Square size={15} /></button>
+            <button className="icon-btn danger" title={t('merge.item.cancel')} onClick={() => run(() => api.mergeCancel(m.id))}><Square size={15} /></button>
           ) : (
-            <button className="icon-btn" title="Remove from the list (files are not touched)" onClick={() => run(() => api.mergeRemove(m.id))}><Trash2 size={15} /></button>
+            <button className="icon-btn" title={t('merge.item.remove')} onClick={() => run(() => api.mergeRemove(m.id))}><Trash2 size={15} /></button>
           )}
         </span>
       </div>
@@ -52,18 +50,18 @@ function MergeItem({ m, settings, run }) {
       )}
       <div className="job-meta">
         {[
-          `${m.parts.length} parts`,
+          t('merge.item.parts', { count: m.parts.length }),
           m.duration ? duration(m.duration) : null,
-          m.chapters != null ? `${m.chapters} chapters` : null,
+          m.chapters != null ? t('merge.item.chapters', { count: m.chapters }) : null,
           m.outputSize ? bytes(m.outputSize) : null,
-          m.partsRemoved ? 'parts removed' : null,
+          m.partsRemoved ? t('merge.item.partsRemoved') : null,
           m.finishedAt ? dateTime(m.finishedAt) : dateTime(m.createdAt),
         ].filter(Boolean).join(' · ')}
       </div>
       {m.error && <p className="text-bad small">{m.error}</p>}
       {open && (
         <div className="merge-item-body">
-          <p className="small"><span className="muted">Output:</span> <code className="path">{relTo(settings?.targetRoot, m.output)}</code></p>
+          <p className="small"><span className="muted">{t('merge.item.output')}</span> <code className="path">{relTo(settings?.targetRoot, m.output)}</code></p>
           <ol className="small merge-parts-done">
             {m.parts.map((p) => <li key={p}>{relTo(settings?.targetRoot, p)}</li>)}
           </ol>
@@ -73,7 +71,7 @@ function MergeItem({ m, settings, run }) {
               {m.verify.checks.map((c) => (
                 <li key={c.id} className={c.status}>
                   <span className={`dot-status ${c.status}`} />
-                  <span><strong>{c.label}</strong> <span className="check-detail">{c.detail}</span></span>
+                  <span><strong>{checkLabel(c)}</strong> <span className="check-detail">{checkDetail(c)}</span></span>
                 </li>
               ))}
             </ul>
@@ -106,7 +104,7 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
       return undefined;
     }
     const mine = ++seq.current;
-    const t = setTimeout(async () => {
+    const timer = setTimeout(async () => {
       setLoading(true);
       try {
         const r = await api.mergeInspect({ paths, chapterMode, outputName: nameEdited ? name : undefined });
@@ -125,7 +123,7 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
         if (mine === seq.current) setLoading(false);
       }
     }, 350);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paths, chapterMode, name, nameEdited, changeTick]);
 
@@ -142,15 +140,15 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
   async function merge() {
     if (!info?.canMerge) return;
     if (removeParts && !(await dialogs.confirm({
-      title: 'Delete the parts?',
-      message: `After a successful merge, delete the ${info.parts.length} original parts? This cannot be undone.`,
-      confirmLabel: 'Merge and delete parts',
+      title: t('merge.view.deleteTitle'),
+      message: t('merge.view.deleteMessage', { count: info.parts.length }),
+      confirmLabel: t('merge.view.deleteConfirm'),
       danger: true,
     }))) return;
     setStarting(true);
     const r = await run(
       () => api.mergeStart({ paths, outputName: name, chapterMode, removeParts }),
-      (x) => `Merging into ${fileName(x.output)}`,
+      (x) => t('merge.view.started', { name: fileName(x.output) }),
     );
     setStarting(false);
     if (r) {
@@ -165,7 +163,7 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
   const warnings = info?.problems.filter((p) => p.level === 'warning') ?? [];
   const parts = info?.parts ?? [];
 
-  const [paneClass, paneSwitch, showPane] = usePaneSwitch(['Converted files', `Parts${paths.length ? ` (${paths.length})` : ''}`]);
+  const [paneClass, paneSwitch, showPane] = usePaneSwitch([t('merge.view.convertedFiles'), paths.length ? t('merge.view.partsPaneCount', { count: paths.length }) : t('merge.view.partsPane')]);
 
   return (
     <main className={`panes merge-panes ${paneClass}`}>
@@ -173,9 +171,10 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
       <SourceBrowser
         settings={settings}
         root="target"
-        title="Converted files"
-        addLabel="Add to merge"
-        hint="Drag files, or a folder with the parts, to the merge list. Ctrl/Shift-click to select several."
+        title={t('merge.view.convertedFiles')}
+        addLabel={t('merge.view.addLabel')}
+        addTitle={t('merge.view.addTitle')}
+        hint={t('merge.view.browserHint')}
         help="merge.overview"
         changeTick={changeTick}
         onAdd={(list) => {
@@ -204,20 +203,20 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
         }}
       >
         <div className="pane-head">
-          <h2>Merge<Help id="merge.overview" /></h2>
+          <h2>{t('merge.view.title')}<Help id="merge.overview" /></h2>
           <div className="pane-tools">
             <button className="btn ghost small" disabled={!paths.length} onClick={() => setPaths([])}>
-              <ListX size={14} /> Clear list
+              <ListX size={14} /> {t('merge.view.clearList')}
             </button>
           </div>
         </div>
 
         <div className="merge-body">
-          <h3 className="section-title">Parts, in order<Help id="merge.parts" /></h3>
+          <h3 className="section-title">{t('merge.view.partsTitle')}<Help id="merge.parts" /></h3>
           {paths.length === 0 ? (
             <div className="drop-hint">
               <Upload size={28} />
-              <p>Drag the parts here from Converted files, then put them in order.</p>
+              <p>{t('merge.view.empty')}</p>
             </div>
           ) : (
             <ol className="parts">
@@ -259,19 +258,19 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
                         {d
                           ? [
                               duration(d.duration),
-                              `${d.chapters} chapter${d.chapters === 1 ? '' : 's'}`,
-                              d.tracks.filter((t) => t.type === 'audio').map((t) => t.lang).join('+') + ' audio',
-                              `${d.tracks.filter((t) => t.type === 'subtitle').length} subs`,
-                              d.tracks.find((t) => t.type === 'video')?.size,
+                              t('merge.view.partChapters', { count: d.chapters }),
+                              t('merge.view.audio', { langs: d.tracks.filter((tr) => tr.type === 'audio').map((tr) => tr.lang).join('+') }),
+                              t('merge.view.subs', { count: d.tracks.filter((tr) => tr.type === 'subtitle').length }),
+                              d.tracks.find((tr) => tr.type === 'video')?.size,
                               bytes(d.size),
                             ].filter(Boolean).join(' · ')
-                          : loading ? 'reading…' : ''}
+                          : loading ? t('merge.view.reading') : ''}
                       </span>
                     </span>
                     <span className="job-actions">
-                      <button className="icon-btn" title="Move up" disabled={i === 0} onClick={() => move(i, i - 1)}><ArrowUp size={14} /></button>
-                      <button className="icon-btn" title="Move down" disabled={i === paths.length - 1} onClick={() => move(i, i + 1)}><ArrowDown size={14} /></button>
-                      <button className="icon-btn" title="Take out of the list" onClick={() => setPaths((x) => x.filter((y) => y !== p))}><X size={14} /></button>
+                      <button className="icon-btn" title={t('merge.view.moveUp')} disabled={i === 0} onClick={() => move(i, i - 1)}><ArrowUp size={14} /></button>
+                      <button className="icon-btn" title={t('merge.view.moveDown')} disabled={i === paths.length - 1} onClick={() => move(i, i + 1)}><ArrowDown size={14} /></button>
+                      <button className="icon-btn" title={t('merge.view.takeOut')} onClick={() => setPaths((x) => x.filter((y) => y !== p))}><X size={14} /></button>
                     </span>
                   </li>
                 );
@@ -281,19 +280,19 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
 
           {info && (errors.length > 0 || warnings.length > 0) && (
             <div className="problems">
-              <h3 className="section-title">Can they be joined?<Help id="merge.compat" /></h3>
+              <h3 className="section-title">{t('merge.view.compatTitle')}<Help id="merge.compat" /></h3>
               <ul>
-                {errors.map((p, i) => <li key={`e${i}`} className="text-bad"><CircleX size={14} /> {p.message}</li>)}
-                {warnings.map((p, i) => <li key={`w${i}`} className="text-warn"><CircleAlert size={14} /> {p.message}</li>)}
+                {errors.map((p, i) => <li key={`e${i}`} className="text-bad"><CircleX size={14} /> {mergeProblem(p)}</li>)}
+                {warnings.map((p, i) => <li key={`w${i}`} className="text-warn"><CircleAlert size={14} /> {mergeProblem(p)}</li>)}
               </ul>
             </div>
           )}
 
           {paths.length > 0 && (
             <div className="merge-options">
-              <h3 className="section-title">Merged file<Help id="merge.options" /></h3>
+              <h3 className="section-title">{t('merge.view.mergedFile')}<Help id="merge.options" /></h3>
               <label className="merge-name-field">
-                <span className="muted small">Name</span>
+                <span className="muted small">{t('common.name')}</span>
                 <span className="name-with-ext">
                   <input
                     value={name}
@@ -307,25 +306,25 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
                 </span>
               </label>
               <p className="muted small">
-                In {info?.outputDir ? relTo(settings?.targetRoot, info.outputDir) || 'the target folder' : '…'} (the folder of part 1).
-                {info?.outputExists && <span className="text-warn"> A file with this name exists: the merged file gets a number ({name}{settings?.renameSeparator ?? '_'}1.mkv).</span>}
+                {t('merge.view.folder', { folder: info?.outputDir ? relTo(settings?.targetRoot, info.outputDir) || t('merge.view.targetFolder') : '…' })}
+                {info?.outputExists && <span className="text-warn"> {t('merge.view.exists', { example: `${name}${settings?.renameSeparator ?? '_'}1.mkv` })}</span>}
               </p>
               <label className="field-inline">
-                Chapters<Help id="merge.chapters" />
+                {t('merge.view.chapters')}<Help id="merge.chapters" />
                 <select value={chapterMode} onChange={(e) => setChapterMode(e.target.value)}>
-                  <option value="keep">Keep each part's chapters</option>
-                  <option value="perFile">One chapter per part, named after the file</option>
+                  <option value="keep">{t('merge.view.chaptersKeep')}</option>
+                  <option value="perFile">{t('merge.view.chaptersPerFile')}</option>
                 </select>
               </label>
               <label className="check">
                 <input type="checkbox" checked={removeParts} onChange={(e) => setRemoveParts(e.target.checked)} />
-                Delete the parts after a successful merge
+                {t('merge.view.deleteParts')}
               </label>
 
               {info?.chapters?.length > 0 && (
                 <div className="chapter-preview">
                   <button className="link small" onClick={() => setShowChapters((v) => !v)}>
-                    {showChapters ? <ChevronDown size={13} /> : <ChevronRight size={13} />} {info.chapters.length} chapters in the merged file
+                    {showChapters ? <ChevronDown size={13} /> : <ChevronRight size={13} />} {t('merge.view.chapterPreview', { count: info.chapters.length })}
                   </button>
                   {showChapters && (
                     <ol>
@@ -339,23 +338,25 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
             </div>
           )}
 
-          <h3 className="section-title merges-title">Recent merges<Help id="merge.history" /></h3>
+          <h3 className="section-title merges-title">{t('merge.view.recent')}<Help id="merge.history" /></h3>
           {merges.length === 0 ? (
-            <p className="muted small">No merges yet.</p>
+            <p className="muted small">{t('merge.view.noMerges')}</p>
           ) : (
             <ul className="merges">{merges.map((m) => <MergeItem key={m.id} m={m} settings={settings} run={run} />)}</ul>
           )}
-          {dropActive && <div className="drop-overlay">Drop to add to the merge list</div>}
+          {dropActive && <div className="drop-overlay">{t('merge.view.dropHere')}</div>}
         </div>
 
         <div className="rename-foot">
           <span className="muted small">
-            {info ? `${parts.length} parts · ${duration(info.duration)} · ${bytes(info.size)}` : `${paths.length} parts`}
-            {loading && ' · reading…'}
+            {info
+              ? `${t('merge.item.parts', { count: parts.length })} · ${duration(info.duration)} · ${bytes(info.size)}`
+              : t('merge.item.parts', { count: paths.length })}
+            {loading && ` · ${t('merge.view.reading')}`}
           </span>
           <span className="spacer" />
           <button className="btn primary" disabled={!info?.canMerge || loading || starting || !name.trim()} onClick={merge}>
-            <Combine size={15} /> Merge {parts.length >= 2 ? `${parts.length} files` : ''}
+            <Combine size={15} /> {parts.length >= 2 ? t('merge.view.mergeFiles', { count: parts.length }) : t('merge.view.merge')}
           </button>
         </div>
       </section>

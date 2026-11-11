@@ -83,20 +83,27 @@ const diffText = (d) => (Math.abs(d) < 60 ? `${Math.abs(d).toFixed(1)} s` : fmtS
 /**
  * Turns the measurements into checks. Pure, so it is unit tested.
  * input: { sourceLength, probe, packets: { [index]: { end, count } }, decode, log }
+ * Each check: { id, label, labelCode, labelParams?, status, detail, detailCode, detailParams }.
+ * label/detail are the English wording (notifications, logs); the web app shows the codes in
+ * the user's language. Params hold numbers, names and tool messages, plus durations already
+ * formatted (1:23:45, 3.0 s). sourceLabel ('source', or 'parts' for a merge) picks a variant.
  */
 export function evaluate({ sourceLength, probe, packets, decode, log, sourceLabel = 'source' }) {
   const checks = [];
-  const add = (id, label, status, detail) => checks.push({ id, label, status, detail });
+  const add = (id, [label, labelCode, labelParams], status, [detail, detailCode, detailParams = {}]) =>
+    checks.push({ id, label, labelCode, ...(labelParams ? { labelParams } : {}), status, detail, detailCode, detailParams });
   const streams = probe?.streams ?? [];
   const video = streams.find((s) => s.codec_type === 'video' && !s.disposition?.attached_pic);
   const audio = streams.filter((s) => s.codec_type === 'audio');
   const subs = streams.filter((s) => s.codec_type === 'subtitle');
 
+  const VIDEO = ['Video', 'video'];
   if (!video) {
-    add('video', 'Video', 'error', 'The file has no video stream');
+    add('video', VIDEO, 'error', ['The file has no video stream', 'noVideo']);
     return finish(checks);
   }
-  add('video', 'Video', 'ok', `${video.codec_name} ${video.width}×${video.height}`);
+  add('video', VIDEO, 'ok', [`${video.codec_name} ${video.width}×${video.height}`, 'videoOk',
+    { codec: video.codec_name, width: video.width, height: video.height }]);
 
   // Real length: where the video packets actually end (metadata can claim more).
   const videoEnd = packets?.[video.index]?.end ?? null;
@@ -106,56 +113,86 @@ export function evaluate({ sourceLength, probe, packets, decode, log, sourceLabe
   const decodedEnd = rawDecoded != null && videoEnd != null && rawDecoded < 1 && videoEnd > 60 ? null : rawDecoded;
   const outLength = decodedEnd != null && videoEnd != null ? Math.min(decodedEnd, videoEnd) : decodedEnd ?? videoEnd ?? videoLength(probe);
   if (sourceLength == null || outLength == null) {
-    add('length', 'Length', 'info', `Output ${fmtSec(outLength)}; the ${sourceLabel} length is unknown`);
+    add('length', ['Length', 'length'], 'info', [`Output ${fmtSec(outLength)}; the ${sourceLabel} length is unknown`, 'lengthUnknown',
+      { output: fmtSec(outLength), sourceLabel }]);
   } else {
     const d = outLength - sourceLength;
     const status = Math.abs(d) <= okDiff(sourceLength) ? 'ok' : Math.abs(d) <= warnDiff(sourceLength) ? 'warning' : 'error';
-    add('length', `Length matches the ${sourceLabel}`, status,
+    const params = { output: fmtSec(outLength), source: fmtSec(sourceLength), sourceLabel };
+    add('length', [`Length matches the ${sourceLabel}`, 'lengthMatches', { sourceLabel }], status,
       status === 'ok'
-        ? `${fmtSec(outLength)} (${sourceLabel} ${fmtSec(sourceLength)})`
-        : `Output is ${diffText(d)} ${d < 0 ? 'shorter' : 'longer'} than the ${sourceLabel}: ${fmtSec(outLength)} vs ${fmtSec(sourceLength)}`);
+        ? [`${fmtSec(outLength)} (${sourceLabel} ${fmtSec(sourceLength)})`, 'lengthOk', params]
+        : [`Output is ${diffText(d)} ${d < 0 ? 'shorter' : 'longer'} than the ${sourceLabel}: ${fmtSec(outLength)} vs ${fmtSec(sourceLength)}`,
+          d < 0 ? 'lengthShorter' : 'lengthLonger', { ...params, diff: diffText(d) }]);
   }
 
   // Audio tracks: how many HandBrake meant to write, and each one complete.
+  const AUDIO_COUNT = ['Audio tracks', 'audioCount'];
   if (log?.found) {
-    add('audioCount', 'Audio tracks', audio.length === log.audioTracks ? 'ok' : 'error',
+    const languages = audio.map((a) => a.tags?.language ?? '?').join(', ');
+    add('audioCount', AUDIO_COUNT, audio.length === log.audioTracks ? 'ok' : 'error',
       audio.length === log.audioTracks
-        ? `${audio.length} (${audio.map((a) => a.tags?.language ?? '?').join(', ') || 'none'})`
-        : `HandBrake wrote ${log.audioTracks}, the file has ${audio.length}`);
+        ? [`${audio.length} (${languages || 'none'})`, languages ? 'audioCountOk' : 'audioCountNone', { count: audio.length, languages }]
+        : [`HandBrake wrote ${log.audioTracks}, the file has ${audio.length}`, 'audioCountMismatch', { expected: log.audioTracks, actual: audio.length }]);
   } else {
-    add('audioCount', 'Audio tracks', audio.length ? 'info' : 'warning', `${audio.length} (no HandBrake log to compare with)`);
+    add('audioCount', AUDIO_COUNT, audio.length ? 'info' : 'warning',
+      [`${audio.length} (no HandBrake log to compare with)`, 'audioCountNoLog', { count: audio.length }]);
   }
   const ref = videoEnd ?? outLength;
   const short = [];
   for (const [i, a] of audio.entries()) {
     const p = packets?.[a.index];
-    if (!p || !p.count) short.push(`track ${i + 1} is empty`);
-    else if (ref != null && ref - p.end > okDiff(ref)) short.push(`track ${i + 1} (${a.tags?.language ?? '?'}) ends ${diffText(ref - p.end)} early`);
+    if (!p || !p.count) short.push({ code: 'audioTrackEmpty', track: i + 1, text: `track ${i + 1} is empty` });
+    else if (ref != null && ref - p.end > okDiff(ref)) {
+      const language = a.tags?.language ?? '?';
+      const diff = diffText(ref - p.end);
+      short.push({ code: 'audioTrackShort', track: i + 1, language, diff, text: `track ${i + 1} (${language}) ends ${diff} early` });
+    }
   }
-  if (audio.length) add('audioLength', 'Audio length', short.length ? 'error' : 'ok', short.length ? short.join('; ') : 'Every track lasts as long as the video');
+  if (audio.length) {
+    add('audioLength', ['Audio length', 'audioLength'], short.length ? 'error' : 'ok', short.length
+      // tracks: [{ code, track, language?, diff? }], shown joined with "; ".
+      ? [short.map((x) => x.text).join('; '), 'audioTracksShort', { tracks: short.map(({ text, ...x }) => x) }]
+      : ['Every track lasts as long as the video', 'audioLengthOk']);
+  }
 
   // Subtitles: tracks passed through by HandBrake (burned-in ones are part of the picture).
-  const subDetail = subs.map((s) => `${s.tags?.language ?? '?'} ${s.codec_name}${packets?.[s.index]?.count === 0 ? ' (no lines)' : ''}`).join(', ');
+  // list: [{ language, codec, noLines }], shown joined with ", ".
+  const list = subs.map((s) => ({ language: s.tags?.language ?? '?', codec: s.codec_name, noLines: packets?.[s.index]?.count === 0 }));
+  const subDetail = list.map((x) => `${x.language} ${x.codec}${x.noLines ? ' (no lines)' : ''}`).join(', ');
+  const SUBS = ['Subtitle tracks', 'subtitles'];
   if (log?.found) {
-    const burned = log.burnedSubtitles ? `; ${log.burnedSubtitles} burned into the picture` : '';
-    if (subs.length === log.subtitleTracks) add('subtitles', 'Subtitle tracks', 'ok', `${subs.length}${subs.length ? `: ${subDetail}` : ''}${burned}`);
-    else add('subtitles', 'Subtitle tracks', subs.length < log.subtitleTracks ? 'warning' : 'info', `HandBrake wrote ${log.subtitleTracks}, the file has ${subs.length}${burned}`);
+    const burnedN = log.burnedSubtitles;
+    const burned = burnedN ? `; ${burnedN} burned into the picture` : '';
+    const withBurned = burnedN ? 'Burned' : '';
+    if (subs.length === log.subtitleTracks) {
+      add('subtitles', SUBS, 'ok', [`${subs.length}${subs.length ? `: ${subDetail}` : ''}${burned}`,
+        `subtitles${subs.length ? 'Ok' : 'None'}${withBurned}`, { count: subs.length, list, burned: burnedN }]);
+    } else {
+      add('subtitles', SUBS, subs.length < log.subtitleTracks ? 'warning' : 'info',
+        [`HandBrake wrote ${log.subtitleTracks}, the file has ${subs.length}${burned}`, `subtitlesMismatch${withBurned}`,
+          { expected: log.subtitleTracks, actual: subs.length, burned: burnedN }]);
+    }
   } else if (subs.length) {
-    add('subtitles', 'Subtitle tracks', 'info', `${subs.length}: ${subDetail}`);
+    add('subtitles', SUBS, 'info', [`${subs.length}: ${subDetail}`, 'subtitlesOk', { count: subs.length, list }]);
   }
 
   // Full decode.
   if (decode) {
-    if (decode.failed) add('decode', 'Full decode', 'error', decode.failed);
-    else if (decode.errors.length === 0) add('decode', 'Full decode', 'ok', 'Every video and audio frame decodes without errors');
+    const DECODE = ['Full decode', 'decode'];
+    if (decode.failed) add('decode', DECODE, 'error', [decode.failed, decode.failedCode ?? 'message', decode.failedParams ?? { message: decode.failed }]);
+    else if (decode.errors.length === 0) add('decode', DECODE, 'ok', ['Every video and audio frame decodes without errors', 'decodeOk']);
     else {
       const status = decode.errors.length > 10 ? 'error' : 'warning';
-      add('decode', 'Full decode', status, `${decode.errors.length} decoding error${decode.errors.length > 1 ? 's' : ''}, e.g. ${decode.errors[0]}`);
+      add('decode', DECODE, status, [`${decode.errors.length} decoding error${decode.errors.length > 1 ? 's' : ''}, e.g. ${decode.errors[0]}`,
+        'decodeErrors', { count: decode.errors.length, example: decode.errors[0] }]);
     }
   }
 
   if (log?.decoderErrors) {
-    add('sourceErrors', 'Source', 'warning', `HandBrake found ${log.decoderErrors} decoding error${log.decoderErrors > 1 ? 's' : ''} in the source; the damage may be visible in the output too`);
+    add('sourceErrors', ['Source', 'sourceErrors'], 'warning',
+      [`HandBrake found ${log.decoderErrors} decoding error${log.decoderErrors > 1 ? 's' : ''} in the source; the damage may be visible in the output too`,
+        'sourceErrors', { count: log.decoderErrors }]);
   }
   return finish(checks);
 }
@@ -251,10 +288,14 @@ export class Verifier {
         },
       },
     );
-    if (r.signal) return { failed: `Stopped (${r.signal})`, end, errors: [] };
+    if (r.signal) return { failed: `Stopped (${r.signal})`, failedCode: 'decodeStopped', failedParams: { signal: r.signal }, end, errors: [] };
     // "[null @ …]" lines are timestamp complaints of the null output, not decoding errors.
     const errors = r.stderr.split('\n').map((l) => l.trim()).filter((l) => l && !/^\[null @/.test(l));
-    if (r.code !== 0) return { failed: errors.at(-1) ?? `ffmpeg exited with code ${r.code}`, end, errors };
+    if (r.code !== 0) {
+      return errors.length
+        ? { failed: errors.at(-1), failedCode: 'message', failedParams: { message: errors.at(-1) }, end, errors }
+        : { failed: `ffmpeg exited with code ${r.code}`, failedCode: 'ffmpegExit', failedParams: { code: r.code }, end, errors };
+    }
     return { end, errors };
   }
 
@@ -274,8 +315,11 @@ export class Verifier {
       try {
         probe = await this.probe(output, opts);
       } catch (err) {
-        if (err.code === 'ENOENT') return done({ status: 'skipped', checks: [], note: 'ffprobe is not installed' });
-        return done({ status: 'error', checks: [{ id: 'readable', label: 'Readable', status: 'error', detail: `Cannot read the file: ${err.message}` }] });
+        if (err.code === 'ENOENT') return done({ status: 'skipped', checks: [], note: 'ffprobe is not installed', noteCode: 'ffprobeMissing' });
+        return done({ status: 'error', checks: [{
+          id: 'readable', label: 'Readable', labelCode: 'readable', status: 'error',
+          detail: `Cannot read the file: ${err.message}`, detailCode: 'cannotRead', detailParams: { message: err.message },
+        }] });
       }
       const sourceProbe = source ? await this.probe(source, opts).catch(() => null) : null;
       const sourceLength = givenLength ?? videoLength(sourceProbe);
@@ -283,7 +327,7 @@ export class Verifier {
       const log = expected ?? (logFile ? parseHandBrakeLog(await fs.readFile(logFile, 'utf8').catch(() => '')) : null);
       onProgress?.(0.02);
       const packets = await this.packets(output, opts);
-      if (isStopped()) return done({ status: 'skipped', checks: [], note: 'Check stopped' });
+      if (isStopped()) return done({ status: 'skipped', checks: [], note: 'Check stopped', noteCode: 'checkStopped' });
       onProgress?.(mode === 'full' ? 0.08 : 1);
       let decode = null;
       if (mode === 'full') {
@@ -293,13 +337,19 @@ export class Verifier {
           videoIndex: mainVideo(probe)?.index,
           onProgress: (p) => onProgress?.(0.08 + p * 0.92),
         });
-        if (isStopped()) return done({ status: 'skipped', checks: [], note: 'Check stopped' });
+        if (isStopped()) return done({ status: 'skipped', checks: [], note: 'Check stopped', noteCode: 'checkStopped' });
       }
       const result = evaluate({ sourceLength, probe, packets, decode, log, sourceLabel });
-      return done({ ...result, checks: [{ id: 'readable', label: 'Readable', status: 'ok', detail: probe.format?.format_long_name ?? 'yes' }, ...result.checks] });
+      return done({ ...result, checks: [{
+        id: 'readable', label: 'Readable', labelCode: 'readable', status: 'ok',
+        // format_long_name is ffprobe's own wording ("Matroska / WebM"), shown as it is.
+        ...(probe.format?.format_long_name
+          ? { detail: probe.format.format_long_name, detailCode: 'format', detailParams: { format: probe.format.format_long_name } }
+          : { detail: 'yes', detailCode: 'readableYes', detailParams: {} }),
+      }, ...result.checks] });
     } catch (err) {
-      if (err.code === 'ENOENT') return done({ status: 'skipped', checks: [], note: 'ffmpeg/ffprobe are not installed' });
-      return done({ status: 'error', checks: [{ id: 'internal', label: 'Check', status: 'error', detail: err.message }] });
+      if (err.code === 'ENOENT') return done({ status: 'skipped', checks: [], note: 'ffmpeg/ffprobe are not installed', noteCode: 'toolsMissing' });
+      return done({ status: 'error', checks: [{ id: 'internal', label: 'Check', labelCode: 'internal', status: 'error', detail: err.message, detailCode: 'message', detailParams: { message: err.message } }] });
     }
   }
 }

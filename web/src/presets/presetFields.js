@@ -1,127 +1,123 @@
 // The HandBrake preset keys, grouped like the desktop app's tabs, for the read-only preset view.
 //
-// Each field: { key, label, options?: { value: label }, format?: (value, preset) => string,
-// show?: (preset) => boolean }. The editor (PresetEditor.jsx) uses the same labels from hbOptions.js.
-// Keys not listed here are shown under "Other settings", so nothing is hidden.
+// Each field: { key, labelKey, options?: { value: name } or an hbOptions.js option table,
+// format?: (value, preset) => string, show?: (preset) => boolean }; each section has a titleKey.
+// Labels are translated when shown. Keys not listed here are shown under "Other settings",
+// so nothing is hidden.
 
+import { t } from '../i18n/index.js';
 import {
-  AUDIO_ENCODERS, BURN, CONTAINERS, CROP_MODE, FRAMERATE_MODE, MIXDOWNS, PAR, QUALITY_TYPE, TRACK_BEHAVIOR, VIDEO_ENCODERS,
-  COMB_DETECT, DEINTERLACE, DENOISE, PAD_MODES, SHARPEN, muxer, parseRotate,
+  BURN_BEHAVIORS, CONTAINERS, CROP_MODES, FRAMERATE_MODES, MIXDOWNS, PAR, QUALITY_TYPES, TRACK_BEHAVIORS_SHORT, VIDEO_ENCODERS,
+  COMB_DETECT, DEINTERLACE, DENOISE, PAD_MODES, SHARPEN, audioEncoderLabel, labelOf, muxer, parseRotate,
 } from './hbOptions.js';
 
-export { AUDIO_ENCODERS, CONTAINERS, MIXDOWNS, VIDEO_ENCODERS };
+export { CONTAINERS, MIXDOWNS, VIDEO_ENCODERS };
 
-const yes = (v) => (v ? 'Yes' : 'No');
+const yes = (v) => t(v ? 'common.yes' : 'common.no');
 const list = (v) => (Array.isArray(v) && v.length ? v.join(', ') : '—');
-const px = (v) => (v ? `${v} px` : 'source');
-const named = (pairs) => Object.fromEntries(pairs);
-const DEINTERLACE_LABEL = named(DEINTERLACE);
-const COMB_LABEL = named(COMB_DETECT);
-const PAD_LABEL = named(PAD_MODES);
-const DENOISE_LABEL = named(DENOISE);
-const SHARPEN_LABEL = named(SHARPEN);
+const px = (v) => (v ? `${v} px` : t('presets.view.source'));
 const isMp4 = (p) => muxer(p.FileFormat) === 'mp4';
-const OFF_DEFAULT = (v) => (v === 'off' || v === '' || v == null ? 'Off' : v === 'none' ? 'None' : String(v));
+const OFF_DEFAULT = (v) => (v === 'off' || v === '' || v == null ? t('common.off') : v === 'none' ? t('common.none') : String(v));
 const rotate = (v) => {
   const r = parseRotate(v);
-  return [r.angle ? `${r.angle}°` : null, r.hflip ? 'flipped' : null].filter(Boolean).join(', ') || 'None';
+  return [r.angle ? `${r.angle}°` : null, r.hflip ? t('presets.view.flipped') : null].filter(Boolean).join(', ') || t('common.none');
 };
 
 export const PRESET_SECTIONS = [
   {
     id: 'summary',
-    title: 'Summary',
+    titleKey: 'presets.tabs.summary',
     fields: [
-      { key: 'FileFormat', label: 'Container', options: CONTAINERS },
-      { key: 'Optimize', label: 'Web optimised', format: yes, show: isMp4 },
-      { key: 'Mp4iPodCompatible', label: 'iPod 5G support', format: yes, show: isMp4 },
-      { key: 'AlignAVStart', label: 'Align A/V start', format: yes },
-      { key: 'ChapterMarkers', label: 'Chapter markers', format: yes },
-      { key: 'MetadataPassthru', label: 'Pass metadata through', format: yes },
+      { key: 'FileFormat', labelKey: 'presets.view.field.container', options: CONTAINERS },
+      { key: 'Optimize', labelKey: 'presets.view.field.optimize', format: yes, show: isMp4 },
+      { key: 'Mp4iPodCompatible', labelKey: 'presets.view.field.ipod', format: yes, show: isMp4 },
+      { key: 'AlignAVStart', labelKey: 'presets.view.field.alignAV', format: yes },
+      { key: 'ChapterMarkers', labelKey: 'presets.view.field.chapterMarkers', format: yes },
+      { key: 'MetadataPassthru', labelKey: 'presets.view.field.metadata', format: yes },
     ],
   },
   {
     id: 'dimensions',
-    title: 'Dimensions',
+    titleKey: 'presets.tabs.dimensions',
     fields: [
-      { key: 'PictureWidth', label: 'Max width', format: px },
-      { key: 'PictureHeight', label: 'Max height', format: px },
-      { key: 'PictureUseMaximumSize', label: 'Use as maximum size', format: yes },
-      { key: 'PictureAllowUpscaling', label: 'Allow upscaling', format: yes },
-      { key: 'PictureKeepRatio', label: 'Keep aspect ratio', format: yes },
-      { key: 'PicturePAR', label: 'Anamorphic', options: PAR },
-      { key: 'PictureCropMode', label: 'Cropping', options: CROP_MODE },
+      { key: 'PictureWidth', labelKey: 'presets.view.field.maxWidth', format: px },
+      { key: 'PictureHeight', labelKey: 'presets.view.field.maxHeight', format: px },
+      { key: 'PictureUseMaximumSize', labelKey: 'presets.view.field.useMaxSize', format: yes },
+      { key: 'PictureAllowUpscaling', labelKey: 'presets.view.field.upscaling', format: yes },
+      { key: 'PictureKeepRatio', labelKey: 'presets.view.field.keepRatio', format: yes },
+      { key: 'PicturePAR', labelKey: 'presets.view.field.anamorphic', options: PAR },
+      { key: 'PictureCropMode', labelKey: 'presets.view.field.cropping', options: CROP_MODES },
       {
-        key: 'PictureTopCrop', label: 'Crop (T/B/L/R)', show: (p) => p.PictureCropMode === 3,
+        key: 'PictureTopCrop', labelKey: 'presets.view.field.crop', show: (p) => p.PictureCropMode === 3,
         format: (_, p) => [p.PictureTopCrop, p.PictureBottomCrop, p.PictureLeftCrop, p.PictureRightCrop].join(' / '),
       },
-      { key: 'PicturePadMode', label: 'Borders', format: (v) => PAD_LABEL[v] ?? OFF_DEFAULT(v) },
-      { key: 'PictureRotate', label: 'Rotate / flip', format: rotate },
+      { key: 'PicturePadMode', labelKey: 'presets.view.field.borders', format: (v) => labelOf(PAD_MODES, v) ?? OFF_DEFAULT(v) },
+      { key: 'PictureRotate', labelKey: 'presets.view.field.rotate', format: rotate },
     ],
   },
   {
     id: 'filters',
-    title: 'Filters',
+    titleKey: 'presets.tabs.filters',
     fields: [
-      { key: 'PictureDetelecine', label: 'Detelecine', format: OFF_DEFAULT },
-      { key: 'PictureDeinterlaceFilter', label: 'Deinterlace', options: DEINTERLACE_LABEL },
-      { key: 'PictureDeinterlacePreset', label: 'Deinterlace preset', show: (p) => p.PictureDeinterlaceFilter && p.PictureDeinterlaceFilter !== 'off' },
-      { key: 'PictureCombDetectPreset', label: 'Interlace detection', options: COMB_LABEL, show: (p) => p.PictureDeinterlaceFilter && p.PictureDeinterlaceFilter !== 'off' },
-      { key: 'PictureDenoiseFilter', label: 'Denoise', options: DENOISE_LABEL },
-      { key: 'PictureDenoisePreset', label: 'Denoise preset', show: (p) => p.PictureDenoiseFilter && p.PictureDenoiseFilter !== 'off' },
-      { key: 'PictureDenoiseTune', label: 'Denoise tune', show: (p) => p.PictureDenoiseFilter && p.PictureDenoiseFilter !== 'off' },
-      { key: 'PictureChromaSmoothPreset', label: 'Chroma smooth', format: OFF_DEFAULT },
-      { key: 'PictureSharpenFilter', label: 'Sharpen', options: SHARPEN_LABEL },
-      { key: 'PictureSharpenPreset', label: 'Sharpen preset', show: (p) => p.PictureSharpenFilter && p.PictureSharpenFilter !== 'off' },
-      { key: 'PictureDeblockPreset', label: 'Deblock', format: OFF_DEFAULT },
-      { key: 'PictureColorspacePreset', label: 'Colourspace', format: OFF_DEFAULT },
-      { key: 'VideoGrayScale', label: 'Greyscale', format: yes },
+      { key: 'PictureDetelecine', labelKey: 'presets.view.field.detelecine', format: OFF_DEFAULT },
+      { key: 'PictureDeinterlaceFilter', labelKey: 'presets.view.field.deinterlace', options: DEINTERLACE },
+      { key: 'PictureDeinterlacePreset', labelKey: 'presets.view.field.deinterlacePreset', show: (p) => p.PictureDeinterlaceFilter && p.PictureDeinterlaceFilter !== 'off' },
+      { key: 'PictureCombDetectPreset', labelKey: 'presets.view.field.interlaceDetection', options: COMB_DETECT, show: (p) => p.PictureDeinterlaceFilter && p.PictureDeinterlaceFilter !== 'off' },
+      { key: 'PictureDenoiseFilter', labelKey: 'presets.view.field.denoise', options: DENOISE },
+      { key: 'PictureDenoisePreset', labelKey: 'presets.view.field.denoisePreset', show: (p) => p.PictureDenoiseFilter && p.PictureDenoiseFilter !== 'off' },
+      { key: 'PictureDenoiseTune', labelKey: 'presets.view.field.denoiseTune', show: (p) => p.PictureDenoiseFilter && p.PictureDenoiseFilter !== 'off' },
+      { key: 'PictureChromaSmoothPreset', labelKey: 'presets.view.field.chromaSmooth', format: OFF_DEFAULT },
+      { key: 'PictureSharpenFilter', labelKey: 'presets.view.field.sharpen', options: SHARPEN },
+      { key: 'PictureSharpenPreset', labelKey: 'presets.view.field.sharpenPreset', show: (p) => p.PictureSharpenFilter && p.PictureSharpenFilter !== 'off' },
+      { key: 'PictureDeblockPreset', labelKey: 'presets.view.field.deblock', format: OFF_DEFAULT },
+      { key: 'PictureColorspacePreset', labelKey: 'presets.view.field.colourspace', format: OFF_DEFAULT },
+      { key: 'VideoGrayScale', labelKey: 'presets.view.field.greyscale', format: yes },
     ],
   },
   {
     id: 'video',
-    title: 'Video',
+    titleKey: 'presets.tabs.video',
     fields: [
-      { key: 'VideoEncoder', label: 'Encoder', options: VIDEO_ENCODERS },
-      { key: 'VideoFramerate', label: 'Frame rate', format: (v) => (!v || v === 'auto' ? 'Same as source' : `${v} fps`) },
-      { key: 'VideoFramerateMode', label: 'Frame rate mode', options: FRAMERATE_MODE },
-      { key: 'VideoQualityType', label: 'Quality by', options: QUALITY_TYPE },
-      { key: 'VideoQualitySlider', label: 'Constant quality (RF)', show: (p) => p.VideoQualityType === 2 },
-      { key: 'VideoAvgBitrate', label: 'Average bitrate', format: (v) => `${v} kbps`, show: (p) => p.VideoQualityType === 1 },
-      { key: 'VideoMultiPass', label: 'Multi-pass encoding', format: yes, show: (p) => p.VideoQualityType !== 2 },
-      { key: 'VideoTurboMultiPass', label: 'Turbo first pass', format: yes, show: (p) => p.VideoQualityType !== 2 && p.VideoMultiPass },
-      { key: 'VideoPreset', label: 'Encoder preset' },
-      { key: 'VideoTune', label: 'Encoder tune', format: (v) => v || 'None' },
-      { key: 'VideoProfile', label: 'Profile' },
-      { key: 'VideoLevel', label: 'Level' },
-      { key: 'VideoOptionExtra', label: 'Advanced options', format: (v) => v || '—' },
+      { key: 'VideoEncoder', labelKey: 'presets.view.field.encoder', options: VIDEO_ENCODERS },
+      { key: 'VideoFramerate', labelKey: 'presets.view.field.framerate', format: (v) => (!v || v === 'auto' ? t('presetOptions.sameAsSource') : `${v} fps`) },
+      { key: 'VideoFramerateMode', labelKey: 'presets.view.field.framerateMode', options: FRAMERATE_MODES },
+      { key: 'VideoQualityType', labelKey: 'presets.view.field.qualityBy', options: QUALITY_TYPES },
+      { key: 'VideoQualitySlider', labelKey: 'presets.view.field.constantQuality', show: (p) => p.VideoQualityType === 2 },
+      { key: 'VideoAvgBitrate', labelKey: 'presets.view.field.averageBitrate', format: (v) => `${v} kbps`, show: (p) => p.VideoQualityType === 1 },
+      { key: 'VideoMultiPass', labelKey: 'presets.view.field.multiPass', format: yes, show: (p) => p.VideoQualityType !== 2 },
+      { key: 'VideoTurboMultiPass', labelKey: 'presets.view.field.turbo', format: yes, show: (p) => p.VideoQualityType !== 2 && p.VideoMultiPass },
+      { key: 'VideoPreset', labelKey: 'presets.view.field.encoderPreset' },
+      { key: 'VideoTune', labelKey: 'presets.view.field.encoderTune', format: (v) => v || t('common.none') },
+      { key: 'VideoProfile', labelKey: 'presets.view.field.profile' },
+      { key: 'VideoLevel', labelKey: 'presets.view.field.level' },
+      { key: 'VideoOptionExtra', labelKey: 'presets.view.field.advanced', format: (v) => v || '—' },
     ],
   },
   {
     id: 'audio',
-    title: 'Audio',
+    titleKey: 'presets.tabs.audio',
     fields: [
-      { key: 'AudioTrackSelectionBehavior', label: 'Tracks', options: TRACK_BEHAVIOR },
-      { key: 'AudioLanguageList', label: 'Languages', format: list },
-      { key: 'AudioSecondaryEncoderMode', label: 'Use only the first encoder for secondary tracks', format: yes },
-      { key: 'AudioCopyMask', label: 'Allowed passthru', format: (v) => (Array.isArray(v) ? v.map((x) => AUDIO_ENCODERS[x] ?? x).join(', ') : '—') },
-      { key: 'AudioEncoderFallback', label: 'Passthru fallback', options: AUDIO_ENCODERS },
+      { key: 'AudioTrackSelectionBehavior', labelKey: 'presets.view.field.tracks', options: TRACK_BEHAVIORS_SHORT },
+      { key: 'AudioLanguageList', labelKey: 'presets.view.field.languages', format: list },
+      { key: 'AudioSecondaryEncoderMode', labelKey: 'presets.view.field.secondary', format: yes },
+      { key: 'AudioCopyMask', labelKey: 'presets.view.field.copyMask', format: (v) => (Array.isArray(v) ? v.map(audioEncoderLabel).join(', ') : '—') },
+      { key: 'AudioEncoderFallback', labelKey: 'presets.view.field.fallback', format: (v) => (v ? audioEncoderLabel(v) : '—') },
     ],
     // AudioList is shown as a table of encoders.
     lists: ['AudioList'],
   },
   {
     id: 'subtitles',
-    title: 'Subtitles',
+    titleKey: 'presets.tabs.subtitles',
     fields: [
-      { key: 'SubtitleTrackSelectionBehavior', label: 'Tracks', options: TRACK_BEHAVIOR },
-      { key: 'SubtitleLanguageList', label: 'Languages', format: list },
-      { key: 'SubtitleAddForeignAudioSearch', label: 'Foreign audio scan', format: yes },
-      { key: 'SubtitleAddForeignAudioSubtitle', label: 'Add foreign audio subtitle', format: yes },
-      { key: 'SubtitleAddCC', label: 'Add closed captions', format: yes },
-      { key: 'SubtitleBurnBehavior', label: 'Burn in', options: BURN },
-      { key: 'SubtitleBurnBDSub', label: 'Burn Blu-ray subtitles', format: yes },
-      { key: 'SubtitleBurnDVDSub', label: 'Burn DVD subtitles', format: yes },
+      { key: 'SubtitleTrackSelectionBehavior', labelKey: 'presets.view.field.tracks', options: TRACK_BEHAVIORS_SHORT },
+      { key: 'SubtitleLanguageList', labelKey: 'presets.view.field.languages', format: list },
+      { key: 'SubtitleAddForeignAudioSearch', labelKey: 'presets.view.field.foreignScan', format: yes },
+      { key: 'SubtitleAddForeignAudioSubtitle', labelKey: 'presets.view.field.foreignSubtitle', format: yes },
+      { key: 'SubtitleAddCC', labelKey: 'presets.view.field.closedCaptions', format: yes },
+      { key: 'SubtitleBurnBehavior', labelKey: 'presets.view.field.burnIn', options: BURN_BEHAVIORS },
+      { key: 'SubtitleBurnBDSub', labelKey: 'presets.view.field.burnBD', format: yes },
+      { key: 'SubtitleBurnDVDSub', labelKey: 'presets.view.field.burnDVD', format: yes },
     ],
   },
 ];
@@ -141,7 +137,10 @@ export function otherKeys(preset) {
 export function formatValue(field, preset) {
   const v = preset[field.key];
   if (field.format) return field.format(v, preset);
-  if (field.options) return field.options[v] ?? (v === '' || v == null ? '—' : String(v));
+  if (field.options) {
+    const label = Array.isArray(field.options) ? labelOf(field.options, v) : field.options[v];
+    return label ?? (v === '' || v == null ? '—' : String(v));
+  }
   if (v === '' || v == null) return '—';
   if (typeof v === 'boolean') return yes(v);
   if (Array.isArray(v)) return list(v);

@@ -1,0 +1,70 @@
+{
+  "title": "Statistiques",
+  "period": "Période",
+  "ranges": {
+    "days7": "7 jours",
+    "days30": "30 jours",
+    "days90": "90 jours",
+    "months12": "12 mois",
+    "allTime": "Depuis le début"
+  },
+  "tiles": {
+    "filesConverted": "Fichiers convertis",
+    "failed": "{count} en échec",
+    "cancelled_one": "{count} annulé",
+    "cancelled_other": "{count} annulés",
+    "watched_one": "{count} issu des dossiers surveillés",
+    "watched_other": "{count} issus des dossiers surveillés",
+    "noneFailed": "aucun échec",
+    "spaceSaved": "Espace économisé",
+    "smaller": "{percent} plus petit · {source} → {output}",
+    "videoConverted": "Vidéo convertie",
+    "ofWork": "en {time} de travail",
+    "speed": "Vitesse",
+    "realTime": "temps réel",
+    "realTimeFps": "temps réel · {fps} i/s en moyenne"
+  },
+  "perBucket": {
+    "day": "Fichiers convertis par jour",
+    "month": "Fichiers convertis par mois"
+  },
+  "chart": "Graphique",
+  "table": "Tableau",
+  "nothingConverted": "Rien n'a été converti durant cette période.",
+  "checks": {
+    "title": "Vérification après conversion",
+    "none": "Aucun fichier vérifié durant cette période.",
+    "summary": "{ok} réussis, {warning} avec avertissements, {error} en échec",
+    "ok": "Vérifiés",
+    "warning": "Avertissements",
+    "error": "En échec",
+    "unchecked_one": "{count} converti sans vérification.",
+    "unchecked_other": "{count} convertis sans vérification."
+  },
+  "biggestSavings": "Plus grosses économies",
+  "nothingYet": "Rien pour l'instant.",
+  "byPreset": "Par préréglage",
+  "columns": {
+    "preset": "Préréglage",
+    "converted": "Convertis",
+    "failed": "En échec",
+    "video": "Vidéo",
+    "work": "Travail",
+    "speed": "Vitesse",
+    "avgFps": "i/s moy.",
+    "saved": "Économisé",
+    "smaller": "Réduction",
+    "month": "Mois",
+    "day": "Jour"
+  },
+  "historySince": "Historique depuis le {date}. Effacer des tâches de la file d'attente ne les retire pas de ces chiffres.",
+  "tip": {
+    "converted_one": "{count} converti",
+    "converted_other": "{count} convertis",
+    "convertedFailed_one": "{count} converti · {failed} en échec",
+    "convertedFailed_other": "{count} convertis · {failed} en échec",
+    "savedWork": "{saved} économisés · {time} de travail",
+    "column_one": "{date} : {count} converti",
+    "column_other": "{date} : {count} convertis"
+  }
+}

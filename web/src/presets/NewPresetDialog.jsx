@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Modal } from '../components/Modal.jsx';
 import { Help } from '../help/Help.jsx';
 import { api } from '../api.js';
+import { t } from '../i18n/index.js';
 
 /**
  * "New preset": a copy of a HandBrake built-in preset or of one of yours, under a new name.
@@ -42,7 +43,9 @@ export function NewPresetDialog({ presets, fromId, categories, run, onClose, onC
 
   const chosenBuiltin = builtins?.presets.find((p) => p.name === builtin);
   const chosenMine = presets.find((p) => p.id === Number(mine));
-  const suggested = source === 'builtin' ? (chosenBuiltin ? `${chosenBuiltin.name} (custom)` : '') : chosenMine ? `${chosenMine.name} (copy)` : '';
+  const suggested = source === 'builtin'
+    ? (chosenBuiltin ? t('presets.newDialog.customName', { name: chosenBuiltin.name }) : '')
+    : chosenMine ? t('presets.editor.copyName', { name: chosenMine.name }) : '';
   const finalName = nameTouched ? name : suggested;
   const canCreate = finalName.trim() && (source === 'builtin' ? !!chosenBuiltin : !!chosenMine) && !busy;
 
@@ -51,38 +54,38 @@ export function NewPresetDialog({ presets, fromId, categories, run, onClose, onC
     if (!canCreate) return;
     setBusy(true);
     const body = { name: finalName.trim(), category, description, ...(source === 'builtin' ? { builtin } : { fromId: Number(mine) }) };
-    const r = await run(() => api.createPreset(body), `Created ${body.name}`);
+    const r = await run(() => api.createPreset(body), t('presets.newDialog.created', { name: body.name }));
     setBusy(false);
     if (r) onCreated(r.id);
   }
 
   return (
     <Modal
-      title={<>New preset<Help id="presets.new" /></>}
-      ariaLabel="New preset"
+      title={<>{t('presets.page.newPreset')}<Help id="presets.new" /></>}
+      ariaLabel={t('presets.page.newPreset')}
       onClose={onClose}
       footer={
         <>
-          <button type="button" className="btn" onClick={onClose}>Cancel</button>
-          <button type="button" className="btn primary" disabled={!canCreate} onClick={create}>{busy ? 'Creating…' : 'Create and edit'}</button>
+          <button type="button" className="btn" onClick={onClose}>{t('common.cancel')}</button>
+          <button type="button" className="btn primary" disabled={!canCreate} onClick={create}>{busy ? t('presets.newDialog.creating') : t('presets.newDialog.create')}</button>
         </>
       }
     >
       <form className="new-preset" onSubmit={create}>
         <fieldset className="set-fieldset">
-          <span className="set-label">Start from</span>
+          <span className="set-label">{t('presets.newDialog.startFrom')}</span>
           <label className="pe-radio">
             <input type="radio" name="np-source" checked={source === 'builtin'} disabled={builtins && !builtins.available} onChange={() => setSource('builtin')} />
-            A HandBrake preset
+            {t('presets.newDialog.builtin')}
           </label>
           {source === 'builtin' && (
             builtins == null ? (
-              <p className="muted small">Asking HandBrake for its presets…</p>
+              <p className="muted small">{t('presets.newDialog.asking')}</p>
             ) : !builtins.available ? (
-              <p className="muted small">HandBrakeCLI isn’t installed on the server, so its built-in presets aren’t available.</p>
+              <p className="muted small">{t('presets.newDialog.noCli')}</p>
             ) : (
               <label className="set-field">
-                <select value={builtin} onChange={(e) => setBuiltin(e.target.value)} aria-label="HandBrake preset">
+                <select value={builtin} onChange={(e) => setBuiltin(e.target.value)} aria-label={t('presets.newDialog.builtinLabel')}>
                   {groups.map(([cat, list]) => (
                     <optgroup key={cat} label={cat}>
                       {list.map((p) => <option key={p.name} value={p.name}>{p.name}</option>)}
@@ -95,11 +98,11 @@ export function NewPresetDialog({ presets, fromId, categories, run, onClose, onC
           )}
           <label className="pe-radio">
             <input type="radio" name="np-source" checked={source === 'mine'} disabled={!presets.length} onChange={() => setSource('mine')} />
-            One of your presets
+            {t('presets.newDialog.mine')}
           </label>
           {source === 'mine' && (
             <label className="set-field">
-              <select value={mine} onChange={(e) => setMine(Number(e.target.value))} aria-label="Your preset">
+              <select value={mine} onChange={(e) => setMine(Number(e.target.value))} aria-label={t('presets.newDialog.mineLabel')}>
                 {presets.map((p) => <option key={p.id} value={p.id}>{p.category ? `${p.category} / ` : ''}{p.name}</option>)}
               </select>
             </label>
@@ -107,7 +110,7 @@ export function NewPresetDialog({ presets, fromId, categories, run, onClose, onC
         </fieldset>
 
         <label className="set-field">
-          <span className="set-label">Name</span>
+          <span className="set-label">{t('common.name')}</span>
           <input
             value={finalName}
             onChange={(e) => {
@@ -121,16 +124,16 @@ export function NewPresetDialog({ presets, fromId, categories, run, onClose, onC
         </label>
         <div className="pe-grid">
           <label className="set-field">
-            <span className="set-label">Category</span>
-            <input value={category} list="new-preset-categories" onChange={(e) => setCategory(e.target.value)} placeholder="None" maxLength={80} />
+            <span className="set-label">{t('presets.editor.category')}</span>
+            <input value={category} list="new-preset-categories" onChange={(e) => setCategory(e.target.value)} placeholder={t('common.none')} maxLength={80} />
             <datalist id="new-preset-categories">
               {categories.map((c) => <option key={c} value={c} />)}
             </datalist>
           </label>
         </div>
         <label className="set-field">
-          <span className="set-label">Description</span>
-          <input value={description} onChange={(e) => setDescription(e.target.value)} maxLength={300} placeholder="What this preset is for" />
+          <span className="set-label">{t('presets.editor.description')}</span>
+          <input value={description} onChange={(e) => setDescription(e.target.value)} maxLength={300} placeholder={t('presets.editor.descriptionPlaceholder')} />
         </label>
         <button type="submit" hidden />
       </form>

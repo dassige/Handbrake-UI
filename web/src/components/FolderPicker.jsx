@@ -3,12 +3,13 @@ import { ArrowUp, ChevronRight, Folder } from 'lucide-react';
 import { api } from '../api.js';
 import { rootLabel } from '../roots.js';
 import { Modal } from './Modal.jsx';
+import { t } from '../i18n/index.js';
 
 /**
  * Lets you pick a folder under the sources folders by browsing the server, instead
  * of typing its path. onPick(path) gets the chosen folder.
  */
-export function FolderPicker({ settings, title = 'Choose a folder', initial, onPick, onClose, onError, kind = 'source' }) {
+export function FolderPicker({ settings, title = t('components.folderPicker.title'), initial, onPick, onClose, onError, kind = 'source' }) {
   // kind 'any': the target folder too (the server only lets the app browse the configured folders).
   const roots = kind === 'any' ? [...settings.sourceRoots, settings.targetRoot] : settings.sourceRoots;
   const startRoot = roots.find((r) => initial && (initial === r || initial.startsWith(r))) ?? roots[0];
@@ -45,13 +46,13 @@ export function FolderPicker({ settings, title = 'Choose a folder', initial, onP
       footer={
         <>
           <span className="picker-path mono" title={listing?.path}>{listing?.path ?? '…'}</span>
-          <button className="btn" onClick={onClose}>Cancel</button>
-          <button className="btn primary" disabled={!listing} onClick={() => onPick(listing.path)}>Choose this folder</button>
+          <button className="btn" onClick={onClose}>{t('common.cancel')}</button>
+          <button className="btn primary" disabled={!listing} onClick={() => onPick(listing.path)}>{t('components.folderPicker.choose')}</button>
         </>
       }
     >
       {roots.length > 1 && (
-        <div className="picker-roots" role="group" aria-label="Sources folder">
+        <div className="picker-roots" role="group" aria-label={t('components.folderPicker.roots')}>
           {roots.map((r) => (
             <button
               key={r}
@@ -68,9 +69,9 @@ export function FolderPicker({ settings, title = 'Choose a folder', initial, onP
           ))}
         </div>
       )}
-      <nav className="crumbs picker-crumbs" aria-label="Folder">
+      <nav className="crumbs picker-crumbs" aria-label={t('components.folderPicker.crumbs')}>
         {listing?.parent && (
-          <button className="icon-btn" title="Up one folder" onClick={() => load(listing.parent)}>
+          <button className="icon-btn" title={t('components.folderPicker.up')} onClick={() => load(listing.parent)}>
             <ArrowUp size={15} />
           </button>
         )}
@@ -82,7 +83,7 @@ export function FolderPicker({ settings, title = 'Choose a folder', initial, onP
         ))}
       </nav>
       <ul className="picker-list">
-        {!loading && dirs.length === 0 && <li className="muted small">No sub-folders here.</li>}
+        {!loading && dirs.length === 0 && <li className="muted small">{t('components.folderPicker.empty')}</li>}
         {dirs.map((d) => (
           <li key={d.path}>
             <button type="button" onClick={() => load(d.path)}>

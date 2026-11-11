@@ -1,0 +1,199 @@
+{
+  "quoted": "“{text}”",
+  "flags": {
+    "regex": "regex",
+    "ext": "ext",
+    "nameExt": "name+ext"
+  },
+  "fields": {
+    "type": "Type",
+    "typeAuto": "Auto (TV or movie)",
+    "typeTv": "TV series",
+    "typeMovie": "Movie",
+    "tvTemplate": "TV template — {tokens}",
+    "movieTemplate": "Movie template — {tokens}",
+    "titleCase": "Title Case words",
+    "apostrophes": "Fix apostrophes (L Uomo → L'Uomo, Wouldn T → Wouldn't)",
+    "showYear": "Keep the year in the show name (remakes)",
+    "extraReleaseTags": "Extra release tags to drop (comma separated)",
+    "extraTags": "Extra tags (comma separated)",
+    "find": "Find",
+    "replaceWith": "Replace with (regex groups: $1, $2…)",
+    "regex": "Regular expression",
+    "caseSensitive": "Case sensitive",
+    "occurrence": "Occurrence",
+    "occurrenceAll": "All",
+    "occurrenceFirst": "First",
+    "occurrenceLast": "Last",
+    "applyTo": "Apply to",
+    "applyToName": "Name",
+    "applyToExt": "Extension",
+    "applyToBoth": "Name and extension",
+    "pattern": "Pattern",
+    "text": "Text",
+    "keepText": "Keep the text itself",
+    "fromPosition": "From position (1 = first)",
+    "count": "Count",
+    "backwards": "Count from the end",
+    "position": "Position (0 = start)",
+    "toPosition": "To position",
+    "characters": "Characters to trim at both ends",
+    "case": "Case",
+    "caseTitle": "Title Case",
+    "caseUpper": "UPPER",
+    "caseLower": "lower",
+    "caseSentence": "Sentence case"
+  },
+  "steps": {
+    "smart": {
+      "label": "Recognise episode / movie",
+      "help": "Finds S01E02 or 1x02 (TV) or a year (movie), drops release tags and builds the name from a template. [ ] blocks vanish when a field inside is empty.",
+      "modeAuto": "auto",
+      "modeTv": "TV",
+      "modeMovie": "movie"
+    },
+    "cleanTags": {
+      "label": "Remove release tags",
+      "help": "Cuts the name at the first release tag (1080p, WEB-DL, x265, ITA…).",
+      "builtIn": "built-in tag list"
+    },
+    "replace": {
+      "label": "Replace",
+      "first": "first",
+      "last": "last"
+    },
+    "removePattern": {
+      "label": "Remove pattern"
+    },
+    "removeAfter": {
+      "label": "Remove everything after text",
+      "summary": "after {text}",
+      "summaryInclusive": "after {text} (inclusive)"
+    },
+    "remove": {
+      "label": "Remove characters",
+      "summary": "{count} from position {start}",
+      "summaryFromEnd": "{count} from position {start} (from end)"
+    },
+    "add": {
+      "label": "Add text",
+      "summary": "{text} at {position}",
+      "summaryFromEnd": "{text} at {position} from end"
+    },
+    "move": {
+      "label": "Move characters",
+      "summary": "{count} chars from {from} to {to}"
+    },
+    "trim": {
+      "label": "Trim characters"
+    },
+    "case": {
+      "label": "Change case",
+      "title": "title",
+      "upper": "upper",
+      "lower": "lower",
+      "sentence": "sentence"
+    },
+    "apostrophes": {
+      "label": "Fix apostrophes",
+      "help": "L Uomo → L'Uomo, Dell Oca → Dell'Oca, Wouldn T → Wouldn't, Holston S → Holston's",
+      "summary": "L Uomo → L'Uomo"
+    },
+    "collapseSpaces": {
+      "label": "Collapse spaces",
+      "summary": "multiple spaces → one"
+    }
+  },
+  "view": {
+    "convertedFiles": "Converted files",
+    "renameList": "Rename list",
+    "renameListCount": "Rename list ({count})",
+    "addLabel": "Add to rename",
+    "browserHint": "Drag files or folders to the rename list. Ctrl/Shift-click to select several.",
+    "rules": "Rules",
+    "editRules": "Edit rules",
+    "history": "History",
+    "showName": "Show name",
+    "showNameTitle": "Use when the show name is missing or wrong, e.g. “S04E07 Reacher Title”",
+    "autoDetected": "auto-detected",
+    "showNameScope": "Which rows get the typed show name",
+    "onlyMissing": "only where missing",
+    "allRows": "for all rows",
+    "resetEdits": "Reset edits",
+    "resetEditsTitle": "Forget names typed by hand",
+    "clearList": "Clear list",
+    "reading": "Reading…",
+    "noVideos": "No video files found.",
+    "empty": "Drag converted files or folders here, or use “Rename” on finished jobs.",
+    "namesColumn": "Current name → new name",
+    "renameFile": "Rename {name}",
+    "tvChip": "TV · S{season}e{episode}",
+    "movieChip": "Movie · {year}",
+    "noChange": "no change",
+    "undoEdit": "undo edit",
+    "dropHere": "Drop to add to the rename list",
+    "counts": "{rename} to rename · {unchanged} unchanged",
+    "needALook": "{count} need a look",
+    "updating": "updating…",
+    "renameButton_one": "Rename {count} file",
+    "renameButton_other": "Rename {count} files",
+    "renameButtonNone": "Rename files",
+    "confirmTitle": "Rename files",
+    "confirmMessage_one": "Rename {count} file?",
+    "confirmMessage_other": "Rename {count} files?",
+    "renamed_one": "Renamed {count} file · undo from History",
+    "renamed_other": "Renamed {count} files · undo from History",
+    "notRenamed": "{count} not renamed: {list}",
+    "addTitle": "Double-click or drag to add to rename"
+  },
+  "rules": {
+    "title": "Rename rules",
+    "use": "Use this rule set",
+    "revert": "Revert",
+    "builtin": "built-in",
+    "new": "New",
+    "importTitle": "Import an Advanced Renamer .aren preset or an exported rule set",
+    "importHint": "Import accepts Advanced Renamer presets (.aren) and rule sets exported from here.",
+    "exportJson": "Export as JSON",
+    "description": "Description",
+    "readOnly": "Built-in rule sets are read-only. Use {icon} Duplicate to make an editable copy.",
+    "steps": "Steps",
+    "active": "Active",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "deleteStep": "Delete step",
+    "addStep": "Add step",
+    "choose": "choose…",
+    "note": "Note",
+    "notePlaceholder": "optional description",
+    "tryIt": "Try it",
+    "samplesPlaceholder": "One file name per line",
+    "showNameOptional": "Show name (optional)",
+    "autoDetected": "auto-detected",
+    "selectOrCreate": "Select or create a rule set.",
+    "discardMessage": "Discard unsaved changes to this rule set?",
+    "discardChanges": "Discard changes",
+    "keepEditing": "Keep editing",
+    "saved": "Rule set saved",
+    "newName": "New rule set",
+    "copyName": "{name} (copy)",
+    "copyCreated": "Copy created",
+    "imported": "Imported “{name}” ({count} steps)",
+    "importedSkipped": "Imported “{name}” ({count} steps); skipped: {skipped}",
+    "deleteTitle": "Delete rule set",
+    "deleteMessage": "Delete rule set “{name}”?",
+    "deleted": "Rule set deleted"
+  },
+  "history": {
+    "title": "Rename history",
+    "empty": "Nothing renamed yet.",
+    "automatic": "automatic",
+    "undone": "undone {time}",
+    "undo": "Undo",
+    "undoTitle": "Undo rename",
+    "undoMessage": "Restore the original names of {count} file(s)?",
+    "restoreNames": "Restore names",
+    "restored": "Restored {count} file(s)",
+    "restoredWithErrors": "Restored {count} file(s); {errors} could not be restored"
+  }
+}

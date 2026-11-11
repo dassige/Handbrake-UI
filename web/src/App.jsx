@@ -22,6 +22,8 @@ import { JobDrawer } from './components/JobDrawer.jsx';
 import { useDialogs } from './components/Dialogs.jsx';
 import { usePaneSwitch } from './components/PaneSwitch.jsx';
 import { displayPath } from './roots.js';
+import { rich, setLanguage, t } from './i18n/index.js';
+import { skipReason } from './i18n/serverText.js';
 
 const VIEWS = ['convert', 'rename', 'merge', 'quality', 'stats', 'presets', 'settings'];
 
@@ -35,8 +37,8 @@ function parseHash(hash) {
 function useMinuteClock() {
   const [, setT] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setT((x) => x + 1), 30_000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setT((x) => x + 1), 30_000);
+    return () => clearInterval(timer);
   }, []);
 }
 
@@ -44,13 +46,17 @@ export default function App() {
   const toasts = useToasts();
   const dialogs = useDialogs();
   const onError = useCallback((e) => toasts.error(e.message || String(e)), [toasts]);
-  const onNotice = useCallback((t) => toasts.info(t), [toasts]);
+  const onNotice = useCallback((text) => toasts.info(text), [toasts]);
   const eventRef = useRef(null);
   const onEvent = useCallback((type, d) => eventRef.current?.(type, d), []);
   const data = useLiveData(onError, onNotice, onEvent);
   const { jobs, queue, presets, settings, info, connected } = data;
   eventRef.current = useAttention({ jobs, queue });
   useMinuteClock();
+  // The language is a server setting: follow it when it loads or changes (here or in another browser).
+  useEffect(() => {
+    if (settings?.language) setLanguage(settings.language);
+  }, [settings?.language]);
 
   const [selectedJobId, setSelectedJobId] = useState(null);
   const [upload, setUpload] = useState(null); // { dir, root, files } while the upload dialog is open
@@ -76,9 +82,9 @@ export default function App() {
     async (v, sub = null) => {
       if (view === 'settings' && v !== 'settings' && settingsDirty.current) {
         const ok = await dialogs.confirm({
-          title: 'Unsaved settings',
-          message: 'Leave Settings without saving? Your changes will be lost.',
-          confirmLabel: 'Leave without saving',
+          title: t('app.leave.settingsTitle'),
+          message: t('app.leave.settingsMessage'),
+          confirmLabel: t('app.leave.confirm'),
           danger: true,
         });
         if (!ok) return;
@@ -86,9 +92,9 @@ export default function App() {
       }
       if (view === 'presets' && v !== 'presets' && presetsDirty.current) {
         const ok = await dialogs.confirm({
-          title: 'Unsaved preset',
-          message: 'Leave the preset editor without saving? Your changes will be lost.',
-          confirmLabel: 'Leave without saving',
+          title: t('app.leave.presetTitle'),
+          message: t('app.leave.presetMessage'),
+          confirmLabel: t('app.leave.confirm'),
           danger: true,
         });
         if (!ok) return;
@@ -129,7 +135,11 @@ export default function App() {
   const selectedJob = useMemo(() => jobs.find((j) => j.id === selectedJobId) ?? null, [jobs, selectedJobId]);
   const estimate = queueEstimate(jobs, queue, settings);
   const activeJobs = (counts0) => (counts0.queued ?? 0) + (counts0.running ?? 0) + (counts0.paused ?? 0);
-  const [paneClass, paneSwitch, showPane] = usePaneSwitch(['Sources', `Queue${queue?.counts && activeJobs(queue.counts) ? ` (${activeJobs(queue.counts)})` : ''}`]);
+  const activeCount = queue?.counts ? activeJobs(queue.counts) : 0;
+  const [paneClass, paneSwitch, showPane] = usePaneSwitch([
+    t('app.panes.sources'),
+    activeCount ? t('app.panes.queueCount', { n: activeCount }) : t('app.panes.queue'),
+  ]);
 
   /** Runs an API call and shows its error, if any, as a toast. */
   const run = useCallback(
@@ -150,20 +160,24 @@ export default function App() {
     async (paths) => {
       if (!paths.length) return;
       if (!effectivePresetId) {
-        toasts.error('Make or import a preset first');
+        toasts.error(t('app.add.noPreset'));
         switchView('presets');
         return;
       }
       const r = await run(() => api.addJobs(paths, effectivePresetId, position));
       if (!r) return;
+      // Skipped files grouped by their (translated) reason: "2 already converted, 1 not a video".
       const reasons = {};
-      for (const s of r.skipped) reasons[s.reason] = (reasons[s.reason] ?? 0) + 1;
-      const skipped = Object.entries(reasons).map(([k, n]) => `${n} ${k}`).join(', ');
+      for (const s of r.skipped) {
+        const reason = skipReason(s);
+        reasons[reason] = (reasons[reason] ?? 0) + 1;
+      }
+      const skipped = Object.entries(reasons).map(([reason, n]) => t('app.add.skippedReason', { count: n, reason })).join(', ');
       if (r.added.length) {
-        toasts.info(`Added ${r.added.length} file${r.added.length > 1 ? 's' : ''}${skipped ? ` · skipped: ${skipped}` : ''}`);
+        toasts.info(skipped ? t('app.add.addedSkipped', { count: r.added.length, skipped }) : t('app.add.added', { count: r.added.length }));
         showPane(1);
       }
-      else toasts.error(`Nothing added${skipped ? `: ${skipped}` : ''}`);
+      else toasts.error(skipped ? t('app.add.nothingSkipped', { skipped }) : t('app.add.nothing'));
     },
     [effectivePresetId, position, run, toasts, switchView, showPane],
   );
@@ -176,21 +190,23 @@ export default function App() {
     }
     const preset = presets.find((p) => p.id === effectivePresetId);
     const ok = await dialogs.confirm({
-      title: 'Watch this folder?',
+      title: t('app.watch.title'),
       message: (
         <>
-          <p>New videos that appear in <strong title={path}>{displayPath(settings, path)}</strong> will be added to the queue by themselves{preset ? <>, with the default preset ({preset.name})</> : null}.</p>
-          <p className="muted small">
-            Files already in it are left alone.{settings.watch.enabled ? '' : ' Watching is off, so this turns it on.'} Change the preset and the
-            other options in Settings → Watch folders.
+          <p>
+            {rich(preset ? 'app.watch.messagePreset' : 'app.watch.message', {
+              path: <strong title={path}>{displayPath(settings, path)}</strong>,
+              preset: preset?.name,
+            })}
           </p>
+          <p className="muted small">{settings.watch.enabled ? t('app.watch.note') : t('app.watch.noteOff')}</p>
         </>
       ),
-      confirmLabel: 'Watch',
+      confirmLabel: t('app.watch.confirm'),
     });
     if (!ok) return;
     const watch = { ...settings.watch, enabled: true, folders: [...settings.watch.folders, { path, presetId: null, recursive: true }] };
-    const r = await run(() => api.saveSettings({ watch }), 'Watching the folder');
+    const r = await run(() => api.saveSettings({ watch }), t('app.watch.done'));
     if (r) data.setSettings(r);
   }
 
@@ -202,30 +218,30 @@ export default function App() {
   async function start() {
     if (sched?.enabled && !sched.open && (counts.queued ?? 0) > 0) {
       const choice = await dialogs.choose({
-        title: 'Outside the conversion window',
+        title: t('app.outsideWindow.title'),
         icon: 'warn',
         cancelValue: null,
         message: (
           <>
-            <p>The conversion window opens {sched.nextStart ? clockTime(sched.nextStart) : 'later'}.</p>
-            <p className="muted small">“Start now” converts the whole queue straight away, ignoring the window until the queue stops.</p>
+            <p>{sched.nextStart ? t('app.outsideWindow.opensAt', { time: clockTime(sched.nextStart) }) : t('app.outsideWindow.opensLater')}</p>
+            <p className="muted small">{t('app.outsideWindow.note')}</p>
           </>
         ),
         buttons: [
-          { label: 'Cancel', value: null },
-          { label: 'Start now', value: 'now' },
-          { label: 'Wait for the window', value: 'wait', primary: true, autoFocus: true },
+          { label: t('common.cancel'), value: null },
+          { label: t('app.outsideWindow.startNow'), value: 'now' },
+          { label: t('app.outsideWindow.wait'), value: 'wait', primary: true, autoFocus: true },
         ],
       });
       if (!choice) return;
-      run(() => api.startQueue(choice === 'now'), choice === 'wait' ? `The queue starts ${clockTime(sched.nextStart)}` : undefined);
+      run(() => api.startQueue(choice === 'now'), choice === 'wait' ? t('app.outsideWindow.startsAt', { time: clockTime(sched.nextStart) }) : undefined);
       return;
     }
     run(() => api.startQueue());
   }
 
-  let stateText = running ? 'Queue running' : 'Queue stopped';
-  if (running && sched?.waiting) stateText = `Waiting for ${clockTime(sched.nextStart)}`;
+  let stateText = running ? t('app.state.running') : t('app.state.stopped');
+  if (running && sched?.waiting) stateText = t('app.state.waitingFor', { time: clockTime(sched.nextStart) });
 
   return (
     <HelpProvider>
@@ -236,16 +252,16 @@ export default function App() {
           <span>HandBrake Queue</span>
           <Help id="app.overview" />
         </div>
-        <nav className="tabs" aria-label="View">
-          <button className={view === 'convert' ? 'active' : ''} onClick={() => switchView('convert')}>Convert</button>
+        <nav className="tabs" aria-label={t('app.views.label')}>
+          <button className={view === 'convert' ? 'active' : ''} onClick={() => switchView('convert')}>{t('app.views.convert')}</button>
           <button className={view === 'rename' ? 'active' : ''} onClick={() => switchView('rename')}>
-            Rename{renamePaths.length ? <span className="chip-count"> {renamePaths.length}</span> : null}
+            {t('app.views.rename')}{renamePaths.length ? <span className="chip-count"> {renamePaths.length}</span> : null}
           </button>
           <button className={view === 'merge' ? 'active' : ''} onClick={() => switchView('merge')}>
-            Merge{mergePaths.length ? <span className="chip-count"> {mergePaths.length}</span> : null}
+            {t('app.views.merge')}{mergePaths.length ? <span className="chip-count"> {mergePaths.length}</span> : null}
           </button>
-          <button className={view === 'quality' ? 'active' : ''} onClick={() => switchView('quality')}>Quality</button>
-          <button className={view === 'stats' ? 'active' : ''} onClick={() => switchView('stats')}>Stats</button>
+          <button className={view === 'quality' ? 'active' : ''} onClick={() => switchView('quality')}>{t('app.views.quality')}</button>
+          <button className={view === 'stats' ? 'active' : ''} onClick={() => switchView('stats')}>{t('app.views.stats')}</button>
         </nav>
         <div className="queue-state">
           <span className={`dot ${running ? (sched?.waiting ? 'wait' : 'on') : 'off'}`} />
@@ -253,18 +269,18 @@ export default function App() {
           <button
             className="btn small"
             onClick={() => (running ? run(api.stopQueue) : start())}
-            title={running ? 'Finish the current job, then stop' : 'Start converting queued jobs'}
+            title={running ? t('app.state.stopTitle') : t('app.state.startTitle')}
           >
             {running ? <Pause size={14} /> : <Play size={14} />}
-            {running ? 'Stop after current' : 'Start'}
+            {running ? t('app.state.stopAfterCurrent') : t('common.start')}
           </button>
           <Help id="queue.state" />
           <span className="counts">
-            {counts.queued ?? 0} queued · {counts.done ?? 0} done
-            {counts.failed ? <span className="text-bad"> · {counts.failed} failed</span> : null}
+            {t('app.state.queued', { count: counts.queued ?? 0 })} · {t('app.state.done', { count: counts.done ?? 0 })}
+            {counts.failed ? <span className="text-bad"> · {t('app.state.failed', { count: counts.failed })}</span> : null}
             {estimate?.seconds > 0 && (
-              <span title={estimate.finishAt && !estimate.unknown ? `Done around ${clockTime(estimate.finishAt)}` : undefined}>
-                {' '}· ≈ {humanDuration(estimate.seconds)} left
+              <span title={estimate.finishAt && !estimate.unknown ? t('app.state.doneAround', { time: clockTime(estimate.finishAt) }) : undefined}>
+                {' '}· {t('app.state.left', { duration: humanDuration(estimate.seconds) })}
               </span>
             )}
           </span>
@@ -272,36 +288,41 @@ export default function App() {
             <button
               className={`sched-pill ${sched.open ? 'open' : ''}`}
               onClick={() => switchView('settings', 'schedule')}
-              title={sched.open ? `Conversion window open${sched.closesAt ? ` until ${clockTime(sched.closesAt)}` : ''}` : `Conversion window closed; opens ${clockTime(sched.nextStart)}`}
+              title={
+                sched.open
+                  ? sched.closesAt ? t('app.window.openUntilTitle', { time: clockTime(sched.closesAt) }) : t('app.window.openTitle')
+                  : t('app.window.closedTitle', { time: clockTime(sched.nextStart) })
+              }
             >
               <CalendarClock size={13} />
-              {sched.open ? (sched.closesAt ? `until ${clockTime(sched.closesAt)}` : 'open') : clockTime(sched.nextStart)}
+              {sched.open ? (sched.closesAt ? t('app.window.until', { time: clockTime(sched.closesAt) }) : t('app.window.open')) : clockTime(sched.nextStart)}
             </button>
           )}
         </div>
         <div className="topbar-right">
           {!connected && (
-            <span className="offline" title="Live updates disconnected; retrying">
-              <WifiOff size={14} /> offline
+            <span className="offline" title={t('app.offlineTitle')}>
+              <WifiOff size={14} /> {t('app.offline')}
             </span>
           )}
           <HelpSearchButton />
-          <button className={`btn ghost ${view === 'presets' ? 'active' : ''}`} onClick={() => switchView('presets')} title="Presets" aria-label="Presets">
-            <SlidersHorizontal size={16} /> <span className="btn-label">Presets</span>
+          <button className={`btn ghost ${view === 'presets' ? 'active' : ''}`} onClick={() => switchView('presets')} title={t('app.views.presets')} aria-label={t('app.views.presets')}>
+            <SlidersHorizontal size={16} /> <span className="btn-label">{t('app.views.presets')}</span>
           </button>
-          <button className={`btn ghost ${view === 'settings' ? 'active' : ''}`} onClick={() => switchView('settings')} title="Settings" aria-label="Settings">
-            <SettingsIcon size={16} /> <span className="btn-label">Settings</span>
+          <button className={`btn ghost ${view === 'settings' ? 'active' : ''}`} onClick={() => switchView('settings')} title={t('app.views.settings')} aria-label={t('app.views.settings')}>
+            <SettingsIcon size={16} /> <span className="btn-label">{t('app.views.settings')}</span>
           </button>
         </div>
       </header>
 
       {info?.handbrake?.error && (
-        <div className="banner bad">HandBrakeCLI is not available: {info.handbrake.error}</div>
+        <div className="banner bad">{t('app.handbrakeMissing', { error: info.handbrake.error })}</div>
       )}
       {presets.length === 0 && view !== 'presets' && (
         <div className="banner">
-          No presets yet. <button className="link" onClick={() => switchView('presets')}>Make or import a preset</button>{' '}
-          to start converting.
+          {rich('app.noPresets', {
+            link: <button className="link" onClick={() => switchView('presets')}>{t('app.noPresetsLink')}</button>,
+          })}
         </div>
       )}
 

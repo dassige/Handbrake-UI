@@ -1,0 +1,202 @@
+{
+  "quoted": "«{text}»",
+  "flags": {
+    "regex": "regex",
+    "ext": "ext",
+    "nameExt": "nombre+ext"
+  },
+  "fields": {
+    "type": "Tipo",
+    "typeAuto": "Auto (serie o película)",
+    "typeTv": "Serie de TV",
+    "typeMovie": "Película",
+    "tvTemplate": "Plantilla de serie — {tokens}",
+    "movieTemplate": "Plantilla de película — {tokens}",
+    "titleCase": "Palabras con Mayúscula Inicial",
+    "apostrophes": "Corregir apóstrofos (L Uomo → L'Uomo, Wouldn T → Wouldn't)",
+    "showYear": "Conservar el año en el nombre de la serie (remakes)",
+    "extraReleaseTags": "Etiquetas de release adicionales que quitar (separadas por comas)",
+    "extraTags": "Etiquetas adicionales (separadas por comas)",
+    "find": "Buscar",
+    "replaceWith": "Reemplazar por (grupos de regex: $1, $2…)",
+    "regex": "Expresión regular",
+    "caseSensitive": "Distinguir mayúsculas y minúsculas",
+    "occurrence": "Aparición",
+    "occurrenceAll": "Todas",
+    "occurrenceFirst": "Primera",
+    "occurrenceLast": "Última",
+    "applyTo": "Aplicar a",
+    "applyToName": "Nombre",
+    "applyToExt": "Extensión",
+    "applyToBoth": "Nombre y extensión",
+    "pattern": "Patrón",
+    "text": "Texto",
+    "keepText": "Conservar el propio texto",
+    "fromPosition": "Desde la posición (1 = primera)",
+    "count": "Cantidad",
+    "backwards": "Contar desde el final",
+    "position": "Posición (0 = inicio)",
+    "toPosition": "A la posición",
+    "characters": "Caracteres que recortar en ambos extremos",
+    "case": "Mayúsculas/minúsculas",
+    "caseTitle": "Mayúscula Inicial",
+    "caseUpper": "MAYÚSCULAS",
+    "caseLower": "minúsculas",
+    "caseSentence": "Tipo oración"
+  },
+  "steps": {
+    "smart": {
+      "label": "Reconocer episodio / película",
+      "help": "Busca S01E02 o 1x02 (serie) o un año (película), quita las etiquetas de release y crea el nombre a partir de una plantilla. Los bloques [ ] desaparecen cuando un campo dentro de ellos está vacío.",
+      "modeAuto": "auto",
+      "modeTv": "serie",
+      "modeMovie": "película"
+    },
+    "cleanTags": {
+      "label": "Quitar etiquetas de release",
+      "help": "Corta el nombre en la primera etiqueta de release (1080p, WEB-DL, x265, ITA…).",
+      "builtIn": "lista de etiquetas integrada"
+    },
+    "replace": {
+      "label": "Reemplazar",
+      "first": "primera",
+      "last": "última"
+    },
+    "removePattern": {
+      "label": "Quitar patrón"
+    },
+    "removeAfter": {
+      "label": "Quitar todo lo que sigue a un texto",
+      "summary": "tras {text}",
+      "summaryInclusive": "tras {text} (incluido)"
+    },
+    "remove": {
+      "label": "Quitar caracteres",
+      "summary": "{count} desde la posición {start}",
+      "summaryFromEnd": "{count} desde la posición {start} (desde el final)"
+    },
+    "add": {
+      "label": "Añadir texto",
+      "summary": "{text} en {position}",
+      "summaryFromEnd": "{text} en {position} desde el final"
+    },
+    "move": {
+      "label": "Mover caracteres",
+      "summary": "{count} caracteres de {from} a {to}"
+    },
+    "trim": {
+      "label": "Recortar caracteres"
+    },
+    "case": {
+      "label": "Cambiar mayúsculas/minúsculas",
+      "title": "mayúscula inicial",
+      "upper": "mayúsculas",
+      "lower": "minúsculas",
+      "sentence": "tipo oración"
+    },
+    "apostrophes": {
+      "label": "Corregir apóstrofos",
+      "help": "L Uomo → L'Uomo, Dell Oca → Dell'Oca, Wouldn T → Wouldn't, Holston S → Holston's",
+      "summary": "L Uomo → L'Uomo"
+    },
+    "collapseSpaces": {
+      "label": "Unificar espacios",
+      "summary": "varios espacios → uno"
+    }
+  },
+  "view": {
+    "convertedFiles": "Archivos convertidos",
+    "renameList": "Lista para renombrar",
+    "renameListCount": "Lista para renombrar ({count})",
+    "addLabel": "Añadir para renombrar",
+    "browserHint": "Arrastre archivos o carpetas a la lista para renombrar. Ctrl/Mayús+clic para seleccionar varios.",
+    "rules": "Reglas",
+    "editRules": "Editar reglas",
+    "history": "Historial",
+    "showName": "Nombre de la serie",
+    "showNameTitle": "Úselo cuando el nombre de la serie falte o sea incorrecto, p. ej., «S04E07 Reacher Title»",
+    "autoDetected": "detectado automáticamente",
+    "showNameScope": "Qué filas reciben el nombre de serie escrito",
+    "onlyMissing": "solo donde falta",
+    "allRows": "en todas las filas",
+    "resetEdits": "Deshacer ediciones",
+    "resetEditsTitle": "Olvidar los nombres escritos a mano",
+    "clearList": "Vaciar la lista",
+    "reading": "Leyendo…",
+    "noVideos": "No se encontraron archivos de video.",
+    "empty": "Arrastre aquí archivos o carpetas convertidos, o use «Renombrar» en los trabajos terminados.",
+    "namesColumn": "Nombre actual → nombre nuevo",
+    "renameFile": "Renombrar {name}",
+    "tvChip": "Serie · S{season}e{episode}",
+    "movieChip": "Película · {year}",
+    "noChange": "sin cambios",
+    "undoEdit": "deshacer edición",
+    "dropHere": "Suelte para añadir a la lista para renombrar",
+    "counts": "{rename} por renombrar · {unchanged} sin cambios",
+    "needALook": "{count} requieren revisión",
+    "updating": "actualizando…",
+    "renameButton_one": "Renombrar {count} archivo",
+    "renameButton_other": "Renombrar {count} archivos",
+    "renameButtonNone": "Renombrar archivos",
+    "confirmTitle": "Renombrar archivos",
+    "confirmMessage_one": "¿Renombrar {count} archivo?",
+    "confirmMessage_other": "¿Renombrar {count} archivos?",
+    "renamed_one": "Se renombró {count} archivo · se puede deshacer desde Historial",
+    "renamed_other": "Se renombraron {count} archivos · se puede deshacer desde Historial",
+    "notRenamed": "{count} sin renombrar: {list}",
+    "addTitle": "Doble clic o arrastre para añadir a la lista para renombrar"
+  },
+  "rules": {
+    "title": "Reglas de renombrado",
+    "use": "Usar este conjunto de reglas",
+    "revert": "Revertir",
+    "builtin": "integrado",
+    "new": "Nuevo",
+    "importTitle": "Importar un preajuste .aren de Advanced Renamer o un conjunto de reglas exportado",
+    "importHint": "Importar acepta preajustes de Advanced Renamer (.aren) y conjuntos de reglas exportados desde aquí.",
+    "exportJson": "Exportar como JSON",
+    "description": "Descripción",
+    "readOnly": "Los conjuntos de reglas integrados son de solo lectura. Use {icon} Duplicar para crear una copia editable.",
+    "steps": "Pasos",
+    "active": "Activo",
+    "moveUp": "Subir",
+    "moveDown": "Bajar",
+    "deleteStep": "Eliminar paso",
+    "addStep": "Añadir paso",
+    "choose": "elija…",
+    "note": "Nota",
+    "notePlaceholder": "descripción opcional",
+    "tryIt": "Pruébelo",
+    "samplesPlaceholder": "Un nombre de archivo por línea",
+    "showNameOptional": "Nombre de la serie (opcional)",
+    "autoDetected": "detectado automáticamente",
+    "selectOrCreate": "Seleccione o cree un conjunto de reglas.",
+    "discardMessage": "¿Descartar los cambios sin guardar en este conjunto de reglas?",
+    "discardChanges": "Descartar cambios",
+    "keepEditing": "Seguir editando",
+    "saved": "Conjunto de reglas guardado",
+    "newName": "Nuevo conjunto de reglas",
+    "copyName": "{name} (copia)",
+    "copyCreated": "Copia creada",
+    "imported": "Se importó «{name}» ({count} pasos)",
+    "importedSkipped": "Se importó «{name}» ({count} pasos); omitidos: {skipped}",
+    "deleteTitle": "Eliminar conjunto de reglas",
+    "deleteMessage": "¿Eliminar el conjunto de reglas «{name}»?",
+    "deleted": "Conjunto de reglas eliminado"
+  },
+  "history": {
+    "title": "Historial de renombrado",
+    "empty": "Aún no se ha renombrado nada.",
+    "automatic": "automático",
+    "undone": "deshecho el {time}",
+    "undo": "Deshacer",
+    "undoTitle": "Deshacer el renombrado",
+    "undoMessage_one": "¿Restaurar el nombre original de {count} archivo?",
+    "undoMessage_other": "¿Restaurar los nombres originales de {count} archivos?",
+    "restoreNames": "Restaurar nombres",
+    "restored_one": "Se restauró {count} archivo",
+    "restored_other": "Se restauraron {count} archivos",
+    "restoredWithErrors_one": "Se restauró {count} archivo; {errors} no se pudieron restaurar",
+    "restoredWithErrors_other": "Se restauraron {count} archivos; {errors} no se pudieron restaurar"
+  }
+}

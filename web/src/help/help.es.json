@@ -1,0 +1,848 @@
+{
+  "topics": {
+    "help.search": {
+      "title": "Buscar en la ayuda",
+      "body": [
+        "Escriba una o varias palabras: un tema aparece en la lista cuando su título o su texto contiene **todas** las palabras. No importan las mayúsculas ni los acentos, y las coincidencias en el título van primero.",
+        "Si no escribe nada, se listan todos los temas de la A a la Z. Cada **?** redondo de la aplicación abre el tema de lo que tiene al lado."
+      ],
+      "see": [
+        "app.overview"
+      ]
+    },
+    "app.overview": {
+      "title": "Cómo funciona HandBrake Queue",
+      "body": [
+        "HandBrake Queue convierte videos en el servidor, usando HandBrakeCLI con preajustes de HandBrake: creados en el [editor de preajustes](#presets.editor) o importados desde la aplicación de escritorio de HandBrake. Los videos que están en su equipo pueden [subirse](#upload.overview) antes.",
+        "### El flujo de trabajo habitual",
+        "1. Suba un [preajuste](#presets) exportado desde HandBrake.",
+        "1. En **Convertir**, arrastre archivos o carpetas desde [Orígenes](#convert.sources) hasta la [cola](#convert.queue).",
+        "1. Pulse **Iniciar**: consulte [Iniciar y detener la cola](#queue.state).",
+        "1. Cada archivo convertido se [comprueba](#verify.overview) para detectar errores, audio o subtítulos que falten y la duración correcta.",
+        "1. En **Renombrar**, dé nombres limpios a los archivos convertidos: consulte [Renombrar archivos](#rename.overview).",
+        "Si lo desea, una varios archivos convertidos en uno (p. ej., una película dividida en dos partes) en **Unir**: consulte [Unir archivos](#merge.overview).",
+        "Para encontrar archivos antiguos o de baja calidad en cualquier lugar de sus carpetas, use **Calidad**: consulte [Control de calidad](#quality.overview).",
+        "Para convertir sin estar presente: una [franja de conversión](#settings.schedule) ejecuta la cola por la noche, las [carpetas vigiladas](#settings.watch) añaden por sí solas las descargas nuevas y las [notificaciones](#settings.notifications) le avisan de cómo fue todo. **Estadísticas** muestra lo que se ha convertido: consulte [Estadísticas](#stats.overview).",
+        "Los archivos de origen nunca se modifican, así que las descargas pueden seguir compartiéndose. Solo se eliminan cuando usted lo pide: consulte [Eliminar archivos de origen](#delete.overview).",
+        "En un teléfono la aplicación funciona igual: las vistas con dos paneles (Orígenes y cola, archivos y lista de renombrado…) muestran un panel cada vez, con un selector encima; al añadir archivos se pasa al segundo panel. Arrastrar y soltar requiere un ratón, así que en una pantalla táctil use las casillas y **Añadir a la cola**, y los botones **Subir**, **Bajar**, **Mover al principio** y **Mover al final** en los detalles de un trabajo para reordenar la cola.",
+        "En Ajustes → **Acerca de** encontrará la versión, las notas de la versión, los créditos y la licencia (GNU GPL, versión 2)."
+      ],
+      "see": [
+        "convert.sources",
+        "convert.queue",
+        "queue.state",
+        "verify.overview",
+        "rename.overview",
+        "presets",
+        "merge.overview",
+        "upload.overview",
+        "quality.overview"
+      ]
+    },
+    "convert.sources": {
+      "title": "Orígenes",
+      "body": [
+        "Las carpetas y los archivos de video que hay en las **Carpetas de origen** definidas en [Ajustes](#settings.folders). Si hay más de una, elija cuál explorar en la lista de la parte superior del panel. Solo se listan carpetas y archivos de video (consulte [Añadir carpetas](#settings.adding) para ver las extensiones).",
+        "- **Doble clic** en una carpeta para abrirla, o en un archivo para añadirlo a la cola.",
+        "- **Arrastre** archivos o carpetas a la cola para añadirlos. Ctrl+clic y Mayús+clic seleccionan varios; la casilla de la parte superior selecciona todo.",
+        "- **Añadir a la cola** añade lo seleccionado.",
+        "- Al añadir una carpeta se añaden todos los videos que contiene, subcarpetas incluidas. Los archivos que ya están en la cola se omiten, y también los ya convertidos, salvo que lo haya desactivado.",
+        "Las insignias muestran qué ha pasado con cada archivo: **En cola**, **Convirtiendo**, **Convertido**, **Con error**. En las carpetas cuentan los archivos que contienen.",
+        "- **Subir** envía videos desde su equipo a la carpeta abierta; soltar archivos de su equipo sobre el panel hace lo mismo. Consulte [Subir videos](#upload.overview).",
+        "- **Descargar** copia en su equipo los archivos o carpetas seleccionados: consulte [Descargar archivos](#download.overview).",
+        "- **Eliminar** borra del servidor los archivos o carpetas seleccionados, tras una confirmación: consulte [Eliminar archivos de origen](#delete.overview).",
+        "Añadir archivos nunca inicia la conversión: pulse **Iniciar** cuando esté listo ([por qué](#queue.state))."
+      ],
+      "see": [
+        "convert.queue",
+        "settings.adding",
+        "queue.state",
+        "upload.overview",
+        "download.overview",
+        "delete.overview"
+      ]
+    },
+    "convert.queue": {
+      "title": "Cola",
+      "body": [
+        "Cada archivo que se va a convertir es un **trabajo**. Los trabajos se ejecutan de uno en uno, de arriba abajo.",
+        "- **Preajuste**: el [preajuste](#presets) que se usa para los archivos que añada a continuación. El preajuste de un trabajo en cola puede cambiarse en sus detalles.",
+        "- **Añadir**: coloca los archivos nuevos **al final** de la cola o **a continuación**, antes de los demás trabajos en espera.",
+        "- **Arrastre** un trabajo en cola por su asa (⋮⋮) para cambiar el orden, o use **Mover al principio**.",
+        "- Los filtros muestran todos los trabajos, los activos, los convertidos o los fallidos y cancelados. **Renombrar estos** (en Convertidos) abre sus archivos en la vista Renombrar, y **Unir estos** en la vista Unir.",
+        "- **Quitar terminados** quita de la lista los trabajos convertidos, fallidos y cancelados. Los archivos no se tocan.",
+        "Haga clic en un trabajo para ver sus [detalles](#job.details)."
+      ],
+      "see": [
+        "queue.state",
+        "job.statuses",
+        "job.actions",
+        "job.details"
+      ]
+    },
+    "queue.state": {
+      "title": "Iniciar y detener la cola",
+      "body": [
+        "La cola **nunca se inicia sola** salvo que usted lo pida: añadir o soltar archivos solo los coloca en la lista. Pulse **Iniciar** para empezar a convertir.",
+        "- Mientras se ejecuta, los archivos que añada se incorporan a la ejecución.",
+        "- Cuando termina el último trabajo, la cola se detiene de nuevo, así que los siguientes archivos que añada esperan a **Iniciar**.",
+        "- **Detener tras el actual** deja terminar el trabajo que se está convirtiendo y después se detiene. Para detenerlo de inmediato, ponga en pausa o cancele ese trabajo.",
+        "- Si el servidor se reinicia durante una ejecución, esta continúa tras el reinicio. El trabajo que se estaba convirtiendo vuelve a empezar desde el 0 %, porque HandBrake no puede reanudar una codificación a medias.",
+        "Dos ajustes pueden iniciarla por usted: la [franja de conversión](#settings.schedule) (iniciar cuando se abre la franja) y las [carpetas vigiladas](#settings.watch) (iniciar tras añadir archivos nuevos).",
+        "Con una franja de conversión, **Iniciar** fuera de la franja pregunta si desea **Esperar a la franja** (la barra superior muestra entonces «Esperando hasta 23:00») o **Iniciar ahora**, que ignora la franja hasta que la cola se detiene."
+      ],
+      "see": [
+        "convert.queue",
+        "job.actions",
+        "queue.eta",
+        "settings.schedule"
+      ]
+    },
+    "job.statuses": {
+      "title": "Estados de los trabajos",
+      "body": [
+        "- **En cola**: esperando su turno.",
+        "- **Analizando**: HandBrake está leyendo el origen antes de convertir.",
+        "- **Convirtiendo**: codificando, con progreso, velocidad (fotogramas por segundo) y tiempo restante.",
+        "- **Finalizando**: HandBrake está escribiendo el final del archivo.",
+        "- **Comprobando**: se está [comprobando](#verify.overview) el archivo convertido.",
+        "- **En pausa**: detenido donde estaba; **Reanudar** lo continúa.",
+        "- **Convertido**: terminado. Una segunda insignia muestra el resultado de la comprobación: **Comprobado**, **Avisos en la comprobación** o **Comprobación fallida**.",
+        "- **Con error**: HandBrake se detuvo con un error; los detalles indican el motivo y el registro da más información.",
+        "- **Cancelado**: usted lo canceló.",
+        "Los filtros situados sobre la lista muestran todos los trabajos, los activos, los convertidos, los fallidos o cancelados, y **Comprobación fallida**: archivos convertidos cuya [comprobación tras la conversión](#verify.overview) encontró problemas. Se pone en rojo cuando hay alguno, y **Comprobar todos de nuevo** los comprueba otra vez uno tras otro."
+      ],
+      "see": [
+        "job.actions",
+        "verify.results"
+      ]
+    },
+    "job.actions": {
+      "title": "Acciones de los trabajos",
+      "body": [
+        "- **Pausar / Reanudar**: congela la conversión (o la comprobación) y la continúa más tarde. Si se reinicia el servidor mientras está en pausa, la conversión vuelve a empezar desde el 0 %. No está disponible cuando el servidor se ejecuta en Windows sin Docker: cancele en su lugar.",
+        "- **Cancelar**: detiene la conversión y elimina el archivo escrito a medias. En un trabajo en cola solo lo marca como cancelado. Mientras se comprueba el archivo, **Omitir comprobación** conserva el archivo convertido y se salta el resto de la comprobación.",
+        "- **Mover al principio**: convierte este trabajo en cola a continuación.",
+        "- **Reintentar**: devuelve a la cola un trabajo fallido o cancelado.",
+        "- **Convertir de nuevo**: un trabajo nuevo para el mismo origen. El archivo nuevo recibe un sufijo como `name (1).mkv`, así que se conserva el primero. En los detalles puede elegir otro preajuste.",
+        "- **Renombrar**: abre el archivo convertido en la [vista Renombrar](#rename.overview).",
+        "- **Comprobar de nuevo**: vuelve a ejecutar la [comprobación](#verify.overview) en un archivo convertido.",
+        "- **Quitar**: retira el trabajo de la lista. Los archivos nunca se eliminan."
+      ],
+      "see": [
+        "job.statuses",
+        "job.details"
+      ]
+    },
+    "job.details": {
+      "title": "Detalles del trabajo",
+      "body": [
+        "Todo sobre un trabajo: el [progreso](#job.statuses), la [comprobación](#verify.results), los [archivos](#job.files), el preajuste, el [origen](#job.source), los [tiempos](#job.timing) y el [registro de HandBrake](#job.log). Los botones de la parte superior son las [acciones del trabajo](#job.actions).",
+        "Los detalles siguen al trabajo en directo mientras se convierte. Ciérrelos con ✕ o con Escape."
+      ],
+      "see": [
+        "job.actions",
+        "job.files",
+        "verify.results",
+        "job.log"
+      ]
+    },
+    "job.files": {
+      "title": "Archivos de origen y de salida",
+      "body": [
+        "- **Origen**: el archivo que se está convirtiendo. Nunca se modifica.",
+        "- **Salida**: dónde va el archivo convertido, dentro de la **Carpeta de destino** y con la disposición elegida en [Ajustes](#settings.layout). Mientras el trabajo está en cola puede **editar** la ruta (debe seguir dentro de la carpeta de destino).",
+        "- Si ya existe un archivo con ese nombre cuando empieza el trabajo, el archivo nuevo recibe un sufijo: `name (1).mkv`. No se sobrescribe nada.",
+        "- Durante la conversión, la salida se escribe como `name.mkv.part` y se renombra cuando HandBrake termina, para que los servidores multimedia nunca tomen archivos escritos a medias.",
+        "- **Tamaños** compara el origen con la salida."
+      ],
+      "see": [
+        "settings.layout",
+        "job.details",
+        "download.overview"
+      ]
+    },
+    "job.source": {
+      "title": "Detalles del origen",
+      "body": [
+        "Lo que HandBrake encontró en el origen cuando se añadió el trabajo: duración, formato y tamaño del video, velocidad de fotogramas, y las pistas de audio y de subtítulos con sus idiomas.",
+        "El [preajuste](#presets) decide cuáles de estas pistas pasan a la salida. La [comprobación](#verify.overview) compara la salida con lo que HandBrake pretendía escribir."
+      ],
+      "see": [
+        "presets",
+        "verify.overview"
+      ]
+    },
+    "job.timing": {
+      "title": "Tiempos",
+      "body": [
+        "Cuándo se añadió, empezó y terminó el trabajo, cuánto duró la codificación (sin contar las pausas) y la velocidad media en fotogramas por segundo. **Intentos** cuenta cuántas veces se inició, p. ej., tras un reintento o un reinicio."
+      ]
+    },
+    "job.log": {
+      "title": "Registro de HandBrake",
+      "body": [
+        "Todo lo que HandBrakeCLI imprimió durante la conversión: los ajustes que usó, las pistas que eligió, avisos y errores. Se actualiza en directo mientras el trabajo se ejecuta.",
+        "Cuando un trabajo falla, el error que se muestra en sus detalles procede de las últimas líneas de error de este registro. La [comprobación](#verify.overview) también lo lee, para saber qué pistas de audio y de subtítulos escribió HandBrake y si encontró errores en el origen.",
+        "La línea `encoder:` indica qué codificador se usó, p. ej., `H.264 (Intel QSV)` para un [preajuste de Quick Sync](#presets.qsv)."
+      ],
+      "see": [
+        "verify.overview",
+        "presets.qsv"
+      ]
+    },
+    "verify.overview": {
+      "title": "Comprobación de los archivos convertidos",
+      "body": [
+        "Tras cada conversión correcta se comprueba la salida antes de marcar el trabajo como convertido. Mientras tanto el trabajo muestra **Comprobando**, y el siguiente trabajo espera.",
+        "### Qué se comprueba",
+        "- **Legible**: el archivo se abre y tiene una secuencia de video.",
+        "- **La duración coincide con el origen**: dónde termina realmente el video, medido leyendo el archivo completo. Un archivo cortado puede seguir declarando la duración completa en sus metadatos, así que eso solo no es fiable. Hasta 2 segundos (o 0,5 %) de diferencia es aceptable, hasta 10 segundos (o 2 %) es un aviso y más es un error.",
+        "- **Pistas de audio**: el archivo tiene todas las pistas de audio que escribió HandBrake (según el [registro](#job.log)) y cada una dura lo mismo que el video.",
+        "- **Pistas de subtítulos**: el archivo tiene todas las pistas de subtítulos que HandBrake pasó tal cual. Los subtítulos incrustados en la imagen forman parte del video. Una pista sin líneas (p. ej., subtítulos forzados en un episodio que no tiene ninguno) se muestra, pero no es un problema.",
+        "- **Decodificación completa**: se decodifica cada fotograma de video y de audio para encontrar datos dañados. Tarda aproximadamente 1–2 minutos en un episodio de 45 minutos.",
+        "- **Origen**: si HandBrake encontró errores de decodificación en el origen, el daño puede verse también en la salida (un aviso).",
+        "Elija **Completo**, **Rápida** (todo salvo la decodificación completa) o **Desactivado** en [Ajustes](#settings.encoding)."
+      ],
+      "see": [
+        "verify.results",
+        "settings.encoding",
+        "rename.auto"
+      ]
+    },
+    "verify.results": {
+      "title": "Resultados de la comprobación",
+      "body": [
+        "- **Comprobado** (verde): se superaron todas las comprobaciones.",
+        "- **Avisos en la comprobación** (ámbar): hay algo que revisar, p. ej., errores en el origen o unos segundos de diferencia en la duración. El archivo suele estar bien.",
+        "- **Comprobación fallida** (rojo): el archivo probablemente está dañado: demasiado corto, una pista de audio ausente o corta, o muchos errores de decodificación. Use **Convertir de nuevo**, o pruebe con otro origen.",
+        "- **Sin comprobar**: la comprobación se omitió, se interrumpió por un reinicio o está desactivada.",
+        "Cada línea de los detalles del trabajo indica qué se encontró. **Comprobar de nuevo** repite la comprobación, p. ej., tras copiar de nuevo el archivo.",
+        "Los archivos que no superan la comprobación nunca se [renombran automáticamente](#rename.auto)."
+      ],
+      "see": [
+        "verify.overview",
+        "job.actions"
+      ]
+    },
+    "presets": {
+      "title": "Preajustes",
+      "body": [
+        "Un preajuste contiene todos los ajustes de conversión: codificador y calidad de video, tamaño, velocidad de fotogramas, filtros, pistas de audio y de subtítulos, contenedor. Puede crear y modificar preajustes aquí, en la página **Preajustes**, o importar los creados en la aplicación de escritorio de HandBrake.",
+        "### Crear un preajuste",
+        "- **Nuevo** parte de uno de los preajustes propios de HandBrake (p. ej., «Fast 1080p30») o de uno de los suyos: consulte [Preajuste nuevo](#presets.new).",
+        "- **Editar** abre el preajuste elegido en el [editor de preajustes](#presets.editor), con las mismas pestañas que HandBrake: Resumen, Dimensiones, Filtros, Video, Audio y Subtítulos.",
+        "- **Duplicar** crea una copia con otro nombre.",
+        "### Importar desde HandBrake",
+        "1. En HandBrake: **Preajustes** → seleccione su preajuste → **Exportar**.",
+        "1. Aquí: pulse **Importar** o suelte el archivo `.json` en cualquier parte de la página.",
+        "- Un archivo puede contener varios preajustes, incluso dentro de carpetas: se añade cada uno.",
+        "- Al importar de nuevo un preajuste con el mismo nombre y categoría, este reemplaza al anterior, con las modificaciones hechas aquí incluidas.",
+        "### Usar preajustes",
+        "- La página muestra todos los ajustes del preajuste elegido, agrupados como las pestañas de HandBrake, además del JSON sin procesar y del rendimiento que ha tenido el preajuste (velocidad, reducción de tamaño). **Descargar** genera un archivo que HandBrake puede importar.",
+        "- El preajuste **predeterminado** (★) se usa al añadir archivos, salvo que elija otro en la cola.",
+        "- Cada trabajo conserva una copia de su preajuste, así que cambiar o eliminar un preajuste nunca modifica los trabajos que ya están en la cola.",
+        "Los codificadores por hardware (`qsv_h264`, `qsv_h265`) convierten en la GPU de Intel: consulte [Preajustes de Quick Sync (GPU)](#presets.qsv). Los codificadores disponibles en este servidor se listan en Ajustes → **Acerca de** y en la pestaña Video del editor."
+      ],
+      "see": [
+        "presets.editor",
+        "presets.new",
+        "presets.qsv",
+        "convert.queue"
+      ]
+    },
+    "presets.qsv": {
+      "title": "Preajustes de Quick Sync (GPU)",
+      "body": [
+        "Un preajuste con un codificador **Quick Sync** de Intel convierte en la GPU de Intel del servidor en lugar de en la CPU. En un Intel i3 de 10.ª generación fue aproximadamente **el doble de rápido** que x264 con la misma tasa de bits, con archivos del mismo tamaño y casi la misma calidad. Quick Sync funciona en las iGPU de Intel a partir de la 6.ª generación, cuando el servidor pasa la GPU (`/dev/dri`) a HandBrake Queue. Si `qsv_h264` aparece en Ajustes → **Acerca de**, está listo.",
+        "### Crear uno en HandBrake para Windows",
+        "1. Abra cualquier video y seleccione el preajuste del que partir.",
+        "1. En la pestaña **Video**, establezca **Codificador de video** en `H.264 (Intel QSV)` y **Preajuste del codificador** en `Balanced`. Mantenga la misma tasa de bits media, o añada aproximadamente un 10–15 % para igualar la calidad de x264.",
+        "1. Deje vacías las **Opciones avanzadas** del codificador: las opciones pensadas para GPU de Intel más nuevas pueden no funcionar en el servidor.",
+        "1. **Guardar preajuste nuevo** con su propio nombre, **Exportar** y súbalo en [Preajustes](#presets).",
+        "Los codificadores Intel QSV solo aparecen en HandBrake cuando su propio equipo tiene una GPU de Intel. Si no la tiene, exporte en su lugar el preajuste de x264 y edite el archivo `.json`: establezca `VideoEncoder` en `qsv_h264` y `VideoPreset` en `balanced`.",
+        "### Cosas que comprobar",
+        "- **La decodificación con Quick Sync debe seguir desactivada.** Si el archivo exportado contiene `\"VideoHWDecode\": 2`, elimine esa línea: la decodificación en la GPU falla en los Intel de 6.ª a 10.ª generación. El origen se decodifica en la CPU, por eso es aproximadamente el doble de rápido y no más.",
+        "- `H.264 (Intel QSV)` con **Balanced** dio los mejores resultados en las pruebas. **Quality** dio el mismo resultado, y `H.265 (Intel QSV)` fue más lento y algo peor con la misma tasa de bits.",
+        "- Si el servidor rechaza el preajuste al subirlo, el mensaje explica el motivo, p. ej., un codificador que no tiene.",
+        "- Para comprobar que un trabajo usó la GPU, busque `encoder: H.264 (Intel QSV)` en su [registro de HandBrake](#job.log). La velocidad también es mayor, p. ej., unos 60 fotogramas por segundo en lugar de 30."
+      ],
+      "see": [
+        "presets",
+        "job.log"
+      ]
+    },
+    "settings.folders": {
+      "title": "Carpetas de origen y de destino",
+      "body": [
+        "Carpetas del servidor (no de su equipo). Los recursos compartidos de un NAS montados en el servidor también sirven.",
+        "- **Carpetas de origen**: dónde están los archivos que se van a convertir. Añada tantas como necesite con **Añadir una carpeta de origen**; el panel Orígenes muestra una cada vez y no puede subir por encima de ella. Quitar una carpeta de la lista no elimina nada.",
+        "- **Nombre** (opcional) en una carpeta de origen: un nombre descriptivo como «Descargas», que se muestra en lugar de la ruta en el panel Orígenes, en las listas de carpetas y en la vista Calidad. Cada nombre puede usarse una vez, con un máximo de 40 caracteres; si se deja vacío se muestra el nombre propio de la carpeta.",
+        "- **Proteger** en una carpeta de origen: impide que sus archivos y carpetas se eliminen desde la aplicación, por ejemplo, la carpeta desde la que un cliente de descargas sigue compartiendo. En el panel Orígenes, una carpeta así muestra **Protegida** en lugar del botón Eliminar, y el servidor también rechaza allí las eliminaciones.",
+        "- **Carpeta de destino**: dónde se escriben los archivos convertidos. Las vistas Renombrar y Unir solo trabajan aquí.",
+        "Todas deben existir. El destino no puede estar dentro de una carpeta de origen, y una carpeta de origen no puede estar dentro de otra. En Docker deben estar dentro de la carpeta montada en el contenedor (`MEDIA_DIR`, normalmente `/mnt`).",
+        "Las disposiciones de salida **Nombre de la carpeta de origen** y **Ruta de origen completa** se calculan a partir de la carpeta de origen en la que está cada archivo."
+      ],
+      "see": [
+        "settings.layout",
+        "convert.sources",
+        "upload.overview",
+        "delete.overview",
+        "backup.overview"
+      ]
+    },
+    "settings.layout": {
+      "title": "Disposición de las carpetas de salida",
+      "body": [
+        "Dónde, dentro de la carpeta de destino, va cada archivo convertido:",
+        "- **Nombre de la carpeta de origen**: `target/Show.S01/episode.mkv`, usando solo el nombre de la carpeta en la que está el origen. Útil para carpetas de temporada.",
+        "- **Ruta de origen completa**: `target/Completed/Show.S01/episode.mkv`, toda la ruta por debajo de la carpeta de origen.",
+        "- **Todo en la carpeta de destino**: `target/episode.mkv`.",
+        "Si el archivo ya existe, el nuevo recibe un sufijo (`episode (1).mkv`). La disposición se aplica a los archivos añadidos tras el cambio; los trabajos en cola conservan su ruta de salida."
+      ],
+      "see": [
+        "job.files"
+      ]
+    },
+    "settings.language": {
+      "title": "Idioma",
+      "body": [
+        "La aplicación, incluida su ayuda, puede mostrarse en inglés, italiano (Italiano), alemán (Deutsch), francés (Français) o español (Español). Cada idioma aparece con su propio nombre, así que es fácil encontrarlo sea cual sea el idioma en que esté la aplicación ahora.",
+        "- **Automático**: cada navegador muestra la aplicación en su propio idioma (el primero de las preferencias de idioma del navegador que tenga la aplicación) y, si no, en inglés. Dos personas pueden usar la aplicación en dos idiomas a la vez.",
+        "- **Un idioma**: todos los navegadores muestran la aplicación en ese idioma.",
+        "La elección se guarda en el servidor, como los demás ajustes, y se aplica en cuanto pulsa **Guardar cambios**. El navegador recuerda el último idioma, así que la próxima vez la aplicación se abre directamente en él.",
+        "Los nombres de archivos y carpetas, los nombres de preajustes y los mensajes de error del servidor, de HandBrake o de ffmpeg se muestran tal cual (normalmente en inglés). Las [notificaciones](#settings.notifications) por correo electrónico y push están siempre en inglés."
+      ],
+      "see": [
+        "settings.notifications"
+      ]
+    },
+    "settings.adding": {
+      "title": "Añadir carpetas",
+      "body": [
+        "- **Incluir subcarpetas**: al añadir una carpeta se añaden también los videos de sus subcarpetas.",
+        "- **Omitir los archivos ya convertidos**: un archivo con un trabajo convertido no se vuelve a añadir. Use **Convertir de nuevo** en su trabajo para rehacer uno.",
+        "- **Extensiones de archivos de video**: qué archivos cuentan como videos, separados por comas.",
+        "- **Omitir los archivos y carpetas que contengan estas palabras**: palabras completas, en mayúsculas o minúsculas, p. ej., `sample` omite `show-sample.mkv` y una carpeta `Sample`, pero no `samples.mkv`."
+      ],
+      "see": [
+        "convert.sources"
+      ]
+    },
+    "settings.encoding": {
+      "title": "Ajustes de codificación",
+      "body": [
+        "- **Prioridad de CPU**: con qué cortesía comparten las conversiones la CPU con otros servicios del servidor (`nice` de Linux, 0–19). Un valor más alto es más amable y solo es más lento cuando el servidor está ocupado. Se ignora cuando el servidor se ejecuta en Windows sin Docker.",
+        "- **Comprobación tras la conversión**: **Completo** (todas las comprobaciones, con decodificación completa), **Rápida** (duraciones, pistas y legibilidad sin decodificar) o **Desactivado**. Consulte [Comprobación de los archivos convertidos](#verify.overview)."
+      ],
+      "see": [
+        "verify.overview"
+      ]
+    },
+    "settings.renaming": {
+      "title": "Ajustes de renombrado",
+      "body": [
+        "- **Renombrar los archivos automáticamente tras la conversión**: desactivado por defecto. Consulte [Renombrado automático](#rename.auto).",
+        "- **Conjunto de reglas para el renombrado automático**: qué [conjunto de reglas](#rename.rules) se usa.",
+        "- **Separador**: cuando el nombre nuevo ya existe, se añade un número después: con `_` se obtiene `name_1.mkv`, `name_2.mkv`."
+      ],
+      "see": [
+        "rename.auto",
+        "rename.rules"
+      ]
+    },
+    "rename.overview": {
+      "title": "Renombrar archivos",
+      "body": [
+        "Los archivos descargados tienen nombres como `The.Rookie.6x01.Title.ITA.ENG.1080p.NFRip.AAC.x265-Pir8`. La vista Renombrar los convierte en `The Rookie S06e01 - Title`, usando [conjuntos de reglas](#rename.rules).",
+        "1. A la izquierda, explore la **carpeta de destino** y arrastre archivos o carpetas convertidos a la lista de renombrado (o use **Renombrar** en un trabajo convertido).",
+        "1. Elija las **Reglas**. La opción integrada **Auto** reconoce tanto episodios de series como películas.",
+        "1. Revise la [vista previa](#rename.preview): corrija cualquier nombre a mano y escriba un [nombre de la serie](#rename.showName) donde no se haya encontrado ninguno.",
+        "1. Pulse **Renombrar**. Cada lote puede deshacerse desde el [Historial](#rename.history).",
+        "Solo se pueden renombrar archivos de la carpeta de destino, nunca los orígenes (las descargas pueden seguir compartiéndose)."
+      ],
+      "see": [
+        "rename.preview",
+        "rename.showName",
+        "rename.rules",
+        "rename.history",
+        "rename.auto"
+      ]
+    },
+    "rename.preview": {
+      "title": "Vista previa del renombrado",
+      "body": [
+        "Cada fila muestra el nombre actual (pequeño, en gris) y el nombre nuevo. No cambia nada en el disco hasta que pulsa **Renombrar**.",
+        "- **Editar** cualquier nombre nuevo escribiendo en él (Intro para confirmar, Escape para cancelar). Una fila editada se ve en azul; **deshacer edición** vuelve al nombre de las reglas.",
+        "- Las **casillas** eligen qué filas se renombran. Las filas con un aviso empiezan sin marcar: revíselas y márquelas cuando le parezcan correctas.",
+        "- Los **avisos** explican lo que las reglas no pudieron encontrar, p. ej., falta el número de episodio, el año o el nombre de la serie.",
+        "- **Serie · S06e01** o **Película · 2024** muestra lo que se reconoció; **sin cambios** significa que el nombre ya es correcto.",
+        "- Si dos archivos recibirían el mismo nombre, o el nombre lo tiene otro archivo de la carpeta, se añade un número: `name_1.mkv` (consulte [Ajustes de renombrado](#settings.renaming)).",
+        "Los archivos de carpetas distintas se agrupan bajo su carpeta."
+      ],
+      "see": [
+        "rename.showName",
+        "rename.rules"
+      ]
+    },
+    "rename.showName": {
+      "title": "Nombre de la serie",
+      "body": [
+        "Algunos archivos no tienen el nombre de la serie antes del número de episodio, p. ej., `S04E07 Reacher Tutti Con Sampson (2026)…`. Escriba el nombre de la serie (`Reacher`) y las filas pasan a `Reacher S04e07 - Tutti Con Sampson`; el nombre también se quita del título del episodio.",
+        "- **solo donde falta** (predeterminado): solo lo reciben las filas en las que no se encontró un nombre de serie. Las demás series de la misma lista conservan el suyo.",
+        "- **en todas las filas**: todas las filas de series reciben este nombre, p. ej., para acortar uno largo o para añadir un año a un remake: `Silo (2023)`."
+      ],
+      "see": [
+        "rename.preview",
+        "rename.smart"
+      ]
+    },
+    "rename.rules": {
+      "title": "Conjuntos de reglas de renombrado",
+      "body": [
+        "Un conjunto de reglas es una lista de [pasos](#rename.steps) que se aplican en orden al nombre de cada archivo (sin su extensión).",
+        "- Los conjuntos de reglas **integrados** (**Auto**, **TV series**, **Movies**) no se pueden modificar: use **Duplicar** para crear una copia editable.",
+        "- **Nuevo** crea un conjunto de reglas con el paso [Reconocer episodio / película](#rename.smart).",
+        "- **Importar** lee los preajustes de Advanced Renamer (`.aren`) y los conjuntos de reglas exportados desde aquí. Cada método de Advanced Renamer usado para nombres (reemplazar, quitar patrón, quitar, añadir, mover, recortar, mayúsculas) se convierte en un paso.",
+        "- **Exportar** (icono de descarga) guarda el conjunto de reglas como un archivo `.json`, p. ej., para copiarlo a otro servidor.",
+        "- Los cambios solo se conservan tras **Guardar**; [Probar](#rename.tryIt) muestra el resultado antes de guardar."
+      ],
+      "see": [
+        "rename.steps",
+        "rename.smart",
+        "rename.tryIt"
+      ]
+    },
+    "rename.steps": {
+      "title": "Pasos de renombrado",
+      "body": [
+        "Los pasos se ejecutan de arriba abajo; desmarque uno para desactivarlo sin eliminarlo. Haga clic en un paso para editarlo.",
+        "- **Reconocer episodio / película**: construye el nombre completo a partir de una plantilla. Consulte [Reconocer episodio / película](#rename.smart).",
+        "- **Quitar etiquetas de release**: corta el nombre en la primera etiqueta como `1080p`, `WEB-DL`, `x265` o `ITA`.",
+        "- **Reemplazar**: busca texto y lo reemplaza: todas las apariciones, la primera o la última, distinguiendo mayúsculas o no. Con **Expresión regular**, `$1`, `$2`… insertan los grupos encontrados.",
+        "- **Quitar patrón**: elimina lo que coincide, p. ej., `(720p).*$` elimina desde `720p` hasta el final.",
+        "- **Quitar todo lo que sigue a un texto**: p. ej., después de `)`.",
+        "- **Quitar caracteres / Añadir texto / Mover caracteres**: trabajan con posiciones, como Advanced Renamer. Las posiciones cambian con cada nombre de archivo, así que los pasos con patrones suelen ser más seguros.",
+        "- **Recortar caracteres**: quita los caracteres indicados de ambos extremos.",
+        "- **Cambiar mayúsculas/minúsculas**: Palabras Con Mayúscula Inicial, MAYÚSCULAS, minúsculas o Mayúscula inicial de frase.",
+        "- **Corregir apóstrofos**: `L Uomo` → `L'Uomo`, `Dell Oca` → `Dell'Oca`, `Wouldn T` → `Wouldn't`.",
+        "- **Unificar espacios**: varios espacios se convierten en uno.",
+        "Los caracteres que los nombres de archivo no pueden contener (`/ \\ : * ? \" < > |`) se quitan o se reemplazan al final; `:` se convierte en ` -`."
+      ],
+      "see": [
+        "rename.smart",
+        "rename.tryIt"
+      ]
+    },
+    "rename.smart": {
+      "title": "Reconocer episodio / película",
+      "body": [
+        "Lee las partes del nombre de un release y construye uno limpio.",
+        "- **Serie**: encuentra `S01E02`, `S01E01E02` o `1x02`. La serie es el texto anterior, y el título del episodio es el texto posterior, hasta la primera etiqueta de release.",
+        "- **Película**: encuentra el año (`2024` o `(2024)`); el título es el texto anterior.",
+        "- **Tipo**: **Auto** trata un nombre con número de episodio como una serie y cualquier otro como una película.",
+        "### Plantillas",
+        "`{show}`, `{season}`, `{episode}`, `{title}` y `{year}` se reemplazan por lo que se encontró; la temporada y el episodio llevan dos dígitos. Una parte entre `[ ]` desaparece cuando un campo que contiene está vacío: `{show} S{season}e{episode}[ - {title}]` da `Lanterns S01e01` cuando no hay título de episodio.",
+        "### Opciones",
+        "- **Palabras con Mayúscula Inicial**: pone en mayúscula cada palabra, respetando las mayúsculas que ya hay (`McLaren`, `INXS`).",
+        "- **Corregir apóstrofos**: `L Osservatore` → `L'Osservatore`.",
+        "- **Conservar el año en el nombre de la serie**: `East of Eden 2026 S01E01` pasa a `East Of Eden (2026) S01e01`. Desactivado por defecto; útil para remakes.",
+        "- **Etiquetas de release adicionales**: más palabras que marcan el comienzo de la información del release."
+      ],
+      "see": [
+        "rename.showName",
+        "rename.steps"
+      ]
+    },
+    "rename.tryIt": {
+      "title": "Probar",
+      "body": [
+        "Muestra lo que hace el conjunto de reglas que se está editando con algunos nombres, antes de guardar. Empieza con los nombres de su lista de renombrado (o unos ejemplos); escriba o pegue cualquier nombre, uno por línea.",
+        "El cuadro **Nombre de la serie** funciona como el de la [vista Renombrar](#rename.showName)."
+      ],
+      "see": [
+        "rename.rules"
+      ]
+    },
+    "rename.history": {
+      "title": "Historial de renombrado",
+      "body": [
+        "Cada lote de renombrados, el más reciente primero, incluidos los automáticos. Haga clic en un lote para ver cada nombre antiguo y nuevo.",
+        "**Deshacer** devuelve a los archivos sus nombres antiguos. Un archivo se omite si se eliminó o se movió desde entonces, o si su nombre antiguo vuelve a estar en uso."
+      ],
+      "see": [
+        "rename.overview"
+      ]
+    },
+    "rename.auto": {
+      "title": "Renombrado automático",
+      "body": [
+        "Cuando **Renombrar los archivos automáticamente tras la conversión** está activado (Ajustes → Renombrado), cada archivo convertido se renombra con el conjunto de reglas elegido justo después de su [comprobación](#verify.overview).",
+        "Por seguridad, un archivo solo se renombra cuando las reglas lo reconocen **sin avisos**. En caso contrario, el trabajo muestra **Requiere renombrado** y usted lo termina en la [vista Renombrar](#rename.overview). Los archivos que no superan la comprobación no se renombran.",
+        "Los renombrados automáticos aparecen en el [Historial](#rename.history) y pueden deshacerse."
+      ],
+      "see": [
+        "settings.renaming",
+        "rename.overview"
+      ]
+    },
+    "merge.overview": {
+      "title": "Unir archivos",
+      "body": [
+        "Une archivos convertidos en un solo MKV, uno tras otro, por ejemplo una película o un concierto dividido en discos o partes. Se conservan los capítulos de cada parte.",
+        "1. A la izquierda, explore la **carpeta de destino** y arrastre las partes (o la carpeta que las contiene) a la lista de unión. En Convertidos, en la cola, **Unir estos** hace lo mismo.",
+        "1. Ponga las partes [en orden](#merge.parts).",
+        "1. Lea la [comprobación de compatibilidad](#merge.compat): allí se explican las partes que no se pueden unir.",
+        "1. Elija el [nombre y los capítulos](#merge.options) del archivo unido y pulse **Unir**.",
+        "Al unir se copian el video, el audio y los subtítulos tal cual, sin volver a convertir, así que tarda aproximadamente lo mismo que copiar los archivos. Después el archivo unido se [comprueba](#verify.overview) como una conversión: su duración debe ser la suma de las partes, con las mismas pistas de audio y de subtítulos que la parte 1.",
+        "Las uniones se ejecutan de una en una, junto con las conversiones. El progreso y los resultados están en [Uniones recientes](#merge.history). Las partes se conservan salvo que elija eliminarlas."
+      ],
+      "see": [
+        "merge.parts",
+        "merge.compat",
+        "merge.chapters",
+        "merge.options",
+        "merge.history"
+      ]
+    },
+    "merge.parts": {
+      "title": "Partes y su orden",
+      "body": [
+        "El archivo unido reproduce las partes de arriba abajo. Una carpeta soltada añade sus archivos de video por orden de nombre (`Disc 1`, `Disc 2`, … `Disc 10`).",
+        "- **Arrastre** una parte por su asa, o use las flechas, para cambiar el orden.",
+        "- ✕ quita una parte de la lista (el archivo no se toca).",
+        "Cada fila muestra la duración de la parte, los capítulos, los idiomas de audio, las pistas de subtítulos, el tamaño de imagen y el tamaño del archivo, leídos del archivo."
+      ],
+      "see": [
+        "merge.compat"
+      ]
+    },
+    "merge.compat": {
+      "title": "¿Se pueden unir las partes?",
+      "body": [
+        "Unir archivos solo funciona cuando todas las partes tienen **las mismas pistas en el mismo orden**. Lo más fácil es convertir todas las partes con el mismo preajuste.",
+        "### Problemas que impiden la unión (rojo)",
+        "- Un número distinto de pistas de video, audio o subtítulos, p. ej., una parte con audio en italiano e inglés y otra solo en italiano.",
+        "- Una pista con otro formato (p. ej., AAC en una parte y AC-3 en otra), o audio con distintos canales o frecuencia de muestreo.",
+        "### Avisos (ámbar): la unión puede continuar",
+        "- Un tamaño de imagen distinto, o video codificado con ajustes ligeramente distintos (p. ej., un recorte diferente). La mayoría de los reproductores lo gestionan; algunos pueden dar un tirón momentáneo donde se unen las partes, así que revise las uniones.",
+        "- Una pista en otro idioma: la pista unida conserva el idioma de la parte 1."
+      ],
+      "see": [
+        "merge.parts",
+        "presets"
+      ]
+    },
+    "merge.chapters": {
+      "title": "Capítulos del archivo unido",
+      "body": [
+        "- **Conservar los capítulos de cada parte** (predeterminado): cada capítulo conserva su lugar, desplazado al punto donde empieza su parte en el archivo unido. Los nombres genéricos de HandBrake (`Chapter 1`, `Chapter 2`…) se renumeran en todo el archivo; los capítulos con nombre propio lo conservan. Una parte sin capítulos recibe un capítulo con el nombre del archivo.",
+        "- **Un capítulo por parte**: un capítulo al comienzo de cada parte, con el nombre de su archivo (los puntos y los guiones bajos se convierten en espacios).",
+        "Abra **capítulos en el archivo unido** bajo las opciones para ver la lista antes de unir."
+      ],
+      "see": [
+        "merge.options"
+      ]
+    },
+    "merge.options": {
+      "title": "Nombre y opciones del archivo unido",
+      "body": [
+        "- **Nombre**: se sugiere a partir de lo que tienen en común los nombres de las partes (`Live Aid - Disc 1`, `Live Aid - Disc 2` → `Live Aid`). El archivo siempre es `.mkv`.",
+        "- El archivo unido va a la **carpeta de la parte 1**. Si el nombre ya existe, se añade un número (`Live Aid_1.mkv`, consulte [Ajustes de renombrado](#settings.renaming)). No se sobrescribe nada.",
+        "- **Capítulos**: consulte [Capítulos del archivo unido](#merge.chapters).",
+        "- **Eliminar las partes tras una unión correcta**: desactivado por defecto. Las partes solo se eliminan si la unión funcionó y la [comprobación](#verify.overview) no falló; si la comprobación está desactivada, se eliminan tras la unión. Esto no se puede deshacer.",
+        "Durante la unión, el archivo se escribe como `name.mkv.part` y se renombra al final, para que los servidores multimedia nunca vean un archivo escrito a medias."
+      ],
+      "see": [
+        "merge.chapters",
+        "merge.history"
+      ]
+    },
+    "merge.history": {
+      "title": "Uniones recientes",
+      "body": [
+        "Cada unión con su estado: **En espera**, **Leyendo las partes**, **Uniendo** (con progreso), **Comprobando**, **Unido**, **Con error** o **Cancelado**. Un archivo unido muestra también su [resultado de la comprobación](#verify.results).",
+        "Haga clic en una unión para ver la salida, las partes, los avisos de mkvmerge y los detalles de la comprobación.",
+        "- ■ cancela una unión en espera o en curso; el archivo escrito a medias se elimina y las partes se conservan.",
+        "- 🗑 quita de la lista una unión terminada. Los archivos no se tocan."
+      ],
+      "see": [
+        "merge.overview",
+        "verify.results"
+      ]
+    },
+    "upload.overview": {
+      "title": "Subir videos",
+      "body": [
+        "Envía archivos de video desde su equipo a una carpeta de origen del servidor, para que puedan convertirse como cualquier otro archivo.",
+        "1. En **Convertir**, abra la carpeta que desee en [Orígenes](#convert.sources) (elija antes la carpeta de origen si tiene varias).",
+        "1. Pulse **Subir**, o suelte archivos de su equipo sobre el panel Orígenes.",
+        "1. Si lo desea, pulse **Nueva carpeta** para crear una subcarpeta y subir los archivos a ella.",
+        "1. Pulse **Subir**. Los archivos se envían de uno en uno; un panel en la esquina muestra el progreso y puede seguir trabajando.",
+        "Solo se aceptan archivos de video (las extensiones de [Añadir carpetas](#settings.adding)). Un archivo existente nunca se reemplaza: usted elige omitirlo o subir una copia llamada «name (1)». La subida se detiene antes de empezar si el servidor no tiene espacio suficiente.",
+        "### Interrupciones",
+        "Mantenga abierta la pestaña del navegador hasta que terminen las subidas. Una conexión interrumpida se reintenta sola. Si se cerró la pestaña, suba de nuevo el mismo archivo a la misma carpeta: continúa donde se detuvo. Las subidas sin terminar son archivos ocultos, que se eliminan solos al cabo de una semana; **Cancelar** elimina uno de inmediato."
+      ],
+      "see": [
+        "convert.sources",
+        "settings.folders",
+        "download.overview"
+      ]
+    },
+    "quality.overview": {
+      "title": "Control de calidad",
+      "body": [
+        "Encuentra archivos de video con un formato antiguo, una resolución baja o una tasa de bits baja, para que sepa cuáles reemplazar o convertir.",
+        "1. En **Calidad**, elija carpetas o archivos en el panel **Carpetas**: están todas las carpetas de origen y la carpeta de destino.",
+        "1. Pulse **Comprobar calidad**. Cada video del interior, subcarpetas incluidas, se lee con ffprobe (solo las cabeceras de los archivos, así que es rápido; se ejecuta con la prioridad de CPU de [Codificación](#settings.encoding)).",
+        "1. Los resultados listan los archivos que **Requieren atención**. Haga clic en las etiquetas para ver un tipo de problema, o en **Todos**.",
+        "Lo que cuenta como problema se define en [Ajustes → Control de calidad](#settings.quality). Al cambiar un criterio, los resultados se actualizan al instante, sin volver a comprobar.",
+        "- **Añadir a la cola** convierte los archivos seleccionados con el preajuste elegido (solo los archivos de una carpeta de origen).",
+        "- **Exportar CSV** descarga los archivos seleccionados (o todos los de la lista) como una hoja de cálculo.",
+        "Se conservan los últimos 20 resultados; elija uno en **Resultado**. Una comprobación puede ejecutarse mientras se convierten archivos."
+      ],
+      "see": [
+        "quality.issues",
+        "settings.quality",
+        "quality.folders"
+      ]
+    },
+    "quality.folders": {
+      "title": "Elegir qué comprobar",
+      "body": [
+        "El panel Carpetas muestra todas las carpetas de origen y la carpeta de destino; elija una en la lista de la parte superior.",
+        "Marque carpetas y archivos (Ctrl+clic y Mayús+clic seleccionan varios) y pulse **Comprobar calidad**. Una carpeta incluye todo lo que contiene. Los archivos que coinciden con las palabras de [Añadir carpetas](#settings.adding) (como «sample») se omiten."
+      ],
+      "see": [
+        "quality.overview",
+        "download.overview"
+      ]
+    },
+    "quality.issues": {
+      "title": "Problemas de calidad",
+      "body": [
+        "- **Formato antiguo**: contenedor, códec de video o códec de audio de las listas de [Ajustes](#settings.quality), como `.avi`, MPEG-4 Parte 2 (DivX, Xvid), MPEG-2, WMV o RealVideo.",
+        "- **Resolución baja**: por debajo de la resolución mínima aceptable. Las películas panorámicas con las barras negras recortadas (p. ej., 1920×800) cuentan por su anchura, como 1080p.",
+        "- **Tasa de bits baja**: la tasa de bits del video está por debajo del mínimo para su resolución. HEVC, AV1 y VP9 necesitan menos, así que su mínimo es más bajo. **~** significa que la tasa de bits se estimó a partir del tamaño del archivo porque este no la indica.",
+        "- **Entrelazado**: solo cuando se activa en Ajustes.",
+        "- **Ilegible**: ffprobe no pudo leer el archivo, o no tiene video."
+      ],
+      "see": [
+        "settings.quality"
+      ]
+    },
+    "settings.quality": {
+      "title": "Criterios del control de calidad",
+      "body": [
+        "Lo que marca el [Control de calidad](#quality.overview). Las listas se separan con comas.",
+        "- **Resolución mínima aceptable**: los archivos por debajo se marcan. La resolución cuenta también la anchura, así que las películas panorámicas recortadas mantienen su clase.",
+        "- **Tasa de bits de video mínima aceptable**: un valor por clase de resolución (SD, 720p, 1080p, 4K) para H.264, MPEG-4 y códecs similares; 0 desactiva la comprobación para esa clase.",
+        "- Los **Códecs eficientes** (por defecto HEVC, AV1, VP9) necesitan solo el porcentaje indicado de esas tasas de bits. Con los valores por defecto, un archivo HEVC de 1080p necesita 1500 kbps en lugar de 2500.",
+        "- **Códecs de video antiguos**, **Códecs de audio antiguos** y **Contenedores antiguos**: nombres tal como los informa ffprobe (`mpeg4`, `msmpeg4v3`, `wmav2`…) y extensiones de archivo (`avi`, `wmv`…). Vacíe una lista para desactivar esa comprobación.",
+        "- **Marcar el video entrelazado**: desactivado por defecto, porque muchas grabaciones de TV son entrelazadas a propósito."
+      ],
+      "see": [
+        "quality.issues",
+        "quality.overview"
+      ]
+    },
+    "download.overview": {
+      "title": "Descargar archivos",
+      "body": [
+        "Copia archivos del servidor a su equipo: desde cualquier carpeta de origen o desde la carpeta de destino, en todos los paneles que listan carpetas (Orígenes, Renombrar, Unir y Calidad).",
+        "- Señale un archivo o una carpeta y pulse su flecha de descarga, o marque varios y pulse **Descargar**.",
+        "- **Un archivo** se descarga de inmediato. La lista de descargas del propio navegador muestra el progreso, y una descarga interrumpida puede reanudarse allí.",
+        "- **Una carpeta** (subcarpetas incluidas) llega como **un archivo ZIP** que conserva las carpetas del interior. Los archivos se guardan tal cual, sin comprimir, así que empieza al instante y el navegador conoce el tamaño. Una descarga ZIP interrumpida debe empezar de nuevo.",
+        "- **Varios archivos** pueden llegar como un ZIP o como archivos separados. Para archivos separados, su navegador puede preguntar una vez si el sitio puede descargar varios archivos.",
+        "Un archivo convertido también puede descargarse desde los detalles de su trabajo (**descargar el archivo convertido**). Los archivos ocultos y las conversiones sin terminar (`.part`) se dejan fuera de los archivos ZIP."
+      ],
+      "see": [
+        "convert.sources",
+        "upload.overview"
+      ]
+    },
+    "delete.overview": {
+      "title": "Eliminar archivos de origen",
+      "body": [
+        "Elimina archivos o carpetas de una carpeta de origen del servidor, por ejemplo, una descarga que ya ha terminado de convertir.",
+        "1. En **Convertir**, marque los archivos o carpetas en [Orígenes](#convert.sources).",
+        "1. Pulse **Eliminar** (o la tecla Supr).",
+        "1. La confirmación muestra exactamente qué se va a eliminar: cuántos archivos, cuánto espacio y todo lo que hay dentro de una carpeta elegida. Pulse **Eliminar** para confirmar; **Cancelar** es la opción predeterminada.",
+        "Eliminar no se puede deshacer. Si un cliente de descargas como Deluge sigue compartiendo los archivos, los notificará como ausentes.",
+        "### Qué se rechaza",
+        "- Los archivos que están en cola, convirtiéndose o en pausa, y las carpetas que contienen alguno. Quítelos antes de la cola.",
+        "- Todo lo que esté en una carpeta de origen marcada como **Proteger** en [Ajustes](#settings.folders).",
+        "- Una carpeta de origen en sí (quítela de la lista en [Ajustes](#settings.folders); eso no elimina nada).",
+        "- Todo lo que esté en la carpeta de destino: los archivos convertidos no se eliminan desde aquí."
+      ],
+      "see": [
+        "convert.sources",
+        "settings.folders"
+      ]
+    },
+    "backup.overview": {
+      "title": "Copia de seguridad y restauración",
+      "body": [
+        "Una copia de seguridad contiene los datos propios de la aplicación: los ajustes (carpetas, criterios de calidad…), los preajustes, los conjuntos de reglas de renombrado, la lista y el historial de trabajos, el historial de renombrado, las uniones y los resultados del control de calidad. Opcionalmente contiene también el registro de HandBrake de cada trabajo. Los archivos de video nunca forman parte de ella.",
+        "Está en [Ajustes](#settings.folders) → **Copia de seguridad y restauración**.",
+        "- **Descargar copia de seguridad** guarda un archivo ZIP en su equipo.",
+        "- **Guardar en el servidor** conserva una en la carpeta de datos de la aplicación (`data/backups`). Se conservan las 10 más recientes.",
+        "### Restaurar",
+        "1. **Elija un archivo de copia de seguridad…** de su equipo, o seleccione una en **Copias de seguridad en el servidor**.",
+        "1. Compruebe lo que contiene: la tabla compara la copia con los datos actuales y señala las carpetas que no existen en este servidor.",
+        "1. Elija **Solo la configuración** (ajustes, preajustes y reglas de renombrado; los trabajos y el historial se conservan) o **Todo** (también los trabajos y sus registros, los historiales, las uniones y los resultados de calidad).",
+        "1. Pulse **Restaurar…** y confirme. Después la página se vuelve a cargar.",
+        "Antes de cada restauración, los datos actuales se guardan en el servidor como **Antes de una restauración**, así que una restauración puede deshacerse restaurando esa copia.",
+        "Una restauración nunca inicia la cola. **Todo** no puede restaurarse mientras se ejecuta una conversión, una unión, un control de calidad o una subida.",
+        "La contraseña del correo electrónico de las [notificaciones](#settings.notifications) forma parte de los ajustes, así que está en todas las copias de seguridad: guarde los archivos de copia en un lugar privado."
+      ],
+      "see": [
+        "settings.folders",
+        "backup.schedule"
+      ]
+    },
+    "queue.eta": {
+      "title": "Cuánto tiempo necesita aún la cola",
+      "body": [
+        "Sobre los trabajos, la cola muestra cuánto tiempo de conversión queda y cuándo terminará; cada trabajo en cola muestra su propia estimación, y la barra superior el total.",
+        "La estimación es la duración de cada origen × la rapidez con la que este servidor convirtió antes archivos similares: la mediana de las últimas 20 conversiones con el **mismo preajuste** (codificación más la [comprobación tras la conversión](#verify.overview)). Para un preajuste sin historial se usan todos los preajustes juntos; si no hay ningún historial, la velocidad del trabajo que se está convirtiendo ahora.",
+        "- Un trabajo cuyo origen aún no se ha leído recibe la duración media de los demás («algunas duraciones estimadas»).",
+        "- Con una [franja de conversión](#settings.schedule), la hora de finalización la tiene en cuenta: los trabajos solo empiezan dentro de la franja, y el que se está convirtiendo cuando se cierra se termina primero.",
+        "- Otras tareas del servidor (transcodificación del servidor multimedia, un control de calidad) ralentizan las conversiones, así que tome la hora como una referencia."
+      ],
+      "see": [
+        "queue.state",
+        "stats.overview",
+        "settings.schedule"
+      ]
+    },
+    "settings.schedule": {
+      "title": "Franja de conversión",
+      "body": [
+        "Convierte solo a ciertas horas, p. ej., durante la noche, para que la codificación no ralentice un servidor multimedia u otros servicios durante el día.",
+        "- **Se abre a las / Se cierra a las**: cuando la hora de cierre es anterior a la de apertura (23:00 → 07:00) la franja pasa por la noche. La misma hora en ambas significa todo el día.",
+        "- **Días** son los días en que la franja **se abre**: el viernes con 23:00 → 07:00 termina el sábado por la mañana.",
+        "- Fuera de la franja la cola no inicia ningún trabajo nuevo. Un trabajo que se está convirtiendo cuando se cierra la franja se termina primero.",
+        "- **Iniciar la cola automáticamente cuando se abra la franja y haya trabajos en espera**: si hay trabajos en espera y la cola está detenida, se inicia cuando se abre la franja. Si pulsa Detener durante la franja, se respeta hasta la siguiente apertura.",
+        "La barra superior muestra el estado de la franja (abierta hasta…, o cuándo se abre de nuevo); haga clic en ella para venir aquí.",
+        "La franja sigue el **reloj del servidor**. Si la zona horaria del servidor difiere de la suya, esta página lo indica: establezca `TZ` en el `.env` del servidor (p. ej., `TZ=Europe/London`) y reinicie el contenedor."
+      ],
+      "see": [
+        "queue.state",
+        "queue.eta",
+        "settings.watch"
+      ]
+    },
+    "settings.watch": {
+      "title": "Carpetas vigiladas",
+      "body": [
+        "Los videos nuevos que aparecen en una carpeta vigilada se añaden solos a la cola, con el preajuste elegido para esa carpeta (o el predeterminado).",
+        "Hay dos formas de añadir una: **Vigilar**, junto a la ruta de la carpeta en el panel Orígenes (Convertir), vigila la carpeta abierta con el preajuste predeterminado, o **Añadir una carpeta vigilada…** aquí, que abre un explorador de carpetas (**Examinar…** cambia la carpeta de una fila existente). En el panel Orígenes las carpetas vigiladas muestran un ojo, y la carpeta abierta muestra **Vigilada**; haga clic en ella para venir aquí.",
+        "- Una carpeta vigilada debe estar dentro de una de las [carpetas de origen](#settings.folders). Las carpetas vigiladas no pueden estar unas dentro de otras.",
+        "- Los archivos que ya hay en una carpeta cuando la añade se **dejan en paz**; arrástrelos usted mismo a la cola si los quiere. Cada archivo se añade **una vez**, aunque después quite su trabajo.",
+        "- Un archivo solo se añade después de que haya **dejado de cambiar** durante el tiempo de calma que establezca (10 minutos por defecto), así que no se toman las descargas ni las copias en curso. Las carpetas se revisan cada pocos minutos, porque los eventos del sistema de archivos no llegan a través de NFS o SMB.",
+        "- Para un cliente de descargas, vigile la carpeta a la que se mueven las descargas **completadas**, no aquella en la que descarga: una descarga en pausa podría parecer terminada.",
+        "- Se aplican las reglas habituales para añadir: palabras excluidas como `sample`, extensiones de video y «Omitir los archivos ya convertidos».",
+        "- **Iniciar la cola tras añadir archivos**: si no, esperan a **Iniciar**. Con una [franja de conversión](#settings.schedule), la cola espera entonces a la franja.",
+        "**Actividad** muestra los archivos que esperan a estabilizarse, los últimos archivos añadidos u omitidos, y problemas como una carpeta que falta. **Buscar ahora** comprueba de inmediato."
+      ],
+      "see": [
+        "settings.schedule",
+        "settings.notifications",
+        "settings.adding"
+      ]
+    },
+    "settings.notifications": {
+      "title": "Notificaciones",
+      "body": [
+        "El servidor puede avisarle cuando la cola termina, cuando una conversión o su comprobación falla, cuando se convierte cada archivo, cuando una carpeta vigilada añade archivos o cuando falla una copia de seguridad programada. Elija los eventos en la parte superior; el correo electrónico y los webhooks siguen esa lista, salvo que un webhook tenga la suya propia.",
+        "### Webhooks",
+        "Un `POST` JSON por mensaje a una URL: un nodo **Webhook** de n8n, un disparador webhook de Home Assistant, ntfy, Gotify… Añada tantos como necesite (hasta 10) con **Añadir un webhook**; cada uno tiene un nombre, un interruptor de activado/desactivado, su URL y cabeceras adicionales opcionales, p. ej., `Authorization: Bearer …`, una por línea.",
+        "- Cada webhook recibe **los eventos elegidos arriba**, o **solo estos eventos**: por ejemplo, todo para n8n, pero solo «la cola terminó» para Home Assistant.",
+        "- El cuerpo contiene `event`, `title`, `message` (texto sin formato), `url` (la dirección de la aplicación, si está definida), `at` y `data` (los detalles del trabajo o de la ejecución).",
+        "### Correo electrónico",
+        "Se envía a través de su servidor SMTP. Ajustes típicos: **STARTTLS** en el puerto 587, **TLS** en el 465. Para Gmail y Outlook, use una **contraseña de aplicación**, no la normal.",
+        "- La contraseña se guarda en el servidor y nunca se devuelve al navegador; deje el cuadro vacío para conservarla.",
+        "- Forma parte de los ajustes, así que está en las [copias de seguridad](#backup.overview).",
+        "**Enviar una prueba** usa lo que hay en pantalla, antes de guardar. **Enviados recientemente** lista los últimos mensajes y cualquier error.",
+        "### Este navegador",
+        "El título de la pestaña siempre muestra el progreso («42 % · Show S01e02.mkv», «✓ Cola terminada»). Las notificaciones de escritorio pueden aparecer mientras la pestaña está en segundo plano; los navegadores solo las permiten en páginas `https://` o `localhost`, así que en una dirección `http://` sin cifrar use el correo electrónico o un webhook."
+      ],
+      "see": [
+        "settings.watch",
+        "queue.state",
+        "backup.overview"
+      ]
+    },
+    "stats.overview": {
+      "title": "Estadísticas",
+      "body": [
+        "Lo que el servidor ha convertido durante el periodo elegido: archivos, espacio ahorrado, duración del video convertido y el trabajo que supuso, y la velocidad (× tiempo real: 2× significa que una hora de video tardó 30 minutos, comprobación incluida).",
+        "- **Archivos convertidos por día** (o por mes en periodos largos): pase el ratón sobre una columna para ver sus detalles, o cambie a **Tabla**.",
+        "- **Comprobación tras la conversión**: cuántos archivos convertidos superaron la [comprobación](#verify.overview), tuvieron avisos o fallaron.",
+        "- **Por preajuste**: compare los preajustes por velocidad y reducción de tamaño.",
+        "Cada conversión que empezó se registra cuando termina. **Quitar terminados** en la cola no la quita de estas cifras. El mismo historial da la [hora de finalización de la cola](#queue.eta)."
+      ],
+      "see": [
+        "queue.eta",
+        "presets"
+      ]
+    },
+    "backup.schedule": {
+      "title": "Copias de seguridad programadas",
+      "body": [
+        "Crea una [copia de seguridad](#backup.overview) por sí sola cada día o cada semana a la hora que elija, y conserva las más recientes (14 por defecto). Las copias programadas más antiguas se eliminan; los demás archivos de la carpeta nunca se tocan.",
+        "- **Carpeta en el servidor**: vacía significa el `data/backups` propio de la aplicación. Para guardar las copias fuera del servidor, use un recurso compartido de red montado en él, p. ej., una carpeta del NAS. Con Docker la carpeta debe estar dentro de la carpeta montada en el contenedor (`MEDIA_DIR`, normalmente `/mnt`). **Examinar…** elige una carpeta dentro de las carpetas de origen o de destino; cualquier otra ruta puede escribirse.",
+        "- La carpeta debe existir y permitir escritura cuando active la programación.",
+        "- Si el servidor estaba apagado o el recurso compartido no estaba montado a la hora de la copia, esta se hace lo antes posible. Una copia fallida se reintenta tras 30 minutos, y puede enviar una [notificación](#settings.notifications) («Ha fallado una copia de seguridad programada»).",
+        "- Cada archivo se escribe con un nombre temporal y se renombra al completarse, así que una copia escrita a medias nunca aparece en la carpeta.",
+        "- **Crear copia ahora** crea una de inmediato con los ajustes guardados.",
+        "Las copias programadas se listan en **Conservadas por la programación**, donde pueden restaurarse, descargarse o eliminarse como las demás.",
+        "La copia contiene los ajustes, y por tanto también la contraseña del correo electrónico de las notificaciones: mantenga la carpeta en privado."
+      ],
+      "see": [
+        "backup.overview",
+        "settings.notifications"
+      ]
+    },
+    "presets.editor": {
+      "title": "Editar un preajuste",
+      "body": [
+        "El editor funciona como la aplicación de escritorio de HandBrake. El nombre, la categoría y la descripción están en la parte superior; los ajustes están en pestañas:",
+        "- **Resumen**: el contenedor (MP4, MKV, WebM, MOV), la optimización web, las marcas de capítulo y los metadatos.",
+        "- **Dimensiones**: rotación y volteo, recorte (el automático quita las barras negras), el **límite de resolución** (los orígenes más grandes se reducen hasta él), anamórfico y bordes.",
+        "- **Filtros**: detelecine, detección de entrelazado y desentrelazado, deblock, reducción de ruido, suavizado de croma, nitidez, espacio de color y escala de grises. Un filtro establecido en **Personalizado** admite los propios ajustes `key=value:key=value` de HandBrake.",
+        "- **Video**: el codificador, la velocidad de fotogramas, la calidad (calidad constante o tasa de bits media) y el preajuste, tune, perfil, nivel y opciones avanzadas del codificador.",
+        "- **Audio**: qué pistas de origen se conservan (por idioma), los codificadores que recibe cada pista, el passthru automático y los nombres de pista.",
+        "- **Subtítulos**: qué pistas de subtítulos se conservan, la búsqueda de audio extranjero, los subtítulos ocultos y la incrustación.",
+        "- **JSON**: cada ajuste tal como lo guarda HandBrake, para los pocos que las pestañas no muestran. **Aplicar al formulario** toma sus ediciones del JSON.",
+        "Los codificadores y sus listas de preajuste, tune, perfil y nivel proceden del HandBrakeCLI de este servidor, así que el editor ofrece solo lo que puede ejecutar. Los codificadores que no pueden ir en el contenedor elegido aparecen atenuados.",
+        "### Guardar",
+        "- **Guardar** reemplaza el preajuste. **Guardar como nuevo…** lo deja como estaba y guarda sus cambios como un preajuste nuevo.",
+        "- Al abrir un preajuste, el servidor deja que HandBrakeCLI lo lea, así que los preajustes de versiones anteriores de HandBrake se actualizan y se rellena cada ajuste. Al guardar, el preajuste se vuelve a comprobar con HandBrakeCLI.",
+        "- Los problemas se listan sobre las pestañas. Uno en rojo (p. ej., un codificador H.265 con un contenedor WebM) debe corregirse antes de guardar; uno en amarillo es un aviso, p. ej., un codificador que este servidor no tiene.",
+        "- Los trabajos que ya están en la cola conservan los ajustes con los que se añadieron. Las carpetas vigiladas usan los ajustes nuevos para los archivos que añadan a partir de ahora.",
+        "- Si sale con cambios sin guardar, se le pregunta antes."
+      ],
+      "see": [
+        "presets",
+        "presets.new",
+        "presets.qsv"
+      ]
+    },
+    "presets.new": {
+      "title": "Preajuste nuevo",
+      "body": [
+        "**Nuevo** (página Preajustes) crea un preajuste y lo abre en el [editor](#presets.editor).",
+        "- **Un preajuste de HandBrake**: uno de los preajustes integrados en HandBrake, como «Fast 1080p30», «H.265 MKV 1080p30» o los preajustes de dispositivos. La lista procede del HandBrakeCLI de este servidor.",
+        "- **Uno de sus preajustes**: una copia, como **Duplicar**.",
+        "Póngale un nombre (y, opcionalmente, una categoría, que agrupa los preajustes en la lista, y una descripción). Dos preajustes solo pueden compartir nombre en categorías distintas.",
+        "El preajuste nuevo se guarda de inmediato: cámbielo en el editor, o elimínelo si cambia de opinión."
+      ],
+      "see": [
+        "presets",
+        "presets.editor"
+      ]
+    }
+  }
+}

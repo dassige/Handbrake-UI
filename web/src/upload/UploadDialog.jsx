@@ -5,6 +5,7 @@ import { bytes, relTo } from '../format.js';
 import { Modal } from '../components/Modal.jsx';
 import { useDialogs } from '../components/Dialogs.jsx';
 import { Help } from '../help/Help.jsx';
+import { rich, t } from '../i18n/index.js';
 
 const extOf = (name) => (name.includes('.') ? name.split('.').pop().toLowerCase() : '');
 
@@ -30,11 +31,18 @@ export function UploadDialog({ dir: initialDir, root, settings, initialFiles = [
 
   async function newFolder() {
     const name = await dialogs.prompt({
-      title: 'New folder',
-      message: <p>Create a folder inside <code>{relTo(root, dir) || root}</code>.</p>,
-      label: 'Folder name',
-      confirmLabel: 'Create',
-      validate: (v) => (/[/\\]/.test(v) ? 'No slashes, please' : v.startsWith('.') ? 'The name cannot start with a dot' : v ? null : 'Type a name'),
+      title: t('upload.newFolder.title'),
+      message: <p>{rich('upload.newFolder.message', { path: relTo(root, dir) || root })}</p>,
+      label: t('upload.newFolder.label'),
+      confirmLabel: t('upload.newFolder.create'),
+      validate: (v) =>
+        /[/\\]/.test(v)
+          ? t('upload.newFolder.noSlashes')
+          : v.startsWith('.')
+            ? t('upload.newFolder.noDot')
+            : v
+              ? null
+              : t('upload.newFolder.typeName'),
     });
     if (!name) return;
     try {
@@ -58,24 +66,21 @@ export function UploadDialog({ dir: initialDir, root, settings, initialFiles = [
       const existing = list.filter((c) => c.exists && !c.partial);
       if (existing.length) {
         const answer = await dialogs.choose({
-          title: 'Some files are already there',
+          title: t('upload.existing.title'),
           icon: 'warn',
           message: (
             <>
-              <p>
-                {existing.length === 1 ? 'A file with this name is' : `${existing.length} files with these names are`} already in the
-                folder. Existing files are never replaced.
-              </p>
+              <p>{t('upload.existing.message', { count: existing.length })}</p>
               <ul className="ask-list">
                 {existing.slice(0, 12).map((c) => <li key={c.name}>{c.name}</li>)}
-                {existing.length > 12 && <li className="muted">… and {existing.length - 12} more</li>}
+                {existing.length > 12 && <li className="muted">{t('upload.existing.more', { count: existing.length - 12 })}</li>}
               </ul>
             </>
           ),
           buttons: [
-            { label: 'Cancel', value: null },
-            { label: 'Skip them', value: 'skip' },
-            { label: 'Upload as copies, “name (1)”', value: 'copy', primary: true, autoFocus: true },
+            { label: t('common.cancel'), value: null },
+            { label: t('upload.existing.skip'), value: 'skip' },
+            { label: t('upload.existing.copies'), value: 'copy', primary: true, autoFocus: true },
           ],
         });
         if (!answer) return;
@@ -86,9 +91,9 @@ export function UploadDialog({ dir: initialDir, root, settings, initialFiles = [
       const remaining = list.reduce((s, c) => s + c.size - (c.partial || 0), 0);
       if (check.freeBytes != null && remaining > check.freeBytes) {
         await dialogs.alert({
-          title: 'Not enough space',
+          title: t('upload.noSpace.title'),
           danger: true,
-          message: `These files need ${bytes(remaining)}, but the server has only ${bytes(check.freeBytes)} free in that folder.`,
+          message: t('upload.noSpace.message', { need: bytes(remaining), free: bytes(check.freeBytes) }),
         });
         return;
       }
@@ -103,30 +108,30 @@ export function UploadDialog({ dir: initialDir, root, settings, initialFiles = [
 
   return (
     <Modal
-      title={<>Upload videos<Help id="upload.overview" /></>}
-      ariaLabel="Upload videos"
+      title={<>{t('upload.dialog.title')}<Help id="upload.overview" /></>}
+      ariaLabel={t('upload.dialog.title')}
       onClose={onClose}
       wide
       footer={
         <>
           <span className="muted small spacer">
-            {videos.length ? `${videos.length} file${videos.length > 1 ? 's' : ''} · ${bytes(total)}` : 'No files chosen'}
+            {videos.length ? t('upload.dialog.chosen', { count: videos.length, size: bytes(total) }) : t('upload.dialog.noFiles')}
           </span>
-          <button className="btn" onClick={onClose}>Cancel</button>
+          <button className="btn" onClick={onClose}>{t('common.cancel')}</button>
           <button className="btn primary" disabled={!videos.length || busy} onClick={start}>
-            <Upload size={15} /> Upload
+            <Upload size={15} /> {t('common.upload')}
           </button>
         </>
       }
     >
       <div className="upload-dest">
-        <span className="muted">Upload to</span>
+        <span className="muted">{t('upload.dialog.uploadTo')}</span>
         <code className="path">{dir}</code>
         <button className="btn small" onClick={newFolder}>
-          <FolderPlus size={14} /> New folder
+          <FolderPlus size={14} /> {t('upload.dialog.newFolder')}
         </button>
       </div>
-      <p className="muted small">To upload somewhere else, close this window and open that folder in Sources first.</p>
+      <p className="muted small">{t('upload.dialog.elsewhere')}</p>
 
       <div
         className={`upload-zone ${over ? 'over' : ''}`}
@@ -144,7 +149,7 @@ export function UploadDialog({ dir: initialDir, root, settings, initialFiles = [
         onClick={() => input.current?.click()}
       >
         <Upload size={26} />
-        <p><strong>Drop video files here</strong> or click to choose them on this computer</p>
+        <p>{rich('upload.dialog.drop')}</p>
         <input
           ref={input}
           type="file"
@@ -163,18 +168,15 @@ export function UploadDialog({ dir: initialDir, root, settings, initialFiles = [
           {files.map((f) => (
             <li key={`${f.name}|${f.size}`} className={isVideo(f) ? '' : 'off'}>
               <span className="file-name" title={f.name}>{f.name}</span>
-              <span className="muted small">{isVideo(f) ? bytes(f.size) : 'not a video file, skipped'}</span>
-              <button className="icon-btn" aria-label={`Remove ${f.name}`} onClick={() => setFiles((l) => l.filter((x) => x !== f))}>
+              <span className="muted small">{isVideo(f) ? bytes(f.size) : t('upload.dialog.notVideo')}</span>
+              <button className="icon-btn" aria-label={t('upload.dialog.removeFile', { name: f.name })} onClick={() => setFiles((l) => l.filter((x) => x !== f))}>
                 <X size={14} />
               </button>
             </li>
           ))}
         </ul>
       )}
-      <p className="muted small">
-        Keep this browser tab open until the uploads finish. You can keep working meanwhile. If an upload is interrupted, upload the
-        same file to the same folder again: it continues where it stopped.
-      </p>
+      <p className="muted small">{t('upload.dialog.keepOpen')}</p>
     </Modal>
   );
 }

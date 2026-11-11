@@ -1,0 +1,124 @@
+{
+  "actions": {
+    "pause": "Anhalten",
+    "resume": "Fortsetzen",
+    "skipCheck": "Prüfung überspringen",
+    "skipCheckTitle": "Die konvertierte Datei behalten und den Rest der Prüfung überspringen",
+    "cancelQueuedTitle": "Abbrechen (bleibt in der Liste)",
+    "cancelRunningTitle": "Diese Konvertierung stoppen und abbrechen",
+    "cancelConversion": "Konvertierung abbrechen",
+    "cancelMessage": "Diese Konvertierung abbrechen? Der Fortschritt geht verloren.",
+    "keepGoing": "Weiterlaufen lassen",
+    "moveTop": "An den Anfang",
+    "up": "Hoch",
+    "upTitle": "Eine Position nach oben",
+    "down": "Runter",
+    "downTitle": "Eine Position nach unten",
+    "moveBottom": "Ans Ende",
+    "renameTitle": "Die konvertierte Datei umbenennen",
+    "again": "Erneut konvertieren",
+    "againTitle": "Erneut konvertieren (neuer Auftrag; die Ausgabe erhält ein Suffix)",
+    "retryTitle": "Wieder in die Warteschlange stellen",
+    "removeTitle": "Aus der Liste entfernen (Dateien bleiben unberührt)"
+  },
+  "row": {
+    "checking": "konvertierte Datei wird geprüft · {percent}",
+    "eta": "noch {time}",
+    "elapsed": "{time} vergangen",
+    "pass": "Durchgang {pass}/{total}",
+    "finishing": "Datei wird abgeschlossen…",
+    "reading": "Quelle wird gelesen…",
+    "took": "in {time}",
+    "fpsAvg": "Ø {fps} fps",
+    "toConvert": "≈ {duration} zu konvertieren",
+    "dragToReorder": "Zum Umsortieren ziehen"
+  },
+  "drawer": {
+    "label": "Auftragsdetails",
+    "waitingForOutput": "Warte auf Ausgabe…",
+    "noLog": "Kein Protokoll für diesen Auftrag.",
+    "showLog": "HandBrake-Protokoll anzeigen",
+    "hideLog": "HandBrake-Protokoll ausblenden",
+    "convertAgainWith": "Erneut konvertieren mit",
+    "choosePreset": "Voreinstellung wählen…",
+    "addedToQueue": "Zur Warteschlange hinzugefügt"
+  },
+  "check": {
+    "title": "Prüfung",
+    "checking": "Konvertierte Datei wird geprüft…",
+    "notChecked": "Nicht geprüft.",
+    "quick": "Schnelle Prüfung",
+    "full": "Vollständige Prüfung",
+    "again": "Erneut prüfen",
+    "started": "Datei wird geprüft…"
+  },
+  "progress": {
+    "title": "Fortschritt",
+    "checking": "Prüfung {percent}",
+    "phase": "Phase",
+    "speed": "Geschwindigkeit",
+    "speedValue": "{fps} fps (Ø {avg})",
+    "timeLeft": "Restzeit",
+    "elapsed": "Vergangen",
+    "pass": "Durchgang",
+    "passValue": "{pass} von {total}"
+  },
+  "phases": {
+    "paused": "angehalten",
+    "verifying": "konvertierte Datei wird geprüft",
+    "reading": "wird gelesen",
+    "scanning": "wird gescannt",
+    "encoding": "wird encodiert",
+    "muxing": "wird gemuxt",
+    "merging": "wird zusammengeführt"
+  },
+  "rename": {
+    "title": "Umbenennen"
+  },
+  "error": {
+    "error": "Fehler",
+    "note": "Hinweis"
+  },
+  "files": {
+    "title": "Dateien",
+    "source": "Quelle",
+    "output": "Ausgabe",
+    "edit": "bearbeiten",
+    "suffixNote": "(ein Suffix wird angehängt, wenn die Datei beim Start bereits existiert)",
+    "outputUpdated": "Ausgabepfad aktualisiert",
+    "sizes": "Größen",
+    "smaller": "({percent} % kleiner)",
+    "larger": "({percent} % größer)",
+    "copyTitle": "Ausgabepfad kopieren",
+    "copy": "Ausgabepfad kopieren",
+    "downloadTitle": "Die konvertierte Datei auf diesen Computer herunterladen",
+    "download": "konvertierte Datei herunterladen"
+  },
+  "preset": {
+    "title": "Voreinstellung",
+    "changed": "Voreinstellung geändert",
+    "deleted": "{name} (gelöscht)"
+  },
+  "source": {
+    "title": "Quelle",
+    "duration": "Dauer",
+    "video": "Video",
+    "audio": "Audio",
+    "subtitles": "Untertitel",
+    "chapters": "Kapitel",
+    "none": "keine",
+    "scanError": "Quelldetails konnten nicht gelesen werden: {error}",
+    "reading": "Quelldetails werden gelesen…"
+  },
+  "timing": {
+    "title": "Zeiten",
+    "added": "Hinzugefügt",
+    "started": "Gestartet",
+    "finished": "Beendet",
+    "encodeTime": "Encodierdauer",
+    "averageSpeed": "Ø Geschwindigkeit",
+    "fps": "{fps} fps",
+    "attempts": "Versuche",
+    "exitCode": "Exit-Code"
+  }
+}

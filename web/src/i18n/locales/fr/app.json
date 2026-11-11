@@ -1,0 +1,81 @@
+{
+  "views": {
+    "label": "Vue",
+    "convert": "Convertir",
+    "rename": "Renommer",
+    "merge": "Fusionner",
+    "quality": "Qualité",
+    "stats": "Statistiques",
+    "presets": "Préréglages",
+    "settings": "Paramètres"
+  },
+  "panes": {
+    "sources": "Sources",
+    "queue": "File d'attente",
+    "queueCount": "File d'attente ({n})"
+  },
+  "leave": {
+    "settingsTitle": "Paramètres non enregistrés",
+    "settingsMessage": "Quitter les Paramètres sans enregistrer ? Vos modifications seront perdues.",
+    "presetTitle": "Préréglage non enregistré",
+    "presetMessage": "Quitter l'éditeur de préréglages sans enregistrer ? Vos modifications seront perdues.",
+    "confirm": "Quitter sans enregistrer"
+  },
+  "add": {
+    "noPreset": "Créez ou importez d'abord un préréglage",
+    "skippedReason_one": "{count} {reason}",
+    "skippedReason_other": "{count} {reason}",
+    "added_one": "{count} fichier ajouté",
+    "added_other": "{count} fichiers ajoutés",
+    "addedSkipped_one": "{count} fichier ajouté · ignorés : {skipped}",
+    "addedSkipped_other": "{count} fichiers ajoutés · ignorés : {skipped}",
+    "nothing": "Rien n'a été ajouté",
+    "nothingSkipped": "Rien n'a été ajouté : {skipped}"
+  },
+  "watch": {
+    "title": "Surveiller ce dossier ?",
+    "message": "Les nouvelles vidéos qui apparaissent dans {path} seront ajoutées automatiquement à la file d'attente.",
+    "messagePreset": "Les nouvelles vidéos qui apparaissent dans {path} seront ajoutées automatiquement à la file d'attente, avec le préréglage par défaut ({preset}).",
+    "note": "Les fichiers déjà présents ne sont pas touchés. Changez le préréglage et les autres options dans Paramètres → Dossiers surveillés.",
+    "noteOff": "Les fichiers déjà présents ne sont pas touchés. La surveillance est désactivée : cette action l'active. Changez le préréglage et les autres options dans Paramètres → Dossiers surveillés.",
+    "confirm": "Surveiller",
+    "done": "Dossier surveillé"
+  },
+  "outsideWindow": {
+    "title": "En dehors de la plage de conversion",
+    "opensAt": "Ouverture de la plage de conversion : {time}.",
+    "opensLater": "La plage de conversion s'ouvre plus tard.",
+    "note": "« Démarrer maintenant » convertit toute la file d'attente immédiatement, en ignorant la plage horaire jusqu'à l'arrêt de la file.",
+    "startNow": "Démarrer maintenant",
+    "wait": "Attendre la plage horaire",
+    "startsAt": "Démarrage de la file d'attente : {time}"
+  },
+  "state": {
+    "running": "File en cours",
+    "stopped": "File arrêtée",
+    "waitingFor": "En attente jusqu'à {time}",
+    "stopTitle": "Terminer la tâche en cours, puis s'arrêter",
+    "startTitle": "Commencer à convertir les tâches en attente",
+    "stopAfterCurrent": "Arrêter après la tâche en cours",
+    "queued_one": "{count} en attente",
+    "queued_other": "{count} en attente",
+    "done_one": "{count} terminée",
+    "done_other": "{count} terminées",
+    "failed_one": "{count} en échec",
+    "failed_other": "{count} en échec",
+    "left": "≈ {duration} restant",
+    "doneAround": "Terminé vers {time}"
+  },
+  "window": {
+    "openUntilTitle": "Plage de conversion ouverte jusqu'à {time}",
+    "openTitle": "Plage de conversion ouverte",
+    "closedTitle": "Plage de conversion fermée ; ouverture : {time}",
+    "until": "jusqu'à {time}",
+    "open": "ouverte"
+  },
+  "offline": "hors ligne",
+  "offlineTitle": "Mises à jour en direct déconnectées ; nouvelle tentative",
+  "handbrakeMissing": "HandBrakeCLI n'est pas disponible : {error}",
+  "noPresets": "Aucun préréglage pour l'instant. {link} pour commencer à convertir.",
+  "noPresetsLink": "Créez ou importez un préréglage"
+}

@@ -1,0 +1,124 @@
+{
+  "actions": {
+    "pause": "Sospendi",
+    "resume": "Riprendi",
+    "skipCheck": "Salta verifica",
+    "skipCheckTitle": "Tieni il file convertito e salta il resto della verifica",
+    "cancelQueuedTitle": "Annulla (resta nell’elenco)",
+    "cancelRunningTitle": "Interrompi e annulla questa conversione",
+    "cancelConversion": "Annulla conversione",
+    "cancelMessage": "Annullare questa conversione? L’avanzamento andrà perso.",
+    "keepGoing": "Continua",
+    "moveTop": "Sposta in cima",
+    "up": "Su",
+    "upTitle": "Sposta su di un posto",
+    "down": "Giù",
+    "downTitle": "Sposta giù di un posto",
+    "moveBottom": "Sposta in fondo",
+    "renameTitle": "Rinomina il file convertito",
+    "again": "Converti di nuovo",
+    "againTitle": "Converti di nuovo (nuovo processo; il file di destinazione riceve un suffisso)",
+    "retryTitle": "Rimetti in coda",
+    "removeTitle": "Rimuovi dall’elenco (i file non vengono toccati)"
+  },
+  "row": {
+    "checking": "verifica del file convertito · {percent}",
+    "eta": "fine stimata {time}",
+    "elapsed": "trascorso {time}",
+    "pass": "passaggio {pass}/{total}",
+    "finishing": "Finalizzazione del file…",
+    "reading": "Lettura della sorgente…",
+    "took": "in {time}",
+    "fpsAvg": "{fps} fps medi",
+    "toConvert": "≈ {duration} di conversione",
+    "dragToReorder": "Trascina per riordinare"
+  },
+  "drawer": {
+    "label": "Dettagli del processo",
+    "waitingForOutput": "In attesa dell’output…",
+    "noLog": "Nessun registro per questo processo.",
+    "showLog": "Mostra il registro di HandBrake",
+    "hideLog": "Nascondi il registro di HandBrake",
+    "convertAgainWith": "Converti di nuovo con",
+    "choosePreset": "scegli la preimpostazione…",
+    "addedToQueue": "Aggiunto alla coda"
+  },
+  "check": {
+    "title": "Verifica",
+    "checking": "Verifica del file convertito…",
+    "notChecked": "Non verificato.",
+    "quick": "Verifica rapida",
+    "full": "Verifica completa",
+    "again": "Verifica di nuovo",
+    "started": "Verifica del file…"
+  },
+  "progress": {
+    "title": "Avanzamento",
+    "checking": "Verifica {percent}",
+    "phase": "Fase",
+    "speed": "Velocità",
+    "speedValue": "{fps} fps (media {avg})",
+    "timeLeft": "Tempo rimanente",
+    "elapsed": "Tempo trascorso",
+    "pass": "Passaggio",
+    "passValue": "{pass} di {total}"
+  },
+  "phases": {
+    "paused": "in pausa",
+    "verifying": "verifica del file convertito",
+    "reading": "lettura",
+    "scanning": "scansione",
+    "encoding": "codifica",
+    "muxing": "multiplazione",
+    "merging": "unione"
+  },
+  "rename": {
+    "title": "Rinomina"
+  },
+  "error": {
+    "error": "Errore",
+    "note": "Nota"
+  },
+  "files": {
+    "title": "File",
+    "source": "Sorgente",
+    "output": "Destinazione",
+    "edit": "modifica",
+    "suffixNote": "(se il file esiste quando inizia, viene aggiunto un suffisso)",
+    "outputUpdated": "Percorso di destinazione aggiornato",
+    "sizes": "Dimensioni",
+    "smaller": "({percent}% più piccolo)",
+    "larger": "({percent}% più grande)",
+    "copyTitle": "Copia il percorso di destinazione",
+    "copy": "copia percorso di destinazione",
+    "downloadTitle": "Scarica il file convertito su questo computer",
+    "download": "scarica file convertito"
+  },
+  "preset": {
+    "title": "Preimpostazione",
+    "changed": "Preimpostazione cambiata",
+    "deleted": "{name} (eliminata)"
+  },
+  "source": {
+    "title": "Sorgente",
+    "duration": "Durata",
+    "video": "Video",
+    "audio": "Audio",
+    "subtitles": "Sottotitoli",
+    "chapters": "Capitoli",
+    "none": "nessuno",
+    "scanError": "Impossibile leggere i dettagli della sorgente: {error}",
+    "reading": "Lettura dei dettagli della sorgente…"
+  },
+  "timing": {
+    "title": "Tempi",
+    "added": "Aggiunto",
+    "started": "Iniziato",
+    "finished": "Terminato",
+    "encodeTime": "Tempo di codifica",
+    "averageSpeed": "Velocità media",
+    "fps": "{fps} fps",
+    "attempts": "Tentativi",
+    "exitCode": "Codice di uscita"
+  }
+}

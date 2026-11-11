@@ -116,6 +116,8 @@ the desktop app.
 - **Works on a phone:** compact top bar, one panel at a time, and buttons for
   everything that needs drag and drop on a computer.
 - **Light and dark theme**, following your system setting.
+- **Five languages:** the app and its help in English, Italian, German, French
+  or Spanish, chosen in Settings → Language, or each browser's own language.
 
 ## Screenshots
 
@@ -597,6 +599,12 @@ for live updates; React + Vite for the UI. One process, no external database.
 
 The in-app help lives in `web/src/help/help.json`. `server/test/help.test.js`
 checks that every **?** has a topic and that every link works.
+
+The UI text lives in `web/src/i18n/locales/<lang>/*.json` (`t('namespace.key')`
+in the code; English is the source) and the translated help in
+`web/src/help/help.<lang>.json`. `server/test/i18n.test.js` checks that every
+key used in the code exists and that every language has every string and help
+topic, with the same placeholders and links.
 
 Issues and pull requests are welcome. Please run `npm test` in `server/` and
 `npm run build` in `web/` before sending a pull request.

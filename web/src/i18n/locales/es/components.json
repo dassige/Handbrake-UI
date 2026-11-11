@@ -1,0 +1,68 @@
+{
+  "dialogs": {
+    "confirmTitle": "Confirme, por favor",
+    "alertTitle": "Aviso",
+    "typeValue": "Escriba un valor"
+  },
+  "paneSwitch": {
+    "label": "Panel"
+  },
+  "toasts": {
+    "dismiss": "Descartar"
+  },
+  "status": {
+    "queued": "En cola",
+    "running": "Convirtiendo",
+    "paused": "En pausa",
+    "done": "Convertido",
+    "failed": "Con error",
+    "cancelled": "Cancelado",
+    "scanning": "Analizando",
+    "finishing": "Finalizando",
+    "checkPaused": "Comprobación en pausa",
+    "checking": "Comprobando"
+  },
+  "verify": {
+    "ok": "Comprobado",
+    "warning": "Avisos en la comprobación",
+    "error": "Comprobación fallida",
+    "skipped": "Sin comprobar",
+    "running": "Comprobando"
+  },
+  "folderBadges": {
+    "converting_one": "{count} convirtiéndose",
+    "converting_other": "{count} convirtiéndose",
+    "queued_one": "{count} en cola",
+    "queued_other": "{count} en cola",
+    "converted_one": "{count} convertido",
+    "converted_other": "{count} convertidos",
+    "failed_one": "{count} con error",
+    "failed_other": "{count} con error"
+  },
+  "folderPicker": {
+    "title": "Elija una carpeta",
+    "choose": "Elegir esta carpeta",
+    "roots": "Carpeta de origen",
+    "crumbs": "Carpeta",
+    "up": "Subir un nivel",
+    "empty": "No hay subcarpetas aquí."
+  },
+  "delete": {
+    "notDeleted": "No eliminados:",
+    "notDeletedList": "No eliminados: {list}",
+    "more_one": "… y {count} más",
+    "more_other": "… y {count} más",
+    "nothingTitle": "No se puede eliminar nada",
+    "title": "¿Eliminar del servidor?",
+    "items_one": "{count} elemento",
+    "items_other": "{count} elementos",
+    "summary": "Eliminación definitiva de {what}: {files}, {size}.",
+    "summaryFolder": "Eliminación definitiva de {what}: {files}, {size}, incluido todo el contenido de la carpeta.",
+    "summaryFolders": "Eliminación definitiva de {what}: {files}, {size}, incluido todo el contenido de {folders}.",
+    "warning": "Esta acción no se puede deshacer. Si un cliente de descargas (p. ej., Deluge) sigue compartiendo estos archivos, los marcará como ausentes.",
+    "deleteItems_one": "Eliminar {count} elemento",
+    "deleteItems_other": "Eliminar {count} elementos",
+    "deleted_one": "Se eliminó {count} elemento",
+    "deleted_other": "Se eliminaron {count} elementos"
+  }
+}

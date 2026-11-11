@@ -1,0 +1,68 @@
+{
+  "dialogs": {
+    "confirmTitle": "Please confirm",
+    "alertTitle": "Notice",
+    "typeValue": "Please type a value"
+  },
+  "paneSwitch": {
+    "label": "Panel"
+  },
+  "toasts": {
+    "dismiss": "Dismiss"
+  },
+  "status": {
+    "queued": "Queued",
+    "running": "Converting",
+    "paused": "Paused",
+    "done": "Converted",
+    "failed": "Failed",
+    "cancelled": "Cancelled",
+    "scanning": "Scanning",
+    "finishing": "Finishing",
+    "checkPaused": "Check paused",
+    "checking": "Checking"
+  },
+  "verify": {
+    "ok": "Checked",
+    "warning": "Check warnings",
+    "error": "Check failed",
+    "skipped": "Not checked",
+    "running": "Checking"
+  },
+  "folderBadges": {
+    "converting_one": "{count} converting",
+    "converting_other": "{count} converting",
+    "queued_one": "{count} queued",
+    "queued_other": "{count} queued",
+    "converted_one": "{count} converted",
+    "converted_other": "{count} converted",
+    "failed_one": "{count} failed",
+    "failed_other": "{count} failed"
+  },
+  "folderPicker": {
+    "title": "Choose a folder",
+    "choose": "Choose this folder",
+    "roots": "Sources folder",
+    "crumbs": "Folder",
+    "up": "Up one folder",
+    "empty": "No sub-folders here."
+  },
+  "delete": {
+    "notDeleted": "Not deleted:",
+    "notDeletedList": "Not deleted: {list}",
+    "more_one": "… and {count} more",
+    "more_other": "… and {count} more",
+    "nothingTitle": "Nothing can be deleted",
+    "title": "Delete from the server?",
+    "items_one": "{count} item",
+    "items_other": "{count} items",
+    "summary": "{what} will be deleted for good: {files}, {size}.",
+    "summaryFolder": "{what} will be deleted for good: {files}, {size}, including everything inside the folder.",
+    "summaryFolders": "{what} will be deleted for good: {files}, {size}, including everything inside {folders}.",
+    "warning": "This cannot be undone. If a download client (e.g. Deluge) is still seeding these files, it will report them as missing.",
+    "deleteItems_one": "Delete {count} item",
+    "deleteItems_other": "Delete {count} items",
+    "deleted_one": "Deleted {count} item",
+    "deleted_other": "Deleted {count} items"
+  }
+}

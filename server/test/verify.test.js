@@ -46,6 +46,16 @@ test('a good conversion passes, with a warning for errors in the source', () => 
   assert.equal(c.subtitles.status, 'ok');
   assert.match(c.subtitles.detail, /1 burned into the picture/);
   assert.match(c.subtitles.detail, /eng subrip \(no lines\)/);
+  // Codes and params for the web app, next to the English text.
+  assert.equal(c.subtitles.detailCode, 'subtitlesOkBurned');
+  assert.deepEqual(c.subtitles.detailParams, {
+    count: 2, burned: 1, list: [{ language: 'ita', codec: 'subrip', noLines: false }, { language: 'eng', codec: 'subrip', noLines: true }],
+  });
+  assert.equal(c.length.labelCode, 'lengthMatches');
+  assert.deepEqual(c.length.labelParams, { sourceLabel: 'source' });
+  assert.equal(c.length.detailCode, 'lengthOk');
+  assert.equal(c.sourceErrors.detailCode, 'sourceErrors');
+  assert.deepEqual(c.sourceErrors.detailParams, { count: 3 });
   assert.equal(c.decode.status, 'ok');
   assert.equal(c.sourceErrors.status, 'warning');
   assert.equal(r.status, 'warning');
@@ -56,6 +66,8 @@ test('a truncated file fails even when its metadata claims the full length', () 
   const r = evaluate({ sourceLength: 2616.656, probe, packets, decode: { end: 598, errors: [] }, log: { found: false } });
   assert.equal(byId(r).length.status, 'error');
   assert.match(byId(r).length.detail, /shorter than the source/);
+  assert.equal(byId(r).length.detailCode, 'lengthShorter');
+  assert.equal(byId(r).length.detailParams.diff, '33:39');
   assert.equal(r.status, 'error');
 });
 
@@ -68,6 +80,8 @@ test('a missing or short audio track and decode errors are errors', () => {
   const r = evaluate({ sourceLength: 2616.6, probe, packets: shortAudio, log: twoAudioLog });
   assert.equal(byId(r).audioLength.status, 'error');
   assert.match(byId(r).audioLength.detail, /track 2 \(eng\) ends .* early/);
+  assert.equal(byId(r).audioLength.detailCode, 'audioTracksShort');
+  assert.deepEqual(byId(r).audioLength.detailParams, { tracks: [{ code: 'audioTrackShort', track: 2, language: 'eng', diff: '21:57' }] });
 
   const errs = Array.from({ length: 12 }, () => '[h264 @ 0x1] error while decoding MB 3 4');
   assert.equal(byId(evaluate({ sourceLength: 2616.6, probe, packets: goodPackets, decode: { end: 2616.6, errors: errs }, log: twoAudioLog })).decode.status, 'error');

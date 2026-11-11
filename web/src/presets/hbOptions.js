@@ -2,15 +2,29 @@
 // labels, filter presets and tunes, which encoders fit which container, quality ranges.
 // The encoders themselves, and their presets/tunes/profiles/levels, come from the server
 // (GET /api/presets/options asks the installed HandBrakeCLI).
+//
+// Option tables are lists of { value, labelKey, vars? } (translated when shown) or
+// { value, label } (a technical name that stays as it is, e.g. "NLMeans", "BT.709").
+import { t } from '../i18n/index.js';
 
-/** [value, label] pairs as <option>s. */
-export const opts = (pairs) => pairs.map(([value, label]) => ({ value, label }));
-const labels = (pairs) => Object.fromEntries(pairs);
+const OFF = { value: 'off', labelKey: 'common.off' };
+const NONE = { value: 'none', labelKey: 'common.none' };
+const DEFAULT = { value: 'default', labelKey: 'presetOptions.default' };
+const CUSTOM = { value: 'custom', labelKey: 'presetOptions.custom' };
+
+/** The label of an option-table entry, in the current language. */
+export const optionLabel = (o) => (o.labelKey ? t(o.labelKey, o.vars) : o.label);
+/** An option table as <option>s: [{ value, label }]. */
+export const opts = (list) => list.map((o) => ({ value: o.value, label: optionLabel(o) }));
+/** The label of a value in an option table (undefined when the table doesn't have it). */
+export function labelOf(list, value) {
+  const o = list.find((x) => x.value === value);
+  return o ? optionLabel(o) : undefined;
+}
 
 // ------------------------------------------------------------------ containers
-const CONTAINER_PAIRS = [['av_mp4', 'MP4'], ['av_mkv', 'MKV'], ['av_webm', 'WebM'], ['av_mov', 'MOV']];
 export const CONTAINERS = {
-  ...labels(CONTAINER_PAIRS),
+  av_mp4: 'MP4', av_mkv: 'MKV', av_webm: 'WebM', av_mov: 'MOV',
   mp4: 'MP4', m4v: 'M4V', mp4v2: 'MP4', mkv: 'MKV', libmkv: 'MKV', webm: 'WebM', mov: 'MOV',
 };
 
@@ -91,7 +105,7 @@ export const isH264 = (enc) => /h264|x264/.test(enc ?? '');
  * lowerIsBetter, label }, or null when the encoder has no quality mode (FFV1, DNxHR, ProRes).
  */
 export function qualityLimits(enc = '') {
-  const q = (low, high, step, lowerIsBetter = true, label = 'RF') => ({ low, high, step, lowerIsBetter, label });
+  const q = (low, high, step, lowerIsBetter = true, label = 'RF') => ({ low, high, step, lowerIsBetter, label: label ?? t('presetOptions.qualityScale') });
   if (/^qsv_/.test(enc)) return q(0, 51, 1, true, 'ICQ');
   if (/^(ffv1|dnxhr|ff_prores|vt_prores)/.test(enc)) return null;
   if (enc === 'x264_10bit' || enc === 'x265_10bit') return q(-12, 51, 0.1);
@@ -103,19 +117,22 @@ export function qualityLimits(enc = '') {
   if (/^vce_av1/.test(enc)) return q(0, 255, 1, true, 'QP');
   if (/^svt_av1/.test(enc)) return q(0, 70, 0.25);
   if (/^VP[89]/.test(enc)) return q(0, 63, 1, true, 'CQ');
-  if (enc === 'theora') return q(0, 63, 1, false, 'Quality');
-  if (/^(vt_|mf_)/.test(enc)) return q(0, 100, 1, false, 'Quality');
+  if (enc === 'theora') return q(0, 63, 1, false, null);
+  if (/^(vt_|mf_)/.test(enc)) return q(0, 100, 1, false, null);
   return q(1, 31, 1, true, 'QP'); // mpeg2, mpeg4
 }
 
 /** HandBrake desktop's x264/x265 tune extras, shown as checkboxes instead of in the tune list. */
-export const TUNE_FLAGS = [['fastdecode', 'Fast decode'], ['zerolatency', 'Zero latency']];
+export const TUNE_FLAGS = [
+  { value: 'fastdecode', labelKey: 'presetOptions.tuneFlag.fastDecode' },
+  { value: 'zerolatency', labelKey: 'presetOptions.tuneFlag.zeroLatency' },
+];
 
 /** Splits VideoTune ("film,fastdecode") into the main tune and the extra flags. */
 export function splitTune(enc, value) {
   const parts = String(value ?? '').split(',').map((s) => s.trim()).filter((s) => s && s !== 'none');
   if (!isX26x(enc)) return { tune: parts.join(','), flags: [] };
-  const flags = parts.filter((p) => TUNE_FLAGS.some(([f]) => f === p));
+  const flags = parts.filter((p) => TUNE_FLAGS.some((f) => f.value === p));
   return { tune: parts.find((p) => !flags.includes(p)) ?? '', flags };
 }
 
@@ -135,35 +152,74 @@ export function defaultEncoderPreset(list) {
 
 export const FRAMERATES = ['5', '10', '12', '15', '20', '23.976', '24', '25', '29.97', '30', '48', '50', '59.94', '60', '72', '75', '90', '100', '120'];
 
-export const FRAMERATE_MODE = labels([['vfr', 'Variable'], ['cfr', 'Constant'], ['pfr', 'Peak']]);
-export const QUALITY_TYPE = labels([[0, 'Target size'], [1, 'Average bitrate'], [2, 'Constant quality']]);
-export const COLOR_RANGE = [['auto', 'Same as source'], ['limited', 'Limited'], ['full', 'Full']];
-export const HDR_METADATA = [['all', 'All'], ['hdr10plus', 'HDR10+ only'], ['dolbyvision', 'Dolby Vision only'], ['off', 'Off']];
+export const FRAMERATE_MODES = [
+  { value: 'vfr', labelKey: 'presetOptions.framerateMode.variable' },
+  { value: 'cfr', labelKey: 'presetOptions.framerateMode.constant' },
+  { value: 'pfr', labelKey: 'presetOptions.framerateMode.peak' },
+];
+export const QUALITY_TYPES = [
+  { value: 0, labelKey: 'presetOptions.qualityType.targetSize' },
+  { value: 1, labelKey: 'presetOptions.qualityType.averageBitrate' },
+  { value: 2, labelKey: 'presetOptions.qualityType.constantQuality' },
+];
+export const COLOR_RANGE = [
+  { value: 'auto', labelKey: 'presetOptions.sameAsSource' },
+  { value: 'limited', labelKey: 'presetOptions.colorRange.limited' },
+  { value: 'full', labelKey: 'presetOptions.colorRange.full' },
+];
+export const HDR_METADATA = [
+  { value: 'all', labelKey: 'presetOptions.hdrMetadata.all' },
+  { value: 'hdr10plus', labelKey: 'presetOptions.hdrMetadata.hdr10plus' },
+  { value: 'dolbyvision', labelKey: 'presetOptions.hdrMetadata.dolbyVision' },
+  OFF,
+];
 
 // ------------------------------------------------------------------ dimensions
-export const CROP_MODES = [[0, 'Automatic'], [1, 'Conservative'], [2, 'None'], [3, 'Custom']];
-export const CROP_MODE = labels(CROP_MODES);
+export const CROP_MODES = [
+  { value: 0, labelKey: 'presetOptions.automatic' },
+  { value: 1, labelKey: 'presetOptions.cropMode.conservative' },
+  { value: 2, labelKey: 'common.none' },
+  { value: 3, labelKey: 'presetOptions.custom' },
+];
 export const RESOLUTION_LIMITS = [
-  { id: '4320p', label: '4320p 8K Ultra HD', width: 7680, height: 4320 },
-  { id: '2160p', label: '2160p 4K Ultra HD', width: 3840, height: 2160 },
-  { id: '1440p', label: '1440p 2.5K Quad HD', width: 2560, height: 1440 },
-  { id: '1080p', label: '1080p Full HD', width: 1920, height: 1080 },
-  { id: '720p', label: '720p HD', width: 1280, height: 720 },
-  { id: '576p', label: '576p PAL', width: 720, height: 576 },
-  { id: '480p', label: '480p NTSC', width: 720, height: 480 },
-  { id: 'none', label: 'None', width: 0, height: 0 },
+  { value: '4320p', label: '4320p 8K Ultra HD', width: 7680, height: 4320 },
+  { value: '2160p', label: '2160p 4K Ultra HD', width: 3840, height: 2160 },
+  { value: '1440p', label: '1440p 2.5K Quad HD', width: 2560, height: 1440 },
+  { value: '1080p', label: '1080p Full HD', width: 1920, height: 1080 },
+  { value: '720p', label: '720p HD', width: 1280, height: 720 },
+  { value: '576p', label: '576p PAL', width: 720, height: 576 },
+  { value: '480p', label: '480p NTSC', width: 720, height: 480 },
+  { value: 'none', labelKey: 'common.none', width: 0, height: 0 },
 ];
 /** The resolution-limit choice for a preset's PictureWidth/PictureHeight ('custom' when none matches). */
 export function resolutionLimit(p) {
   const w = Number(p.PictureWidth) || 0;
   const h = Number(p.PictureHeight) || 0;
-  return RESOLUTION_LIMITS.find((r) => r.width === w && r.height === h)?.id ?? 'custom';
+  return RESOLUTION_LIMITS.find((r) => r.width === w && r.height === h)?.value ?? 'custom';
 }
-export const PAR_MODES = [['auto', 'Automatic'], ['off', 'None'], ['custom', 'Custom'], ['loose', 'Loose (older presets)'], ['strict', 'Strict (older presets)']];
-export const PAR = { ...labels(PAR_MODES), none: 'None' };
-export const PAD_MODES = [['none', 'None'], ['letterbox', 'Height (letterbox)'], ['pillarbox', 'Width (pillarbox)'], ['fill', 'Width & height'], ['custom', 'Custom']];
-export const PAD_COLORS = [['black', 'Black'], ['darkslategray', 'Dark grey'], ['slategray', 'Grey'], ['white', 'White']];
-export const ROTATIONS = [[0, 'None'], [90, '90°'], [180, '180°'], [270, '270°']];
+export const PAR_MODES = [
+  { value: 'auto', labelKey: 'presetOptions.automatic' },
+  { value: 'off', labelKey: 'common.none' },
+  CUSTOM,
+  { value: 'loose', labelKey: 'presetOptions.par.loose' },
+  { value: 'strict', labelKey: 'presetOptions.par.strict' },
+];
+/** PAR_MODES plus the old 'none' value, for showing a preset. */
+export const PAR = [...PAR_MODES, NONE];
+export const PAD_MODES = [
+  NONE,
+  { value: 'letterbox', labelKey: 'presetOptions.padMode.letterbox' },
+  { value: 'pillarbox', labelKey: 'presetOptions.padMode.pillarbox' },
+  { value: 'fill', labelKey: 'presetOptions.padMode.fill' },
+  CUSTOM,
+];
+export const PAD_COLORS = [
+  { value: 'black', labelKey: 'presetOptions.padColor.black' },
+  { value: 'darkslategray', labelKey: 'presetOptions.padColor.darkGrey' },
+  { value: 'slategray', labelKey: 'presetOptions.padColor.grey' },
+  { value: 'white', labelKey: 'presetOptions.padColor.white' },
+];
+export const ROTATIONS = [{ value: 0, labelKey: 'common.none' }, { value: 90, label: '90°' }, { value: 180, label: '180°' }, { value: 270, label: '270°' }];
 
 /** PictureRotate "angle=90:hflip=1" as { angle, hflip }. */
 export function parseRotate(v) {
@@ -173,32 +229,84 @@ export function parseRotate(v) {
 export const formatRotate = ({ angle, hflip }) => `angle=${angle}:hflip=${hflip ? 1 : 0}`;
 
 // ------------------------------------------------------------------ filters (libhb/param.c)
-const STRENGTHS = [['ultralight', 'Ultralight'], ['light', 'Light'], ['medium', 'Medium'], ['strong', 'Strong'], ['stronger', 'Stronger'], ['verystrong', 'Very strong']];
-export const DETELECINE = [['off', 'Off'], ['default', 'Default'], ['custom', 'Custom']];
-export const COMB_DETECT = [['off', 'Off'], ['default', 'Default'], ['permissive', 'Less sensitive'], ['fast', 'Fast'], ['custom', 'Custom']];
-export const DEINTERLACE = [['off', 'Off'], ['decomb', 'Decomb'], ['deinterlace', 'Yadif'], ['bwdif', 'Bwdif']];
+const STRENGTHS = [
+  { value: 'ultralight', labelKey: 'presetOptions.strength.ultralight' },
+  { value: 'light', labelKey: 'presetOptions.strength.light' },
+  { value: 'medium', labelKey: 'presetOptions.strength.medium' },
+  { value: 'strong', labelKey: 'presetOptions.strength.strong' },
+  { value: 'stronger', labelKey: 'presetOptions.strength.stronger' },
+  { value: 'verystrong', labelKey: 'presetOptions.strength.veryStrong' },
+];
+export const DETELECINE = [OFF, DEFAULT, CUSTOM];
+export const COMB_DETECT = [
+  OFF,
+  DEFAULT,
+  { value: 'permissive', labelKey: 'presetOptions.combDetect.lessSensitive' },
+  { value: 'fast', labelKey: 'presetOptions.combDetect.fast' },
+  CUSTOM,
+];
+export const DEINTERLACE = [OFF, { value: 'decomb', label: 'Decomb' }, { value: 'deinterlace', label: 'Yadif' }, { value: 'bwdif', label: 'Bwdif' }];
+const BOB = { value: 'bob', label: 'Bob' };
 export const DEINTERLACE_PRESETS = {
-  decomb: [['default', 'Default'], ['bob', 'Bob'], ['eedi2', 'EEDI2'], ['eedi2bob', 'EEDI2 Bob'], ['custom', 'Custom']],
-  deinterlace: [['default', 'Default'], ['skip-spatial', 'Skip spatial check'], ['bob', 'Bob'], ['custom', 'Custom']],
-  bwdif: [['default', 'Default'], ['bob', 'Bob'], ['custom', 'Custom']],
+  decomb: [DEFAULT, BOB, { value: 'eedi2', label: 'EEDI2' }, { value: 'eedi2bob', label: 'EEDI2 Bob' }, CUSTOM],
+  deinterlace: [DEFAULT, { value: 'skip-spatial', labelKey: 'presetOptions.deinterlacePreset.skipSpatial' }, BOB, CUSTOM],
+  bwdif: [DEFAULT, BOB, CUSTOM],
 };
-export const DEBLOCK = [['off', 'Off'], ...STRENGTHS, ['custom', 'Custom']];
-export const DEBLOCK_TUNES = [['small', 'Small (4×4)'], ['medium', 'Medium (8×8)'], ['large', 'Large (16×16)']];
-export const DENOISE = [['off', 'Off'], ['nlmeans', 'NLMeans'], ['hqdn3d', 'HQDN3D']];
-export const DENOISE_PRESETS = [['ultralight', 'Ultralight'], ['light', 'Light'], ['medium', 'Medium'], ['strong', 'Strong'], ['custom', 'Custom']];
-export const NLMEANS_TUNES = [['none', 'None'], ['film', 'Film'], ['grain', 'Grain'], ['highmotion', 'High motion'], ['animation', 'Animation'], ['tape', 'Tape'], ['sprite', 'Sprite']];
-export const CHROMA_SMOOTH = [['off', 'Off'], ...STRENGTHS, ['custom', 'Custom']];
-export const CHROMA_SMOOTH_TUNES = [['none', 'None'], ['tiny', 'Tiny'], ['small', 'Small'], ['medium', 'Medium'], ['wide', 'Wide'], ['verywide', 'Very wide']];
-export const SHARPEN = [['off', 'Off'], ['unsharp', 'Unsharp'], ['lapsharp', 'Lapsharp']];
-export const SHARPEN_PRESETS = [...STRENGTHS, ['custom', 'Custom']];
+export const DEBLOCK = [OFF, ...STRENGTHS, CUSTOM];
+export const DEBLOCK_TUNES = [
+  { value: 'small', labelKey: 'presetOptions.deblockTune.small' },
+  { value: 'medium', labelKey: 'presetOptions.deblockTune.medium' },
+  { value: 'large', labelKey: 'presetOptions.deblockTune.large' },
+];
+export const DENOISE = [OFF, { value: 'nlmeans', label: 'NLMeans' }, { value: 'hqdn3d', label: 'HQDN3D' }];
+export const DENOISE_PRESETS = [...STRENGTHS.slice(0, 4), CUSTOM];
+const FILM = { value: 'film', labelKey: 'presetOptions.filterTune.film' };
+const GRAIN = { value: 'grain', labelKey: 'presetOptions.filterTune.grain' };
+const ANIMATION = { value: 'animation', labelKey: 'presetOptions.filterTune.animation' };
+const SPRITE = { value: 'sprite', labelKey: 'presetOptions.filterTune.sprite' };
+export const NLMEANS_TUNES = [
+  NONE,
+  FILM,
+  GRAIN,
+  { value: 'highmotion', labelKey: 'presetOptions.filterTune.highMotion' },
+  ANIMATION,
+  { value: 'tape', labelKey: 'presetOptions.filterTune.tape' },
+  SPRITE,
+];
+export const CHROMA_SMOOTH = [OFF, ...STRENGTHS, CUSTOM];
+export const CHROMA_SMOOTH_TUNES = [
+  NONE,
+  { value: 'tiny', labelKey: 'presetOptions.chromaSmoothTune.tiny' },
+  { value: 'small', labelKey: 'presetOptions.chromaSmoothTune.small' },
+  { value: 'medium', labelKey: 'presetOptions.chromaSmoothTune.medium' },
+  { value: 'wide', labelKey: 'presetOptions.chromaSmoothTune.wide' },
+  { value: 'verywide', labelKey: 'presetOptions.chromaSmoothTune.veryWide' },
+];
+export const SHARPEN = [OFF, { value: 'unsharp', label: 'Unsharp' }, { value: 'lapsharp', label: 'Lapsharp' }];
+export const SHARPEN_PRESETS = [...STRENGTHS, CUSTOM];
 export const SHARPEN_TUNES = {
-  unsharp: [['none', 'None'], ['ultrafine', 'Ultrafine'], ['fine', 'Fine'], ['medium', 'Medium'], ['coarse', 'Coarse'], ['verycoarse', 'Very coarse']],
-  lapsharp: [['none', 'None'], ['film', 'Film'], ['grain', 'Grain'], ['animation', 'Animation'], ['sprite', 'Sprite']],
+  unsharp: [
+    NONE,
+    { value: 'ultrafine', labelKey: 'presetOptions.unsharpTune.ultrafine' },
+    { value: 'fine', labelKey: 'presetOptions.unsharpTune.fine' },
+    { value: 'medium', labelKey: 'presetOptions.unsharpTune.medium' },
+    { value: 'coarse', labelKey: 'presetOptions.unsharpTune.coarse' },
+    { value: 'verycoarse', labelKey: 'presetOptions.unsharpTune.veryCoarse' },
+  ],
+  lapsharp: [NONE, FILM, GRAIN, ANIMATION, SPRITE],
 };
-export const COLORSPACE = [['off', 'Off'], ['bt2020', 'BT.2020'], ['bt709', 'BT.709'], ['bt601-6-525', 'BT.601 SMPTE-C'], ['bt601-6-625', 'BT.601 EBU'], ['custom', 'Custom']];
+export const COLORSPACE = [
+  OFF,
+  { value: 'bt2020', label: 'BT.2020' },
+  { value: 'bt709', label: 'BT.709' },
+  { value: 'bt601-6-525', label: 'BT.601 SMPTE-C' },
+  { value: 'bt601-6-625', label: 'BT.601 EBU' },
+  CUSTOM,
+];
 
 // ------------------------------------------------------------------ audio
-export const AUDIO_ENCODERS = {
+// Encoder names stay as they are; passthru names are built from the format ("AC3 passthru").
+const AUDIO_ENCODER_NAMES = {
   av_aac: 'AAC (avcodec)',
   ca_aac: 'AAC (CoreAudio)',
   ca_haac: 'HE-AAC (CoreAudio)',
@@ -216,24 +324,37 @@ export const AUDIO_ENCODERS = {
   alac24: 'ALAC 24-bit',
   pcm16: 'PCM 16-bit',
   pcm24: 'PCM 24-bit',
-  'copy:aac': 'AAC passthru',
-  'copy:ac3': 'AC3 passthru',
-  'copy:eac3': 'E-AC3 passthru',
-  'copy:truehd': 'TrueHD passthru',
-  'copy:dts': 'DTS passthru',
-  'copy:dtshd': 'DTS-HD passthru',
-  'copy:mp2': 'MP2 passthru',
-  'copy:mp3': 'MP3 passthru',
-  'copy:opus': 'Opus passthru',
-  'copy:vorbis': 'Vorbis passthru',
-  'copy:flac': 'FLAC passthru',
-  'copy:alac': 'ALAC passthru',
-  'copy:pcm': 'PCM passthru',
-  copy: 'Auto passthru',
-  none: 'None',
 };
+const PASSTHRU_FORMATS = {
+  'copy:aac': 'AAC',
+  'copy:ac3': 'AC3',
+  'copy:eac3': 'E-AC3',
+  'copy:truehd': 'TrueHD',
+  'copy:dts': 'DTS',
+  'copy:dtshd': 'DTS-HD',
+  'copy:mp2': 'MP2',
+  'copy:mp3': 'MP3',
+  'copy:opus': 'Opus',
+  'copy:vorbis': 'Vorbis',
+  'copy:flac': 'FLAC',
+  'copy:alac': 'ALAC',
+  'copy:pcm': 'PCM',
+};
+/** Every audio encoder HandBrake can have (used when the server's list is unknown). */
+export const AUDIO_ENCODERS = [...Object.keys(AUDIO_ENCODER_NAMES), ...Object.keys(PASSTHRU_FORMATS), 'copy', 'none'];
 
 export const isPassthru = (enc) => String(enc ?? '').startsWith('copy');
+
+/** The format a passthru encoder copies: 'copy:ac3' → "AC3". */
+export const passthruFormat = (enc) => PASSTHRU_FORMATS[enc] ?? enc;
+
+/** An audio encoder as shown: "AAC (avcodec)", "AC3 passthru", "Auto passthru", "None". */
+export function audioEncoderLabel(enc) {
+  if (Object.hasOwn(PASSTHRU_FORMATS, enc)) return t('presetOptions.audioEncoder.passthru', { format: PASSTHRU_FORMATS[enc] });
+  if (enc === 'copy') return t('presetOptions.audioEncoder.autoPassthru');
+  if (enc === 'none') return t('common.none');
+  return AUDIO_ENCODER_NAMES[enc] ?? enc;
+}
 
 /** The containers an audio encoder can be written to. */
 export function audioMuxers(enc = '') {
@@ -244,11 +365,19 @@ export function audioMuxers(enc = '') {
   return ['mp4', 'mov', 'mkv'];
 }
 
-export const MIXDOWNS = {
-  none: 'None', mono: 'Mono', left_only: 'Mono (left only)', right_only: 'Mono (right only)', stereo: 'Stereo',
-  dpl1: 'Dolby Surround', dpl2: 'Dolby Pro Logic II', '5point1': '5.1 channels', '6point1': '6.1 channels',
-  '7point1': '7.1 channels', '5_2_lfe': '7.1 (5F/2R/LFE)',
-};
+export const MIXDOWNS = [
+  NONE,
+  { value: 'mono', labelKey: 'presetOptions.mixdown.mono' },
+  { value: 'left_only', labelKey: 'presetOptions.mixdown.leftOnly' },
+  { value: 'right_only', labelKey: 'presetOptions.mixdown.rightOnly' },
+  { value: 'stereo', labelKey: 'presetOptions.mixdown.stereo' },
+  { value: 'dpl1', label: 'Dolby Surround' },
+  { value: 'dpl2', label: 'Dolby Pro Logic II' },
+  { value: '5point1', labelKey: 'presetOptions.mixdown.channels', vars: { layout: '5.1' } },
+  { value: '6point1', labelKey: 'presetOptions.mixdown.channels', vars: { layout: '6.1' } },
+  { value: '7point1', labelKey: 'presetOptions.mixdown.channels', vars: { layout: '7.1' } },
+  { value: '5_2_lfe', label: '7.1 (5F/2R/LFE)' },
+];
 export const SAMPLERATES = ['8', '11.025', '12', '16', '22.05', '24', '32', '44.1', '48', '88.2', '96', '176.4', '192'];
 export const AUDIO_BITRATES = [32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 448, 512, 576, 640, 768, 960, 1152, 1344, 1536];
 /** Encoders without a bitrate (lossless). */
@@ -287,8 +416,25 @@ export const NEW_AUDIO_TRACK = {
   AudioTrackDRCSlider: 0,
 };
 
-export const TRACK_BEHAVIORS = [['none', 'None'], ['first', 'First matching selected language'], ['all', 'All matching selected languages']];
-export const TRACK_BEHAVIOR = { ...labels(TRACK_BEHAVIORS), first: 'First matching language', all: 'All matching languages' };
-export const BURN_BEHAVIORS = [['none', 'None'], ['foreign', 'Foreign audio subtitle track'], ['first', 'First selected track'], ['foreign_first', 'Foreign audio, then first selected track']];
-export const BURN = labels(BURN_BEHAVIORS);
-export const AUDIO_NAMING = [['none', 'None'], ['unnamed', 'Unnamed tracks only'], ['all', 'All tracks']];
+export const TRACK_BEHAVIORS = [
+  NONE,
+  { value: 'first', labelKey: 'presetOptions.trackBehavior.first' },
+  { value: 'all', labelKey: 'presetOptions.trackBehavior.all' },
+];
+/** Shorter labels, for showing a preset. */
+export const TRACK_BEHAVIORS_SHORT = [
+  NONE,
+  { value: 'first', labelKey: 'presetOptions.trackBehavior.firstShort' },
+  { value: 'all', labelKey: 'presetOptions.trackBehavior.allShort' },
+];
+export const BURN_BEHAVIORS = [
+  NONE,
+  { value: 'foreign', labelKey: 'presetOptions.burnBehavior.foreign' },
+  { value: 'first', labelKey: 'presetOptions.burnBehavior.first' },
+  { value: 'foreign_first', labelKey: 'presetOptions.burnBehavior.foreignFirst' },
+];
+export const AUDIO_NAMING = [
+  NONE,
+  { value: 'unnamed', labelKey: 'presetOptions.audioNaming.unnamed' },
+  { value: 'all', labelKey: 'presetOptions.audioNaming.all' },
+];

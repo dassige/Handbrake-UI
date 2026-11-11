@@ -1,0 +1,848 @@
+{
+  "topics": {
+    "help.search": {
+      "title": "In der Hilfe suchen",
+      "body": [
+        "Geben Sie ein oder mehrere Wörter ein: Ein Thema wird aufgelistet, wenn sein Titel oder Text **jedes** Wort enthält. Groß-/Kleinschreibung und Akzente spielen keine Rolle, und Wörter im Titel stehen weiter oben.",
+        "Ohne Eingabe werden alle Themen von A bis Z aufgelistet. Jedes runde **?** in der App öffnet das Thema zu dem Element daneben."
+      ],
+      "see": [
+        "app.overview"
+      ]
+    },
+    "app.overview": {
+      "title": "So funktioniert HandBrake Queue",
+      "body": [
+        "HandBrake Queue konvertiert Videos auf dem Server mit HandBrakeCLI und HandBrake-Voreinstellungen: im [Voreinstellungseditor](#presets.editor) erstellt oder aus der HandBrake-Desktop-App importiert. Videos, die auf Ihrem Computer liegen, können zuerst [hochgeladen](#upload.overview) werden.",
+        "### Der übliche Ablauf",
+        "1. Laden Sie eine aus HandBrake exportierte [Voreinstellung](#presets) hoch.",
+        "1. Ziehen Sie unter **Konvertieren** Dateien oder Ordner aus den [Quellen](#convert.sources) in die [Warteschlange](#convert.queue).",
+        "1. Klicken Sie auf **Starten**: siehe [Die Warteschlange starten und stoppen](#queue.state).",
+        "1. Jede konvertierte Datei wird auf Fehler, fehlenden Ton oder fehlende Untertitel und die richtige Länge [geprüft](#verify.overview).",
+        "1. Geben Sie den konvertierten Dateien unter **Umbenennen** saubere Namen: siehe [Dateien umbenennen](#rename.overview).",
+        "Optional können Sie mehrere konvertierte Dateien (z. B. einen in zwei Teile geteilten Film) unter **Zusammenführen** zu einer verbinden: siehe [Dateien zusammenführen](#merge.overview).",
+        "Um alte oder qualitativ schwache Dateien irgendwo in Ihren Ordnern zu finden, verwenden Sie **Qualität**: siehe [Qualitätsprüfung](#quality.overview).",
+        "Um zu konvertieren, ohne dabei zu sein: Ein [Zeitfenster](#settings.schedule) lässt die Warteschlange nachts laufen, [überwachte Ordner](#settings.watch) fügen neue Downloads von selbst hinzu, und [Benachrichtigungen](#settings.notifications) sagen Ihnen, wie es gelaufen ist. **Statistik** zeigt, was konvertiert wurde: siehe [Statistik](#stats.overview).",
+        "Quelldateien werden nie verändert, Downloads können also weiter geseedet werden. Sie werden nur gelöscht, wenn Sie es verlangen: siehe [Quelldateien löschen](#delete.overview).",
+        "Auf dem Smartphone funktioniert die App genauso: Ansichten mit zwei Bereichen (Quellen und Warteschlange, Dateien und Umbenennungsliste …) zeigen jeweils einen Bereich, mit einem Umschalter darüber; beim Hinzufügen von Dateien springt die Ansicht zum zweiten Bereich. Drag-and-drop braucht eine Maus, nutzen Sie auf einem Touchscreen also die Kontrollkästchen und **Zur Warteschlange hinzufügen** sowie die Schaltflächen **Hoch**, **Runter**, **An den Anfang** und **Ans Ende** in den Details eines Auftrags, um die Warteschlange umzusortieren.",
+        "Unter Einstellungen → **Über** finden Sie die Version, die Versionshinweise, die Danksagungen und die Lizenz (GNU GPL, Version 2)."
+      ],
+      "see": [
+        "convert.sources",
+        "convert.queue",
+        "queue.state",
+        "verify.overview",
+        "rename.overview",
+        "presets",
+        "merge.overview",
+        "upload.overview",
+        "quality.overview"
+      ]
+    },
+    "convert.sources": {
+      "title": "Quellen",
+      "body": [
+        "Die Ordner und Videodateien unter **Quellordner**, festgelegt in den [Einstellungen](#settings.folders). Bei mehreren wählen Sie in der Liste oben im Bereich, welcher durchsucht wird. Aufgelistet werden nur Ordner und Videodateien (die Dateiendungen siehe [Ordner hinzufügen](#settings.adding)).",
+        "- **Doppelklicken** Sie einen Ordner, um ihn zu öffnen, oder eine Datei, um sie zur Warteschlange hinzuzufügen.",
+        "- **Ziehen** Sie Dateien oder Ordner in die Warteschlange, um sie hinzuzufügen. Mit Strg-Klick und Umschalt-Klick wählen Sie mehrere aus; das Kontrollkästchen ganz oben wählt alles aus.",
+        "- **Zur Warteschlange hinzufügen** fügt das Ausgewählte hinzu.",
+        "- Beim Hinzufügen eines Ordners wird jedes darin liegende Video hinzugefügt, Unterordner eingeschlossen. Bereits eingereihte Dateien werden übersprungen, ebenso bereits konvertierte, sofern Sie das nicht abgeschaltet haben.",
+        "Abzeichen zeigen, was mit jeder Datei geschehen ist: **Wartend**, **Wird konvertiert**, **Konvertiert**, **Fehlgeschlagen**. Bei Ordnern zählen sie die enthaltenen Dateien.",
+        "- **Hochladen** sendet Videos von Ihrem Computer in den geöffneten Ordner; das Ablegen von Dateien von Ihrem Computer auf dem Bereich bewirkt dasselbe. Siehe [Videos hochladen](#upload.overview).",
+        "- **Herunterladen** kopiert die ausgewählten Dateien oder Ordner auf Ihren Computer: siehe [Dateien herunterladen](#download.overview).",
+        "- **Löschen** entfernt die ausgewählten Dateien oder Ordner nach einer Bestätigung vom Server: siehe [Quelldateien löschen](#delete.overview).",
+        "Das Hinzufügen von Dateien startet nie die Konvertierung: Klicken Sie auf **Starten**, wenn Sie bereit sind ([Warum?](#queue.state))."
+      ],
+      "see": [
+        "convert.queue",
+        "settings.adding",
+        "queue.state",
+        "upload.overview",
+        "download.overview",
+        "delete.overview"
+      ]
+    },
+    "convert.queue": {
+      "title": "Warteschlange",
+      "body": [
+        "Jede zu konvertierende Datei ist ein **Auftrag**. Aufträge laufen nacheinander, von oben nach unten.",
+        "- **Voreinstellung**: die [Voreinstellung](#presets), die für die als Nächstes hinzugefügten Dateien verwendet wird. Die Voreinstellung eines wartenden Auftrags lässt sich in seinen Details ändern.",
+        "- **Hinzufügen**: Neue Dateien kommen **ans Ende** der Warteschlange oder **als Nächstes**, vor die übrigen wartenden Aufträge.",
+        "- **Ziehen** Sie einen wartenden Auftrag am Griff (⋮⋮), um die Reihenfolge zu ändern, oder verwenden Sie **An den Anfang**.",
+        "- Die Filter zeigen alle Aufträge, die aktiven, die konvertierten oder die fehlgeschlagenen und abgebrochenen. **Diese umbenennen** (unter „Konvertiert“) öffnet deren Dateien in der Ansicht „Umbenennen“, **Diese zusammenführen** in der Ansicht „Zusammenführen“.",
+        "- **Erledigte entfernen** entfernt konvertierte, fehlgeschlagene und abgebrochene Aufträge aus der Liste. Dateien bleiben unberührt.",
+        "Klicken Sie auf einen Auftrag, um seine [Details](#job.details) zu sehen."
+      ],
+      "see": [
+        "queue.state",
+        "job.statuses",
+        "job.actions",
+        "job.details"
+      ]
+    },
+    "queue.state": {
+      "title": "Die Warteschlange starten und stoppen",
+      "body": [
+        "Die Warteschlange **startet nie von selbst**, sofern Sie es nicht verlangen: Das Hinzufügen oder Ablegen von Dateien legt sie nur in die Liste. Klicken Sie auf **Starten**, um mit dem Konvertieren zu beginnen.",
+        "- Solange sie läuft, werden hinzugefügte Dateien in den Durchlauf aufgenommen.",
+        "- Ist der letzte Auftrag erledigt, stoppt die Warteschlange wieder; die nächsten Dateien warten dann auf **Starten**.",
+        "- **Nach aktuellem stoppen** lässt den laufenden Auftrag fertig konvertieren und stoppt danach. Um sofort zu stoppen, halten Sie diesen Auftrag an oder brechen Sie ihn ab.",
+        "- Wird der Server während eines Durchlaufs neu gestartet, läuft der Durchlauf danach weiter. Der Auftrag, der gerade konvertiert wurde, beginnt wieder bei 0 %, weil HandBrake eine Encodierung nicht mittendrin fortsetzen kann.",
+        "Zwei Einstellungen können sie für Sie starten: das [Zeitfenster](#settings.schedule) (Start, wenn das Zeitfenster öffnet) und [überwachte Ordner](#settings.watch) (Start nach dem Hinzufügen neuer Dateien).",
+        "Bei einem Zeitfenster fragt **Starten** außerhalb des Fensters, ob Sie **auf das Zeitfenster warten** möchten (die obere Leiste zeigt dann „Wartet bis 23:00“) oder **jetzt starten**, was das Zeitfenster ignoriert, bis die Warteschlange stoppt."
+      ],
+      "see": [
+        "convert.queue",
+        "job.actions",
+        "queue.eta",
+        "settings.schedule"
+      ]
+    },
+    "job.statuses": {
+      "title": "Auftragsstatus",
+      "body": [
+        "- **Wartend**: wartet, bis er an der Reihe ist.",
+        "- **Wird gescannt**: HandBrake liest die Quelle, bevor es konvertiert.",
+        "- **Wird konvertiert**: wird encodiert, mit Fortschritt, Geschwindigkeit (Bilder pro Sekunde) und Restzeit.",
+        "- **Wird abgeschlossen**: HandBrake schreibt das Ende der Datei.",
+        "- **Wird geprüft**: Die konvertierte Datei wird [geprüft](#verify.overview).",
+        "- **Angehalten**: dort gestoppt, wo er war; **Fortsetzen** macht weiter.",
+        "- **Konvertiert**: erledigt. Ein zweites Abzeichen zeigt das Ergebnis der Prüfung: **Geprüft**, **Prüfwarnungen** oder **Prüfung fehlgeschlagen**.",
+        "- **Fehlgeschlagen**: HandBrake wurde mit einem Fehler beendet; die Details zeigen den Grund, und das Protokoll enthält mehr.",
+        "- **Abgebrochen**: Sie haben ihn abgebrochen.",
+        "Die Filter über der Liste zeigen alle Aufträge, die aktiven, die konvertierten, die fehlgeschlagenen oder abgebrochenen sowie **Prüfung fehlgeschlagen**: konvertierte Dateien, bei deren [Prüfung nach der Konvertierung](#verify.overview) Probleme gefunden wurden. Er wird rot, wenn es welche gibt, und **Alle erneut prüfen** prüft sie nacheinander noch einmal."
+      ],
+      "see": [
+        "job.actions",
+        "verify.results"
+      ]
+    },
+    "job.actions": {
+      "title": "Auftragsaktionen",
+      "body": [
+        "- **Anhalten / Fortsetzen**: friert die Konvertierung (oder die Prüfung) ein und setzt sie später fort. Ein Neustart des Servers im angehaltenen Zustand startet die Konvertierung wieder bei 0 %. Nicht verfügbar, wenn der Server unter Windows ohne Docker läuft: Brechen Sie stattdessen ab.",
+        "- **Abbrechen**: stoppt die Konvertierung und löscht die halb geschriebene Datei. Bei einem wartenden Auftrag wird er nur als abgebrochen markiert. Während die Datei geprüft wird, behält **Prüfung überspringen** die konvertierte Datei und überspringt den Rest der Prüfung.",
+        "- **An den Anfang**: konvertiert diesen wartenden Auftrag als Nächstes.",
+        "- **Erneut versuchen**: stellt einen fehlgeschlagenen oder abgebrochenen Auftrag wieder in die Warteschlange.",
+        "- **Erneut konvertieren**: ein neuer Auftrag für dieselbe Quelle. Die neue Datei erhält ein Suffix wie `name (1).mkv`, die erste bleibt also erhalten. In den Details können Sie eine andere Voreinstellung wählen.",
+        "- **Umbenennen**: öffnet die konvertierte Datei in der [Ansicht „Umbenennen“](#rename.overview).",
+        "- **Erneut prüfen**: führt die [Prüfung](#verify.overview) für eine konvertierte Datei noch einmal aus.",
+        "- **Entfernen**: nimmt den Auftrag aus der Liste. Dateien werden nie gelöscht."
+      ],
+      "see": [
+        "job.statuses",
+        "job.details"
+      ]
+    },
+    "job.details": {
+      "title": "Auftragsdetails",
+      "body": [
+        "Alles zu einem Auftrag: [Fortschritt](#job.statuses), die [Prüfung](#verify.results), [Dateien](#job.files), Voreinstellung, [Quelle](#job.source), [Zeiten](#job.timing) und das [HandBrake-Protokoll](#job.log). Die Schaltflächen oben sind die [Auftragsaktionen](#job.actions).",
+        "Die Details folgen dem Auftrag live, während er konvertiert. Schließen Sie sie mit ✕ oder Escape."
+      ],
+      "see": [
+        "job.actions",
+        "job.files",
+        "verify.results",
+        "job.log"
+      ]
+    },
+    "job.files": {
+      "title": "Quell- und Ausgabedateien",
+      "body": [
+        "- **Quelle**: die Datei, die konvertiert wird. Sie wird nie verändert.",
+        "- **Ausgabe**: wohin die konvertierte Datei kommt, unter dem **Zielordner** in der in den [Einstellungen](#settings.layout) gewählten Struktur. Solange der Auftrag wartet, können Sie sie **bearbeiten** (sie muss im Zielordner bleiben).",
+        "- Existiert beim Start des Auftrags schon eine Datei mit diesem Namen, erhält die neue Datei ein Suffix: `name (1).mkv`. Nichts wird überschrieben.",
+        "- Während der Konvertierung wird die Ausgabe als `name.mkv.part` geschrieben und umbenannt, wenn HandBrake fertig ist, damit Medienserver nie halb geschriebene Dateien aufnehmen.",
+        "- **Größen** vergleicht die Quelle mit der Ausgabe."
+      ],
+      "see": [
+        "settings.layout",
+        "job.details",
+        "download.overview"
+      ]
+    },
+    "job.source": {
+      "title": "Quelldetails",
+      "body": [
+        "Was HandBrake in der Quelle gefunden hat, als der Auftrag hinzugefügt wurde: Länge, Videoformat und -größe, Bildrate sowie die Ton- und Untertitelspuren mit ihren Sprachen.",
+        "Die [Voreinstellung](#presets) entscheidet, welche dieser Spuren in die Ausgabe kommen. Die [Prüfung](#verify.overview) vergleicht die Ausgabe mit dem, was HandBrake schreiben wollte."
+      ],
+      "see": [
+        "presets",
+        "verify.overview"
+      ]
+    },
+    "job.timing": {
+      "title": "Zeiten",
+      "body": [
+        "Wann der Auftrag hinzugefügt, gestartet und beendet wurde, wie lange das Encodieren gedauert hat (Pausen nicht mitgezählt) und die durchschnittliche Geschwindigkeit in Bildern pro Sekunde. **Versuche** zählt, wie oft er gestartet wurde, z. B. nach einem erneuten Versuch oder einem Neustart."
+      ]
+    },
+    "job.log": {
+      "title": "HandBrake-Protokoll",
+      "body": [
+        "Alles, was HandBrakeCLI beim Konvertieren ausgegeben hat: die verwendeten Einstellungen, die gewählten Spuren, Warnungen und Fehler. Es wird live aktualisiert, solange der Auftrag läuft.",
+        "Schlägt ein Auftrag fehl, stammt der in seinen Details angezeigte Fehler aus den letzten Fehlerzeilen dieses Protokolls. Auch die [Prüfung](#verify.overview) liest es, um zu wissen, welche Ton- und Untertitelspuren HandBrake geschrieben hat und ob es Fehler in der Quelle gefunden hat.",
+        "Die Zeile `encoder:` zeigt, welcher Encoder verwendet wurde, z. B. `H.264 (Intel QSV)` bei einer [Quick-Sync-Voreinstellung](#presets.qsv)."
+      ],
+      "see": [
+        "verify.overview",
+        "presets.qsv"
+      ]
+    },
+    "verify.overview": {
+      "title": "Konvertierte Dateien prüfen",
+      "body": [
+        "Nach jeder erfolgreichen Konvertierung wird die Ausgabe geprüft, bevor der Auftrag als konvertiert gilt. Währenddessen zeigt der Auftrag **Wird geprüft**, und der nächste Auftrag wartet.",
+        "### Was geprüft wird",
+        "- **Lesbar**: Die Datei lässt sich öffnen und hat einen Videostream.",
+        "- **Länge entspricht der Quelle**: wo das Video tatsächlich endet, gemessen durch Lesen der ganzen Datei. Eine abgeschnittene Datei kann in ihren Metadaten trotzdem die volle Länge angeben, darauf allein wird also nicht vertraut. Bis zu 2 Sekunden (oder 0,5 %) Abweichung sind in Ordnung, bis zu 10 Sekunden (oder 2 %) ergeben eine Warnung, mehr einen Fehler.",
+        "- **Tonspuren**: Die Datei hat jede Tonspur, die HandBrake geschrieben hat (laut [Protokoll](#job.log)), und jede ist so lang wie das Video.",
+        "- **Untertitelspuren**: Die Datei hat jede Untertitelspur, die HandBrake durchgereicht hat. Ins Bild eingebrannte Untertitel sind Teil des Videos. Eine Spur ohne Zeilen (z. B. erzwungene Untertitel in einer Episode, die keine hat) wird angezeigt, ist aber kein Problem.",
+        "- **Vollständige Decodierung**: Jedes Video- und Tonbild wird decodiert, um beschädigte Daten zu finden. Das dauert bei einer 45-Minuten-Episode etwa 1–2 Minuten.",
+        "- **Quelle**: Hat HandBrake Decodierfehler in der Quelle gefunden, kann der Schaden auch in der Ausgabe sichtbar sein (eine Warnung).",
+        "Wählen Sie in den [Einstellungen](#settings.encoding) **Vollständig**, **Schnell** (alles außer der vollständigen Decodierung) oder **Aus**."
+      ],
+      "see": [
+        "verify.results",
+        "settings.encoding",
+        "rename.auto"
+      ]
+    },
+    "verify.results": {
+      "title": "Prüfergebnisse",
+      "body": [
+        "- **Geprüft** (grün): Alle Prüfungen bestanden.",
+        "- **Prüfwarnungen** (gelb): etwas, das man sich ansehen sollte, z. B. Fehler in der Quelle oder wenige Sekunden Abweichung in der Länge. Die Datei ist meist in Ordnung.",
+        "- **Prüfung fehlgeschlagen** (rot): Die Datei ist wahrscheinlich defekt: zu kurz, eine fehlende oder zu kurze Tonspur oder viele Decodierfehler. Verwenden Sie **Erneut konvertieren** oder versuchen Sie eine andere Quelle.",
+        "- **Nicht geprüft**: Die Prüfung wurde übersprungen, durch einen Neustart gestoppt oder ausgeschaltet.",
+        "Jede Zeile in den Auftragsdetails sagt, was gefunden wurde. **Erneut prüfen** wiederholt die Prüfung, z. B. nachdem die Datei zurückkopiert wurde.",
+        "Dateien, die die Prüfung nicht bestehen, werden nie [automatisch umbenannt](#rename.auto)."
+      ],
+      "see": [
+        "verify.overview",
+        "job.actions"
+      ]
+    },
+    "presets": {
+      "title": "Voreinstellungen",
+      "body": [
+        "Eine Voreinstellung enthält jede Konvertierungseinstellung: Videoencoder und Qualität, Größe, Bildrate, Filter, Ton- und Untertitelspuren, Container. Sie können Voreinstellungen hier auf der Seite **Voreinstellungen** erstellen und ändern oder in der HandBrake-Desktop-App erstellte Voreinstellungen importieren.",
+        "### Eine Voreinstellung erstellen",
+        "- **Neu** geht von einer der HandBrake-eigenen Voreinstellungen (z. B. „Fast 1080p30“) oder von einer Ihrer eigenen aus: siehe [Neue Voreinstellung](#presets.new).",
+        "- **Bearbeiten** öffnet die gewählte Voreinstellung im [Voreinstellungseditor](#presets.editor), mit denselben Tabs wie HandBrake: Übersicht, Bildgröße, Filter, Video, Audio und Untertitel.",
+        "- **Duplizieren** erstellt eine Kopie unter einem neuen Namen.",
+        "### Aus HandBrake importieren",
+        "1. In HandBrake: **Voreinstellungen** → Ihre Voreinstellung auswählen → **Exportieren**.",
+        "1. Hier: Klicken Sie auf **Importieren** oder legen Sie die `.json`-Datei irgendwo auf der Seite ab.",
+        "- Eine Datei kann mehrere Voreinstellungen enthalten, auch in Ordnern: Jede wird hinzugefügt.",
+        "- Wird eine Voreinstellung mit gleichem Namen und gleicher Kategorie erneut importiert, ersetzt sie die alte, hier vorgenommene Änderungen eingeschlossen.",
+        "### Voreinstellungen verwenden",
+        "- Die Seite zeigt jede Einstellung der gewählten Voreinstellung, gruppiert wie die Tabs von HandBrake, dazu das rohe JSON und wie sich die Voreinstellung bewährt hat (Geschwindigkeit, Größenreduzierung). **Herunterladen** liefert eine Datei, die HandBrake importieren kann.",
+        "- Die **Standard**-Voreinstellung (★) wird beim Hinzufügen von Dateien verwendet, sofern Sie in der Warteschlange keine andere wählen.",
+        "- Jeder Auftrag behält eine Kopie seiner Voreinstellung, das Ändern oder Löschen einer Voreinstellung ändert also nie Aufträge, die schon in der Warteschlange sind.",
+        "Hardware-Encoder (`qsv_h264`, `qsv_h265`) konvertieren auf der Intel-GPU: siehe [Quick-Sync-Voreinstellungen (GPU)](#presets.qsv). Die auf diesem Server verfügbaren Encoder stehen unter Einstellungen → Über und im Tab „Video“ des Editors."
+      ],
+      "see": [
+        "presets.editor",
+        "presets.new",
+        "presets.qsv",
+        "convert.queue"
+      ]
+    },
+    "presets.qsv": {
+      "title": "Quick-Sync-Voreinstellungen (GPU)",
+      "body": [
+        "Eine Voreinstellung mit einem Intel-**Quick-Sync**-Encoder konvertiert auf der Intel-GPU des Servers statt auf der CPU. Auf einem Intel i3 der 10. Generation war sie bei gleicher Bitrate etwa **doppelt so schnell** wie x264, mit gleich großen Dateien und fast gleicher Qualität. Quick Sync funktioniert auf Intel-iGPUs ab der 6. Generation, wenn der Server die GPU (`/dev/dri`) an HandBrake Queue durchreicht. Steht `qsv_h264` unter Einstellungen → Über, ist alles bereit.",
+        "### Eine in HandBrake für Windows erstellen",
+        "1. Öffnen Sie ein beliebiges Video und wählen Sie die Voreinstellung, von der Sie ausgehen.",
+        "1. Setzen Sie im Tab **Video** den **Videoencoder** auf `H.264 (Intel QSV)` und die **Encoder-Voreinstellung** auf `Balanced`. Behalten Sie dieselbe durchschnittliche Bitrate bei oder geben Sie etwa 10–15 % dazu, um die Qualität von x264 zu erreichen.",
+        "1. Lassen Sie das Feld **Erweiterte Optionen** des Encoders leer: Optionen für neuere Intel-GPUs funktionieren auf dem Server möglicherweise nicht.",
+        "1. **Neue Voreinstellung speichern** unter eigenem Namen, **Exportieren** Sie sie und laden Sie sie unter [Voreinstellungen](#presets) hoch.",
+        "Die Intel-QSV-Encoder erscheinen in HandBrake nur, wenn Ihr eigener Computer eine Intel-GPU hat. Exportieren Sie sonst die x264-Voreinstellung und bearbeiten Sie die `.json`-Datei: Setzen Sie `VideoEncoder` auf `qsv_h264` und `VideoPreset` auf `balanced`.",
+        "### Worauf Sie achten sollten",
+        "- **Die Quick-Sync-Decodierung muss ausgeschaltet bleiben.** Enthält die exportierte Datei `\"VideoHWDecode\": 2`, löschen Sie diese Zeile: Das Decodieren auf der GPU schlägt bei Intel der 6. bis 10. Generation fehl. Die Quelle wird auf der CPU decodiert, weshalb es etwa doppelt so schnell ist und nicht mehr.",
+        "- `H.264 (Intel QSV)` mit **Balanced** lieferte in Tests die besten Ergebnisse. **Quality** brachte dasselbe Ergebnis, und `H.265 (Intel QSV)` war bei gleicher Bitrate langsamer und etwas schlechter.",
+        "- Lehnt der Server die Voreinstellung beim Hochladen ab, nennt die Meldung den Grund, z. B. einen Encoder, den er nicht hat.",
+        "- Um zu prüfen, ob ein Auftrag die GPU verwendet hat, suchen Sie in seinem [HandBrake-Protokoll](#job.log) nach `encoder: H.264 (Intel QSV)`. Auch die Geschwindigkeit ist höher, z. B. etwa 60 statt 30 Bilder pro Sekunde."
+      ],
+      "see": [
+        "presets",
+        "job.log"
+      ]
+    },
+    "settings.folders": {
+      "title": "Quell- und Zielordner",
+      "body": [
+        "Ordner auf dem Server (nicht auf Ihrem Computer). Auf dem Server eingebundene NAS-Freigaben funktionieren ebenfalls.",
+        "- **Quellordner**: wo die zu konvertierenden Dateien liegen. Fügen Sie so viele hinzu, wie Sie brauchen, mit **Quellordner hinzufügen**; der Bereich „Quellen“ zeigt jeweils einen und kann nicht darüber hinaus navigieren. Das Entfernen eines Ordners aus der Liste löscht nichts.",
+        "- **Name** (optional) bei einem Quellordner: ein Anzeigename wie „Downloads“, der im Bereich „Quellen“, in den Ordnerlisten und in der Ansicht „Qualität“ statt des Pfads angezeigt wird. Jeder Name kann nur einmal vergeben werden, höchstens 40 Zeichen; bei leerem Namen wird der eigene Name des Ordners angezeigt.",
+        "- **Schützen** bei einem Quellordner: verhindert, dass seine Dateien und Ordner aus der App gelöscht werden, z. B. den Ordner, aus dem ein Download-Client noch seedet. Im Bereich „Quellen“ zeigt ein solcher Ordner **Geschützt** statt der Schaltfläche „Löschen“, und auch der Server lehnt dort das Löschen ab.",
+        "- **Zielordner**: wohin konvertierte Dateien geschrieben werden. Die Ansichten „Umbenennen“ und „Zusammenführen“ arbeiten nur hier.",
+        "Alle müssen existieren. Das Ziel darf nicht in einem Quellordner liegen, und ein Quellordner nicht in einem anderen. In Docker müssen sie im Ordner liegen, der in den Container eingebunden ist (`MEDIA_DIR`, meist `/mnt`).",
+        "Die Ausgabestrukturen **Name des Quellordners** und **Vollständiger Quellpfad** werden aus dem Quellordner berechnet, in dem die jeweilige Datei liegt."
+      ],
+      "see": [
+        "settings.layout",
+        "convert.sources",
+        "upload.overview",
+        "delete.overview",
+        "backup.overview"
+      ]
+    },
+    "settings.layout": {
+      "title": "Struktur der Ausgabeordner",
+      "body": [
+        "Wohin unter dem Zielordner jede konvertierte Datei kommt:",
+        "- **Name des Quellordners**: `target/Show.S01/episode.mkv`, nur mit dem Namen des Ordners, in dem die Quelle liegt. Gut für Staffelordner.",
+        "- **Vollständiger Quellpfad**: `target/Completed/Show.S01/episode.mkv`, der ganze Pfad unterhalb des Quellordners.",
+        "- **Alles direkt im Zielordner**: `target/episode.mkv`.",
+        "Existiert die Datei schon, erhält die neue ein Suffix (`episode (1).mkv`). Die Struktur gilt für Dateien, die nach der Änderung hinzugefügt werden; wartende Aufträge behalten ihren Ausgabepfad."
+      ],
+      "see": [
+        "job.files"
+      ]
+    },
+    "settings.language": {
+      "title": "Sprache",
+      "body": [
+        "Die App, die Hilfe eingeschlossen, kann auf Englisch, Italienisch (Italiano), Deutsch (Deutsch), Französisch (Français) oder Spanisch (Español) angezeigt werden. Jede Sprache wird mit ihrem eigenen Namen aufgeführt, sodass sie sich leicht finden lässt, in welcher Sprache die App gerade auch angezeigt wird.",
+        "- **Automatisch**: Jeder Browser zeigt die App in seiner eigenen Sprache an (der ersten in den Spracheinstellungen des Browsers, die die App hat), sonst auf Englisch. Zwei Personen können die App gleichzeitig in zwei Sprachen verwenden.",
+        "- **Eine Sprache**: Jeder Browser zeigt die App in dieser Sprache an.",
+        "Die Wahl wird wie die übrigen Einstellungen auf dem Server gespeichert und gilt, sobald Sie auf **Änderungen speichern** klicken. Der Browser merkt sich die zuletzt verwendete Sprache, die App öffnet sich beim nächsten Mal also sofort darin.",
+        "Datei- und Ordnernamen, Namen von Voreinstellungen sowie Fehlermeldungen des Servers, von HandBrake oder ffmpeg werden unverändert angezeigt (meist auf Englisch). E-Mail- und Push-[Benachrichtigungen](#settings.notifications) sind immer auf Englisch."
+      ],
+      "see": [
+        "settings.notifications"
+      ]
+    },
+    "settings.adding": {
+      "title": "Ordner hinzufügen",
+      "body": [
+        "- **Unterordner einschließen**: Beim Hinzufügen eines Ordners werden auch die Videos in seinen Unterordnern hinzugefügt.",
+        "- **Bereits konvertierte Dateien überspringen**: Eine Datei mit einem konvertierten Auftrag wird nicht noch einmal hinzugefügt. Verwenden Sie **Erneut konvertieren** bei ihrem Auftrag, um eine erneut zu konvertieren.",
+        "- **Dateiendungen für Videos**: welche Dateien als Videos gelten, durch Kommas getrennt.",
+        "- **Dateien und Ordner mit diesen Wörtern überspringen**: ganze Wörter, in beliebiger Schreibweise, z. B. überspringt `sample` die Datei `show-sample.mkv` und einen Ordner `Sample`, aber nicht `samples.mkv`."
+      ],
+      "see": [
+        "convert.sources"
+      ]
+    },
+    "settings.encoding": {
+      "title": "Encodierungseinstellungen",
+      "body": [
+        "- **CPU-Priorität**: wie rücksichtsvoll Konvertierungen die CPU mit anderen Diensten auf dem Server teilen (Linux `nice`, 0–19). Höher ist schonender und macht nur langsamer, wenn der Server ausgelastet ist. Wird ignoriert, wenn der Server unter Windows ohne Docker läuft.",
+        "- **Prüfung nach der Konvertierung**: **Vollständig** (jede Prüfung, mit vollständiger Decodierung), **Schnell** (Längen, Spuren und Lesbarkeit ohne Decodierung) oder **Aus**. Siehe [Konvertierte Dateien prüfen](#verify.overview)."
+      ],
+      "see": [
+        "verify.overview"
+      ]
+    },
+    "settings.renaming": {
+      "title": "Einstellungen zum Umbenennen",
+      "body": [
+        "- **Dateien nach der Konvertierung automatisch umbenennen**: standardmäßig aus. Siehe [Automatisches Umbenennen](#rename.auto).",
+        "- **Regelsatz für automatisches Umbenennen**: welcher [Regelsatz](#rename.rules) verwendet wird.",
+        "- **Trennzeichen**: Ist der neue Name vergeben, wird dahinter eine Zahl angehängt: Mit `_` erhalten Sie `name_1.mkv`, `name_2.mkv`."
+      ],
+      "see": [
+        "rename.auto",
+        "rename.rules"
+      ]
+    },
+    "rename.overview": {
+      "title": "Dateien umbenennen",
+      "body": [
+        "Heruntergeladene Dateien haben Namen wie `The.Rookie.6x01.Title.ITA.ENG.1080p.NFRip.AAC.x265-Pir8`. Die Ansicht „Umbenennen“ macht daraus mit [Regelsätzen](#rename.rules) `The Rookie S06e01 - Title`.",
+        "1. Durchsuchen Sie links den **Zielordner** und ziehen Sie konvertierte Dateien oder Ordner in die Umbenennungsliste (oder verwenden Sie **Umbenennen** bei einem konvertierten Auftrag).",
+        "1. Wählen Sie die **Regeln**. Das integrierte **Auto** erkennt sowohl Serienfolgen als auch Filme.",
+        "1. Sehen Sie sich die [Vorschau](#rename.preview) an: Korrigieren Sie jeden Namen von Hand und geben Sie einen [Serienname](#rename.showName) ein, wo keiner gefunden wurde.",
+        "1. Klicken Sie auf **Umbenennen**. Jeder Stapel lässt sich im [Verlauf](#rename.history) rückgängig machen.",
+        "Umbenannt werden können nur Dateien im Zielordner, nie die Quellen (Downloads werden vielleicht noch geseedet)."
+      ],
+      "see": [
+        "rename.preview",
+        "rename.showName",
+        "rename.rules",
+        "rename.history",
+        "rename.auto"
+      ]
+    },
+    "rename.preview": {
+      "title": "Vorschau beim Umbenennen",
+      "body": [
+        "Jede Zeile zeigt den aktuellen Namen (klein, grau) und den neuen Namen. Auf dem Datenträger ändert sich nichts, bis Sie auf **Umbenennen** klicken.",
+        "- **Bearbeiten** Sie jeden neuen Namen, indem Sie darin tippen (Enter zum Bestätigen, Escape zum Abbrechen). Eine bearbeitete Zeile ist blau; **Änderung rückgängig** kehrt zum Namen der Regeln zurück.",
+        "- **Häkchen** bestimmen, welche Zeilen umbenannt werden. Zeilen mit einer Warnung beginnen ohne Häkchen: Prüfen Sie sie und setzen Sie das Häkchen, wenn sie richtig aussehen.",
+        "- **Warnungen** erklären, was die Regeln nicht finden konnten, z. B. keine Folgennummer, kein Jahr oder keinen Serienname.",
+        "- **Serie · S06e01** oder **Film · 2024** zeigt, was erkannt wurde; **keine Änderung** bedeutet, dass der Name schon stimmt.",
+        "- Würden zwei Dateien denselben Namen erhalten, oder ist der Name von einer anderen Datei im Ordner belegt, wird eine Zahl angehängt: `name_1.mkv` (siehe [Einstellungen zum Umbenennen](#settings.renaming)).",
+        "Dateien in verschiedenen Ordnern werden unter ihrem Ordner gruppiert."
+      ],
+      "see": [
+        "rename.showName",
+        "rename.rules"
+      ]
+    },
+    "rename.showName": {
+      "title": "Serienname",
+      "body": [
+        "Manche Dateien haben den Serienname nicht vor der Folgennummer, z. B. `S04E07 Reacher Tutti Con Sampson (2026)…`. Geben Sie den Serienname (`Reacher`) ein, und die Zeilen erhalten `Reacher S04e07 - Tutti Con Sampson`; der Name wird auch aus dem Folgentitel entfernt.",
+        "- **nur wo er fehlt** (Standard): Nur Zeilen, in denen kein Serienname gefunden wurde, erhalten ihn. Andere Serien in derselben Liste behalten ihren.",
+        "- **für alle Zeilen**: Jede Serienzeile erhält diesen Serienname, z. B. um einen langen zu kürzen oder bei einem Remake ein Jahr hinzuzufügen: `Silo (2023)`."
+      ],
+      "see": [
+        "rename.preview",
+        "rename.smart"
+      ]
+    },
+    "rename.rules": {
+      "title": "Umbenennungsregelsätze",
+      "body": [
+        "Ein Regelsatz ist eine Liste von [Schritten](#rename.steps), die der Reihe nach auf jeden Dateinamen (ohne Endung) angewendet werden.",
+        "- **Integrierte** Regelsätze (**Auto**, **TV series**, **Movies**) lassen sich nicht ändern: Verwenden Sie **Duplizieren**, um eine bearbeitbare Kopie zu erstellen.",
+        "- **Neu** beginnt einen Regelsatz mit dem Schritt [Episode / Film erkennen](#rename.smart).",
+        "- **Importieren** liest Advanced-Renamer-Voreinstellungen (`.aren`) sowie von hier exportierte Regelsätze. Jede für Namen verwendete Advanced-Renamer-Methode (Ersetzen, Muster entfernen, Entfernen, Hinzufügen, Verschieben, Abschneiden, Schreibweise) wird zu einem Schritt.",
+        "- **Exportieren** (Download-Symbol) speichert den Regelsatz als `.json`-Datei, z. B. um ihn auf einen anderen Server zu kopieren.",
+        "- Änderungen bleiben nur nach **Speichern** erhalten; [Ausprobieren](#rename.tryIt) zeigt das Ergebnis vor dem Speichern."
+      ],
+      "see": [
+        "rename.steps",
+        "rename.smart",
+        "rename.tryIt"
+      ]
+    },
+    "rename.steps": {
+      "title": "Umbenennungsschritte",
+      "body": [
+        "Schritte laufen von oben nach unten; entfernen Sie das Häkchen bei einem, um ihn auszuschalten, ohne ihn zu löschen. Klicken Sie auf einen Schritt, um ihn zu bearbeiten.",
+        "- **Episode / Film erkennen**: baut den ganzen Namen aus einer Vorlage. Siehe [Episode / Film erkennen](#rename.smart).",
+        "- **Release-Tags entfernen**: schneidet den Namen beim ersten Tag wie `1080p`, `WEB-DL`, `x265` oder `ITA` ab.",
+        "- **Ersetzen**: sucht Text und ersetzt ihn: alle, das erste oder das letzte Vorkommen, mit oder ohne Beachtung der Schreibweise. Mit **Regulärer Ausdruck** fügen `$1`, `$2` … die gefundenen Gruppen ein.",
+        "- **Muster entfernen**: löscht, was passt, z. B. löscht `(720p).*$` von `720p` bis zum Ende.",
+        "- **Alles nach einem Text entfernen**: z. B. nach `)`.",
+        "- **Zeichen entfernen / Text einfügen / Zeichen verschieben**: arbeiten mit Positionen, wie Advanced Renamer. Positionen ändern sich mit jedem Dateinamen, Musterschritte sind daher meist sicherer.",
+        "- **Zeichen abschneiden**: entfernt die aufgeführten Zeichen an beiden Enden.",
+        "- **Schreibweise ändern**: Title Case, GROSS, klein oder Satzanfang groß.",
+        "- **Apostrophe korrigieren**: `L Uomo` → `L'Uomo`, `Dell Oca` → `Dell'Oca`, `Wouldn T` → `Wouldn't`.",
+        "- **Leerzeichen zusammenfassen**: mehrere Leerzeichen werden zu einem.",
+        "Zeichen, die Dateinamen nicht enthalten dürfen (`/ \\ : * ? \" < > |`), werden am Ende entfernt oder ersetzt; `:` wird zu ` -`."
+      ],
+      "see": [
+        "rename.smart",
+        "rename.tryIt"
+      ]
+    },
+    "rename.smart": {
+      "title": "Episode / Film erkennen",
+      "body": [
+        "Liest die Bestandteile eines Release-Namens und baut einen sauberen.",
+        "- **Serie**: findet `S01E02`, `S01E01E02` oder `1x02`. Die Serie ist der Text davor, der Folgentitel der Text danach, bis zum ersten Release-Tag.",
+        "- **Film**: findet das Jahr (`2024` oder `(2024)`); der Titel ist der Text davor.",
+        "- **Typ**: **Auto** behandelt einen Namen mit Folgennummer als Serie und alles andere als Film.",
+        "### Vorlagen",
+        "`{show}`, `{season}`, `{episode}`, `{title}` und `{year}` werden durch das Gefundene ersetzt; Staffel und Folge erhalten zwei Ziffern. Ein Teil in `[ ]` verschwindet, wenn ein Feld darin leer ist: `{show} S{season}e{episode}[ - {title}]` ergibt `Lanterns S01e01`, wenn es keinen Folgentitel gibt.",
+        "### Optionen",
+        "- **Wörter groß schreiben (Title Case)**: schreibt jedes Wort groß und behält vorhandene Großbuchstaben (`McLaren`, `INXS`).",
+        "- **Apostrophe korrigieren**: `L Osservatore` → `L'Osservatore`.",
+        "- **Jahr im Seriennamen behalten**: `East of Eden 2026 S01E01` wird zu `East Of Eden (2026) S01e01`. Standardmäßig aus; nützlich bei Remakes.",
+        "- **Weitere zu entfernende Release-Tags**: weitere Wörter, die den Beginn der Release-Informationen markieren."
+      ],
+      "see": [
+        "rename.showName",
+        "rename.steps"
+      ]
+    },
+    "rename.tryIt": {
+      "title": "Ausprobieren",
+      "body": [
+        "Zeigt vor dem Speichern, was der bearbeitete Regelsatz mit einigen Namen macht. Es beginnt mit den Namen aus Ihrer Umbenennungsliste (oder einigen Beispielen); tippen oder fügen Sie beliebige Namen ein, einen pro Zeile.",
+        "Das Feld **Serienname** funktioniert wie das in der [Ansicht „Umbenennen“](#rename.showName)."
+      ],
+      "see": [
+        "rename.rules"
+      ]
+    },
+    "rename.history": {
+      "title": "Umbenennungsverlauf",
+      "body": [
+        "Jeder Umbenennungsstapel, der neueste zuerst, auch automatische. Klicken Sie auf einen Stapel, um jeden alten und neuen Namen zu sehen.",
+        "**Rückgängig** gibt den Dateien ihre alten Namen zurück. Eine Datei wird übersprungen, wenn sie seitdem gelöscht oder verschoben wurde oder wenn ihr alter Name wieder vergeben ist."
+      ],
+      "see": [
+        "rename.overview"
+      ]
+    },
+    "rename.auto": {
+      "title": "Automatisches Umbenennen",
+      "body": [
+        "Ist **Dateien nach der Konvertierung automatisch umbenennen** eingeschaltet (Einstellungen → Umbenennen), wird jede konvertierte Datei direkt nach ihrer [Prüfung](#verify.overview) mit dem gewählten Regelsatz umbenannt.",
+        "Aus Sicherheitsgründen wird eine Datei nur umbenannt, wenn die Regeln sie **ohne Warnungen** erkennen. Andernfalls zeigt der Auftrag **Umbenennen nötig**, und Sie schließen es in der [Ansicht „Umbenennen“](#rename.overview) ab. Dateien, die die Prüfung nicht bestehen, werden nicht umbenannt.",
+        "Automatische Umbenennungen erscheinen im [Verlauf](#rename.history) und lassen sich rückgängig machen."
+      ],
+      "see": [
+        "settings.renaming",
+        "rename.overview"
+      ]
+    },
+    "merge.overview": {
+      "title": "Dateien zusammenführen",
+      "body": [
+        "Verbindet konvertierte Dateien nacheinander zu einer MKV, zum Beispiel einen Film oder ein Konzert, die auf Discs oder Teile verteilt sind. Die Kapitel jedes Teils bleiben erhalten.",
+        "1. Durchsuchen Sie links den **Zielordner** und ziehen Sie die Teile (oder den Ordner, der sie enthält) in die Zusammenführungsliste. Unter **Konvertiert** in der Warteschlange erledigt **Diese zusammenführen** dasselbe.",
+        "1. Bringen Sie die Teile [in die richtige Reihenfolge](#merge.parts).",
+        "1. Lesen Sie die [Kompatibilitätsprüfung](#merge.compat): Teile, die sich nicht verbinden lassen, werden dort erklärt.",
+        "1. Wählen Sie [Name und Kapitel](#merge.options) der zusammengeführten Datei und klicken Sie auf **Zusammenführen**.",
+        "Beim Zusammenführen werden Video, Ton und Untertitel unverändert kopiert, ohne erneut zu konvertieren, es dauert also etwa so lange wie das Kopieren der Dateien. Die zusammengeführte Datei wird danach wie eine Konvertierung [geprüft](#verify.overview): Ihre Länge muss der Summe der Teile entsprechen, mit denselben Ton- und Untertitelspuren wie Teil 1.",
+        "Zusammenführungen laufen nacheinander, parallel zu Konvertierungen. Fortschritt und Ergebnisse stehen unter [Letzte Zusammenführungen](#merge.history). Die Teile bleiben erhalten, sofern Sie nicht festlegen, dass sie gelöscht werden."
+      ],
+      "see": [
+        "merge.parts",
+        "merge.compat",
+        "merge.chapters",
+        "merge.options",
+        "merge.history"
+      ]
+    },
+    "merge.parts": {
+      "title": "Teile und ihre Reihenfolge",
+      "body": [
+        "Die zusammengeführte Datei spielt die Teile von oben nach unten ab. Ein abgelegter Ordner fügt seine Videodateien in Namensreihenfolge hinzu (`Disc 1`, `Disc 2`, … `Disc 10`).",
+        "- **Ziehen** Sie einen Teil am Griff oder verwenden Sie die Pfeile, um die Reihenfolge zu ändern.",
+        "- ✕ nimmt einen Teil aus der Liste (die Datei bleibt unberührt).",
+        "Jede Zeile zeigt Länge, Kapitel, Tonsprachen, Untertitelspuren, Bildgröße und Dateigröße des Teils, aus der Datei gelesen."
+      ],
+      "see": [
+        "merge.compat"
+      ]
+    },
+    "merge.compat": {
+      "title": "Lassen sich die Teile verbinden?",
+      "body": [
+        "Das Verbinden funktioniert nur, wenn jeder Teil **dieselben Spuren in derselben Reihenfolge** hat. Am einfachsten konvertieren Sie alle Teile mit derselben Voreinstellung.",
+        "### Probleme, die das Zusammenführen verhindern (rot)",
+        "- Eine unterschiedliche Anzahl von Video-, Ton- oder Untertitelspuren, z. B. ein Teil mit italienischem und englischem Ton und ein anderer nur mit italienischem.",
+        "- Eine Spur in einem anderen Format (z. B. AAC in einem Teil, AC-3 in einem anderen) oder Ton mit anderen Kanälen oder einer anderen Abtastrate.",
+        "### Warnungen (gelb): Das Zusammenführen kann weitergehen",
+        "- Eine andere Bildgröße oder mit leicht anderen Einstellungen encodiertes Video (z. B. ein anderer Zuschnitt). Die meisten Player kommen damit zurecht; manche ruckeln an der Verbindungsstelle kurz, prüfen Sie die Übergänge also.",
+        "- Eine Spur in einer anderen Sprache: Die zusammengeführte Spur behält die Sprache von Teil 1."
+      ],
+      "see": [
+        "merge.parts",
+        "presets"
+      ]
+    },
+    "merge.chapters": {
+      "title": "Kapitel der zusammengeführten Datei",
+      "body": [
+        "- **Die Kapitel jedes Teils behalten** (Standard): Jedes Kapitel behält seinen Platz, verschoben an den Anfang seines Teils in der zusammengeführten Datei. Die allgemeinen Namen von HandBrake (`Chapter 1`, `Chapter 2` …) werden über die ganze Datei neu nummeriert; Kapitel mit eigenen Namen behalten diese. Ein Teil ohne Kapitel erhält ein Kapitel, das nach der Datei benannt ist.",
+        "- **Ein Kapitel pro Teil**: ein Kapitel am Anfang jedes Teils, benannt nach seiner Datei (Punkte und Unterstriche werden zu Leerzeichen).",
+        "Öffnen Sie **Kapitel in der zusammengeführten Datei** unter den Optionen, um die Liste vor dem Zusammenführen zu sehen."
+      ],
+      "see": [
+        "merge.options"
+      ]
+    },
+    "merge.options": {
+      "title": "Name und Optionen der zusammengeführten Datei",
+      "body": [
+        "- **Name**: vorgeschlagen aus dem, was die Namen der Teile gemeinsam haben (`Live Aid - Disc 1`, `Live Aid - Disc 2` → `Live Aid`). Die Datei ist immer `.mkv`.",
+        "- Die zusammengeführte Datei kommt in den **Ordner von Teil 1**. Ist der Name vergeben, wird eine Zahl angehängt (`Live Aid_1.mkv`, siehe [Einstellungen zum Umbenennen](#settings.renaming)). Nichts wird überschrieben.",
+        "- **Kapitel**: siehe [Kapitel der zusammengeführten Datei](#merge.chapters).",
+        "- **Die Teile nach erfolgreichem Zusammenführen löschen**: standardmäßig aus. Die Teile werden nur gelöscht, wenn das Zusammenführen funktioniert hat und die [Prüfung](#verify.overview) nicht fehlgeschlagen ist; ist die Prüfung ausgeschaltet, werden sie nach dem Zusammenführen gelöscht. Das lässt sich nicht rückgängig machen.",
+        "Beim Zusammenführen wird die Datei als `name.mkv.part` geschrieben und am Ende umbenannt, damit Medienserver nie eine halb geschriebene Datei sehen."
+      ],
+      "see": [
+        "merge.chapters",
+        "merge.history"
+      ]
+    },
+    "merge.history": {
+      "title": "Letzte Zusammenführungen",
+      "body": [
+        "Jede Zusammenführung mit ihrem Status: **Wartend**, **Teile werden gelesen**, **Wird zusammengeführt** (mit Fortschritt), **Wird geprüft**, **Zusammengeführt**, **Fehlgeschlagen** oder **Abgebrochen**. Eine zusammengeführte Datei zeigt auch ihr [Prüfergebnis](#verify.results).",
+        "Klicken Sie auf eine Zusammenführung, um die Ausgabe, die Teile, eventuelle Warnungen von mkvmerge und die Prüfdetails zu sehen.",
+        "- ■ bricht eine wartende oder laufende Zusammenführung ab; die halb geschriebene Datei wird gelöscht und die Teile bleiben erhalten.",
+        "- 🗑 entfernt eine beendete Zusammenführung aus der Liste. Dateien bleiben unberührt."
+      ],
+      "see": [
+        "merge.overview",
+        "verify.results"
+      ]
+    },
+    "upload.overview": {
+      "title": "Videos hochladen",
+      "body": [
+        "Sendet Videodateien von Ihrem Computer in einen Quellordner auf dem Server, damit sie wie jede andere Datei konvertiert werden können.",
+        "1. Öffnen Sie unter **Konvertieren** in den [Quellen](#convert.sources) den gewünschten Ordner (wählen Sie zuerst den Quellordner, wenn Sie mehrere haben).",
+        "1. Klicken Sie auf **Hochladen** oder legen Sie Dateien von Ihrem Computer auf dem Bereich „Quellen“ ab.",
+        "1. Klicken Sie optional auf **Neuer Ordner**, um einen Unterordner zu erstellen und dorthin hochzuladen.",
+        "1. Klicken Sie auf **Hochladen**. Die Dateien werden nacheinander gesendet; ein Fenster in der Ecke zeigt den Fortschritt, und Sie können weiterarbeiten.",
+        "Akzeptiert werden nur Videodateien (die Endungen aus [Ordner hinzufügen](#settings.adding)). Eine vorhandene Datei wird nie ersetzt: Sie wählen, ob sie übersprungen oder eine Kopie namens „name (1)“ hochgeladen wird. Der Upload wird gar nicht erst gestartet, wenn dem Server der Platz fehlt.",
+        "### Unterbrechungen",
+        "Lassen Sie den Browser-Tab geöffnet, bis die Uploads abgeschlossen sind. Eine abgebrochene Verbindung wird von selbst erneut versucht. Wurde der Tab geschlossen, laden Sie dieselbe Datei erneut in denselben Ordner hoch: Sie wird dort fortgesetzt, wo sie aufgehört hat. Unfertige Uploads sind versteckte Dateien, die nach einer Woche von selbst entfernt werden; **Abbrechen** entfernt einen sofort."
+      ],
+      "see": [
+        "convert.sources",
+        "settings.folders",
+        "download.overview"
+      ]
+    },
+    "quality.overview": {
+      "title": "Qualitätsprüfung",
+      "body": [
+        "Findet Videodateien mit altem Format, niedriger Auflösung oder niedriger Bitrate, damit Sie wissen, welche Sie ersetzen oder konvertieren sollten.",
+        "1. Wählen Sie unter **Qualität** im Bereich **Ordner** Ordner oder Dateien aus: Jeder Quellordner und der Zielordner sind dort vorhanden.",
+        "1. Klicken Sie auf **Qualität prüfen**. Jedes darin liegende Video, Unterordner eingeschlossen, wird mit ffprobe gelesen (nur die Dateiköpfe, es geht also schnell; es läuft mit der CPU-Priorität aus [Encodierung](#settings.encoding)).",
+        "1. Die Ergebnisse listen die Dateien auf, die **Auffällig** sind. Klicken Sie auf die Chips, um eine Art von Problem zu sehen, oder auf **Alle**.",
+        "Was als Problem gilt, legen Sie in den [Einstellungen → Qualitätsprüfung](#settings.quality) fest. Das Ändern eines Kriteriums aktualisiert die Ergebnisse sofort, ohne erneut zu prüfen.",
+        "- **Zur Warteschlange hinzufügen** konvertiert die ausgewählten Dateien mit der gewählten Voreinstellung (nur Dateien in einem Quellordner).",
+        "- **CSV exportieren** lädt die ausgewählten Dateien (oder alle aufgelisteten) als Tabelle herunter.",
+        "Die letzten 20 Ergebnisse werden aufbewahrt; wählen Sie eines unter **Ergebnis**. Eine Prüfung kann laufen, während Dateien konvertiert werden."
+      ],
+      "see": [
+        "quality.issues",
+        "settings.quality",
+        "quality.folders"
+      ]
+    },
+    "quality.folders": {
+      "title": "Auswählen, was geprüft wird",
+      "body": [
+        "Der Bereich „Ordner“ zeigt jeden Quellordner und den Zielordner; wählen Sie einen in der Liste oben.",
+        "Setzen Sie Häkchen bei Ordnern und Dateien (Strg-Klick und Umschalt-Klick wählen mehrere aus) und klicken Sie auf **Qualität prüfen**. Ein Ordner umfasst alles darin. Dateien, die zu den Wörtern aus [Ordner hinzufügen](#settings.adding) passen (wie „sample“), werden übersprungen."
+      ],
+      "see": [
+        "quality.overview",
+        "download.overview"
+      ]
+    },
+    "quality.issues": {
+      "title": "Qualitätsprobleme",
+      "body": [
+        "- **Altes Format** (Container / Videocodec / Audiocodec): Formate aus den Listen in den [Einstellungen](#settings.quality), wie `.avi`, MPEG-4 Part 2 (DivX, Xvid), MPEG-2, WMV oder RealVideo.",
+        "- **Niedrige Auflösung**: unter der niedrigsten akzeptablen Auflösung. Breitbildfilme mit abgeschnittenen schwarzen Balken (z. B. 1920×800) zählen nach ihrer Breite, also als 1080p.",
+        "- **Niedrige Bitrate**: Die Videobitrate liegt unter dem Minimum für ihre Auflösung. HEVC, AV1 und VP9 brauchen weniger, ihr Minimum ist also niedriger. **~** bedeutet, dass die Bitrate aus der Dateigröße geschätzt wurde, weil die Datei sie nicht angibt.",
+        "- **Interlaced**: nur wenn in den Einstellungen eingeschaltet.",
+        "- **Nicht lesbar**: ffprobe konnte die Datei nicht lesen, oder sie hat kein Video."
+      ],
+      "see": [
+        "settings.quality"
+      ]
+    },
+    "settings.quality": {
+      "title": "Kriterien der Qualitätsprüfung",
+      "body": [
+        "Was die [Qualitätsprüfung](#quality.overview) markiert. Listen werden durch Kommas getrennt.",
+        "- **Niedrigste akzeptable Auflösung**: Dateien darunter werden markiert. Die Auflösung berücksichtigt auch die Breite, sodass zugeschnittene Breitbildfilme ihre Klasse behalten.",
+        "- **Niedrigste akzeptable Videobitrate**: ein Wert pro Auflösungsklasse (SD, 720p, 1080p, 4K) für H.264, MPEG-4 und ähnliche Codecs; 0 schaltet die Prüfung für diese Klasse aus.",
+        "- **Effiziente Codecs** (standardmäßig HEVC, AV1, VP9) brauchen nur den angegebenen Prozentsatz dieser Bitraten. Mit den Standardwerten braucht eine 1080p-HEVC-Datei 1500 kbps statt 2500.",
+        "- **Alte Videocodecs**, **Alte Audiocodecs** und **Alte Container**: Namen, wie ffprobe sie meldet (`mpeg4`, `msmpeg4v3`, `wmav2` …), und Dateiendungen (`avi`, `wmv` …). Leeren Sie eine Liste, um diese Prüfung auszuschalten.",
+        "- **Interlaced-Video markieren**: standardmäßig aus, weil viele TV-Aufnahmen absichtlich interlaced sind."
+      ],
+      "see": [
+        "quality.issues",
+        "quality.overview"
+      ]
+    },
+    "download.overview": {
+      "title": "Dateien herunterladen",
+      "body": [
+        "Kopiert Dateien vom Server auf Ihren Computer: aus jedem Quellordner oder dem Zielordner, in jedem Bereich, der Ordner auflistet (Quellen, Umbenennen, Zusammenführen und Qualität).",
+        "- Zeigen Sie auf eine Datei oder einen Ordner und klicken Sie auf den Download-Pfeil, oder setzen Sie bei mehreren ein Häkchen und klicken Sie auf **Herunterladen**.",
+        "- **Eine Datei** wird sofort heruntergeladen. Die eigene Download-Liste des Browsers zeigt den Fortschritt, und ein unterbrochener Download kann dort fortgesetzt werden.",
+        "- **Ein Ordner** (Unterordner eingeschlossen) kommt als **eine ZIP-Datei**, die die Ordner darin beibehält. Die Dateien werden unverändert abgelegt, nicht komprimiert, sodass der Download sofort beginnt und der Browser die Größe kennt. Ein unterbrochener ZIP-Download muss von vorn beginnen.",
+        "- **Mehrere Dateien** können als eine ZIP-Datei oder als einzelne Dateien kommen. Bei einzelnen Dateien fragt Ihr Browser eventuell einmal, ob die Seite mehrere Dateien herunterladen darf.",
+        "Eine konvertierte Datei lässt sich auch aus ihren Auftragsdetails herunterladen (**konvertierte Datei herunterladen**). Versteckte Dateien und unfertige Konvertierungen (`.part`) bleiben in ZIP-Dateien außen vor."
+      ],
+      "see": [
+        "convert.sources",
+        "upload.overview"
+      ]
+    },
+    "delete.overview": {
+      "title": "Quelldateien löschen",
+      "body": [
+        "Entfernt Dateien oder Ordner aus einem Quellordner auf dem Server, zum Beispiel einen Download, den Sie fertig konvertiert haben.",
+        "1. Setzen Sie unter **Konvertieren** in den [Quellen](#convert.sources) Häkchen bei den Dateien oder Ordnern.",
+        "1. Klicken Sie auf **Löschen** (oder drücken Sie die Entf-Taste).",
+        "1. Die Bestätigung zeigt genau, was verschwindet: wie viele Dateien, wie viel Speicherplatz und alles in einem gewählten Ordner. Klicken Sie zur Bestätigung auf **Löschen**; **Abbrechen** ist vorausgewählt.",
+        "Das Löschen lässt sich nicht rückgängig machen. Seedet ein Download-Client wie Deluge die Dateien noch, meldet er sie als fehlend.",
+        "### Was abgelehnt wird",
+        "- Dateien, die in der Warteschlange stehen, konvertiert werden oder angehalten sind, und Ordner, die eine enthalten. Entfernen Sie sie zuerst aus der Warteschlange.",
+        "- Alles in einem Quellordner, der in den [Einstellungen](#settings.folders) mit **Schützen** markiert ist.",
+        "- Ein Quellordner selbst (entfernen Sie ihn stattdessen aus der Liste in den [Einstellungen](#settings.folders); das löscht nichts).",
+        "- Alles im Zielordner: Konvertierte Dateien werden von hier aus nicht gelöscht."
+      ],
+      "see": [
+        "convert.sources",
+        "settings.folders"
+      ]
+    },
+    "backup.overview": {
+      "title": "Sicherung und Wiederherstellung",
+      "body": [
+        "Eine Sicherung enthält die eigenen Daten der App: Einstellungen (Ordner, Qualitätskriterien …), Voreinstellungen, Umbenennungsregelsätze, die Auftragsliste und den Verlauf, den Umbenennungsverlauf, Zusammenführungen und Ergebnisse der Qualitätsprüfung. Optional enthält sie auch das HandBrake-Protokoll jedes Auftrags. Videodateien sind nie Teil davon.",
+        "Sie finden sie in den [Einstellungen](#settings.folders) → **Sicherung und Wiederherstellung**.",
+        "- **Sicherung herunterladen** speichert eine ZIP-Datei auf Ihrem Computer.",
+        "- **Auf dem Server speichern** legt eine im Datenordner der App ab (`data/backups`). Die neuesten 10 werden aufbewahrt.",
+        "### Wiederherstellen",
+        "1. **Sicherungsdatei wählen…** von Ihrem Computer, oder wählen Sie eine unter **Sicherungen auf dem Server**.",
+        "1. Prüfen Sie, was sie enthält: Die Tabelle vergleicht die Sicherung mit den aktuellen Daten, und Ordner, die auf diesem Server nicht existieren, werden angezeigt.",
+        "1. Wählen Sie **Nur Konfiguration** (Einstellungen, Voreinstellungen und Umbenennungsregeln; Aufträge und Verlauf bleiben) oder **Alles** (auch Aufträge und ihre Protokolle, Verläufe, Zusammenführungen und Qualitätsergebnisse).",
+        "1. Klicken Sie auf **Wiederherstellen…** und bestätigen Sie. Danach wird die Seite neu geladen.",
+        "Vor jeder Wiederherstellung werden die aktuellen Daten als **Vor einer Wiederherstellung** auf dem Server gespeichert, sodass sich eine Wiederherstellung durch Wiederherstellen dieser Sicherung rückgängig machen lässt.",
+        "Eine Wiederherstellung startet nie die Warteschlange. **Alles** lässt sich nicht wiederherstellen, solange eine Konvertierung, Zusammenführung, Qualitätsprüfung oder ein Upload läuft.",
+        "Das E-Mail-Passwort für [Benachrichtigungen](#settings.notifications) gehört zu den Einstellungen und ist deshalb in jeder Sicherung enthalten: Bewahren Sie Sicherungsdateien an einem privaten Ort auf."
+      ],
+      "see": [
+        "settings.folders",
+        "backup.schedule"
+      ]
+    },
+    "queue.eta": {
+      "title": "Wie lange die Warteschlange noch braucht",
+      "body": [
+        "Über den Aufträgen zeigt die Warteschlange, wie viel Konvertierungszeit noch bleibt und wann sie fertig ist; jeder wartende Auftrag zeigt seine eigene Schätzung, die obere Leiste die Gesamtzeit.",
+        "Die Schätzung ist die Länge jeder Quelle × wie schnell dieser Server ähnliche Dateien zuvor konvertiert hat: der Median der letzten 20 Konvertierungen mit **derselben Voreinstellung** (Encodierung plus [Prüfung nach der Konvertierung](#verify.overview)). Gibt es für eine Voreinstellung keinen Verlauf, werden alle Voreinstellungen zusammen verwendet; gibt es gar keinen Verlauf, die Geschwindigkeit des Auftrags, der gerade konvertiert wird.",
+        "- Ein Auftrag, dessen Quelle noch nicht gelesen wurde, erhält die durchschnittliche Länge der anderen („einige Längen geschätzt“).",
+        "- Bei einem [Zeitfenster](#settings.schedule) richtet sich die Fertigstellungszeit danach: Aufträge starten nur innerhalb des Fensters, und einer, der beim Schließen konvertiert wird, wird zuerst fertiggestellt.",
+        "- Andere Arbeit auf dem Server (Transcodierung durch den Medienserver, eine Qualitätsprüfung) bremst Konvertierungen, betrachten Sie die Zeit also als Richtwert."
+      ],
+      "see": [
+        "queue.state",
+        "stats.overview",
+        "settings.schedule"
+      ]
+    },
+    "settings.schedule": {
+      "title": "Zeitfenster",
+      "body": [
+        "Konvertiert nur zu bestimmten Zeiten, z. B. über Nacht, damit das Encodieren tagsüber einen Medienserver oder andere Dienste nicht ausbremst.",
+        "- **Öffnet um / Schließt um**: Liegt die Schließzeit vor der Öffnungszeit (23:00 → 07:00), läuft das Zeitfenster über Nacht. Dieselbe Zeit für beide bedeutet ganztägig.",
+        "- **Tage** sind die Tage, an denen das Zeitfenster **öffnet**: Freitag mit 23:00 → 07:00 endet am Samstagmorgen.",
+        "- Außerhalb des Zeitfensters startet die Warteschlange keinen neuen Auftrag. Ein Auftrag, der beim Schließen des Zeitfensters konvertiert wird, wird zuerst fertiggestellt.",
+        "- **Warteschlange automatisch starten, wenn das Zeitfenster öffnet**: Warten Aufträge und ist die Warteschlange gestoppt, startet sie, wenn das Zeitfenster öffnet. Ein Klick auf Stopp während des Zeitfensters wird bis zur nächsten Öffnung respektiert.",
+        "Die obere Leiste zeigt den Zustand des Zeitfensters (offen bis … oder wann es das nächste Mal öffnet); klicken Sie darauf, um hierher zu gelangen.",
+        "Das Zeitfenster folgt der **Uhr des Servers**. Weicht die Zeitzone des Servers von Ihrer ab, weist diese Seite darauf hin: Setzen Sie `TZ` in der `.env` des Servers (z. B. `TZ=Europe/London`) und starten Sie den Container neu."
+      ],
+      "see": [
+        "queue.state",
+        "queue.eta",
+        "settings.watch"
+      ]
+    },
+    "settings.watch": {
+      "title": "Überwachte Ordner",
+      "body": [
+        "Neue Videos, die in einem überwachten Ordner erscheinen, werden von selbst zur Warteschlange hinzugefügt, mit der für diesen Ordner gewählten Voreinstellung (oder der Standardvoreinstellung).",
+        "Es gibt zwei Wege, einen hinzuzufügen: **Überwachen** neben dem Ordnerpfad im Bereich „Quellen“ (Konvertieren) überwacht den geöffneten Ordner mit der Standardvoreinstellung, oder **Überwachten Ordner hinzufügen…** hier, was einen Ordnerbrowser öffnet (**Durchsuchen…** ändert den Ordner einer vorhandenen Zeile). Im Bereich „Quellen“ zeigen überwachte Ordner ein Auge, und der geöffnete Ordner zeigt **Überwacht**; klicken Sie darauf, um hierher zu gelangen.",
+        "- Ein überwachter Ordner muss in einem der [Quellordner](#settings.folders) liegen. Überwachte Ordner dürfen nicht ineinander liegen.",
+        "- Dateien, die beim Hinzufügen schon in einem Ordner liegen, bleiben **unberührt**; ziehen Sie sie selbst in die Warteschlange, wenn Sie sie möchten. Jede Datei wird **einmal** hinzugefügt, auch wenn Sie ihren Auftrag später entfernen.",
+        "- Eine Datei wird erst hinzugefügt, nachdem sie sich für die eingestellte Ruhezeit (standardmäßig 10 Minuten) **nicht mehr geändert** hat, sodass laufende Downloads und Kopiervorgänge nicht aufgenommen werden. Die Ordner werden alle paar Minuten angesehen, weil Dateisystemereignisse über NFS oder SMB nicht ankommen.",
+        "- Überwachen Sie bei einem Download-Client den Ordner, in den **abgeschlossene** Downloads verschoben werden, nicht den, in den er herunterlädt: Ein angehaltener Download könnte sonst fertig aussehen.",
+        "- Es gelten die üblichen Regeln fürs Hinzufügen: Ausschlusswörter wie `sample`, Videoendungen und „Bereits konvertierte Dateien überspringen“.",
+        "- **Warteschlange nach dem Hinzufügen von Dateien starten**: Sonst warten sie auf **Starten**. Bei einem [Zeitfenster](#settings.schedule) wartet die Warteschlange dann auf das Fenster.",
+        "**Aktivität** zeigt Dateien, die noch zur Ruhe kommen müssen, die zuletzt hinzugefügten oder übersprungenen Dateien und Probleme wie einen fehlenden Ordner. **Jetzt suchen** prüft sofort."
+      ],
+      "see": [
+        "settings.schedule",
+        "settings.notifications",
+        "settings.adding"
+      ]
+    },
+    "settings.notifications": {
+      "title": "Benachrichtigungen",
+      "body": [
+        "Der Server kann Ihnen mitteilen, wenn die Warteschlange fertig ist, eine Konvertierung oder ihre Prüfung fehlschlägt, jede Datei konvertiert ist, ein überwachter Ordner Dateien hinzufügt oder eine geplante Sicherung fehlschlägt. Wählen Sie die Ereignisse oben aus; E-Mail und die Webhooks folgen dieser Liste, sofern ein Webhook keine eigene hat.",
+        "### Webhooks",
+        "Ein JSON-`POST` pro Nachricht an eine URL: ein n8n-**Webhook**-Node, ein Home-Assistant-Webhook-Trigger, ntfy, Gotify … Fügen Sie so viele hinzu, wie Sie brauchen (bis zu 10), mit **Webhook hinzufügen**; jeder hat einen Namen, einen Ein/Aus-Schalter, seine URL und optionale zusätzliche Header, z. B. `Authorization: Bearer …`, einen pro Zeile.",
+        "- Jeder Webhook erhält **Die oben gewählten Ereignisse** oder **Nur diese Ereignisse**: zum Beispiel alles an n8n, aber nur „Die Warteschlange ist fertig“ an Home Assistant.",
+        "- Der Body enthält `event`, `title`, `message` (Klartext), `url` (die Adresse der App, falls gesetzt), `at` und `data` (die Details des Auftrags oder des Durchlaufs).",
+        "### E-Mail",
+        "Wird über Ihren SMTP-Server gesendet. Typische Einstellungen: **STARTTLS** auf Port 587, **TLS** auf 465. Verwenden Sie bei Gmail und Outlook ein **App-Passwort**, nicht Ihr normales.",
+        "- Das Passwort wird auf dem Server gespeichert und nie an den Browser zurückgesendet; lassen Sie das Feld leer, um es zu behalten.",
+        "- Es gehört zu den Einstellungen und ist deshalb in [Sicherungen](#backup.overview) enthalten.",
+        "**Test senden** verwendet, was auf dem Bildschirm steht, noch vor dem Speichern. **Zuletzt gesendet** listet die letzten Nachrichten und eventuelle Fehler auf.",
+        "### Dieser Browser",
+        "Der Tab-Titel zeigt immer den Fortschritt („42 % · Show S01e02.mkv“, „✓ Warteschlange fertig“). Desktop-Benachrichtigungen können erscheinen, während der Tab im Hintergrund ist; Browser erlauben sie nur auf `https://`-Seiten oder `localhost`, nutzen Sie bei einer einfachen `http://`-Adresse also stattdessen E-Mail oder einen Webhook."
+      ],
+      "see": [
+        "settings.watch",
+        "queue.state",
+        "backup.overview"
+      ]
+    },
+    "stats.overview": {
+      "title": "Statistik",
+      "body": [
+        "Was der Server im gewählten Zeitraum konvertiert hat: Dateien, gesparter Speicherplatz, Länge des konvertierten Videos und der dafür nötige Aufwand sowie die Geschwindigkeit (× Echtzeit: 2× bedeutet, dass eine Stunde Video 30 Minuten gedauert hat, Prüfung eingeschlossen).",
+        "- **Konvertierte Dateien pro Tag** (oder pro Monat bei langen Zeiträumen): Zeigen Sie auf eine Säule, um ihre Details zu sehen, oder wechseln Sie zu **Tabelle**.",
+        "- **Prüfung nach der Konvertierung**: wie viele konvertierte Dateien die [Prüfung](#verify.overview) bestanden haben, Warnungen hatten oder fehlgeschlagen sind.",
+        "- **Nach Voreinstellung**: vergleichen Sie Voreinstellungen nach Geschwindigkeit und Größenreduzierung.",
+        "Jede begonnene Konvertierung wird aufgezeichnet, wenn sie endet. **Erledigte entfernen** in der Warteschlange entfernt sie nicht aus diesen Zahlen. Derselbe Verlauf liefert die [Fertigstellungszeit der Warteschlange](#queue.eta)."
+      ],
+      "see": [
+        "queue.eta",
+        "presets"
+      ]
+    },
+    "backup.schedule": {
+      "title": "Geplante Sicherungen",
+      "body": [
+        "Erstellt jeden Tag oder jede Woche zur gewählten Zeit von selbst eine [Sicherung](#backup.overview) und behält die neuesten (standardmäßig 14). Ältere geplante Sicherungen werden gelöscht; andere Dateien im Ordner werden nie angetastet.",
+        "- **Ordner auf dem Server**: Leer bedeutet das eigene `data/backups` der App. Um Sicherungen nicht auf dem Server zu halten, verwenden Sie eine darauf eingebundene Netzwerkfreigabe, z. B. einen Ordner auf dem NAS. Mit Docker muss der Ordner in dem Ordner liegen, der in den Container eingebunden ist (`MEDIA_DIR`, meist `/mnt`). **Durchsuchen…** wählt einen Ordner unter den Quell- oder Zielordnern; jeder andere Pfad kann eingegeben werden.",
+        "- Der Ordner muss existieren und beschreibbar sein, wenn Sie den Zeitplan einschalten.",
+        "- War der Server zum Zeitpunkt der Sicherung aus oder die Freigabe nicht eingebunden, wird die Sicherung so bald wie möglich erstellt. Eine fehlgeschlagene Sicherung wird nach 30 Minuten erneut versucht und kann eine [Benachrichtigung](#settings.notifications) senden („Eine geplante Sicherung ist fehlgeschlagen“).",
+        "- Jede Datei wird unter einem temporären Namen geschrieben und nach Fertigstellung umbenannt, sodass im Ordner nie eine halb geschriebene Sicherung erscheint.",
+        "- **Jetzt sichern** erstellt sofort eine mit den gespeicherten Einstellungen.",
+        "Geplante Sicherungen stehen unter **Vom Zeitplan aufbewahrt**, wo sie wie die anderen wiederhergestellt, heruntergeladen oder gelöscht werden können.",
+        "Die Sicherung enthält die Einstellungen, also auch das E-Mail-Passwort für Benachrichtigungen: Halten Sie den Ordner privat."
+      ],
+      "see": [
+        "backup.overview",
+        "settings.notifications"
+      ]
+    },
+    "presets.editor": {
+      "title": "Eine Voreinstellung bearbeiten",
+      "body": [
+        "Der Editor funktioniert wie die HandBrake-Desktop-App. Name, Kategorie und Beschreibung stehen oben; die Einstellungen sind in Tabs:",
+        "- **Übersicht**: der Container (MP4, MKV, WebM, MOV), Web-Optimierung, Kapitelmarken und Metadaten.",
+        "- **Bildgröße**: Drehen und Spiegeln, Zuschneiden (automatisch entfernt schwarze Balken), das **Auflösungslimit** (größere Quellen werden darauf herunterskaliert), anamorph und Ränder.",
+        "- **Filter**: Detelecine, Interlace-Erkennung und Deinterlacing, Deblock, Rauschunterdrückung, Chroma-Glättung, Schärfen, Farbraum und Graustufen. Ein auf **Benutzerdefiniert** gestellter Filter übernimmt HandBrakes eigene Einstellungen im Format `key=value:key=value`.",
+        "- **Video**: der Encoder, die Bildrate, die Qualität (konstante Qualität oder durchschnittliche Bitrate) und die Voreinstellung, Tune, Profil, Level und erweiterten Optionen des Encoders.",
+        "- **Audio**: welche Quellspuren behalten werden (nach Sprache), die Encoder, die jede Spur erhält, Auto-Passthru und Spurnamen.",
+        "- **Untertitel**: welche Untertitelspuren behalten werden, Scan nach fremdsprachigem Ton, Closed Captions und Einbrennen.",
+        "- **JSON**: jede Einstellung so, wie HandBrake sie speichert, für die wenigen, die die Tabs nicht zeigen. **Ins Formular übernehmen** übernimmt Ihre JSON-Änderungen.",
+        "Die Encoder und ihre Listen für Voreinstellung, Tune, Profil und Level stammen vom HandBrakeCLI dieses Servers, der Editor bietet also nur an, was dieser ausführen kann. Encoder, die nicht in den gewählten Container passen, sind ausgegraut.",
+        "### Speichern",
+        "- **Speichern** ersetzt die Voreinstellung. **Als neu speichern…** lässt sie, wie sie war, und speichert Ihre Änderungen als neue Voreinstellung.",
+        "- Beim Öffnen einer Voreinstellung lässt der Server sie von HandBrakeCLI einlesen, sodass Voreinstellungen aus älteren HandBrake-Versionen aktualisiert und alle Einstellungen ausgefüllt werden. Beim Speichern wird die Voreinstellung erneut mit HandBrakeCLI geprüft.",
+        "- Probleme werden über den Tabs aufgelistet. Ein rotes (z. B. ein H.265-Encoder mit einem WebM-Container) muss vor dem Speichern behoben werden; ein gelbes ist eine Warnung, z. B. ein Encoder, den dieser Server nicht hat.",
+        "- Aufträge, die schon in der Warteschlange sind, behalten die Einstellungen, mit denen sie hinzugefügt wurden. Überwachte Ordner verwenden die neuen Einstellungen für Dateien, die sie ab jetzt hinzufügen.",
+        "- Beim Verlassen mit nicht gespeicherten Änderungen wird zuerst gefragt."
+      ],
+      "see": [
+        "presets",
+        "presets.new",
+        "presets.qsv"
+      ]
+    },
+    "presets.new": {
+      "title": "Neue Voreinstellung",
+      "body": [
+        "**Neu** (Seite „Voreinstellungen“) erstellt eine Voreinstellung und öffnet sie im [Editor](#presets.editor).",
+        "- **Einer HandBrake-Voreinstellung**: eine der in HandBrake eingebauten Voreinstellungen, wie „Fast 1080p30“, „H.265 MKV 1080p30“ oder die Geräte-Voreinstellungen. Die Liste stammt vom HandBrakeCLI dieses Servers.",
+        "- **Einer Ihrer Voreinstellungen**: eine Kopie, wie bei **Duplizieren**.",
+        "Geben Sie einen Namen ein (und optional eine Kategorie, die Voreinstellungen in der Liste gruppiert, sowie eine Beschreibung). Zwei Voreinstellungen können nur in verschiedenen Kategorien denselben Namen haben.",
+        "Die neue Voreinstellung wird sofort gespeichert: Ändern Sie sie im Editor oder löschen Sie sie, wenn Sie es sich anders überlegen."
+      ],
+      "see": [
+        "presets",
+        "presets.editor"
+      ]
+    }
+  }
+}

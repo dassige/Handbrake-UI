@@ -1,0 +1,21 @@
+{
+  "ago": {
+    "justNow": "gerade eben",
+    "minutes_one": "vor {count} Min.",
+    "minutes_other": "vor {count} Min.",
+    "hours_one": "vor {count} Std.",
+    "hours_other": "vor {count} Std."
+  },
+  "duration": {
+    "daysHours": "{days} T {hours} Std.",
+    "hoursMinutes": "{hours} Std. {minutes} Min.",
+    "hours": "{hours} Std.",
+    "minutes": "{minutes} Min.",
+    "seconds": "{seconds} s"
+  },
+  "clock": {
+    "tomorrow": "morgen {time}",
+    "weekday": "{day} {time}",
+    "date": "{date} {time}"
+  }
+}

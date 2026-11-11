@@ -1,0 +1,16 @@
+{
+  "dialog": {
+    "summary_one": "{count} fichier, {size} au total.",
+    "summary_other": "{count} fichiers, {size} au total.",
+    "summaryFolders_one": "{count} fichier, {size} au total, provenant des dossiers choisis et de leurs sous-dossiers.",
+    "summaryFolders_other": "{count} fichiers, {size} au total, provenant des dossiers choisis et de leurs sous-dossiers.",
+    "separateHint": "Les fichiers séparés peuvent être mis en pause et repris dans le navigateur ; votre navigateur peut demander une fois si ce site peut télécharger plusieurs fichiers.",
+    "zipHint": "Un seul fichier ZIP (<code>{name}</code>) conserve les dossiers, mais un téléchargement ZIP interrompu doit recommencer depuis le début.",
+    "separate": "Fichiers séparés",
+    "zip": "Un seul ZIP ({size})"
+  },
+  "title": {
+    "folder": "Télécharger le dossier « {name} » en ZIP",
+    "file": "Télécharger « {name} »"
+  }
+}

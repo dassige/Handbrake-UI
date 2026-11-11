@@ -1,0 +1,81 @@
+{
+  "views": {
+    "label": "View",
+    "convert": "Convert",
+    "rename": "Rename",
+    "merge": "Merge",
+    "quality": "Quality",
+    "stats": "Stats",
+    "presets": "Presets",
+    "settings": "Settings"
+  },
+  "panes": {
+    "sources": "Sources",
+    "queue": "Queue",
+    "queueCount": "Queue ({n})"
+  },
+  "leave": {
+    "settingsTitle": "Unsaved settings",
+    "settingsMessage": "Leave Settings without saving? Your changes will be lost.",
+    "presetTitle": "Unsaved preset",
+    "presetMessage": "Leave the preset editor without saving? Your changes will be lost.",
+    "confirm": "Leave without saving"
+  },
+  "add": {
+    "noPreset": "Make or import a preset first",
+    "skippedReason_one": "{count} {reason}",
+    "skippedReason_other": "{count} {reason}",
+    "added_one": "Added {count} file",
+    "added_other": "Added {count} files",
+    "addedSkipped_one": "Added {count} file · skipped: {skipped}",
+    "addedSkipped_other": "Added {count} files · skipped: {skipped}",
+    "nothing": "Nothing added",
+    "nothingSkipped": "Nothing added: {skipped}"
+  },
+  "watch": {
+    "title": "Watch this folder?",
+    "message": "New videos that appear in {path} will be added to the queue by themselves.",
+    "messagePreset": "New videos that appear in {path} will be added to the queue by themselves, with the default preset ({preset}).",
+    "note": "Files already in it are left alone. Change the preset and the other options in Settings → Watch folders.",
+    "noteOff": "Files already in it are left alone. Watching is off, so this turns it on. Change the preset and the other options in Settings → Watch folders.",
+    "confirm": "Watch",
+    "done": "Watching the folder"
+  },
+  "outsideWindow": {
+    "title": "Outside the conversion window",
+    "opensAt": "The conversion window opens {time}.",
+    "opensLater": "The conversion window opens later.",
+    "note": "“Start now” converts the whole queue straight away, ignoring the window until the queue stops.",
+    "startNow": "Start now",
+    "wait": "Wait for the window",
+    "startsAt": "The queue starts {time}"
+  },
+  "state": {
+    "running": "Queue running",
+    "stopped": "Queue stopped",
+    "waitingFor": "Waiting for {time}",
+    "stopTitle": "Finish the current job, then stop",
+    "startTitle": "Start converting queued jobs",
+    "stopAfterCurrent": "Stop after current",
+    "queued_one": "{count} queued",
+    "queued_other": "{count} queued",
+    "done_one": "{count} done",
+    "done_other": "{count} done",
+    "failed_one": "{count} failed",
+    "failed_other": "{count} failed",
+    "left": "≈ {duration} left",
+    "doneAround": "Done around {time}"
+  },
+  "window": {
+    "openUntilTitle": "Conversion window open until {time}",
+    "openTitle": "Conversion window open",
+    "closedTitle": "Conversion window closed; opens {time}",
+    "until": "until {time}",
+    "open": "open"
+  },
+  "offline": "offline",
+  "offlineTitle": "Live updates disconnected; retrying",
+  "handbrakeMissing": "HandBrakeCLI is not available: {error}",
+  "noPresets": "No presets yet. {link} to start converting.",
+  "noPresetsLink": "Make or import a preset"
+}

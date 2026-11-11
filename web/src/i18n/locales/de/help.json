@@ -1,0 +1,13 @@
+{
+  "help": "Hilfe",
+  "helpFor": "Hilfe: {title}",
+  "searchHelp": "Hilfe durchsuchen",
+  "related": "Siehe auch:",
+  "searchPlaceholder": "Suchbegriffe, z. B. Audio Prüfung",
+  "allTopics_one": "{count} Thema, von A bis Z",
+  "allTopics_other": "Alle {count} Themen, von A bis Z",
+  "hits_one": "{count} Thema enthält alle Wörter",
+  "hits_other": "{count} Themen enthalten alle Wörter, die besten zuerst",
+  "noHits": "Kein Thema enthält alle Wörter: Versuchen Sie es mit weniger oder anderen Wörtern.",
+  "topics": "Hilfethemen"
+}

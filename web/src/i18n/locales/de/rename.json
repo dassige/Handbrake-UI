@@ -1,0 +1,199 @@
+{
+  "quoted": "„{text}“",
+  "flags": {
+    "regex": "Regex",
+    "ext": "Ext.",
+    "nameExt": "Name+Ext."
+  },
+  "fields": {
+    "type": "Typ",
+    "typeAuto": "Auto (Serie oder Film)",
+    "typeTv": "Serie",
+    "typeMovie": "Film",
+    "tvTemplate": "Vorlage für Serien — {tokens}",
+    "movieTemplate": "Vorlage für Filme — {tokens}",
+    "titleCase": "Wörter groß schreiben (Title Case)",
+    "apostrophes": "Apostrophe korrigieren (L Uomo → L'Uomo, Wouldn T → Wouldn't)",
+    "showYear": "Jahr im Seriennamen behalten (Remakes)",
+    "extraReleaseTags": "Weitere zu entfernende Release-Tags (kommagetrennt)",
+    "extraTags": "Weitere Tags (kommagetrennt)",
+    "find": "Suchen",
+    "replaceWith": "Ersetzen durch (Regex-Gruppen: $1, $2…)",
+    "regex": "Regulärer Ausdruck",
+    "caseSensitive": "Groß-/Kleinschreibung beachten",
+    "occurrence": "Vorkommen",
+    "occurrenceAll": "Alle",
+    "occurrenceFirst": "Erstes",
+    "occurrenceLast": "Letztes",
+    "applyTo": "Anwenden auf",
+    "applyToName": "Name",
+    "applyToExt": "Endung",
+    "applyToBoth": "Name und Endung",
+    "pattern": "Muster",
+    "text": "Text",
+    "keepText": "Den Text selbst behalten",
+    "fromPosition": "Ab Position (1 = erstes)",
+    "count": "Anzahl",
+    "backwards": "Vom Ende zählen",
+    "position": "Position (0 = Anfang)",
+    "toPosition": "Zur Position",
+    "characters": "An beiden Enden zu entfernende Zeichen",
+    "case": "Schreibweise",
+    "caseTitle": "Title Case",
+    "caseUpper": "GROSS",
+    "caseLower": "klein",
+    "caseSentence": "Satzanfang groß"
+  },
+  "steps": {
+    "smart": {
+      "label": "Episode / Film erkennen",
+      "help": "Findet S01E02 oder 1x02 (Serie) oder ein Jahr (Film), entfernt Release-Tags und baut den Namen aus einer Vorlage. [ ]-Blöcke verschwinden, wenn ein Feld darin leer ist.",
+      "modeAuto": "auto",
+      "modeTv": "Serie",
+      "modeMovie": "Film"
+    },
+    "cleanTags": {
+      "label": "Release-Tags entfernen",
+      "help": "Schneidet den Namen beim ersten Release-Tag ab (1080p, WEB-DL, x265, ITA…).",
+      "builtIn": "integrierte Tag-Liste"
+    },
+    "replace": {
+      "label": "Ersetzen",
+      "first": "erstes",
+      "last": "letztes"
+    },
+    "removePattern": {
+      "label": "Muster entfernen"
+    },
+    "removeAfter": {
+      "label": "Alles nach einem Text entfernen",
+      "summary": "nach {text}",
+      "summaryInclusive": "nach {text} (einschließlich)"
+    },
+    "remove": {
+      "label": "Zeichen entfernen",
+      "summary": "{count} ab Position {start}",
+      "summaryFromEnd": "{count} ab Position {start} (vom Ende)"
+    },
+    "add": {
+      "label": "Text einfügen",
+      "summary": "{text} an {position}",
+      "summaryFromEnd": "{text} an {position} vom Ende"
+    },
+    "move": {
+      "label": "Zeichen verschieben",
+      "summary": "{count} Zeichen von {from} nach {to}"
+    },
+    "trim": {
+      "label": "Zeichen abschneiden"
+    },
+    "case": {
+      "label": "Schreibweise ändern",
+      "title": "Title Case",
+      "upper": "groß",
+      "lower": "klein",
+      "sentence": "Satzanfang"
+    },
+    "apostrophes": {
+      "label": "Apostrophe korrigieren",
+      "help": "L Uomo → L'Uomo, Dell Oca → Dell'Oca, Wouldn T → Wouldn't, Holston S → Holston's",
+      "summary": "L Uomo → L'Uomo"
+    },
+    "collapseSpaces": {
+      "label": "Leerzeichen zusammenfassen",
+      "summary": "mehrere Leerzeichen → eines"
+    }
+  },
+  "view": {
+    "convertedFiles": "Konvertierte Dateien",
+    "renameList": "Umbenennungsliste",
+    "renameListCount": "Umbenennungsliste ({count})",
+    "addLabel": "Zum Umbenennen hinzufügen",
+    "browserHint": "Ziehen Sie Dateien oder Ordner in die Umbenennungsliste. Mit Strg/Umschalt-Klick wählen Sie mehrere aus.",
+    "rules": "Regeln",
+    "editRules": "Regeln bearbeiten",
+    "history": "Verlauf",
+    "showName": "Serienname",
+    "showNameTitle": "Verwenden, wenn der Serienname fehlt oder falsch ist, z. B. „S04E07 Reacher Title“",
+    "autoDetected": "automatisch erkannt",
+    "showNameScope": "Welche Zeilen den eingegebenen Seriennamen erhalten",
+    "onlyMissing": "nur wo er fehlt",
+    "allRows": "für alle Zeilen",
+    "resetEdits": "Änderungen zurücksetzen",
+    "resetEditsTitle": "Von Hand eingegebene Namen verwerfen",
+    "clearList": "Liste leeren",
+    "reading": "Wird gelesen…",
+    "noVideos": "Keine Videodateien gefunden.",
+    "empty": "Ziehen Sie konvertierte Dateien oder Ordner hierher, oder verwenden Sie „Umbenennen“ bei fertigen Aufträgen.",
+    "namesColumn": "Aktueller Name → neuer Name",
+    "renameFile": "{name} umbenennen",
+    "tvChip": "Serie · S{season}E{episode}",
+    "movieChip": "Film · {year}",
+    "noChange": "keine Änderung",
+    "undoEdit": "Änderung rückgängig",
+    "dropHere": "Hier ablegen, um zur Umbenennungsliste hinzuzufügen",
+    "counts": "{rename} umzubenennen · {unchanged} unverändert",
+    "needALook": "{count} zu prüfen",
+    "updating": "wird aktualisiert…",
+    "renameButton_one": "{count} Datei umbenennen",
+    "renameButton_other": "{count} Dateien umbenennen",
+    "renameButtonNone": "Dateien umbenennen",
+    "confirmTitle": "Dateien umbenennen",
+    "confirmMessage_one": "{count} Datei umbenennen?",
+    "confirmMessage_other": "{count} Dateien umbenennen?",
+    "renamed_one": "{count} Datei umbenannt · rückgängig über „Verlauf“",
+    "renamed_other": "{count} Dateien umbenannt · rückgängig über „Verlauf“",
+    "notRenamed": "{count} nicht umbenannt: {list}",
+    "addTitle": "Doppelklicken oder ziehen, um zum Umbenennen hinzuzufügen"
+  },
+  "rules": {
+    "title": "Umbenennungsregeln",
+    "use": "Diesen Regelsatz verwenden",
+    "revert": "Zurücksetzen",
+    "builtin": "integriert",
+    "new": "Neu",
+    "importTitle": "Eine Advanced-Renamer-Voreinstellung (.aren) oder einen exportierten Regelsatz importieren",
+    "importHint": "Importiert werden Advanced-Renamer-Voreinstellungen (.aren) und hier exportierte Regelsätze.",
+    "exportJson": "Als JSON exportieren",
+    "description": "Beschreibung",
+    "readOnly": "Integrierte Regelsätze sind schreibgeschützt. Mit {icon} Duplizieren erstellen Sie eine bearbeitbare Kopie.",
+    "steps": "Schritte",
+    "active": "Aktiv",
+    "moveUp": "Nach oben",
+    "moveDown": "Nach unten",
+    "deleteStep": "Schritt löschen",
+    "addStep": "Schritt hinzufügen",
+    "choose": "auswählen…",
+    "note": "Notiz",
+    "notePlaceholder": "optionale Beschreibung",
+    "tryIt": "Ausprobieren",
+    "samplesPlaceholder": "Ein Dateiname pro Zeile",
+    "showNameOptional": "Serienname (optional)",
+    "autoDetected": "automatisch erkannt",
+    "selectOrCreate": "Wählen oder erstellen Sie einen Regelsatz.",
+    "discardMessage": "Nicht gespeicherte Änderungen an diesem Regelsatz verwerfen?",
+    "discardChanges": "Änderungen verwerfen",
+    "keepEditing": "Weiter bearbeiten",
+    "saved": "Regelsatz gespeichert",
+    "newName": "Neuer Regelsatz",
+    "copyName": "{name} (Kopie)",
+    "copyCreated": "Kopie erstellt",
+    "imported": "„{name}“ importiert ({count} Schritte)",
+    "importedSkipped": "„{name}“ importiert ({count} Schritte); übersprungen: {skipped}",
+    "deleteTitle": "Regelsatz löschen",
+    "deleteMessage": "Regelsatz „{name}“ löschen?",
+    "deleted": "Regelsatz gelöscht"
+  },
+  "history": {
+    "title": "Umbenennungsverlauf",
+    "empty": "Noch nichts umbenannt.",
+    "automatic": "automatisch",
+    "undone": "rückgängig gemacht am {time}",
+    "undo": "Rückgängig",
+    "undoTitle": "Umbenennung rückgängig machen",
+    "undoMessage": "Die ursprünglichen Namen von {count} Datei(en) wiederherstellen?",
+    "restoreNames": "Namen wiederherstellen",
+    "restored": "{count} Datei(en) wiederhergestellt",
+    "restoredWithErrors": "{count} Datei(en) wiederhergestellt; {errors} konnten nicht wiederhergestellt werden"
+  }
+}

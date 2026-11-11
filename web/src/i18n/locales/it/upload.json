@@ -1,0 +1,68 @@
+{
+  "dialog": {
+    "title": "Carica video",
+    "uploadTo": "Carica in",
+    "newFolder": "Nuova cartella",
+    "elsewhere": "Per caricare altrove, chiudi questa finestra e prima apri quella cartella in Sorgenti.",
+    "drop": "<strong>Rilascia qui i file video</strong> o fai clic per sceglierli su questo computer",
+    "notVideo": "non è un file video, saltato",
+    "removeFile": "Rimuovi {name}",
+    "keepOpen": "Tieni aperta questa scheda del browser finché i caricamenti non sono finiti. Nel frattempo puoi continuare a lavorare. Se un caricamento si interrompe, carica di nuovo lo stesso file nella stessa cartella: riprende da dove si era fermato.",
+    "chosen_one": "{count} file · {size}",
+    "chosen_other": "{count} file · {size}",
+    "noFiles": "Nessun file scelto"
+  },
+  "newFolder": {
+    "title": "Nuova cartella",
+    "message": "Crea una cartella dentro <code>{path}</code>.",
+    "label": "Nome della cartella",
+    "create": "Crea",
+    "noSlashes": "Niente barre, per favore",
+    "noDot": "Il nome non può iniziare con un punto",
+    "typeName": "Inserisci un nome"
+  },
+  "existing": {
+    "title": "Alcuni file sono già presenti",
+    "message_one": "Nella cartella c’è già un file con questo nome. I file esistenti non vengono mai sostituiti.",
+    "message_other": "Nella cartella ci sono già {count} file con questi nomi. I file esistenti non vengono mai sostituiti.",
+    "more_one": "… e {count} altro",
+    "more_other": "… e altri {count}",
+    "skip": "Saltali",
+    "copies": "Carica come copie, “nome (1)”"
+  },
+  "noSpace": {
+    "title": "Spazio insufficiente",
+    "message": "Questi file richiedono {need}, ma il server ha solo {free} liberi in quella cartella."
+  },
+  "panel": {
+    "label": "Caricamenti",
+    "uploading_one": "Caricamento · {count} rimanente",
+    "uploading_other": "Caricamento · {count} rimanenti",
+    "finished_one": "Caricamenti finiti · {count} completato",
+    "finished_other": "Caricamenti finiti · {count} completati",
+    "failed_one": "{count} non riuscito",
+    "failed_other": "{count} non riusciti",
+    "collapse": "Comprimi",
+    "expand": "Espandi",
+    "cancelTitle": "Annulla questo caricamento",
+    "cancelLabel": "Annulla {name}",
+    "retryTitle": "Riprova",
+    "retryLabel": "Riprova {name}",
+    "waiting": "In attesa · {size}",
+    "progress": "{sent} di {size}",
+    "progressSpeed_one": "{sent} di {size} · {speed}/s · {count} min rimanente",
+    "progressSpeed_other": "{sent} di {size} · {speed}/s · {count} min rimanenti",
+    "uploaded": "Caricato · {size}",
+    "cancelled": "Annullato"
+  },
+  "cancel": {
+    "title": "Annulla caricamento",
+    "message": "Interrompere il caricamento di “{name}” ed eliminare la parte già inviata?",
+    "confirm": "Annulla caricamento",
+    "keep": "Continua a caricare"
+  },
+  "errors": {
+    "retrying": "{error}; nuovo tentativo…",
+    "failed": "{name}: {error}"
+  }
+}

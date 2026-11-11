@@ -1,0 +1,13 @@
+{
+  "help": "Ayuda",
+  "helpFor": "Ayuda: {title}",
+  "searchHelp": "Buscar en la ayuda",
+  "related": "Relacionado:",
+  "searchPlaceholder": "Palabras que buscar, p. ej., audio comprobación",
+  "allTopics_one": "{count} tema, de la A a la Z",
+  "allTopics_other": "Los {count} temas, de la A a la Z",
+  "hits_one": "{count} tema contiene todas las palabras",
+  "hits_other": "{count} temas contienen todas las palabras, los mejores primero",
+  "noHits": "Ningún tema contiene todas las palabras: pruebe con menos palabras o con otras.",
+  "topics": "Temas de ayuda"
+}

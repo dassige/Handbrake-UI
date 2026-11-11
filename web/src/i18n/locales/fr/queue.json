@@ -1,0 +1,46 @@
+{
+  "title": "File d'attente",
+  "filters": {
+    "all": "Tout",
+    "active": "Actives",
+    "done": "Converties",
+    "failed": "Échouées / annulées",
+    "checkFailed": "Vérification échouée",
+    "checkFailedTitle": "Fichiers convertis dont la vérification après conversion a échoué"
+  },
+  "preset": "Préréglage",
+  "presetTitle": "Préréglage utilisé pour les fichiers que vous ajoutez",
+  "presetDefault": "{name} (par défaut)",
+  "positionTitle": "Où les nouveaux fichiers sont placés dans la file d'attente",
+  "position": {
+    "end": "à la fin",
+    "next": "en suivant"
+  },
+  "checkAllAgain": "Tout revérifier",
+  "checkAllAgainTitle": "Vérifier à nouveau ces fichiers convertis, l'un après l'autre",
+  "renameThese": "Renommer ceux-ci",
+  "renameTheseTitle": "Ouvrir les fichiers convertis dans la vue Renommer",
+  "mergeThese": "Fusionner ceux-ci",
+  "mergeTheseTitle": "Ouvrir les fichiers convertis dans la vue Fusionner",
+  "clearFinished": "Effacer les terminées",
+  "clearFinishedTitle": "Retirer de la liste les tâches converties, échouées et annulées (les fichiers ne sont pas touchés)",
+  "clearDialog": {
+    "title": "Effacer les tâches terminées",
+    "message_one": "Retirer {count} tâche terminée de la liste ? Les fichiers ne sont pas supprimés.",
+    "message_other": "Retirer {count} tâches terminées de la liste ? Les fichiers ne sont pas supprimés."
+  },
+  "noMatch": "Aucune tâche ne correspond à ce filtre.",
+  "dragHere": "Faites glisser ici des fichiers ou des dossiers depuis Sources.",
+  "dropToAdd": "Déposer pour ajouter à la file d'attente",
+  "estimate": {
+    "left": "≈ {duration} de conversion restante",
+    "notEstimated_one": "{count} tâche pas encore estimée",
+    "notEstimated_other": "{count} tâches pas encore estimées",
+    "doneAround": "terminé vers {time}",
+    "ifStartedDoneAround": "si démarrée, terminée vers {time}",
+    "waitingWindow": "En attente de la plage de conversion : démarrage {time}",
+    "windowClosed": "Plage fermée : la tâche en cours se termine, le reste attend jusqu'à {time}",
+    "windowOpenUntil": "Plage ouverte jusqu'à {time}",
+    "guessed": "(certaines durées estimées)"
+  }
+}

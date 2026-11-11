@@ -1,0 +1,64 @@
+{
+  "title": "Stats",
+  "period": "Period",
+  "ranges": {
+    "days7": "7 days",
+    "days30": "30 days",
+    "days90": "90 days",
+    "months12": "12 months",
+    "allTime": "All time"
+  },
+  "tiles": {
+    "filesConverted": "Files converted",
+    "failed": "{count} failed",
+    "cancelled": "{count} cancelled",
+    "watched": "{count} from watch folders",
+    "noneFailed": "none failed",
+    "spaceSaved": "Space saved",
+    "smaller": "{percent} smaller · {source} → {output}",
+    "videoConverted": "Video converted",
+    "ofWork": "in {time} of work",
+    "speed": "Speed",
+    "realTime": "real time",
+    "realTimeFps": "real time · {fps} fps on average"
+  },
+  "perBucket": {
+    "day": "Files converted per day",
+    "month": "Files converted per month"
+  },
+  "chart": "Chart",
+  "table": "Table",
+  "nothingConverted": "Nothing converted in this period.",
+  "checks": {
+    "title": "Check after conversion",
+    "none": "No checked files in this period.",
+    "summary": "{ok} passed, {warning} with warnings, {error} failed",
+    "ok": "Checked",
+    "warning": "Warnings",
+    "error": "Failed",
+    "unchecked": "{count} converted without a check."
+  },
+  "biggestSavings": "Biggest savings",
+  "nothingYet": "Nothing yet.",
+  "byPreset": "By preset",
+  "columns": {
+    "preset": "Preset",
+    "converted": "Converted",
+    "failed": "Failed",
+    "video": "Video",
+    "work": "Work",
+    "speed": "Speed",
+    "avgFps": "Avg fps",
+    "saved": "Saved",
+    "smaller": "Smaller",
+    "month": "Month",
+    "day": "Day"
+  },
+  "historySince": "History since {date}. Clearing jobs from the queue does not remove them from these figures.",
+  "tip": {
+    "converted": "{count} converted",
+    "convertedFailed": "{count} converted · {failed} failed",
+    "savedWork": "{saved} saved · {time} of work",
+    "column": "{date}: {count} converted"
+  }
+}

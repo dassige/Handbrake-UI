@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { api } from '../api.js';
+import { intlLocale, rich, t } from '../i18n/index.js';
 import { Card } from './fields.jsx';
 import content from './credits.json';
 
 /* global __WEB_VERSION__ */
 const WEB_VERSION = typeof __WEB_VERSION__ === 'undefined' ? {} : __WEB_VERSION__;
-
-const SUMMARY =
-  'Turns a headless Linux box into a HandBrake conversion server: pick videos on the server (or upload them), queue them with HandBrake presets (made in its preset editor or imported from the desktop app), and get checked, renamed results. It runs the official HandBrakeCLI and is not affiliated with the HandBrake project.';
+const AUTHOR = 'Gerry Dassi (DGSoft)';
 
 function External({ href, children }) {
   return (
@@ -22,7 +21,7 @@ function External({ href, children }) {
 function released(v) {
   const m = /^(\d{4})\/(\d{2})\/(\d{2})/.exec(v ?? '');
   if (!m) return v ?? null;
-  return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+  return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])).toLocaleDateString(intlLocale(), { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 /** "1.2.0 · 10 Nov 2026 12:07 · 170ad19" */
@@ -57,6 +56,7 @@ export function AboutSection({ info, onError }) {
   const current = releases.find((r) => r.version === app?.version);
   // Open the newest release, and the newest one that has notes when that differs.
   const firstWithNotes = releases.find((r) => r.notes.length);
+  const author = about?.author ?? AUTHOR;
 
   return (
     <>
@@ -65,24 +65,24 @@ export function AboutSection({ info, onError }) {
         <div className="about-hero-text">
           <h2>HandBrake Queue</h2>
           <div className="muted small">
-            Version <strong>{app?.version ?? '…'}</strong>
-            {app?.date && <> · released {released(app.date)}</>}
-            {' · '}by {about?.author ?? 'Gerry Dassi (DGSoft)'}
+            {rich('settings.about.version', { version: app?.version ?? '…' })}
+            {app?.date && <> · {t('settings.about.released', { date: released(app.date) })}</>}
+            {' · '}{t('settings.about.by', { author })}
           </div>
-          <p>{SUMMARY}</p>
+          <p>{t('settings.about.summary')}</p>
           {about && (
             <div className="about-links">
-              <External href={about.releaseNotesUrl}>Release notes for v{app?.version}</External>
-              <External href={about.releasesUrl}>All releases</External>
-              <External href={about.repositoryUrl}>Source code</External>
+              <External href={about.releaseNotesUrl}>{t('settings.about.releaseNotesFor', { version: app?.version })}</External>
+              <External href={about.releasesUrl}>{t('settings.about.allReleases')}</External>
+              <External href={about.repositoryUrl}>{t('settings.about.sourceCode')}</External>
             </div>
           )}
         </div>
       </section>
 
-      <Card title="Release notes">
+      <Card title={t('settings.about.releaseNotes')}>
         {!releases.length ? (
-          <p className="set-hint">{about ? 'No release notes found.' : 'Loading…'}</p>
+          <p className="set-hint">{about ? t('settings.about.noReleaseNotes') : t('common.loading')}</p>
         ) : (
           <div className="release-list">
             {releases.map((r, i) => (
@@ -90,12 +90,12 @@ export function AboutSection({ info, onError }) {
                 <summary>
                   <strong>v{r.version}</strong>
                   {r.date && <span className="muted small"> · {released(r.date)}</span>}
-                  {r === current && <span className="badge done">this version</span>}
+                  {r === current && <span className="badge done">{t('settings.about.thisVersion')}</span>}
                 </summary>
                 {r.notes.length ? (
                   <ul>{r.notes.map((n, j) => <li key={j}>{n.replace(/^(feat|fix|chore|docs|refactor|perf|style|test)(\([^)]*\))?:\s*/i, '')}</li>)}</ul>
                 ) : (
-                  <p className="set-hint">Version number only, no notes.</p>
+                  <p className="set-hint">{t('settings.about.versionOnly')}</p>
                 )}
               </details>
             ))}
@@ -103,13 +103,14 @@ export function AboutSection({ info, onError }) {
         )}
       </Card>
 
-      <Card title="Credits">
+      <Card title={t('settings.about.credits')}>
         <p>
-          Developed by {about?.author ?? 'Gerry Dassi (DGSoft)'} with{' '}
-          <a href="https://claude.com/claude-code" target="_blank" rel="noreferrer">Claude Code</a>, Anthropic's AI coding
-          assistant, which contributed to the code, tests and documentation.
+          {rich('settings.about.developedBy', {
+            author,
+            claudeCode: <a href="https://claude.com/claude-code" target="_blank" rel="noreferrer">Claude Code</a>,
+          })}
         </p>
-        <p className="set-hint">HandBrake Queue is built on these projects. Thank you to their authors.</p>
+        <p className="set-hint">{t('settings.about.builtOn')}</p>
         <ul className="credits">
           {content.credits.map((c) => (
             <li key={c.name}>
@@ -123,43 +124,45 @@ export function AboutSection({ info, onError }) {
         </ul>
       </Card>
 
-      <Card title="Licence">
-        <p>
-          HandBrake Queue is free software under the <strong>GNU General Public License, version 2</strong> (GPL-2.0-only).
-          HandBrakeCLI, FFmpeg and MKVToolNix are separate programs with their own licences (GPL/LGPL); the app runs them,
-          it does not include their code.
-        </p>
+      <Card title={t('settings.about.licence')}>
+        <p>{rich('settings.about.licenceText')}</p>
         {about?.licenseText && (
           <details className="set-details">
-            <summary>Read the GNU GPL, version 2</summary>
+            <summary>{t('settings.about.readGpl')}</summary>
             <pre className="code-block license-text">{about.licenseText}</pre>
           </details>
         )}
       </Card>
 
-      <Card title="This installation">
+      <Card title={t('settings.about.installation')}>
         <dl className="versions">
           <VersionRow label="HandBrake Queue" v={app} repo={about?.repositoryUrl} />
-          <VersionRow label="Server" v={about?.versions?.server} repo={about?.repositoryUrl} />
-          <VersionRow label="Web UI" v={WEB_VERSION} repo={about?.repositoryUrl} />
+          <VersionRow label={t('settings.about.server')} v={about?.versions?.server} repo={about?.repositoryUrl} />
+          <VersionRow label={t('settings.about.webUi')} v={WEB_VERSION} repo={about?.repositoryUrl} />
           <dt>HandBrakeCLI</dt>
           <dd>{hb?.error ? <span className="text-bad">{hb.error}</span> : hb?.version ?? '…'}</dd>
           <dt>Node.js</dt>
-          <dd>{about ? `${about.runtime.node} on ${about.runtime.os}${about.runtime.docker ? ' · in Docker' : ''}` : '…'}</dd>
-          <dt>Data folder</dt>
+          <dd>
+            {about
+              ? about.runtime.docker
+                ? t('settings.about.runtimeDocker', { node: about.runtime.node, os: about.runtime.os })
+                : t('settings.about.runtime', { node: about.runtime.node, os: about.runtime.os })
+              : '…'}
+          </dd>
+          <dt>{t('settings.about.dataFolder')}</dt>
           <dd className="mono">{about?.runtime.dataDir ?? '…'}</dd>
-          <dt>Server clock</dt>
+          <dt>{t('settings.about.serverClock')}</dt>
           <dd>{info?.time ? `${info.time.zone} (UTC${info.time.offset >= 0 ? '+' : '−'}${Math.abs(info.time.offset / 60)})` : '…'}</dd>
         </dl>
         {hb?.encoders?.length > 0 && (
           <>
-            <span className="set-label">Video encoders in this HandBrakeCLI</span>
+            <span className="set-label">{t('settings.about.encoders')}</span>
             <div className="chip-list">{hb.encoders.map((e) => <code key={e} className="chip">{e}</code>)}</div>
           </>
         )}
       </Card>
 
-      <p className="set-hint about-copy">© {year} {about?.author ?? 'Gerry Dassi (DGSoft)'}. Released under the GNU GPL, version 2.</p>
+      <p className="set-hint about-copy">{t('settings.about.copyright', { year, author })}</p>
     </>
   );
 }

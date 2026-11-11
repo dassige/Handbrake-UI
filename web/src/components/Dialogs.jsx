@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, HelpCircle, Info } from 'lucide-react';
 import { Modal } from './Modal.jsx';
+import { t } from '../i18n/index.js';
 
 // The app's own replacement for window.confirm / alert / prompt: every question
 // is a Modal, and every helper returns a Promise with the answer.
@@ -29,7 +30,8 @@ export function DialogProvider({ children }) {
       /** Resolves to the value of the button pressed, or `cancelValue` (default null) on Escape/close. */
       choose: ask,
       /** Resolves true or false. */
-      confirm: ({ title = 'Please confirm', message, confirmLabel = 'OK', cancelLabel = 'Cancel', danger } = {}) =>
+      // Default titles and labels are default parameters: translated at each call, in the current language.
+      confirm: ({ title = t('components.dialogs.confirmTitle'), message, confirmLabel = t('common.ok'), cancelLabel = t('common.cancel'), danger } = {}) =>
         ask({
           title, message, icon: danger ? 'warn' : 'question', cancelValue: false,
           buttons: [
@@ -38,18 +40,18 @@ export function DialogProvider({ children }) {
           ],
         }),
       /** Resolves when closed. */
-      alert: ({ title = 'Notice', message, okLabel = 'OK', danger } = {}) =>
+      alert: ({ title = t('components.dialogs.alertTitle'), message, okLabel = t('common.ok'), danger } = {}) =>
         ask({
           title, message, icon: danger ? 'warn' : 'info', cancelValue: undefined,
           buttons: [{ label: okLabel, value: undefined, primary: true, autoFocus: true }],
         }),
       /** Resolves to the trimmed text, or null when cancelled. */
-      prompt: ({ title, message, label, value = '', placeholder, confirmLabel = 'OK', validate } = {}) =>
+      prompt: ({ title, message, label, value = '', placeholder, confirmLabel = t('common.ok'), validate } = {}) =>
         ask({
           title, message, cancelValue: null,
           input: { label, value, placeholder, validate },
           buttons: [
-            { label: 'Cancel', value: null },
+            { label: t('common.cancel'), value: null },
             { label: confirmLabel, value: 'input', primary: true },
           ],
         }),
@@ -92,7 +94,7 @@ function AskDialog({ dialog }) {
   function press(b) {
     if (b.value !== 'input') return finish(b.value);
     const v = text.trim();
-    const problem = input.validate?.(v) ?? (v ? null : 'Please type a value');
+    const problem = input.validate?.(v) ?? (v ? null : t('components.dialogs.typeValue'));
     if (problem) {
       setError(problem);
       return undefined;

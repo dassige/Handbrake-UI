@@ -1,3 +1,5 @@
+import { t } from './i18n/index.js';
+
 async function request(method, url, body) {
   const res = await fetch(url, {
     method,
@@ -140,8 +142,8 @@ export function sendChunk({ dir, name, size, offset }, blob, onProgress) {
         reject(err);
       }
     };
-    xhr.onerror = () => reject(Object.assign(new Error('Network error'), { network: true }));
-    xhr.onabort = () => reject(Object.assign(new Error('Cancelled'), { aborted: true }));
+    xhr.onerror = () => reject(Object.assign(new Error(t('misc.api.networkError')), { network: true }));
+    xhr.onabort = () => reject(Object.assign(new Error(t('misc.api.cancelled')), { aborted: true }));
     xhr.send(blob);
   });
   return { promise, abort: () => xhr.abort() };

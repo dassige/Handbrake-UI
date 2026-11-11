@@ -1,0 +1,68 @@
+{
+  "dialog": {
+    "title": "Upload videos",
+    "uploadTo": "Upload to",
+    "newFolder": "New folder",
+    "elsewhere": "To upload somewhere else, close this window and open that folder in Sources first.",
+    "drop": "<strong>Drop video files here</strong> or click to choose them on this computer",
+    "notVideo": "not a video file, skipped",
+    "removeFile": "Remove {name}",
+    "keepOpen": "Keep this browser tab open until the uploads finish. You can keep working meanwhile. If an upload is interrupted, upload the same file to the same folder again: it continues where it stopped.",
+    "chosen_one": "{count} file · {size}",
+    "chosen_other": "{count} files · {size}",
+    "noFiles": "No files chosen"
+  },
+  "newFolder": {
+    "title": "New folder",
+    "message": "Create a folder inside <code>{path}</code>.",
+    "label": "Folder name",
+    "create": "Create",
+    "noSlashes": "No slashes, please",
+    "noDot": "The name cannot start with a dot",
+    "typeName": "Type a name"
+  },
+  "existing": {
+    "title": "Some files are already there",
+    "message_one": "A file with this name is already in the folder. Existing files are never replaced.",
+    "message_other": "{count} files with these names are already in the folder. Existing files are never replaced.",
+    "more_one": "… and {count} more",
+    "more_other": "… and {count} more",
+    "skip": "Skip them",
+    "copies": "Upload as copies, “name (1)”"
+  },
+  "noSpace": {
+    "title": "Not enough space",
+    "message": "These files need {need}, but the server has only {free} free in that folder."
+  },
+  "panel": {
+    "label": "Uploads",
+    "uploading_one": "Uploading · {count} left",
+    "uploading_other": "Uploading · {count} left",
+    "finished_one": "Uploads finished · {count} done",
+    "finished_other": "Uploads finished · {count} done",
+    "failed_one": "{count} failed",
+    "failed_other": "{count} failed",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "cancelTitle": "Cancel this upload",
+    "cancelLabel": "Cancel {name}",
+    "retryTitle": "Try again",
+    "retryLabel": "Retry {name}",
+    "waiting": "Waiting · {size}",
+    "progress": "{sent} of {size}",
+    "progressSpeed_one": "{sent} of {size} · {speed}/s · {count} min left",
+    "progressSpeed_other": "{sent} of {size} · {speed}/s · {count} min left",
+    "uploaded": "Uploaded · {size}",
+    "cancelled": "Cancelled"
+  },
+  "cancel": {
+    "title": "Cancel upload",
+    "message": "Stop uploading “{name}” and delete the part already sent?",
+    "confirm": "Cancel upload",
+    "keep": "Keep uploading"
+  },
+  "errors": {
+    "retrying": "{error}; retrying…",
+    "failed": "{name}: {error}"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "title": "Estadísticas",
+  "period": "Periodo",
+  "ranges": {
+    "days7": "7 días",
+    "days30": "30 días",
+    "days90": "90 días",
+    "months12": "12 meses",
+    "allTime": "Todo"
+  },
+  "tiles": {
+    "filesConverted": "Archivos convertidos",
+    "failed": "{count} con error",
+    "cancelled": "{count} cancelados",
+    "watched": "{count} de carpetas vigiladas",
+    "noneFailed": "ninguno con error",
+    "spaceSaved": "Espacio ahorrado",
+    "smaller": "{percent} más pequeño · {source} → {output}",
+    "videoConverted": "Video convertido",
+    "ofWork": "en {time} de trabajo",
+    "speed": "Velocidad",
+    "realTime": "tiempo real",
+    "realTimeFps": "tiempo real · {fps} fps de media"
+  },
+  "perBucket": {
+    "day": "Archivos convertidos por día",
+    "month": "Archivos convertidos por mes"
+  },
+  "chart": "Gráfico",
+  "table": "Tabla",
+  "nothingConverted": "No se convirtió nada en este periodo.",
+  "checks": {
+    "title": "Comprobación tras la conversión",
+    "none": "No hay archivos comprobados en este periodo.",
+    "summary": "{ok} correctos, {warning} con avisos, {error} con error",
+    "ok": "Comprobados",
+    "warning": "Avisos",
+    "error": "Con error",
+    "unchecked": "{count} convertidos sin comprobación."
+  },
+  "biggestSavings": "Mayores ahorros",
+  "nothingYet": "Aún nada.",
+  "byPreset": "Por preajuste",
+  "columns": {
+    "preset": "Preajuste",
+    "converted": "Convertidos",
+    "failed": "Con error",
+    "video": "Video",
+    "work": "Trabajo",
+    "speed": "Velocidad",
+    "avgFps": "fps medios",
+    "saved": "Ahorrado",
+    "smaller": "Reducción",
+    "month": "Mes",
+    "day": "Día"
+  },
+  "historySince": "Historial desde el {date}. Quitar trabajos de la cola no los elimina de estas cifras.",
+  "tip": {
+    "converted": "{count} convertidos",
+    "convertedFailed": "{count} convertidos · {failed} con error",
+    "savedWork": "{saved} ahorrado · {time} de trabajo",
+    "column": "{date}: {count} convertidos"
+  }
+}

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
+import { t } from '../i18n/index.js';
 
 // Escape closes only the top-most layer (a help panel above a dialog above the job drawer).
 const layers = [];
@@ -32,7 +33,7 @@ export function Modal({ title, onClose, children, footer, wide, className = '', 
       <div className={`modal ${wide ? 'wide' : ''}`} role="dialog" aria-label={ariaLabel ?? (typeof title === 'string' ? title : undefined)}>
         <div className="modal-head">
           <h2>{title}</h2>
-          <button className="icon-btn" onClick={onClose} aria-label="Close">
+          <button className="icon-btn" onClick={onClose} aria-label={t('common.close')}>
             <X size={18} />
           </button>
         </div>

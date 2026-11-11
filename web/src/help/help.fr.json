@@ -1,0 +1,848 @@
+{
+  "topics": {
+    "help.search": {
+      "title": "Rechercher dans l'aide",
+      "body": [
+        "Saisissez un ou plusieurs mots : un sujet est listé lorsque son titre ou son texte contient **tous** les mots. La casse et les accents n'ont pas d'importance, et les mots présents dans le titre classent le sujet en premier.",
+        "Sans rien saisir, tous les sujets sont listés de A à Z. Chaque **?** rond de l'application ouvre le sujet qui concerne l'élément voisin."
+      ],
+      "see": [
+        "app.overview"
+      ]
+    },
+    "app.overview": {
+      "title": "Comment fonctionne HandBrake Queue",
+      "body": [
+        "HandBrake Queue convertit des vidéos sur le serveur, avec HandBrakeCLI et des préréglages HandBrake : créés dans l'[éditeur de préréglages](#presets.editor) ou importés depuis l'application de bureau HandBrake. Les vidéos qui se trouvent sur votre ordinateur peuvent d'abord être [téléversées](#upload.overview).",
+        "### Le déroulement habituel",
+        "1. Téléversez un [préréglage](#presets) exporté depuis HandBrake.",
+        "1. Dans **Convertir**, faites glisser des fichiers ou des dossiers depuis [Sources](#convert.sources) vers la [file d'attente](#convert.queue).",
+        "1. Appuyez sur **Démarrer** : voir [Démarrer et arrêter la file d'attente](#queue.state).",
+        "1. Chaque fichier converti est [vérifié](#verify.overview) : erreurs, audio ou sous-titres manquants, durée correcte.",
+        "1. Dans **Renommer**, donnez des noms propres aux fichiers convertis : voir [Renommer des fichiers](#rename.overview).",
+        "Si vous le souhaitez, réunissez plusieurs fichiers convertis en un seul (p. ex. un film coupé en deux parties) dans **Fusionner** : voir [Fusionner des fichiers](#merge.overview).",
+        "Pour retrouver les fichiers anciens ou de mauvaise qualité dans vos dossiers, utilisez **Qualité** : voir [Contrôle de qualité](#quality.overview).",
+        "Pour convertir sans être présent : une [plage de conversion](#settings.schedule) lance la file d'attente la nuit, les [dossiers surveillés](#settings.watch) ajoutent tout seuls les nouveaux téléchargements, et les [notifications](#settings.notifications) vous disent comment cela s'est passé. **Statistiques** montre ce qui a été converti : voir [Statistiques](#stats.overview).",
+        "Les fichiers sources ne sont jamais modifiés : vos téléchargements peuvent donc continuer à être partagés. Ils ne sont supprimés que sur demande : voir [Supprimer des fichiers sources](#delete.overview).",
+        "Sur un téléphone, l'application fonctionne de la même façon : les vues à deux panneaux (Sources et file d'attente, fichiers et liste à renommer…) n'en montrent qu'un à la fois, avec un sélecteur au-dessus ; l'ajout de fichiers passe au second panneau. Le glisser-déposer demande une souris : sur un écran tactile, utilisez les cases à cocher et **Ajouter à la file**, ainsi que les boutons **Monter**, **Descendre**, **Placer en tête** et **Placer en dernier** dans les détails d'une tâche pour réordonner la file.",
+        "Paramètres → **À propos** donne la version, les notes de version, les crédits et la licence (GNU GPL, version 2)."
+      ],
+      "see": [
+        "convert.sources",
+        "convert.queue",
+        "queue.state",
+        "verify.overview",
+        "rename.overview",
+        "presets",
+        "merge.overview",
+        "upload.overview",
+        "quality.overview"
+      ]
+    },
+    "convert.sources": {
+      "title": "Sources",
+      "body": [
+        "Les dossiers et fichiers vidéo situés sous les **Dossiers de sources** définis dans les [Paramètres](#settings.folders). S'il y en a plusieurs, choisissez celui à parcourir dans la liste en haut du panneau. Seuls les dossiers et les fichiers vidéo sont listés (voir [Ajout de dossiers](#settings.adding) pour les extensions).",
+        "- **Double-cliquez** sur un dossier pour l'ouvrir, ou sur un fichier pour l'ajouter à la file d'attente.",
+        "- **Faites glisser** des fichiers ou des dossiers vers la file d'attente pour les ajouter. Ctrl-clic et Maj-clic en sélectionnent plusieurs ; la case en haut sélectionne tout.",
+        "- **Ajouter à la file** ajoute la sélection.",
+        "- Ajouter un dossier ajoute toutes les vidéos qu'il contient, sous-dossiers compris. Les fichiers déjà dans la file sont ignorés, de même que les fichiers déjà convertis, sauf si vous avez désactivé cette option.",
+        "Des pastilles indiquent ce qui est arrivé à chaque fichier : **En attente**, **Conversion**, **Converti**, **Échec**. Sur les dossiers, elles comptent les fichiers qu'ils contiennent.",
+        "- **Téléverser** envoie des vidéos de votre ordinateur dans le dossier ouvert ; déposer des fichiers de votre ordinateur sur le panneau fait la même chose. Voir [Téléverser des vidéos](#upload.overview).",
+        "- **Télécharger** copie les fichiers ou dossiers sélectionnés sur votre ordinateur : voir [Télécharger des fichiers](#download.overview).",
+        "- **Supprimer** retire les fichiers ou dossiers sélectionnés du serveur, après confirmation : voir [Supprimer des fichiers sources](#delete.overview).",
+        "Ajouter des fichiers ne lance jamais la conversion : appuyez sur **Démarrer** quand vous êtes prêt ([pourquoi](#queue.state))."
+      ],
+      "see": [
+        "convert.queue",
+        "settings.adding",
+        "queue.state",
+        "upload.overview",
+        "download.overview",
+        "delete.overview"
+      ]
+    },
+    "convert.queue": {
+      "title": "File d'attente",
+      "body": [
+        "Chaque fichier à convertir est une **tâche**. Les tâches s'exécutent une par une, de haut en bas.",
+        "- **Préréglage** : le [préréglage](#presets) utilisé pour les fichiers que vous ajoutez ensuite. Le préréglage d'une tâche en attente peut être changé dans ses détails.",
+        "- **Ajouter** : place les nouveaux fichiers **à la fin** de la file ou **en suivant**, avant les autres tâches en attente.",
+        "- **Faites glisser** une tâche en attente par sa poignée (⋮⋮) pour changer l'ordre, ou utilisez **Placer en tête**.",
+        "- Les filtres affichent toutes les tâches, les actives, les converties, ou les échouées et annulées. **Renommer ceux-ci** (sous Converties) ouvre leurs fichiers dans la vue Renommer, **Fusionner ceux-ci** dans la vue Fusionner.",
+        "- **Effacer les terminées** retire de la liste les tâches converties, échouées et annulées. Les fichiers ne sont pas touchés.",
+        "Cliquez sur une tâche pour voir ses [détails](#job.details)."
+      ],
+      "see": [
+        "queue.state",
+        "job.statuses",
+        "job.actions",
+        "job.details"
+      ]
+    },
+    "queue.state": {
+      "title": "Démarrer et arrêter la file d'attente",
+      "body": [
+        "La file d'attente **ne démarre jamais toute seule**, sauf si vous le demandez : ajouter ou déposer des fichiers les place simplement dans la liste. Appuyez sur **Démarrer** pour lancer les conversions.",
+        "- Pendant qu'elle tourne, les fichiers que vous ajoutez rejoignent l'exécution en cours.",
+        "- Quand la dernière tâche est terminée, la file s'arrête de nouveau : les fichiers ajoutés ensuite attendent donc **Démarrer**.",
+        "- **Arrêter après la tâche en cours** laisse la tâche en cours de conversion se terminer, puis s'arrête. Pour arrêter tout de suite, mettez cette tâche en pause ou annulez-la.",
+        "- Si le serveur redémarre pendant une exécution, celle-ci reprend après le redémarrage. La tâche qui était en cours de conversion repart de 0 %, car HandBrake ne peut pas reprendre un encodage à mi-chemin.",
+        "Deux paramètres peuvent la démarrer pour vous : la [plage de conversion](#settings.schedule) (démarrer à l'ouverture de la plage) et les [dossiers surveillés](#settings.watch) (démarrer après l'ajout de nouveaux fichiers).",
+        "Avec une plage de conversion, **Démarrer** en dehors de la plage demande s'il faut **Attendre la plage horaire** (la barre du haut affiche alors « En attente de la plage de conversion : démarrage 23:00 ») ou **Démarrer maintenant**, ce qui ignore la plage jusqu'à l'arrêt de la file."
+      ],
+      "see": [
+        "convert.queue",
+        "job.actions",
+        "queue.eta",
+        "settings.schedule"
+      ]
+    },
+    "job.statuses": {
+      "title": "États des tâches",
+      "body": [
+        "- **En attente** : attend son tour.",
+        "- **Analyse** : HandBrake lit la source avant de convertir.",
+        "- **Conversion** : encodage, avec la progression, la vitesse (images par seconde) et le temps restant.",
+        "- **Finalisation** : HandBrake écrit la fin du fichier.",
+        "- **Vérification** : le fichier converti est en cours de [vérification](#verify.overview).",
+        "- **En pause** : arrêtée là où elle en était ; **Reprendre** la continue.",
+        "- **Converti** : terminé. Une seconde pastille indique le résultat de la vérification : **Vérifié**, **Avertissements de vérification** ou **Vérification échouée**.",
+        "- **Échec** : HandBrake s'est arrêté sur une erreur ; les détails en donnent la raison et le journal en dit plus.",
+        "- **Annulé** : vous l'avez annulée.",
+        "Les filtres au-dessus de la liste affichent toutes les tâches, les actives, les converties, les échouées ou annulées, et **Vérification échouée** : les fichiers convertis dont la [vérification après conversion](#verify.overview) a trouvé des problèmes. Il devient rouge s'il y en a, et **Tout revérifier** les vérifie à nouveau l'un après l'autre."
+      ],
+      "see": [
+        "job.actions",
+        "verify.results"
+      ]
+    },
+    "job.actions": {
+      "title": "Actions sur les tâches",
+      "body": [
+        "- **Pause / Reprendre** : fige la conversion (ou la vérification) et la continue plus tard. Redémarrer le serveur pendant une pause relance la conversion depuis 0 %. Indisponible quand le serveur tourne sous Windows sans Docker : annulez plutôt.",
+        "- **Annuler** : arrête la conversion et supprime le fichier à moitié écrit. Sur une tâche en attente, elle est simplement marquée comme annulée. Pendant la vérification du fichier, **Ignorer la vérification** conserve le fichier converti et saute le reste de la vérification.",
+        "- **Placer en tête** : convertit cette tâche en attente en suivant.",
+        "- **Réessayer** : remet une tâche échouée ou annulée dans la file d'attente.",
+        "- **Convertir à nouveau** : une nouvelle tâche pour la même source. Le nouveau fichier reçoit un suffixe, par exemple `name (1).mkv`, de sorte que le premier est conservé. Dans les détails, vous pouvez choisir un autre préréglage.",
+        "- **Renommer** : ouvre le fichier converti dans la [vue Renommer](#rename.overview).",
+        "- **Vérifier à nouveau** : relance la [vérification](#verify.overview) d'un fichier converti.",
+        "- **Retirer** : enlève la tâche de la liste. Les fichiers ne sont jamais supprimés."
+      ],
+      "see": [
+        "job.statuses",
+        "job.details"
+      ]
+    },
+    "job.details": {
+      "title": "Détails d'une tâche",
+      "body": [
+        "Tout sur une tâche : [progression](#job.statuses), [vérification](#verify.results), [fichiers](#job.files), préréglage, [source](#job.source), [durées](#job.timing) et [journal HandBrake](#job.log). Les boutons en haut sont les [actions sur les tâches](#job.actions).",
+        "Les détails suivent la tâche en direct pendant sa conversion. Fermez-les avec ✕ ou Échap."
+      ],
+      "see": [
+        "job.actions",
+        "job.files",
+        "verify.results",
+        "job.log"
+      ]
+    },
+    "job.files": {
+      "title": "Fichiers source et de sortie",
+      "body": [
+        "- **Source** : le fichier en cours de conversion. Il n'est jamais modifié.",
+        "- **Sortie** : l'emplacement du fichier converti, sous le **Dossier cible**, selon l'organisation choisie dans les [Paramètres](#settings.layout). Tant que la tâche est en attente, vous pouvez le **modifier** (il doit rester dans le dossier cible).",
+        "- Si un fichier de ce nom existe déjà au démarrage de la tâche, le nouveau fichier reçoit un suffixe : `name (1).mkv`. Rien n'est écrasé.",
+        "- Pendant la conversion, la sortie est écrite sous le nom `name.mkv.part` puis renommée quand HandBrake a fini, de sorte que les serveurs multimédias ne prennent jamais en compte des fichiers à moitié écrits.",
+        "- **Tailles** compare la source à la sortie."
+      ],
+      "see": [
+        "settings.layout",
+        "job.details",
+        "download.overview"
+      ]
+    },
+    "job.source": {
+      "title": "Détails de la source",
+      "body": [
+        "Ce que HandBrake a trouvé dans la source lors de l'ajout de la tâche : durée, format et taille de la vidéo, fréquence d'images, ainsi que les pistes audio et de sous-titres avec leurs langues.",
+        "Le [préréglage](#presets) décide lesquelles de ces pistes vont dans la sortie. La [vérification](#verify.overview) compare la sortie à ce que HandBrake avait prévu d'écrire."
+      ],
+      "see": [
+        "presets",
+        "verify.overview"
+      ]
+    },
+    "job.timing": {
+      "title": "Durées",
+      "body": [
+        "Quand la tâche a été ajoutée, démarrée et terminée, combien de temps l'encodage a duré (pauses non comptées) et la vitesse moyenne en images par seconde. **Tentatives** compte combien de fois elle a été démarrée, p. ex. après une nouvelle tentative ou un redémarrage."
+      ]
+    },
+    "job.log": {
+      "title": "Journal HandBrake",
+      "body": [
+        "Tout ce que HandBrakeCLI a affiché pendant la conversion : les réglages utilisés, les pistes choisies, les avertissements et les erreurs. Il se met à jour en direct pendant l'exécution de la tâche.",
+        "Quand une tâche échoue, l'erreur affichée dans ses détails provient des dernières lignes d'erreur de ce journal. La [vérification](#verify.overview) le lit aussi, pour savoir quelles pistes audio et de sous-titres HandBrake a écrites et s'il a trouvé des erreurs dans la source.",
+        "La ligne `encoder:` indique quel encodeur a été utilisé, p. ex. `H.264 (Intel QSV)` pour un [préréglage Quick Sync](#presets.qsv)."
+      ],
+      "see": [
+        "verify.overview",
+        "presets.qsv"
+      ]
+    },
+    "verify.overview": {
+      "title": "Vérifier les fichiers convertis",
+      "body": [
+        "Après chaque conversion réussie, la sortie est vérifiée avant que la tâche ne soit marquée comme convertie. La tâche affiche **Vérification** pendant ce temps, et la suivante attend.",
+        "### Ce qui est vérifié",
+        "- **Lisible** : le fichier s'ouvre et contient un flux vidéo.",
+        "- **La durée correspond à la source** : l'endroit où la vidéo se termine réellement, mesuré en lisant tout le fichier. Un fichier tronqué peut quand même annoncer la durée complète dans ses métadonnées, qui ne sont donc pas prises pour argent comptant. Jusqu'à 2 secondes (ou 0,5 %) d'écart, c'est correct ; jusqu'à 10 secondes (ou 2 %), c'est un avertissement ; au-delà, c'est une erreur.",
+        "- **Pistes audio** : le fichier contient toutes les pistes audio que HandBrake a écrites (d'après le [journal](#job.log)), et chacune dure aussi longtemps que la vidéo.",
+        "- **Pistes de sous-titres** : le fichier contient toutes les pistes de sous-titres que HandBrake a transmises telles quelles. Les sous-titres incrustés dans l'image font partie de la vidéo. Une piste sans aucune ligne (p. ex. des sous-titres forcés dans un épisode qui n'en a pas) est affichée mais n'est pas un problème.",
+        "- **Décodage complet** : chaque image vidéo et audio est décodée pour détecter des données endommagées. Cela prend environ 1 à 2 minutes pour un épisode de 45 minutes.",
+        "- **Source** : si HandBrake a trouvé des erreurs de décodage dans la source, les dégâts peuvent aussi être visibles dans la sortie (avertissement).",
+        "Choisissez **Complète**, **Rapide** (tout sauf le décodage complet) ou **Désactivée** dans les [Paramètres](#settings.encoding)."
+      ],
+      "see": [
+        "verify.results",
+        "settings.encoding",
+        "rename.auto"
+      ]
+    },
+    "verify.results": {
+      "title": "Résultats de la vérification",
+      "body": [
+        "- **Vérifié** (vert) : toutes les vérifications sont passées.",
+        "- **Avertissements de vérification** (orange) : quelque chose à regarder, p. ex. des erreurs dans la source ou quelques secondes d'écart de durée. Le fichier est généralement correct.",
+        "- **Vérification échouée** (rouge) : le fichier est probablement défectueux : trop court, piste audio manquante ou trop courte, ou nombreuses erreurs de décodage. Utilisez **Convertir à nouveau**, ou essayez une autre source.",
+        "- **Non vérifié** : la vérification a été ignorée, interrompue par un redémarrage, ou désactivée.",
+        "Chaque ligne des détails de la tâche indique ce qui a été trouvé. **Vérifier à nouveau** refait la vérification, p. ex. après avoir recopié le fichier.",
+        "Les fichiers qui échouent à la vérification ne sont jamais [renommés automatiquement](#rename.auto)."
+      ],
+      "see": [
+        "verify.overview",
+        "job.actions"
+      ]
+    },
+    "presets": {
+      "title": "Préréglages",
+      "body": [
+        "Un préréglage contient tous les réglages de conversion : encodeur et qualité vidéo, taille, fréquence d'images, filtres, pistes audio et de sous-titres, conteneur. Vous pouvez créer et modifier des préréglages ici, sur la page **Préréglages**, ou importer des préréglages créés dans l'application de bureau HandBrake.",
+        "### Créer un préréglage",
+        "- **Nouveau** part de l'un des préréglages propres à HandBrake (p. ex. « Fast 1080p30 ») ou de l'un des vôtres : voir [Nouveau préréglage](#presets.new).",
+        "- **Modifier** ouvre le préréglage choisi dans l'[éditeur de préréglages](#presets.editor), avec les mêmes onglets que HandBrake : Résumé, Dimensions, Filtres, Vidéo, Audio et Sous-titres.",
+        "- **Dupliquer** en fait une copie sous un nouveau nom.",
+        "### Importer depuis HandBrake",
+        "1. Dans HandBrake : **Préréglages** → sélectionnez votre préréglage → **Exporter**.",
+        "1. Ici : appuyez sur **Importer** ou déposez le fichier `.json` n'importe où sur la page.",
+        "- Un fichier peut contenir plusieurs préréglages, y compris dans des dossiers : chacun est ajouté.",
+        "- Importer de nouveau un préréglage de même nom et de même catégorie remplace l'ancien, modifications faites ici comprises.",
+        "### Utiliser les préréglages",
+        "- La page affiche tous les réglages du préréglage choisi, regroupés comme les onglets de HandBrake, ainsi que le JSON brut et les performances du préréglage (vitesse, réduction de taille). **Télécharger** donne un fichier que HandBrake peut importer.",
+        "- Le préréglage **par défaut** (★) est utilisé quand vous ajoutez des fichiers, sauf si vous en choisissez un autre dans la file d'attente.",
+        "- Chaque tâche garde une copie de son préréglage : modifier ou supprimer un préréglage ne change donc jamais les tâches déjà dans la file.",
+        "Les encodeurs matériels (`qsv_h264`, `qsv_h265`) convertissent sur le GPU Intel : voir [Préréglages Quick Sync (GPU)](#presets.qsv). Les encodeurs disponibles sur ce serveur sont listés dans Paramètres → À propos et dans l'onglet Vidéo de l'éditeur."
+      ],
+      "see": [
+        "presets.editor",
+        "presets.new",
+        "presets.qsv",
+        "convert.queue"
+      ]
+    },
+    "presets.qsv": {
+      "title": "Préréglages Quick Sync (GPU)",
+      "body": [
+        "Un préréglage avec un encodeur Intel **Quick Sync** convertit sur le GPU Intel du serveur au lieu du CPU. Sur un Intel i3 de 10e génération, c'était environ **deux fois plus rapide** que x264 au même débit, avec des fichiers de même taille et une qualité presque identique. Quick Sync fonctionne avec les iGPU Intel à partir de la 6e génération, quand le serveur donne accès au GPU (`/dev/dri`) à HandBrake Queue. Si `qsv_h264` figure dans Paramètres → À propos, tout est prêt.",
+        "### En créer un dans HandBrake pour Windows",
+        "1. Ouvrez une vidéo quelconque, puis sélectionnez le préréglage de départ.",
+        "1. Dans l'onglet **Vidéo**, réglez **Encodeur vidéo** sur `H.264 (Intel QSV)` et **Préréglage de l'encodeur** sur `Balanced`. Gardez le même débit moyen, ou ajoutez environ 10 à 15 % pour égaler la qualité de x264.",
+        "1. Laissez vides les **Options avancées** de l'encodeur : des options prévues pour des GPU Intel plus récents peuvent ne pas fonctionner sur le serveur.",
+        "1. **Enregistrer le nouveau préréglage** sous son propre nom, **Exporter**-le, puis téléversez-le dans [Préréglages](#presets).",
+        "Les encodeurs Intel QSV n'apparaissent dans HandBrake que si votre propre ordinateur a un GPU Intel. Sans cela, exportez le préréglage x264 et modifiez le fichier `.json` : réglez `VideoEncoder` sur `qsv_h264` et `VideoPreset` sur `balanced`.",
+        "### Points à vérifier",
+        "- **Le décodage Quick Sync doit rester désactivé.** Si le fichier exporté contient `\"VideoHWDecode\": 2`, supprimez cette ligne : le décodage sur le GPU échoue sur les Intel de 6e à 10e génération. La source est décodée par le CPU, ce qui explique pourquoi c'est environ deux fois plus rapide et pas davantage.",
+        "- `H.264 (Intel QSV)` avec **Balanced** a donné les meilleurs résultats lors des tests. **Quality** a donné le même résultat, et `H.265 (Intel QSV)` était plus lent et légèrement moins bon au même débit.",
+        "- Si le serveur rejette le préréglage quand vous le téléversez, le message en indique la raison, p. ex. un encodeur qu'il n'a pas.",
+        "- Pour vérifier qu'une tâche a utilisé le GPU, cherchez `encoder: H.264 (Intel QSV)` dans son [journal HandBrake](#job.log). La vitesse est aussi plus élevée, p. ex. environ 60 images par seconde au lieu de 30."
+      ],
+      "see": [
+        "presets",
+        "job.log"
+      ]
+    },
+    "settings.folders": {
+      "title": "Dossiers de sources et dossier cible",
+      "body": [
+        "Des dossiers sur le serveur (pas sur votre ordinateur). Les partages NAS montés sur le serveur fonctionnent aussi.",
+        "- **Dossiers de sources** : l'emplacement des fichiers à convertir. Ajoutez-en autant que nécessaire avec **Ajouter un dossier de sources** ; le panneau Sources en affiche un à la fois et ne peut pas remonter au-dessus. Retirer un dossier de la liste ne supprime rien.",
+        "- **Nom** (facultatif) sur un dossier de sources : un nom convivial tel que « Téléchargements », affiché à la place du chemin dans le panneau Sources, les listes de dossiers et la vue Qualité. Chaque nom ne peut servir qu'une fois, 40 caractères au maximum ; un nom vide affiche le nom du dossier lui-même.",
+        "- **Protéger** sur un dossier de sources : empêche la suppression de ses fichiers et dossiers depuis l'application, par exemple le dossier dont un client de téléchargement assure encore le partage. Dans le panneau Sources, un tel dossier affiche **Protégé** à la place du bouton Supprimer, et le serveur refuse aussi les suppressions à cet endroit.",
+        "- **Dossier cible** : l'emplacement où les fichiers convertis sont écrits. Les vues Renommer et Fusionner ne travaillent qu'ici.",
+        "Tous doivent exister. La cible ne peut pas se trouver dans un dossier de sources, et un dossier de sources ne peut pas se trouver dans un autre. Dans Docker, ils doivent se trouver dans le dossier monté dans le conteneur (`MEDIA_DIR`, généralement `/mnt`).",
+        "Les organisations de sortie **Nom du dossier source** et **Chemin source complet** sont calculées à partir du dossier de sources où se trouve chaque fichier."
+      ],
+      "see": [
+        "settings.layout",
+        "convert.sources",
+        "upload.overview",
+        "delete.overview",
+        "backup.overview"
+      ]
+    },
+    "settings.layout": {
+      "title": "Organisation du dossier de sortie",
+      "body": [
+        "L'emplacement, sous le dossier cible, où va chaque fichier converti :",
+        "- **Nom du dossier source** : `target/Show.S01/episode.mkv`, en utilisant uniquement le nom du dossier où se trouve la source. Pratique pour les dossiers de saisons.",
+        "- **Chemin source complet** : `target/Completed/Show.S01/episode.mkv`, le chemin complet sous le dossier de sources.",
+        "- **Tout dans le dossier cible** : `target/episode.mkv`.",
+        "Si le fichier existe déjà, le nouveau reçoit un suffixe (`episode (1).mkv`). L'organisation s'applique aux fichiers ajoutés après le changement ; les tâches en attente gardent leur chemin de sortie."
+      ],
+      "see": [
+        "job.files"
+      ]
+    },
+    "settings.language": {
+      "title": "Langue",
+      "body": [
+        "L'application, aide comprise, peut s'afficher en anglais, italien (Italiano), allemand (Deutsch), français (Français) ou espagnol (Español). Chaque langue est listée sous son propre nom, ce qui permet de la retrouver facilement quelle que soit la langue actuelle de l'application.",
+        "- **Automatique** : chaque navigateur affiche l'application dans sa propre langue (la première, parmi les préférences de langue du navigateur, que l'application propose), l'anglais sinon. Deux personnes peuvent utiliser l'application dans deux langues en même temps.",
+        "- **Une langue** : chaque navigateur affiche l'application dans cette langue.",
+        "Le choix est enregistré sur le serveur, comme les autres paramètres, et s'applique dès que vous appuyez sur **Enregistrer les modifications**. Le navigateur retient la dernière langue, de sorte que l'application s'ouvre ensuite directement dedans.",
+        "Les noms de fichiers et de dossiers, les noms de préréglages et les messages d'erreur du serveur, de HandBrake ou de ffmpeg sont affichés tels quels (généralement en anglais). Les [notifications](#settings.notifications) par e-mail et push sont toujours en anglais."
+      ],
+      "see": [
+        "settings.notifications"
+      ]
+    },
+    "settings.adding": {
+      "title": "Ajout de dossiers",
+      "body": [
+        "- **Inclure les sous-dossiers** : ajouter un dossier ajoute aussi les vidéos de ses sous-dossiers.",
+        "- **Ignorer les fichiers déjà convertis** : un fichier qui a une tâche convertie n'est pas ajouté de nouveau. Utilisez **Convertir à nouveau** sur sa tâche pour en refaire un.",
+        "- **Extensions des fichiers vidéo** : quels fichiers comptent comme des vidéos, séparés par des virgules.",
+        "- **Ignorer les fichiers et dossiers contenant ces mots** : mots entiers, sans tenir compte de la casse ; p. ex. `sample` ignore `show-sample.mkv` et un dossier `Sample`, mais pas `samples.mkv`."
+      ],
+      "see": [
+        "convert.sources"
+      ]
+    },
+    "settings.encoding": {
+      "title": "Réglages d'encodage",
+      "body": [
+        "- **Priorité CPU** : à quel point les conversions partagent poliment le CPU avec les autres services du serveur (`nice` sous Linux, 0 à 19). Plus la valeur est haute, plus c'est doux, et plus lent seulement quand le serveur est occupé. Ignorée quand le serveur tourne sous Windows sans Docker.",
+        "- **Vérification après conversion** : **Complète** (toutes les vérifications, avec un décodage complet), **Rapide** (durées, pistes et lisibilité sans décodage) ou **Désactivée**. Voir [Vérifier les fichiers convertis](#verify.overview)."
+      ],
+      "see": [
+        "verify.overview"
+      ]
+    },
+    "settings.renaming": {
+      "title": "Réglages de renommage",
+      "body": [
+        "- **Renommer automatiquement les fichiers après la conversion** : désactivé par défaut. Voir [Renommage automatique](#rename.auto).",
+        "- **Jeu de règles pour le renommage automatique** : quel [jeu de règles](#rename.rules) est utilisé.",
+        "- **Séparateur** : quand le nouveau nom est déjà pris, un numéro est ajouté après : avec `_`, vous obtenez `name_1.mkv`, `name_2.mkv`."
+      ],
+      "see": [
+        "rename.auto",
+        "rename.rules"
+      ]
+    },
+    "rename.overview": {
+      "title": "Renommer des fichiers",
+      "body": [
+        "Les fichiers téléchargés ont des noms comme `The.Rookie.6x01.Title.ITA.ENG.1080p.NFRip.AAC.x265-Pir8`. La vue Renommer les transforme en `The Rookie S06e01 - Title`, à l'aide de [jeux de règles](#rename.rules).",
+        "1. À gauche, parcourez le **dossier cible** et faites glisser les fichiers ou dossiers convertis vers la liste à renommer (ou utilisez **Renommer** sur une tâche convertie).",
+        "1. Choisissez les **Règles**. Le jeu intégré **Auto** reconnaît aussi bien les épisodes de séries que les films.",
+        "1. Regardez l'[aperçu](#rename.preview) : corrigez un nom à la main si besoin, et saisissez un [nom de série](#rename.showName) là où aucun n'a été trouvé.",
+        "1. Appuyez sur **Renommer**. Chaque lot peut être annulé depuis l'[Historique](#rename.history).",
+        "Seuls les fichiers du dossier cible peuvent être renommés, jamais les sources (les téléchargements peuvent encore être partagés)."
+      ],
+      "see": [
+        "rename.preview",
+        "rename.showName",
+        "rename.rules",
+        "rename.history",
+        "rename.auto"
+      ]
+    },
+    "rename.preview": {
+      "title": "Aperçu du renommage",
+      "body": [
+        "Chaque ligne montre le nom actuel (petit, gris) et le nouveau nom. Rien ne change sur le disque tant que vous n'appuyez pas sur **Renommer**.",
+        "- **Modifiez** n'importe quel nouveau nom en le saisissant (Entrée pour confirmer, Échap pour annuler). Une ligne modifiée est bleue ; **annuler la saisie** revient au nom donné par les règles.",
+        "- Les **cases à cocher** choisissent les lignes à renommer. Les lignes avec un avertissement démarrent décochées : vérifiez-les et cochez-les quand elles vous semblent correctes.",
+        "- Les **avertissements** expliquent ce que les règles n'ont pas trouvé, p. ex. pas de numéro d'épisode, pas d'année ou pas de nom de série.",
+        "- **Série · S06e01** ou **Film · 2024** montre ce qui a été reconnu ; **aucun changement** signifie que le nom est déjà bon.",
+        "- Si deux fichiers obtiennent le même nom, ou si le nom est pris par un autre fichier du dossier, un numéro est ajouté : `name_1.mkv` (voir [Réglages de renommage](#settings.renaming)).",
+        "Les fichiers de dossiers différents sont regroupés sous leur dossier."
+      ],
+      "see": [
+        "rename.showName",
+        "rename.rules"
+      ]
+    },
+    "rename.showName": {
+      "title": "Nom de la série",
+      "body": [
+        "Certains fichiers n'ont pas le nom de la série avant le numéro d'épisode, p. ex. `S04E07 Reacher Tutti Con Sampson (2026)…`. Saisissez le nom de la série (`Reacher`) et les lignes deviennent `Reacher S04e07 - Tutti Con Sampson` ; le nom est aussi retiré du titre de l'épisode.",
+        "- **seulement là où il manque** (par défaut) : seules les lignes où aucun nom de série n'a été trouvé le reçoivent. Les autres séries de la même liste gardent le leur.",
+        "- **pour toutes les lignes** : chaque ligne de série reçoit ce nom, p. ex. pour raccourcir un nom trop long ou ajouter une année pour un remake : `Silo (2023)`."
+      ],
+      "see": [
+        "rename.preview",
+        "rename.smart"
+      ]
+    },
+    "rename.rules": {
+      "title": "Jeux de règles de renommage",
+      "body": [
+        "Un jeu de règles est une liste d'[étapes](#rename.steps) appliquées dans l'ordre à chaque nom de fichier (sans son extension).",
+        "- Les jeux de règles **intégrés** (**Auto**, **Série TV**, **Films**) ne peuvent pas être modifiés : utilisez **Dupliquer** pour en faire une copie modifiable.",
+        "- **Nouveau** démarre un jeu de règles avec l'étape [Reconnaître épisode / film](#rename.smart).",
+        "- **Importer** lit les préréglages Advanced Renamer (`.aren`) ainsi que les jeux de règles exportés d'ici. Chaque méthode d'Advanced Renamer utilisée pour les noms (remplacer, supprimer un motif, supprimer, ajouter, déplacer, couper, casse) devient une étape.",
+        "- **Exporter** (icône de téléchargement) enregistre le jeu de règles dans un fichier `.json`, p. ex. pour le copier sur un autre serveur.",
+        "- Les modifications ne sont conservées qu'après **Enregistrer** ; [Essayer](#rename.tryIt) montre le résultat avant d'enregistrer."
+      ],
+      "see": [
+        "rename.steps",
+        "rename.smart",
+        "rename.tryIt"
+      ]
+    },
+    "rename.steps": {
+      "title": "Étapes de renommage",
+      "body": [
+        "Les étapes s'exécutent de haut en bas ; décochez-en une pour la désactiver sans la supprimer. Cliquez sur une étape pour la modifier.",
+        "- **Reconnaître épisode / film** : construit le nom complet à partir d'un modèle. Voir [Reconnaître épisode / film](#rename.smart).",
+        "- **Supprimer les balises de release** : coupe le nom à la première balise telle que `1080p`, `WEB-DL`, `x265` ou `ITA`.",
+        "- **Remplacer** : trouve du texte et le remplace : toutes les occurrences, la première ou la dernière, en respectant la casse ou non. Avec **Expression régulière**, `$1`, `$2`… insèrent les groupes trouvés.",
+        "- **Supprimer un motif** : supprime ce qui correspond, p. ex. `(720p).*$` supprime de `720p` jusqu'à la fin.",
+        "- **Supprimer tout après un texte** : p. ex. après `)`.",
+        "- **Supprimer des caractères / Ajouter du texte / Déplacer des caractères** : travaillent sur des positions, comme Advanced Renamer. Les positions changent avec chaque nom de fichier ; les étapes à motif sont donc généralement plus sûres.",
+        "- **Supprimer des caractères aux extrémités** : retire les caractères listés aux deux extrémités.",
+        "- **Changer la casse** : Majuscule À Chaque Mot, MAJUSCULES, minuscules ou Majuscule en début de phrase.",
+        "- **Corriger les apostrophes** : `L Uomo` → `L'Uomo`, `Dell Oca` → `Dell'Oca`, `Wouldn T` → `Wouldn't`.",
+        "- **Fusionner les espaces** : plusieurs espaces deviennent un seul.",
+        "Les caractères que les noms de fichiers ne peuvent pas contenir (`/ \\ : * ? \" < > |`) sont supprimés ou remplacés à la fin ; `:` devient ` -`."
+      ],
+      "see": [
+        "rename.smart",
+        "rename.tryIt"
+      ]
+    },
+    "rename.smart": {
+      "title": "Reconnaître épisode / film",
+      "body": [
+        "Lit les éléments d'un nom de release et en construit un propre.",
+        "- **Série** : trouve `S01E02`, `S01E01E02` ou `1x02`. La série est le texte qui précède, le titre de l'épisode le texte qui suit, jusqu'à la première balise de release.",
+        "- **Film** : trouve l'année (`2024` ou `(2024)`) ; le titre est le texte qui précède.",
+        "- **Type** : **Auto** traite un nom avec un numéro d'épisode comme une série et tout le reste comme un film.",
+        "### Modèles",
+        "`{show}`, `{season}`, `{episode}`, `{title}` et `{year}` sont remplacés par ce qui a été trouvé ; la saison et l'épisode reçoivent deux chiffres. Une partie entre `[ ]` disparaît quand un champ qu'elle contient est vide : `{show} S{season}e{episode}[ - {title}]` donne `Lanterns S01e01` quand il n'y a pas de titre d'épisode.",
+        "### Options",
+        "- **Majuscule À Chaque Mot** : met une majuscule à chaque mot, en conservant les majuscules déjà présentes (`McLaren`, `INXS`).",
+        "- **Corriger les apostrophes** : `L Osservatore` → `L'Osservatore`.",
+        "- **Garder l'année dans le nom de la série** : `East of Eden 2026 S01E01` devient `East Of Eden (2026) S01e01`. Désactivé par défaut ; utile pour les remakes.",
+        "- **Balises de release supplémentaires** : d'autres mots qui marquent le début des informations de release."
+      ],
+      "see": [
+        "rename.showName",
+        "rename.steps"
+      ]
+    },
+    "rename.tryIt": {
+      "title": "Essayer",
+      "body": [
+        "Montre ce que le jeu de règles en cours de modification fait à quelques noms, avant d'enregistrer. Il démarre avec les noms de votre liste à renommer (ou quelques exemples) ; saisissez ou collez n'importe quels noms, un par ligne.",
+        "La zone **Nom de la série** fonctionne comme celle de la [vue Renommer](#rename.showName)."
+      ],
+      "see": [
+        "rename.rules"
+      ]
+    },
+    "rename.history": {
+      "title": "Historique des renommages",
+      "body": [
+        "Chaque lot de renommages, du plus récent au plus ancien, y compris les renommages automatiques. Cliquez sur un lot pour voir chaque ancien et nouveau nom.",
+        "**Annuler** redonne aux fichiers leurs anciens noms. Un fichier est ignoré s'il a été supprimé ou déplacé depuis, ou si son ancien nom est de nouveau utilisé."
+      ],
+      "see": [
+        "rename.overview"
+      ]
+    },
+    "rename.auto": {
+      "title": "Renommage automatique",
+      "body": [
+        "Quand **Renommer automatiquement les fichiers après la conversion** est activé (Paramètres → Renommage), chaque fichier converti est renommé avec le jeu de règles choisi juste après sa [vérification](#verify.overview).",
+        "Par sécurité, un fichier n'est renommé que si les règles le reconnaissent **sans avertissement**. Sinon, la tâche affiche **À renommer** et vous la terminez dans la [vue Renommer](#rename.overview). Les fichiers qui échouent à la vérification ne sont pas renommés.",
+        "Les renommages automatiques apparaissent dans l'[Historique](#rename.history) et peuvent être annulés."
+      ],
+      "see": [
+        "settings.renaming",
+        "rename.overview"
+      ]
+    },
+    "merge.overview": {
+      "title": "Fusionner des fichiers",
+      "body": [
+        "Réunit des fichiers convertis en un seul MKV, l'un après l'autre, par exemple un film ou un concert réparti sur des disques ou des parties. Les chapitres de chaque partie sont conservés.",
+        "1. À gauche, parcourez le **dossier cible** et faites glisser les parties (ou le dossier qui les contient) vers la liste de fusion. Sous **Converties** dans la file d'attente, **Fusionner ceux-ci** fait la même chose.",
+        "1. Mettez les parties [dans l'ordre](#merge.parts).",
+        "1. Lisez la [vérification de compatibilité](#merge.compat) : les parties qui ne peuvent pas être jointes y sont expliquées.",
+        "1. Choisissez le [nom et les chapitres](#merge.options) du fichier fusionné et appuyez sur **Fusionner**.",
+        "La fusion copie la vidéo, l'audio et les sous-titres tels quels, sans reconvertir : elle prend donc à peu près le temps d'une copie des fichiers. Le fichier fusionné est ensuite [vérifié](#verify.overview) comme une conversion : sa durée doit être celle des parties additionnées, avec les mêmes pistes audio et de sous-titres que la partie 1.",
+        "Les fusions s'exécutent une par une, en parallèle des conversions. La progression et les résultats se trouvent sous [Fusions récentes](#merge.history). Les parties sont conservées, sauf si vous choisissez de les supprimer."
+      ],
+      "see": [
+        "merge.parts",
+        "merge.compat",
+        "merge.chapters",
+        "merge.options",
+        "merge.history"
+      ]
+    },
+    "merge.parts": {
+      "title": "Les parties et leur ordre",
+      "body": [
+        "Le fichier fusionné lit les parties de haut en bas. Un dossier déposé ajoute ses fichiers vidéo dans l'ordre des noms (`Disc 1`, `Disc 2`, … `Disc 10`).",
+        "- **Faites glisser** une partie par sa poignée, ou utilisez les flèches, pour changer l'ordre.",
+        "- ✕ retire une partie de la liste (le fichier n'est pas touché).",
+        "Chaque ligne affiche la durée, les chapitres, les langues audio, les pistes de sous-titres, la taille d'image et la taille du fichier de la partie, lus dans le fichier."
+      ],
+      "see": [
+        "merge.compat"
+      ]
+    },
+    "merge.compat": {
+      "title": "Les parties peuvent-elles être jointes ?",
+      "body": [
+        "Joindre des fichiers ne fonctionne que si chaque partie a les **mêmes pistes dans le même ordre**. Le plus simple est de convertir toutes les parties avec le même préréglage.",
+        "### Problèmes qui bloquent la fusion (rouge)",
+        "- Un nombre différent de pistes vidéo, audio ou de sous-titres, p. ex. une partie avec de l'audio italien et anglais et une autre avec de l'italien seulement.",
+        "- Une piste dans un format différent (p. ex. AAC dans une partie, AC-3 dans une autre), ou un audio avec des canaux ou une fréquence d'échantillonnage différents.",
+        "### Avertissements (orange) : la fusion peut continuer",
+        "- Une taille d'image différente, ou une vidéo encodée avec des réglages légèrement différents (p. ex. un recadrage différent). La plupart des lecteurs s'en accommodent ; certains peuvent saccader un instant à la jonction des parties : vérifiez donc les jonctions.",
+        "- Une piste dans une autre langue : la piste fusionnée garde la langue de la partie 1."
+      ],
+      "see": [
+        "merge.parts",
+        "presets"
+      ]
+    },
+    "merge.chapters": {
+      "title": "Chapitres du fichier fusionné",
+      "body": [
+        "- **Garder les chapitres de chaque partie** (par défaut) : chaque chapitre garde sa place, déplacée à l'endroit où sa partie commence dans le fichier fusionné. Les noms génériques de HandBrake (`Chapter 1`, `Chapter 2`…) sont renumérotés sur l'ensemble du fichier ; les chapitres qui ont leur propre nom le gardent. Une partie sans chapitres reçoit un chapitre nommé d'après le fichier.",
+        "- **Un chapitre par partie** : un chapitre au début de chaque partie, nommé d'après son fichier (les points et les tirets bas deviennent des espaces).",
+        "Ouvrez **chapitres dans le fichier fusionné** sous les options pour voir la liste avant de fusionner."
+      ],
+      "see": [
+        "merge.options"
+      ]
+    },
+    "merge.options": {
+      "title": "Nom et options du fichier fusionné",
+      "body": [
+        "- **Nom** : suggéré à partir de ce que les noms des parties ont en commun (`Live Aid - Disc 1`, `Live Aid - Disc 2` → `Live Aid`). Le fichier est toujours en `.mkv`.",
+        "- Le fichier fusionné va dans le **dossier de la partie 1**. Si le nom est pris, un numéro est ajouté (`Live Aid_1.mkv`, voir [Réglages de renommage](#settings.renaming)). Rien n'est écrasé.",
+        "- **Chapitres** : voir [Chapitres du fichier fusionné](#merge.chapters).",
+        "- **Supprimer les parties après une fusion réussie** : désactivé par défaut. Les parties ne sont supprimées que si la fusion a réussi et que la [vérification](#verify.overview) n'a pas échoué ; si la vérification est désactivée, elles sont supprimées après la fusion. Cette action est irréversible.",
+        "Pendant la fusion, le fichier est écrit sous le nom `name.mkv.part` puis renommé à la fin, de sorte que les serveurs multimédias ne voient jamais un fichier à moitié écrit."
+      ],
+      "see": [
+        "merge.chapters",
+        "merge.history"
+      ]
+    },
+    "merge.history": {
+      "title": "Fusions récentes",
+      "body": [
+        "Chaque fusion avec son état : **En attente**, **Lecture des parties**, **Fusion** (avec la progression), **Vérification**, **Fusionné**, **Échec** ou **Annulé**. Un fichier fusionné affiche aussi son [résultat de vérification](#verify.results).",
+        "Cliquez sur une fusion pour voir la sortie, les parties, les éventuels avertissements de mkvmerge et les détails de la vérification.",
+        "- ■ annule une fusion en attente ou en cours ; le fichier à moitié écrit est supprimé et les parties sont conservées.",
+        "- 🗑 retire une fusion terminée de la liste. Les fichiers ne sont pas touchés."
+      ],
+      "see": [
+        "merge.overview",
+        "verify.results"
+      ]
+    },
+    "upload.overview": {
+      "title": "Téléverser des vidéos",
+      "body": [
+        "Envoie des fichiers vidéo de votre ordinateur vers un dossier de sources du serveur, pour qu'ils puissent être convertis comme n'importe quel autre fichier.",
+        "1. Dans **Convertir**, ouvrez le dossier voulu dans [Sources](#convert.sources) (choisissez d'abord le dossier de sources si vous en avez plusieurs).",
+        "1. Appuyez sur **Téléverser**, ou déposez des fichiers de votre ordinateur sur le panneau Sources.",
+        "1. Si vous le souhaitez, appuyez sur **Nouveau dossier** pour créer un sous-dossier et y téléverser.",
+        "1. Appuyez sur **Téléverser**. Les fichiers partent un par un ; un panneau dans le coin affiche la progression et vous pouvez continuer à travailler.",
+        "Seuls les fichiers vidéo sont acceptés (les extensions de [Ajout de dossiers](#settings.adding)). Un fichier existant n'est jamais remplacé : vous choisissez de l'ignorer ou de téléverser une copie nommée « name (1) ». Le téléversement s'arrête avant de commencer si le serveur manque d'espace.",
+        "### Interruptions",
+        "Gardez l'onglet du navigateur ouvert jusqu'à la fin des téléversements. Une connexion coupée est retentée automatiquement. Si l'onglet a été fermé, téléversez de nouveau le même fichier dans le même dossier : il reprend là où il s'était arrêté. Les téléversements inachevés sont des fichiers cachés, supprimés automatiquement au bout d'une semaine ; **Annuler** en supprime un immédiatement."
+      ],
+      "see": [
+        "convert.sources",
+        "settings.folders",
+        "download.overview"
+      ]
+    },
+    "quality.overview": {
+      "title": "Contrôle de qualité",
+      "body": [
+        "Trouve les fichiers vidéo qui ont un format ancien, une basse résolution ou un faible débit, pour que vous sachiez lesquels remplacer ou convertir.",
+        "1. Dans **Qualité**, choisissez des dossiers ou des fichiers dans le panneau **Dossiers** : chaque dossier de sources et le dossier cible s'y trouvent.",
+        "1. Appuyez sur **Contrôler la qualité**. Chaque vidéo qu'ils contiennent, sous-dossiers compris, est lue avec ffprobe (seulement les en-têtes de fichier, donc c'est rapide ; cela s'exécute avec la priorité CPU définie dans [Encodage](#settings.encoding)).",
+        "1. Les résultats listent les fichiers **À revoir**. Cliquez sur les pastilles pour voir un seul type de problème, ou sur **Tous**.",
+        "Ce qui compte comme un problème se règle dans [Paramètres → Contrôle de qualité](#settings.quality). Changer un critère met les résultats à jour immédiatement, sans nouveau contrôle.",
+        "- **Ajouter à la file** convertit les fichiers sélectionnés avec le préréglage choisi (uniquement les fichiers d'un dossier de sources).",
+        "- **Exporter en CSV** télécharge les fichiers sélectionnés (ou tous ceux listés) sous forme de tableur.",
+        "Les 20 derniers résultats sont conservés ; choisissez-en un dans **Résultat**. Un contrôle peut s'exécuter pendant que des fichiers sont en cours de conversion."
+      ],
+      "see": [
+        "quality.issues",
+        "settings.quality",
+        "quality.folders"
+      ]
+    },
+    "quality.folders": {
+      "title": "Choisir ce qu'il faut contrôler",
+      "body": [
+        "Le panneau Dossiers affiche chaque dossier de sources et le dossier cible ; choisissez-en un dans la liste en haut.",
+        "Cochez des dossiers et des fichiers (Ctrl-clic et Maj-clic en sélectionnent plusieurs) et appuyez sur **Contrôler la qualité**. Un dossier inclut tout ce qu'il contient. Les fichiers qui correspondent aux mots de [Ajout de dossiers](#settings.adding) (comme « sample ») sont ignorés."
+      ],
+      "see": [
+        "quality.overview",
+        "download.overview"
+      ]
+    },
+    "quality.issues": {
+      "title": "Problèmes de qualité",
+      "body": [
+        "- **Format ancien** : les formats des listes de [Paramètres](#settings.quality), tels que `.avi`, MPEG-4 Part 2 (DivX, Xvid), MPEG-2, WMV ou RealVideo (conteneur, codec vidéo ou codec audio).",
+        "- **Basse résolution** : en dessous de la résolution minimale acceptable. Les films en écran large dont les bandes noires sont recadrées (p. ex. 1920×800) comptent selon leur largeur, comme du 1080p.",
+        "- **Faible débit** : le débit vidéo est inférieur au minimum pour sa résolution. HEVC, AV1 et VP9 en demandent moins, donc leur minimum est plus bas. **~** signifie que le débit a été estimé à partir de la taille du fichier, car le fichier ne l'indique pas.",
+        "- **Entrelacé** : uniquement quand c'est activé dans les Paramètres.",
+        "- **Illisible** : ffprobe n'a pas pu lire le fichier, ou il n'a pas de vidéo."
+      ],
+      "see": [
+        "settings.quality"
+      ]
+    },
+    "settings.quality": {
+      "title": "Critères du contrôle de qualité",
+      "body": [
+        "Ce que le [contrôle de qualité](#quality.overview) signale. Les listes sont séparées par des virgules.",
+        "- **Résolution minimale acceptable** : les fichiers en dessous sont signalés. La résolution tient compte aussi de la largeur, de sorte que les films en écran large recadrés gardent leur catégorie.",
+        "- **Débit vidéo minimal acceptable** : une valeur par catégorie de résolution (SD, 720p, 1080p, 4K) pour H.264, MPEG-4 et les codecs similaires ; 0 désactive le contrôle pour cette catégorie.",
+        "- Les **Codecs efficaces** (HEVC, AV1, VP9 par défaut) n'ont besoin que du pourcentage indiqué de ces débits. Avec les valeurs par défaut, un fichier HEVC en 1080p demande 1500 kbit/s au lieu de 2500.",
+        "- **Codecs vidéo anciens**, **Codecs audio anciens** et **Conteneurs anciens** : noms tels que ffprobe les indique (`mpeg4`, `msmpeg4v3`, `wmav2`…) et extensions de fichier (`avi`, `wmv`…). Videz une liste pour désactiver ce contrôle.",
+        "- **Signaler les vidéos entrelacées** : désactivé par défaut, car beaucoup d'enregistrements TV sont entrelacés volontairement."
+      ],
+      "see": [
+        "quality.issues",
+        "quality.overview"
+      ]
+    },
+    "download.overview": {
+      "title": "Télécharger des fichiers",
+      "body": [
+        "Copie des fichiers du serveur vers votre ordinateur : depuis n'importe quel dossier de sources ou le dossier cible, dans chaque panneau qui liste des dossiers (Sources, Renommer, Fusionner et Qualité).",
+        "- Pointez un fichier ou un dossier et appuyez sur sa flèche de téléchargement, ou cochez-en plusieurs et appuyez sur **Télécharger**.",
+        "- **Un fichier** se télécharge tout de suite. La liste de téléchargements du navigateur affiche la progression, et un téléchargement interrompu peut y être repris.",
+        "- **Un dossier** (sous-dossiers compris) arrive sous la forme d'**un seul fichier ZIP** qui conserve les dossiers. Les fichiers y sont stockés tels quels, sans compression : le téléchargement démarre donc aussitôt et le navigateur connaît la taille. Un téléchargement ZIP interrompu doit recommencer.",
+        "- **Plusieurs fichiers** peuvent arriver en un seul ZIP ou sous forme de fichiers séparés. Pour des fichiers séparés, votre navigateur peut demander une fois si le site est autorisé à télécharger plusieurs fichiers.",
+        "Un fichier converti peut aussi être téléchargé depuis les détails de sa tâche (**télécharger le fichier converti**). Les fichiers cachés et les conversions inachevées (`.part`) sont exclus des fichiers ZIP."
+      ],
+      "see": [
+        "convert.sources",
+        "upload.overview"
+      ]
+    },
+    "delete.overview": {
+      "title": "Supprimer des fichiers sources",
+      "body": [
+        "Retire des fichiers ou des dossiers d'un dossier de sources du serveur, par exemple un téléchargement dont vous avez fini la conversion.",
+        "1. Dans **Convertir**, cochez les fichiers ou dossiers dans [Sources](#convert.sources).",
+        "1. Appuyez sur **Supprimer** (ou sur la touche Suppr).",
+        "1. La confirmation indique exactement ce qui va disparaître : combien de fichiers, combien d'espace, et tout ce que contient un dossier choisi. Appuyez sur **Supprimer** pour confirmer ; **Annuler** est le choix par défaut.",
+        "La suppression est irréversible. Si un client de téléchargement tel que Deluge partage encore les fichiers, il les signalera comme manquants.",
+        "### Ce qui est refusé",
+        "- Les fichiers en attente, en cours de conversion ou en pause, et les dossiers qui en contiennent un. Retirez-les d'abord de la file d'attente.",
+        "- Tout ce qui se trouve dans un dossier de sources marqué **Protéger** dans les [Paramètres](#settings.folders).",
+        "- Un dossier de sources lui-même (retirez-le plutôt de la liste dans les [Paramètres](#settings.folders) ; cela ne supprime rien).",
+        "- Tout ce qui se trouve dans le dossier cible : les fichiers convertis ne sont pas supprimés d'ici."
+      ],
+      "see": [
+        "convert.sources",
+        "settings.folders"
+      ]
+    },
+    "backup.overview": {
+      "title": "Sauvegarde et restauration",
+      "body": [
+        "Une sauvegarde contient les données propres à l'application : paramètres (dossiers, critères de qualité…), préréglages, jeux de règles de renommage, liste et historique des tâches, historique des renommages, fusions et résultats des contrôles de qualité. Elle peut aussi contenir le journal HandBrake de chaque tâche. Les fichiers vidéo n'en font jamais partie.",
+        "Elle se trouve dans les [Paramètres](#settings.folders) → **Sauvegarde et restauration**.",
+        "- **Télécharger la sauvegarde** enregistre un fichier ZIP sur votre ordinateur.",
+        "- **Enregistrer sur le serveur** en conserve une dans le dossier de données de l'application (`data/backups`). Les 10 plus récentes sont gardées.",
+        "### Restaurer",
+        "1. **Choisir un fichier de sauvegarde…** sur votre ordinateur, ou choisissez-en une sous **Sauvegardes sur le serveur**.",
+        "1. Vérifiez ce qu'elle contient : le tableau compare la sauvegarde aux données actuelles, et les dossiers qui n'existent pas sur ce serveur sont signalés.",
+        "1. Choisissez **Configuration uniquement** (paramètres, préréglages et règles de renommage ; les tâches et l'historique restent) ou **Tout** (aussi les tâches et leurs journaux, les historiques, les fusions et les résultats de qualité).",
+        "1. Appuyez sur **Restaurer…** et confirmez. La page se recharge ensuite.",
+        "Avant chaque restauration, les données actuelles sont enregistrées sur le serveur sous le nom **Avant une restauration** : une restauration peut donc être annulée en restaurant celle-là.",
+        "Une restauration ne démarre jamais la file d'attente. **Tout** ne peut pas être restauré pendant qu'une conversion, une fusion, un contrôle de qualité ou un téléversement est en cours.",
+        "Le mot de passe e-mail des [notifications](#settings.notifications) fait partie des paramètres, il figure donc dans chaque sauvegarde : gardez les fichiers de sauvegarde dans un endroit privé."
+      ],
+      "see": [
+        "settings.folders",
+        "backup.schedule"
+      ]
+    },
+    "queue.eta": {
+      "title": "Combien de temps la file d'attente demande encore",
+      "body": [
+        "Au-dessus des tâches, la file d'attente affiche combien de temps de conversion il reste et quand elle sera terminée ; chaque tâche en attente affiche sa propre estimation, et la barre du haut le total.",
+        "L'estimation est la durée de chaque source × la vitesse à laquelle ce serveur a converti des fichiers similaires auparavant : la médiane des 20 dernières conversions avec le **même préréglage** (encodage plus [vérification après conversion](#verify.overview)). Pour un préréglage sans historique, tous les préréglages sont utilisés ensemble ; sans aucun historique, la vitesse de la tâche en cours de conversion.",
+        "- Une tâche dont la source n'a pas encore été lue reçoit la durée moyenne des autres (« certaines durées estimées »).",
+        "- Avec une [plage de conversion](#settings.schedule), l'heure de fin la suit : les tâches ne démarrent que dans la plage, et celle qui est en cours de conversion à sa fermeture est d'abord terminée.",
+        "- D'autres travaux sur le serveur (transcodage du serveur multimédia, contrôle de qualité) ralentissent les conversions : considérez donc l'heure comme une indication."
+      ],
+      "see": [
+        "queue.state",
+        "stats.overview",
+        "settings.schedule"
+      ]
+    },
+    "settings.schedule": {
+      "title": "Plage de conversion",
+      "body": [
+        "Ne convertit qu'à certaines heures, p. ex. la nuit, pour que l'encodage ne ralentisse pas un serveur multimédia ou d'autres services pendant la journée.",
+        "- **Ouverture à / Fermeture à** : quand l'heure de fermeture est antérieure à l'heure d'ouverture (23:00 → 07:00), la plage court sur la nuit. La même heure pour les deux signifie toute la journée.",
+        "- Les **Jours** sont les jours où la plage **s'ouvre** : le vendredi avec 23:00 → 07:00 se termine le samedi matin.",
+        "- En dehors de la plage, la file d'attente ne démarre pas de nouvelle tâche. Une tâche en cours de conversion à la fermeture de la plage est d'abord terminée.",
+        "- **Démarrer automatiquement la file d'attente à l'ouverture de la plage si des tâches attendent** : si des tâches attendent et que la file est arrêtée, elle démarre à l'ouverture de la plage. Un appui sur Arrêter pendant la plage est respecté jusqu'à la prochaine ouverture.",
+        "La barre du haut affiche l'état de la plage (ouverte jusqu'à …, ou prochaine ouverture) ; cliquez dessus pour venir ici.",
+        "La plage suit l'**horloge du serveur**. Si le fuseau horaire du serveur diffère du vôtre, cette page l'indique : définissez `TZ` dans le `.env` du serveur (p. ex. `TZ=Europe/London`) et redémarrez le conteneur."
+      ],
+      "see": [
+        "queue.state",
+        "queue.eta",
+        "settings.watch"
+      ]
+    },
+    "settings.watch": {
+      "title": "Dossiers surveillés",
+      "body": [
+        "Les nouvelles vidéos qui apparaissent dans un dossier surveillé sont ajoutées toutes seules à la file d'attente, avec le préréglage choisi pour ce dossier (ou celui par défaut).",
+        "Deux façons d'en ajouter un : **Surveiller** à côté du chemin du dossier dans le panneau Sources (Convertir) surveille le dossier ouvert avec le préréglage par défaut, ou **Ajouter un dossier surveillé…** ici, qui ouvre un navigateur de dossiers (**Parcourir…** change le dossier d'une ligne existante). Dans le panneau Sources, les dossiers surveillés affichent un œil, et le dossier ouvert affiche **Surveillé** ; cliquez dessus pour venir ici.",
+        "- Un dossier surveillé doit se trouver dans l'un des [dossiers de sources](#settings.folders). Les dossiers surveillés ne peuvent pas être imbriqués.",
+        "- Les fichiers déjà présents dans un dossier quand vous l'ajoutez sont **laissés de côté** ; faites-les glisser vous-même dans la file d'attente si vous les voulez. Chaque fichier n'est ajouté qu'**une seule fois**, même si vous retirez ensuite sa tâche.",
+        "- Un fichier n'est ajouté qu'après avoir **cessé de changer** pendant le délai de stabilisation que vous avez fixé (10 minutes par défaut), de sorte que les téléchargements et copies en cours ne soient pas pris en compte. Les dossiers sont examinés toutes les quelques minutes, car les événements du système de fichiers n'arrivent pas sur NFS ou SMB.",
+        "- Pour un client de téléchargement, surveillez le dossier où sont déplacés les téléchargements **terminés**, et non celui dans lequel il télécharge : un téléchargement en pause pourrait sinon sembler fini.",
+        "- Les règles d'ajout habituelles s'appliquent : mots exclus tels que `sample`, extensions vidéo, et « Ignorer les fichiers déjà convertis ».",
+        "- **Démarrer la file d'attente après l'ajout de fichiers** : sinon, ils attendent **Démarrer**. Avec une [plage de conversion](#settings.schedule), la file attend alors la plage.",
+        "**Activité** affiche les fichiers qui attendent de se stabiliser, les derniers fichiers ajoutés ou ignorés, et les problèmes tels qu'un dossier manquant. **Chercher maintenant** examine les dossiers immédiatement."
+      ],
+      "see": [
+        "settings.schedule",
+        "settings.notifications",
+        "settings.adding"
+      ]
+    },
+    "settings.notifications": {
+      "title": "Notifications",
+      "body": [
+        "Le serveur peut vous prévenir quand la file d'attente est terminée, quand une conversion ou sa vérification échoue, quand chaque fichier est converti, quand un dossier surveillé ajoute des fichiers ou quand une sauvegarde planifiée échoue. Choisissez les événements en haut ; l'e-mail et les webhooks suivent cette liste, sauf si un webhook a la sienne.",
+        "### Webhooks",
+        "Un `POST` JSON par message vers une URL : un nœud **Webhook** n8n, un déclencheur webhook Home Assistant, ntfy, Gotify… Ajoutez-en autant que nécessaire (jusqu'à 10) avec **Ajouter un webhook** ; chacun a un nom, un interrupteur, son URL et des en-têtes supplémentaires facultatifs, p. ex. `Authorization: Bearer …`, un par ligne.",
+        "- Chaque webhook reçoit soit **Les événements choisis ci-dessus**, soit **Seulement ces événements** : par exemple tout pour n8n, mais seulement « la file d'attente est terminée » pour Home Assistant.",
+        "- Le corps contient `event`, `title`, `message` (texte brut), `url` (l'adresse de l'application, si elle est définie), `at` et `data` (les détails de la tâche ou de l'exécution).",
+        "### E-mail",
+        "Envoyé via votre serveur SMTP. Réglages typiques : **STARTTLS** sur le port 587, **TLS** sur le 465. Pour Gmail et Outlook, utilisez un **mot de passe d'application**, pas votre mot de passe habituel.",
+        "- Le mot de passe est stocké sur le serveur et jamais renvoyé au navigateur ; laissez la zone vide pour le conserver.",
+        "- Il fait partie des paramètres, il figure donc dans les [sauvegardes](#backup.overview).",
+        "**Envoyer un test** utilise ce qui est à l'écran, avant l'enregistrement. **Envoyés récemment** liste les derniers messages et les éventuelles erreurs.",
+        "### Ce navigateur",
+        "Le titre de l'onglet affiche toujours la progression (« 42 % · Show S01e02.mkv », « ✓ File terminée »). Des notifications de bureau peuvent apparaître quand l'onglet est en arrière-plan ; les navigateurs ne les autorisent que sur les pages `https://` ou `localhost` : sur une simple adresse `http://`, utilisez plutôt l'e-mail ou un webhook."
+      ],
+      "see": [
+        "settings.watch",
+        "queue.state",
+        "backup.overview"
+      ]
+    },
+    "stats.overview": {
+      "title": "Statistiques",
+      "body": [
+        "Ce que le serveur a converti sur la période choisie : fichiers, espace économisé, durée de vidéo convertie et travail nécessaire, et vitesse (× temps réel : 2× signifie qu'une heure de vidéo a pris 30 minutes, vérification comprise).",
+        "- **Fichiers convertis par jour** (ou par mois pour les longues périodes) : survolez une colonne pour ses détails, ou passez à **Tableau**.",
+        "- **Vérification après conversion** : combien de fichiers convertis ont réussi la [vérification](#verify.overview), avaient des avertissements ou l'ont échouée.",
+        "- **Par préréglage** : comparez les préréglages sur la vitesse et la réduction de taille.",
+        "Chaque conversion démarrée est enregistrée à sa fin. **Effacer les terminées** dans la file d'attente ne la retire pas de ces chiffres. Le même historique donne l'[heure de fin de la file](#queue.eta)."
+      ],
+      "see": [
+        "queue.eta",
+        "presets"
+      ]
+    },
+    "backup.schedule": {
+      "title": "Sauvegardes planifiées",
+      "body": [
+        "Crée une [sauvegarde](#backup.overview) automatiquement chaque jour ou chaque semaine à l'heure choisie, et conserve les plus récentes (14 par défaut). Les anciennes sauvegardes planifiées sont supprimées ; les autres fichiers du dossier ne sont jamais touchés.",
+        "- **Dossier sur le serveur** : vide, cela signifie le dossier `data/backups` de l'application. Pour garder les sauvegardes hors du serveur, utilisez un partage réseau monté dessus, p. ex. un dossier du NAS. Avec Docker, le dossier doit se trouver dans le dossier monté dans le conteneur (`MEDIA_DIR`, généralement `/mnt`). **Parcourir…** choisit un dossier sous les dossiers de sources ou cible ; tout autre chemin peut être saisi.",
+        "- Le dossier doit exister et être accessible en écriture quand vous activez la planification.",
+        "- Si le serveur était éteint ou si le partage n'était pas monté à l'heure de la sauvegarde, elle est faite dès que possible. Une sauvegarde échouée est retentée après 30 minutes, et peut envoyer une [notification](#settings.notifications) (« Une sauvegarde planifiée a échoué »).",
+        "- Chaque fichier est écrit sous un nom temporaire puis renommé une fois complet, de sorte qu'une sauvegarde à moitié écrite n'apparaisse jamais dans le dossier.",
+        "- **Sauvegarder maintenant** en crée une immédiatement avec les réglages enregistrés.",
+        "Les sauvegardes planifiées sont listées sous **Conservées par la planification**, où elles peuvent être restaurées, téléchargées ou supprimées comme les autres.",
+        "La sauvegarde contient les paramètres, donc aussi le mot de passe e-mail des notifications : gardez le dossier privé."
+      ],
+      "see": [
+        "backup.overview",
+        "settings.notifications"
+      ]
+    },
+    "presets.editor": {
+      "title": "Modifier un préréglage",
+      "body": [
+        "L'éditeur fonctionne comme l'application de bureau HandBrake. Le nom, la catégorie et la description sont en haut ; les réglages sont dans des onglets :",
+        "- **Résumé** : le conteneur (MP4, MKV, WebM, MOV), l'optimisation pour le web, les marqueurs de chapitre et les métadonnées.",
+        "- **Dimensions** : rotation et retournement, recadrage (l'automatique supprime les bandes noires), la **limite de résolution** (les sources plus grandes sont réduites à cette limite), l'anamorphose et les bordures.",
+        "- **Filtres** : détélécinéma, détection d'entrelacement et désentrelacement, déblocage, réduction du bruit, lissage de la chrominance, netteté, espace colorimétrique et niveaux de gris. Un filtre réglé sur **Personnalisé** prend les propres réglages `key=value:key=value` de HandBrake.",
+        "- **Vidéo** : l'encodeur, la fréquence d'images, la qualité (qualité constante ou débit moyen) et le préréglage, le réglage (tune), le profil, le niveau et les options avancées de l'encodeur.",
+        "- **Audio** : quelles pistes sources sont conservées (par langue), les encodeurs que reçoit chaque piste, l'auto passthru et les noms de pistes.",
+        "- **Sous-titres** : quelles pistes de sous-titres sont conservées, la recherche de l'audio étranger, les sous-titres codés et l'incrustation.",
+        "- **JSON** : chaque réglage tel que HandBrake le stocke, pour les quelques-uns que les onglets n'affichent pas. **Appliquer au formulaire** prend en compte vos modifications du JSON.",
+        "Les encodeurs et leurs listes de préréglages, réglages, profils et niveaux viennent du HandBrakeCLI de ce serveur : l'éditeur ne propose donc que ce qu'il peut exécuter. Les encodeurs qui ne peuvent pas aller dans le conteneur choisi sont grisés.",
+        "### Enregistrer",
+        "- **Enregistrer** remplace le préréglage. **Enregistrer comme nouveau…** le garde tel qu'il était et enregistre vos modifications comme un nouveau préréglage.",
+        "- Quand vous ouvrez un préréglage, le serveur le fait lire par HandBrakeCLI : les préréglages d'anciennes versions de HandBrake sont donc mis à niveau et chaque réglage est renseigné. L'enregistrement vérifie de nouveau le préréglage avec HandBrakeCLI.",
+        "- Les problèmes sont listés au-dessus des onglets. Un problème rouge (p. ex. un encodeur H.265 avec un conteneur WebM) doit être corrigé avant l'enregistrement ; un jaune est un avertissement, p. ex. un encodeur que ce serveur n'a pas.",
+        "- Les tâches déjà dans la file gardent les réglages avec lesquels elles ont été ajoutées. Les dossiers surveillés utilisent les nouveaux réglages pour les fichiers qu'ils ajoutent à partir de maintenant.",
+        "- Quitter avec des modifications non enregistrées demande d'abord confirmation."
+      ],
+      "see": [
+        "presets",
+        "presets.new",
+        "presets.qsv"
+      ]
+    },
+    "presets.new": {
+      "title": "Nouveau préréglage",
+      "body": [
+        "**Nouveau** (page Préréglages) crée un préréglage et l'ouvre dans l'[éditeur](#presets.editor).",
+        "- **Un préréglage HandBrake** : l'un des préréglages intégrés à HandBrake, tels que « Fast 1080p30 », « H.265 MKV 1080p30 » ou les préréglages d'appareils. La liste vient du HandBrakeCLI de ce serveur.",
+        "- **L'un de vos préréglages** : une copie, comme **Dupliquer**.",
+        "Donnez-lui un nom (et éventuellement une catégorie, qui regroupe les préréglages dans la liste, et une description). Deux préréglages ne peuvent porter le même nom que dans des catégories différentes.",
+        "Le nouveau préréglage est enregistré tout de suite : modifiez-le dans l'éditeur, ou supprimez-le si vous changez d'avis."
+      ],
+      "see": [
+        "presets",
+        "presets.editor"
+      ]
+    }
+  }
+}

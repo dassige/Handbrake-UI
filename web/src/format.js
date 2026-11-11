@@ -1,3 +1,5 @@
+import { intlLocale, t } from './i18n/index.js';
+
 export function bytes(n) {
   if (n == null) return '—';
   const units = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -21,7 +23,7 @@ export function duration(seconds) {
 
 export function dateTime(ms) {
   if (!ms) return '—';
-  return new Date(ms).toLocaleString(undefined, {
+  return new Date(ms).toLocaleString(intlLocale(), {
     day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
   });
 }
@@ -29,9 +31,9 @@ export function dateTime(ms) {
 export function ago(ms) {
   if (!ms) return '';
   const s = (Date.now() - ms) / 1000;
-  if (s < 60) return 'just now';
-  if (s < 3600) return `${Math.floor(s / 60)} min ago`;
-  if (s < 86400) return `${Math.floor(s / 3600)} h ago`;
+  if (s < 60) return t('format.ago.justNow');
+  if (s < 3600) return t('format.ago.minutes', { count: Math.floor(s / 60) });
+  if (s < 86400) return t('format.ago.hours', { count: Math.floor(s / 3600) });
   return dateTime(ms);
 }
 
@@ -74,21 +76,22 @@ export function humanDuration(seconds) {
   const d = Math.floor(s / 86400);
   const h = Math.floor((s % 86400) / 3600);
   const m = Math.floor((s % 3600) / 60);
-  if (d) return `${d} d ${h} h`;
-  if (h) return m ? `${h} h ${m} min` : `${h} h`;
-  if (m) return `${m} min`;
-  return `${s} s`;
+  if (d) return t('format.duration.daysHours', { days: d, hours: h });
+  if (h) return m ? t('format.duration.hoursMinutes', { hours: h, minutes: m }) : t('format.duration.hours', { hours: h });
+  if (m) return t('format.duration.minutes', { minutes: m });
+  return t('format.duration.seconds', { seconds: s });
 }
 
 /** A moment in the near future: "14:05", "tomorrow 03:40", "Thu 03:40", "24 Nov 03:40". */
 export function clockTime(ms, now = Date.now()) {
   if (ms == null) return '—';
-  const t = new Date(ms);
-  const time = t.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  const at = new Date(ms);
+  const locale = intlLocale();
+  const time = at.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
   const day = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
-  const days = Math.round((day(t) - day(new Date(now))) / 86_400_000);
+  const days = Math.round((day(at) - day(new Date(now))) / 86_400_000);
   if (days === 0) return time;
-  if (days === 1) return `tomorrow ${time}`;
-  if (days > 1 && days < 7) return `${t.toLocaleDateString(undefined, { weekday: 'short' })} ${time}`;
-  return `${t.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} ${time}`;
+  if (days === 1) return t('format.clock.tomorrow', { time });
+  if (days > 1 && days < 7) return t('format.clock.weekday', { day: at.toLocaleDateString(locale, { weekday: 'short' }), time });
+  return t('format.clock.date', { date: at.toLocaleDateString(locale, { day: 'numeric', month: 'short' }), time });
 }

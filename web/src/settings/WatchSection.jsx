@@ -4,6 +4,8 @@ import { FolderPicker } from '../components/FolderPicker.jsx';
 import { rootLabel } from '../roots.js';
 import { api } from '../api.js';
 import { ago, bytes, clockTime, fileName, relTo } from '../format.js';
+import { t } from '../i18n/index.js';
+import { skipReason } from '../i18n/serverText.js';
 import { Card, Check, Field, NumberInput, Switch } from './fields.jsx';
 
 const isInside = (root, p) => {
@@ -28,7 +30,7 @@ export function WatchSection({ draft, set, base, presets, liveStatus, run, dirty
 
   async function scanNow() {
     setScanning(true);
-    const r = await run(() => api.watchScan(), (x) => (x.added ? `Added ${x.added} file${x.added === 1 ? '' : 's'} to the queue` : 'Nothing new to add'));
+    const r = await run(() => api.watchScan(), (x) => (x.added ? t('settings.watch.scanAdded', { count: x.added }) : t('settings.watch.scanNothing')));
     if (r) setStatus(r.status);
     setScanning(false);
   }
@@ -40,18 +42,15 @@ export function WatchSection({ draft, set, base, presets, liveStatus, run, dirty
   return (
     <>
       <Card
-        title="Watch folders"
+        title={t('settings.watch.title')}
         help="settings.watch"
-        aside={<Switch checked={w.enabled} onChange={(v) => setW('enabled', v)} label={w.enabled ? 'On' : 'Off'} />}
+        aside={<Switch checked={w.enabled} onChange={(v) => setW('enabled', v)} label={w.enabled ? t('common.on') : t('common.off')} />}
       >
-        <p className="set-hint">
-          New videos that appear in these folders are added to the queue by themselves. Files that are already there when you add
-          a folder are left alone (drag them into the queue if you want them). Each file is added once.
-        </p>
+        <p className="set-hint">{t('settings.watch.intro')}</p>
         <div className="watch-list">
           {w.folders.map((f, i) => (
             <div key={i} className="watch-row">
-              <Field label={`Folder ${i + 1}`} className="grow">
+              <Field label={t('settings.watch.folder', { number: i + 1 })} className="grow">
                 <div className="inline-form">
                   <input
                     value={f.path}
@@ -61,15 +60,15 @@ export function WatchSection({ draft, set, base, presets, liveStatus, run, dirty
                     onChange={(e) => setFolder(i, { path: e.target.value })}
                     aria-invalid={outside(f.path) || undefined}
                   />
-                  <button type="button" className="btn small" onClick={() => setPicking(i)} title="Pick the folder by browsing the server">
-                    <FolderSearch size={14} /> Browse…
+                  <button type="button" className="btn small" onClick={() => setPicking(i)} title={t('settings.watch.browseTitle')}>
+                    <FolderSearch size={14} /> {t('settings.browse')}
                   </button>
                 </div>
-                {outside(f.path) && <span className="warn-text">Must be inside one of the sources folders.</span>}
+                {outside(f.path) && <span className="warn-text">{t('settings.watch.outside')}</span>}
               </Field>
-              <Field label="Preset">
+              <Field label={t('settings.watch.preset')}>
                 <select value={f.presetId ?? ''} onChange={(e) => setFolder(i, { presetId: e.target.value ? Number(e.target.value) : null })}>
-                  <option value="">Default preset</option>
+                  <option value="">{t('settings.watch.defaultPreset')}</option>
                   {presets.map((p) => (
                     <option key={p.id} value={p.id}>{p.category ? `${p.category} / ` : ''}{p.name}</option>
                   ))}
@@ -77,9 +76,9 @@ export function WatchSection({ draft, set, base, presets, liveStatus, run, dirty
               </Field>
               <label className="set-check compact">
                 <input type="checkbox" checked={f.recursive} onChange={(e) => setFolder(i, { recursive: e.target.checked })} />
-                <span>Sub-folders</span>
+                <span>{t('settings.watch.subfolders')}</span>
               </label>
-              <button type="button" className="icon-btn danger" title="Stop watching this folder (nothing is deleted)" onClick={() => setW('folders', w.folders.filter((_, j) => j !== i))}>
+              <button type="button" className="icon-btn danger" title={t('settings.watch.remove')} onClick={() => setW('folders', w.folders.filter((_, j) => j !== i))}>
                 <Trash2 size={15} />
               </button>
             </div>
@@ -93,12 +92,12 @@ export function WatchSection({ draft, set, base, presets, liveStatus, run, dirty
               setPicking(w.folders.length);
             }}
           >
-            <Plus size={14} /> Add a watch folder…
+            <Plus size={14} /> {t('settings.watch.add')}
           </button>
           {picking != null && (
             <FolderPicker
               settings={draft}
-              title="Choose a watch folder"
+              title={t('settings.watch.pickTitle')}
               initial={w.folders[picking]?.path || undefined}
               onError={onError}
               onClose={() => {
@@ -115,71 +114,71 @@ export function WatchSection({ draft, set, base, presets, liveStatus, run, dirty
         </div>
       </Card>
 
-      <Card title="When files appear">
+      <Card title={t('settings.watch.whenTitle')}>
         <div className="set-row">
-          <Field label="Wait until a file has not changed for (minutes)" hint="So files still downloading or copying are not picked up.">
+          <Field label={t('settings.watch.settle')} hint={t('settings.watch.settleHint')}>
             <NumberInput min="1" max="1440" value={w.settleMinutes} onChange={(v) => setW('settleMinutes', v)} className="narrow" />
           </Field>
-          <Field label="Look for new files every (minutes)">
+          <Field label={t('settings.watch.interval')}>
             <NumberInput min="1" max="60" value={w.intervalMinutes} onChange={(v) => setW('intervalMinutes', v)} className="narrow" />
           </Field>
         </div>
         <Check
           checked={w.autoStart}
           onChange={(v) => setW('autoStart', v)}
-          hint={draft.schedule.enabled ? 'With the conversion window on, the queue then waits for the window to open.' : undefined}
+          hint={draft.schedule.enabled ? t('settings.watch.autoStartHint') : undefined}
         >
-          Start the queue after adding files
+          {t('settings.watch.autoStart')}
         </Check>
       </Card>
 
       <Card
-        title="Activity"
+        title={t('settings.watch.activity')}
         aside={
           <button type="button" className="btn small" onClick={scanNow} disabled={!saved.enabled || scanning || dirty}>
-            <RefreshCw size={14} className={scanning || status?.scanning ? 'spin' : ''} /> Look now
+            <RefreshCw size={14} className={scanning || status?.scanning ? 'spin' : ''} /> {t('settings.watch.lookNow')}
           </button>
         }
       >
         {!saved.enabled ? (
-          <p className="set-hint">Watching is off{w.enabled ? ' (save to turn it on)' : ''}.</p>
+          <p className="set-hint">{w.enabled ? t('settings.watch.offSave') : t('settings.watch.off')}</p>
         ) : (
           <>
             <p className="set-hint">
-              {status?.lastScanAt ? `Last look ${ago(status.lastScanAt)}` : 'Not looked yet'}
-              {status?.nextScanAt ? ` · next at ${clockTime(status.nextScanAt)}` : ''}
-              {dirty ? ' · save your changes first' : ''}
+              {status?.lastScanAt ? t('settings.watch.lastLook', { ago: ago(status.lastScanAt) }) : t('settings.watch.notLooked')}
+              {status?.nextScanAt ? ` · ${t('settings.watch.nextAt', { time: clockTime(status.nextScanAt) })}` : ''}
+              {dirty ? ` · ${t('settings.saveFirst')}` : ''}
             </p>
             {Object.entries(status?.errors ?? {}).map(([folder, msg]) => (
               <p key={folder} className="warn-text"><TriangleAlert size={13} /> {folder}: {msg}</p>
             ))}
             {status?.pending?.length > 0 && (
               <>
-                <h4 className="set-subhead">Waiting to settle</h4>
+                <h4 className="set-subhead">{t('settings.watch.pending')}</h4>
                 <ul className="activity-list">
                   {status.pending.map((p) => (
                     <li key={p.path} title={p.path}>
                       <Clock size={14} className="muted" />
                       <span className="file-name">{relTo(p.folder, p.path)}</span>
-                      <span className="muted small">{bytes(p.size)} · from {clockTime(Math.max(p.readyAt, Date.now()))}</span>
+                      <span className="muted small">{bytes(p.size)} · {t('settings.watch.pendingFrom', { time: clockTime(Math.max(p.readyAt, Date.now())) })}</span>
                     </li>
                   ))}
                 </ul>
               </>
             )}
-            <h4 className="set-subhead">Recently</h4>
+            <h4 className="set-subhead">{t('settings.watch.recent')}</h4>
             {status?.recent?.length ? (
               <ul className="activity-list">
                 {status.recent.map((r) => (
                   <li key={r.path + r.at} title={r.path}>
                     {r.action === 'added' ? <CheckCircle2 size={14} className="text-good" /> : <SkipForward size={14} className="muted" />}
                     <span className="file-name">{fileName(r.path)}</span>
-                    <span className="muted small">{r.action === 'added' ? 'added' : `skipped: ${r.note}`} · {ago(r.at)}</span>
+                    <span className="muted small">{r.action === 'added' ? t('settings.watch.added') : t('settings.watch.skipped', { note: r.note ? skipReason({ reason: r.note }) : '' })} · {ago(r.at)}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="set-hint">Nothing added yet.</p>
+              <p className="set-hint">{t('settings.watch.nothingAdded')}</p>
             )}
           </>
         )}

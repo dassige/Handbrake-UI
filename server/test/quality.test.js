@@ -67,6 +67,18 @@ test('old formats, low resolution, low bitrate and interlacing are flagged', () 
   assert.deepEqual(kinds(describeMedia({ format: {}, streams: [] }, { file: '/a.mkv', size: 1 })), ['error']);
 });
 
+test('issues carry a code and params for the web app, next to the English text', () => {
+  const [codec, resolution] = evaluateQuality(info({ codec: 'mpeg4', width: 640, height: 352, bitRate: '1000000' }, '/m/old.mkv'), DEFAULT_QUALITY);
+  assert.deepEqual(codec, { kind: 'format', code: 'oldVideoCodec', params: { codec: 'mpeg4' }, text: 'Old video codec: mpeg4' });
+  assert.equal(resolution.code, 'lowResolution');
+  assert.deepEqual(resolution.params, { width: 640, height: 352, minHeight: 720 });
+  const [low] = evaluateQuality(info({ codec: 'hevc', formatBitRate: '1000000' }), DEFAULT_QUALITY);
+  assert.equal(low.code, 'lowBitrateCodecEstimated');
+  assert.deepEqual(low.params, { kbps: 840, min: 1500, resolution: 'fhd', codec: 'HEVC' });
+  assert.equal(low.text, 'Low bitrate: 840 (est.) kbps, below 1500 kbps for 1080p HEVC');
+  assert.equal(evaluateQuality(info({ bitRate: '1500000' }), DEFAULT_QUALITY)[0].code, 'lowBitrate');
+});
+
 test('criteria can turn checks off', () => {
   const off = normalizeQuality({
     minHeight: 0, minKbps: { sd: 0, hd: 0, fhd: 0, uhd: 0 }, badContainers: [], badVideoCodecs: [],

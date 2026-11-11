@@ -1,11 +1,12 @@
 // Friendly names of the sources folders (Settings → Folders → Name).
+import { t } from './i18n/index.js';
 
 const base = (p) => String(p ?? '').replace(/[\\/]+$/, '').split(/[\\/]/).pop() || p;
 
 /** The name to show for a sources folder (or the target folder). */
 export function rootLabel(settings, root) {
   if (!settings || !root) return root ?? '';
-  if (root === settings.targetRoot) return 'Target';
+  if (root === settings.targetRoot) return t('misc.roots.target');
   return settings.sourceNames?.[root] || base(root);
 }
 

@@ -1,0 +1,68 @@
+{
+  "dialogs": {
+    "confirmTitle": "Bitte bestätigen",
+    "alertTitle": "Hinweis",
+    "typeValue": "Bitte einen Wert eingeben"
+  },
+  "paneSwitch": {
+    "label": "Bereich"
+  },
+  "toasts": {
+    "dismiss": "Ausblenden"
+  },
+  "status": {
+    "queued": "Wartend",
+    "running": "Wird konvertiert",
+    "paused": "Angehalten",
+    "done": "Konvertiert",
+    "failed": "Fehlgeschlagen",
+    "cancelled": "Abgebrochen",
+    "scanning": "Wird gescannt",
+    "finishing": "Wird abgeschlossen",
+    "checkPaused": "Prüfung angehalten",
+    "checking": "Wird geprüft"
+  },
+  "verify": {
+    "ok": "Geprüft",
+    "warning": "Prüfwarnungen",
+    "error": "Prüfung fehlgeschlagen",
+    "skipped": "Nicht geprüft",
+    "running": "Wird geprüft"
+  },
+  "folderBadges": {
+    "converting_one": "{count} in Konvertierung",
+    "converting_other": "{count} in Konvertierung",
+    "queued_one": "{count} wartend",
+    "queued_other": "{count} wartend",
+    "converted_one": "{count} konvertiert",
+    "converted_other": "{count} konvertiert",
+    "failed_one": "{count} fehlgeschlagen",
+    "failed_other": "{count} fehlgeschlagen"
+  },
+  "folderPicker": {
+    "title": "Ordner wählen",
+    "choose": "Diesen Ordner wählen",
+    "roots": "Quellordner",
+    "crumbs": "Ordner",
+    "up": "Eine Ebene höher",
+    "empty": "Keine Unterordner vorhanden."
+  },
+  "delete": {
+    "notDeleted": "Nicht gelöscht:",
+    "notDeletedList": "Nicht gelöscht: {list}",
+    "more_one": "… und {count} weiteres",
+    "more_other": "… und {count} weitere",
+    "nothingTitle": "Nichts kann gelöscht werden",
+    "title": "Vom Server löschen?",
+    "items_one": "{count} Element",
+    "items_other": "{count} Elemente",
+    "summary": "Folgendes wird endgültig gelöscht: {what} – {files}, {size}.",
+    "summaryFolder": "Folgendes wird endgültig gelöscht: {what} – {files}, {size}, einschließlich des gesamten Ordnerinhalts.",
+    "summaryFolders": "Folgendes wird endgültig gelöscht: {what} – {files}, {size}, einschließlich des gesamten Inhalts von {folders}.",
+    "warning": "Dies kann nicht rückgängig gemacht werden. Wenn ein Download-Client (z. B. Deluge) diese Dateien noch seedet, meldet er sie als fehlend.",
+    "deleteItems_one": "{count} Element löschen",
+    "deleteItems_other": "{count} Elemente löschen",
+    "deleted_one": "{count} Element gelöscht",
+    "deleted_other": "{count} Elemente gelöscht"
+  }
+}

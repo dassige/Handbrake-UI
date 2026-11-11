@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { api, sendChunk } from '../api.js';
+import { t } from '../i18n/index.js';
 
 const CHUNK = 32 * 1024 * 1024;
 const MAX_RETRIES = 6;
@@ -71,7 +72,7 @@ export function useUploads({ onError } = {}) {
         } catch (e) {
           if (e.aborted || cancelled.current.has(item.id)) return;
           if (e.status === 400 || ++retries > MAX_RETRIES) throw e;
-          patch(item.id, { error: `${e.message}; retrying…` });
+          patch(item.id, { error: t('upload.errors.retrying', { error: e.message }) });
           await sleep(Math.min(30_000, 1000 * 2 ** (retries - 1)));
           offset = await serverOffset(item);
           patch(item.id, { sent: offset, error: null });
@@ -96,7 +97,7 @@ export function useUploads({ onError } = {}) {
         } catch (e) {
           if (!cancelled.current.has(next.id)) {
             patch(next.id, { status: 'failed', error: e.message });
-            errRef.current?.(new Error(`${next.name}: ${e.message}`));
+            errRef.current?.(new Error(t('upload.errors.failed', { name: next.name, error: e.message })));
           }
         }
       }

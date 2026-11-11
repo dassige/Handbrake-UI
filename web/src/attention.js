@@ -2,15 +2,24 @@
 // queue's progress, and (opt-in, per browser) desktop notifications.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { clockTime, fileName } from './format.js';
+import { t } from './i18n/index.js';
 
 const APP = 'HandBrake Queue';
 const KEY = 'hbui.browserNotify';
 
+// label is translated each time it is read (t(e.labelKey) does the same).
+const browserEvent = (id, labelKey) => ({
+  id,
+  labelKey,
+  get label() {
+    return t(this.labelKey);
+  },
+});
 export const BROWSER_EVENTS = [
-  { id: 'queueFinished', label: 'The queue finished' },
-  { id: 'jobFailed', label: 'A conversion failed' },
-  { id: 'checkFailed', label: 'A check after conversion failed' },
-  { id: 'jobDone', label: 'Each converted file' },
+  browserEvent('queueFinished', 'misc.attention.events.queueFinished'),
+  browserEvent('jobFailed', 'misc.attention.events.jobFailed'),
+  browserEvent('checkFailed', 'misc.attention.events.checkFailed'),
+  browserEvent('jobDone', 'misc.attention.events.jobDone'),
 ];
 const DEFAULT_PREFS = { enabled: false, events: { queueFinished: true, jobFailed: true, checkFailed: true, jobDone: false } };
 
@@ -93,14 +102,14 @@ export function useAttention({ jobs, queue }) {
   let title = APP;
   if (active) {
     const name = fileName(active.sourcePath);
-    if (active.status === 'paused') title = `Paused · ${name} — ${APP}`;
-    else if (active.phase === 'verifying') title = `Checking · ${name} — ${APP}`;
-    else if (active.phase === 'encoding') title = `${Math.floor((active.progress ?? 0) * 100)}% · ${name} — ${APP}`;
-    else title = `Starting · ${name} — ${APP}`;
+    if (active.status === 'paused') title = t('misc.attention.title.paused', { name, app: APP });
+    else if (active.phase === 'verifying') title = t('misc.attention.title.checking', { name, app: APP });
+    else if (active.phase === 'encoding') title = t('misc.attention.title.progress', { percent: Math.floor((active.progress ?? 0) * 100), name, app: APP });
+    else title = t('misc.attention.title.starting', { name, app: APP });
   } else if (queue?.schedule?.waiting && queue.schedule.nextStart) {
-    title = `Waiting for ${clockTime(queue.schedule.nextStart)} — ${APP}`;
+    title = t('misc.attention.title.waiting', { time: clockTime(queue.schedule.nextStart), app: APP });
   } else if (finishedUnseen) {
-    title = `✓ Queue finished — ${APP}`;
+    title = t('misc.attention.title.finished', { app: APP });
   }
   useEffect(() => {
     document.title = title;
@@ -114,7 +123,10 @@ export function useAttention({ jobs, queue }) {
       if (hidden) setFinishedUnseen(true);
       if (want('queueFinished')) {
         const c = data?.counts ?? {};
-        show('Queue finished', `${c.done ?? 0} converted${c.failed ? ` · ${c.failed} failed` : ''}`, 'queue');
+        const body = c.failed
+          ? t('misc.attention.notify.queueFinishedBodyFailed', { count: c.done ?? 0, failed: c.failed })
+          : t('misc.attention.notify.queueFinishedBody', { count: c.done ?? 0 });
+        show(t('misc.attention.notify.queueFinished'), body, 'queue');
       }
       return;
     }
@@ -122,10 +134,10 @@ export function useAttention({ jobs, queue }) {
     const { prev, job } = data;
     const name = fileName(job.sourcePath);
     if (job.status === 'failed' && prev.status !== 'failed' && want('jobFailed')) {
-      show('Conversion failed', `${name}\n${job.error ?? ''}`, `job-${job.id}`);
+      show(t('misc.attention.notify.jobFailed'), `${name}\n${job.error ?? ''}`, `job-${job.id}`);
     } else if (job.status === 'done' && prev.status !== 'done') {
-      if (job.verifyStatus === 'error' && want('checkFailed')) show('Check failed', name, `job-${job.id}`);
-      else if (job.verifyStatus !== 'error' && want('jobDone')) show('Converted', name, `job-${job.id}`);
+      if (job.verifyStatus === 'error' && want('checkFailed')) show(t('misc.attention.notify.checkFailed'), name, `job-${job.id}`);
+      else if (job.verifyStatus !== 'error' && want('jobDone')) show(t('misc.attention.notify.jobDone'), name, `job-${job.id}`);
     }
   }, []);
 }

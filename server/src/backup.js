@@ -311,9 +311,13 @@ export class Backups {
         bk.close();
       }
       const warnings = [];
+      const missingFolders = [];
       const folders = [...(settings.sourceRoots ?? (settings.sourceRoot ? [settings.sourceRoot] : [])), settings.targetRoot].filter(Boolean);
       for (const f of folders) {
-        if (!(await fs.stat(f).then((s) => s.isDirectory(), () => false))) warnings.push(`The folder ${f} does not exist on this server; fix it in Settings after restoring.`);
+        if (!(await fs.stat(f).then((s) => s.isDirectory(), () => false))) {
+          warnings.push(`The folder ${f} does not exist on this server; fix it in Settings after restoring.`);
+          missingFolders.push(f);
+        }
       }
       return {
         source,
@@ -322,14 +326,26 @@ export class Backups {
         logs: u.logs.length,
         current: countRows(this.db),
         warnings,
+        // The same as `warnings` and `busy`, as data the web app words in its own language.
+        missingFolders,
         busy: this.busyReason(),
+        busyCode: this.busyCode(),
       };
     } finally {
       await fs.rm(u.work, { recursive: true, force: true });
     }
   }
 
-  /** Why a full restore cannot run now, or null. */
+  /** Why a full restore cannot run now, or null: 'conversion' | 'merge' | 'quality' | 'upload'. */
+  busyCode() {
+    if (this.queue.active) return 'conversion';
+    if (this.merger.active) return 'merge';
+    if (this.quality.active) return 'quality';
+    if (this.uploads.writing.size) return 'upload';
+    return null;
+  }
+
+  /** Why a full restore cannot run now, in English, or null. */
   busyReason() {
     if (this.queue.active) return 'a conversion is running';
     if (this.merger.active) return 'a merge is running';

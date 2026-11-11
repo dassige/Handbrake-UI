@@ -5,6 +5,8 @@ import { Modal } from '../components/Modal.jsx';
 import { STEP_DEFS, newStep } from './stepDefs.js';
 import { Help } from '../help/Help.jsx';
 import { useDialogs } from '../components/Dialogs.jsx';
+import { rich, t } from '../i18n/index.js';
+import { renameWarning } from '../i18n/serverText.js';
 
 const SAMPLE_NAMES = [
   'The.Rookie.6x01.La.Maledizione.Dell.Ultimo.Turno.ITA.ENG.1080p.NFRip.AAC.x265-Pir8.mkv',
@@ -18,10 +20,10 @@ function StepFields({ step, onChange, readOnly }) {
   const set = (k, v) => onChange({ ...step, [k]: v });
   return (
     <div className="step-fields">
-      {def.help && <p className="muted small">{def.help}{step.type === 'smart' && <Help id="rename.smart" />}</p>}
+      {def.helpKey && <p className="muted small">{t(def.helpKey)}{step.type === 'smart' && <Help id="rename.smart" />}</p>}
       <label className="step-field wide">
-        <span>Note</span>
-        <input value={step.description} onChange={(e) => set('description', e.target.value)} disabled={readOnly} placeholder="optional description" />
+        <span>{t('rename.rules.note')}</span>
+        <input value={step.description} onChange={(e) => set('description', e.target.value)} disabled={readOnly} placeholder={t('rename.rules.notePlaceholder')} />
       </label>
       {def.fields.map((fd) => {
         const v = step[fd.k];
@@ -29,16 +31,16 @@ function StepFields({ step, onChange, readOnly }) {
           return (
             <label key={fd.k} className="check step-field">
               <input type="checkbox" checked={!!v} onChange={(e) => set(fd.k, e.target.checked)} disabled={readOnly} />
-              {fd.label}
+              {t(fd.labelKey, fd.labelVars)}
             </label>
           );
         }
         return (
           <label key={fd.k} className={`step-field ${fd.type === 'text' || fd.type === 'list' ? 'wide' : ''}`}>
-            <span>{fd.label}</span>
+            <span>{t(fd.labelKey, fd.labelVars)}</span>
             {fd.type === 'select' ? (
               <select value={v} onChange={(e) => set(fd.k, e.target.value)} disabled={readOnly}>
-                {fd.options.map(([val, lab]) => <option key={val} value={val}>{lab}</option>)}
+                {fd.options.map((o) => <option key={o.value} value={o.value}>{t(o.labelKey)}</option>)}
               </select>
             ) : fd.type === 'number' ? (
               <input type="number" value={v} onChange={(e) => set(fd.k, Number(e.target.value))} disabled={readOnly} />
@@ -89,7 +91,7 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
   useEffect(() => {
     if (!draft) return undefined;
     const names = samples.split('\n').map((s) => s.trim()).filter(Boolean);
-    const t = setTimeout(async () => {
+    const timer = setTimeout(async () => {
       try {
         setResults(await api.testRename(draft.steps, names, showName));
         setTestError(null);
@@ -97,10 +99,10 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
         setTestError(e.message);
       }
     }, 300);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [draft, samples, showName]);
 
-  const confirmDiscard = async () => !dirty || dialogs.confirm({ title: 'Unsaved changes', message: 'Discard unsaved changes to this rule set?', confirmLabel: 'Discard changes', cancelLabel: 'Keep editing', danger: true });
+  const confirmDiscard = async () => !dirty || dialogs.confirm({ title: t('common.unsavedChanges'), message: t('rename.rules.discardMessage'), confirmLabel: t('rename.rules.discardChanges'), cancelLabel: t('rename.rules.keepEditing'), danger: true });
   const select = async (id) => (await confirmDiscard()) && setSelectedId(id);
   const setSteps = (fn) => setDraft((d) => ({ ...d, steps: fn(d.steps) }));
   const toggleOpen = (i) => setOpen((o) => {
@@ -122,20 +124,20 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
   }
 
   async function save() {
-    const r = await run(() => api.updateRenameRule(selected.id, draft), 'Rule set saved');
+    const r = await run(() => api.updateRenameRule(selected.id, draft), t('rename.rules.saved'));
     if (r) setDraft({ name: r.name, description: r.description ?? '', steps: r.steps });
   }
 
   async function duplicate() {
     if (!(await confirmDiscard())) return;
     const src = draft ?? selected;
-    const r = await run(() => api.createRenameRule({ name: `${src.name} (copy)`, description: src.description, steps: src.steps }), 'Copy created');
+    const r = await run(() => api.createRenameRule({ name: t('rename.rules.copyName', { name: src.name }), description: src.description, steps: src.steps }), t('rename.rules.copyCreated'));
     if (r) setSelectedId(r.id);
   }
 
   async function create() {
     if (!(await confirmDiscard())) return;
-    const r = await run(() => api.createRenameRule({ name: 'New rule set', steps: [newStep('smart')] }));
+    const r = await run(() => api.createRenameRule({ name: t('rename.rules.newName'), steps: [newStep('smart')] }));
     if (r) setSelectedId(r.id);
   }
 
@@ -143,34 +145,36 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
     for (const file of files) {
       const content = await readTextFile(file);
       const r = await run(() => api.importRenameRule(file.name, content), (x) =>
-        `Imported “${x.rule.name}” (${x.rule.steps.length} steps)${x.skipped.length ? `; skipped: ${x.skipped.join(', ')}` : ''}`);
+        x.skipped.length
+          ? t('rename.rules.importedSkipped', { name: x.rule.name, count: x.rule.steps.length, skipped: x.skipped.join(', ') })
+          : t('rename.rules.imported', { name: x.rule.name, count: x.rule.steps.length }));
       if (r) setSelectedId(r.rule.id);
     }
     if (fileInput.current) fileInput.current.value = '';
   }
 
   async function remove() {
-    if (!(await dialogs.confirm({ title: 'Delete rule set', message: `Delete rule set “${selected.name}”?`, confirmLabel: 'Delete', danger: true }))) return;
-    const r = await run(() => api.deleteRenameRule(selected.id), 'Rule set deleted');
+    if (!(await dialogs.confirm({ title: t('rename.rules.deleteTitle'), message: t('rename.rules.deleteMessage', { name: selected.name }), confirmLabel: t('common.delete'), danger: true }))) return;
+    const r = await run(() => api.deleteRenameRule(selected.id), t('rename.rules.deleted'));
     if (r) setSelectedId(rules.find((x) => x.id !== selected.id)?.id ?? null);
   }
 
   return (
     <Modal
-      title={<>Rename rules<Help id="rename.rules" /></>}
-      ariaLabel="Rename rules"
+      title={<>{t('rename.rules.title')}<Help id="rename.rules" /></>}
+      ariaLabel={t('rename.rules.title')}
       onClose={async () => (await confirmDiscard()) && onClose()}
       wide
       footer={
         <>
           {selected && onPick && (
-            <button className="btn" onClick={async () => (await confirmDiscard()) && (onPick(selected.id), onClose())}>Use this rule set</button>
+            <button className="btn" onClick={async () => (await confirmDiscard()) && (onPick(selected.id), onClose())}>{t('rename.rules.use')}</button>
           )}
           <span className="spacer" />
           {!readOnly && selected && (
             <>
-              <button className="btn" disabled={!dirty} onClick={() => setDraft({ name: selected.name, description: selected.description ?? '', steps: structuredClone(selected.steps) })}>Revert</button>
-              <button className="btn primary" disabled={!dirty} onClick={save}>Save</button>
+              <button className="btn" disabled={!dirty} onClick={() => setDraft({ name: selected.name, description: selected.description ?? '', steps: structuredClone(selected.steps) })}>{t('rename.rules.revert')}</button>
+              <button className="btn primary" disabled={!dirty} onClick={save}>{t('common.save')}</button>
             </>
           )}
         </>
@@ -181,17 +185,17 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
           {rules.map((r) => (
             <button key={r.id} className={`rule-item ${r.id === selectedId ? 'active' : ''}`} onClick={() => select(r.id)}>
               <span>{r.name}</span>
-              {r.builtin && <span className="badge">built-in</span>}
+              {r.builtin && <span className="badge">{t('rename.rules.builtin')}</span>}
             </button>
           ))}
           <div className="rule-list-actions">
-            <button className="btn small" onClick={create}><Plus size={14} /> New</button>
-            <button className="btn small" onClick={() => fileInput.current?.click()} title="Import an Advanced Renamer .aren preset or an exported rule set">
-              <Upload size={14} /> Import
+            <button className="btn small" onClick={create}><Plus size={14} /> {t('rename.rules.new')}</button>
+            <button className="btn small" onClick={() => fileInput.current?.click()} title={t('rename.rules.importTitle')}>
+              <Upload size={14} /> {t('common.import')}
             </button>
             <input ref={fileInput} type="file" accept=".aren,.json" multiple hidden onChange={(e) => importFiles([...e.target.files])} />
           </div>
-          <p className="muted small">Import accepts Advanced Renamer presets (.aren) and rule sets exported from here.</p>
+          <p className="muted small">{t('rename.rules.importHint')}</p>
         </aside>
 
         {draft && selected ? (
@@ -199,21 +203,21 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
             <div className="rule-head">
               <input className="rule-name" value={draft.name} disabled={readOnly} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
               <div className="job-actions">
-                <button className="icon-btn" title="Duplicate" onClick={duplicate}><Copy size={16} /></button>
-                <a className="icon-btn" title="Export as JSON" href={api.exportRenameRuleUrl(selected.id)} download><Download size={16} /></a>
-                {!readOnly && <button className="icon-btn danger" title="Delete" onClick={remove}><Trash2 size={16} /></button>}
+                <button className="icon-btn" title={t('common.duplicate')} onClick={duplicate}><Copy size={16} /></button>
+                <a className="icon-btn" title={t('rename.rules.exportJson')} href={api.exportRenameRuleUrl(selected.id)} download><Download size={16} /></a>
+                {!readOnly && <button className="icon-btn danger" title={t('common.delete')} onClick={remove}><Trash2 size={16} /></button>}
               </div>
             </div>
             <input
               className="rule-desc"
               value={draft.description}
               disabled={readOnly}
-              placeholder="Description"
+              placeholder={t('rename.rules.description')}
               onChange={(e) => setDraft({ ...draft, description: e.target.value })}
             />
-            {readOnly && <p className="note">Built-in rule sets are read-only. Use <Copy size={12} /> Duplicate to make an editable copy.</p>}
+            {readOnly && <p className="note">{rich('rename.rules.readOnly', { icon: <Copy size={12} /> })}</p>}
 
-            <h3 className="steps-title">Steps<Help id="rename.steps" /></h3>
+            <h3 className="steps-title">{t('rename.rules.steps')}<Help id="rename.steps" /></h3>
             <ol className="steps">
               {draft.steps.map((step, i) => {
                 const def = STEP_DEFS[step.type];
@@ -225,20 +229,20 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
                         type="checkbox"
                         checked={step.active}
                         disabled={readOnly}
-                        title="Active"
+                        title={t('rename.rules.active')}
                         onChange={(e) => setSteps((s) => s.map((x, j) => (j === i ? { ...x, active: e.target.checked } : x)))}
                       />
                       <button className="step-toggle" onClick={() => toggleOpen(i)}>
                         {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                         <span className="step-num">{i + 1}</span>
-                        <strong>{def.label}</strong>
+                        <strong>{t(def.labelKey)}</strong>
                         <span className="step-summary">{step.description ? `${step.description} — ` : ''}{def.summary(step)}</span>
                       </button>
                       {!readOnly && (
                         <span className="job-actions">
-                          <button className="icon-btn" title="Move up" disabled={i === 0} onClick={() => moveStep(i, -1)}><ArrowUp size={14} /></button>
-                          <button className="icon-btn" title="Move down" disabled={i === draft.steps.length - 1} onClick={() => moveStep(i, 1)}><ArrowDown size={14} /></button>
-                          <button className="icon-btn danger" title="Delete step" onClick={() => { setSteps((s) => s.filter((_, j) => j !== i)); setOpen(new Set()); }}>
+                          <button className="icon-btn" title={t('rename.rules.moveUp')} disabled={i === 0} onClick={() => moveStep(i, -1)}><ArrowUp size={14} /></button>
+                          <button className="icon-btn" title={t('rename.rules.moveDown')} disabled={i === draft.steps.length - 1} onClick={() => moveStep(i, 1)}><ArrowDown size={14} /></button>
+                          <button className="icon-btn danger" title={t('rename.rules.deleteStep')} onClick={() => { setSteps((s) => s.filter((_, j) => j !== i)); setOpen(new Set()); }}>
                             <Trash2 size={14} />
                           </button>
                         </span>
@@ -253,7 +257,7 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
             </ol>
             {!readOnly && (
               <label className="field-inline">
-                <Plus size={14} /> Add step
+                <Plus size={14} /> {t('rename.rules.addStep')}
                 <select
                   value=""
                   onChange={(e) => {
@@ -263,19 +267,19 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
                     setOpen(new Set([at]));
                   }}
                 >
-                  <option value="">choose…</option>
-                  {Object.entries(STEP_DEFS).map(([k, d]) => <option key={k} value={k}>{d.label}</option>)}
+                  <option value="">{t('rename.rules.choose')}</option>
+                  {Object.entries(STEP_DEFS).map(([k, d]) => <option key={k} value={k}>{t(d.labelKey)}</option>)}
                 </select>
               </label>
             )}
 
             <div className="try-it">
-              <h3>Try it<Help id="rename.tryIt" /></h3>
+              <h3>{t('rename.rules.tryIt')}<Help id="rename.tryIt" /></h3>
               <div className="try-grid">
-                <textarea value={samples} onChange={(e) => setSamples(e.target.value)} spellCheck={false} rows={5} placeholder="One file name per line" />
+                <textarea value={samples} onChange={(e) => setSamples(e.target.value)} spellCheck={false} rows={5} placeholder={t('rename.rules.samplesPlaceholder')} />
                 <label className="step-field">
-                  <span>Show name (optional)</span>
-                  <input value={showName} onChange={(e) => setShowName(e.target.value)} placeholder="auto-detected" />
+                  <span>{t('rename.rules.showNameOptional')}</span>
+                  <input value={showName} onChange={(e) => setShowName(e.target.value)} placeholder={t('rename.rules.autoDetected')} />
                 </label>
               </div>
               {testError && <p className="text-bad small">{testError}</p>}
@@ -284,14 +288,14 @@ export function RuleEditor({ rules, initialId, sampleNames, run, onClose, onPick
                   <li key={i}>
                     <span className="muted">{r.from}</span>
                     <span>→ <strong>{r.to}</strong></span>
-                    {r.warnings.length > 0 && <span className="warn-text">⚠ {r.warnings.join('; ')}</span>}
+                    {r.warnings.length > 0 && <span className="warn-text">⚠ {r.warnings.map(renameWarning).join('; ')}</span>}
                   </li>
                 ))}
               </ul>
             </div>
           </section>
         ) : (
-          <section className="rule-detail muted">Select or create a rule set.</section>
+          <section className="rule-detail muted">{t('rename.rules.selectOrCreate')}</section>
         )}
       </div>
     </Modal>

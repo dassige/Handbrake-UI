@@ -2,17 +2,19 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArchiveRestore, CalendarClock, Download, HardDriveDownload, RotateCcw, Save, Trash2, Upload } from 'lucide-react';
 import { api } from '../api.js';
 import { bytes, dateTime } from '../format.js';
+import { rich, t } from '../i18n/index.js';
+import { backupBusy, backupWarnings } from '../i18n/serverText.js';
 import { useDialogs } from '../components/Dialogs.jsx';
 import { startDownload } from '../download/useDownload.jsx';
 import { Card } from './fields.jsx';
 
 const COUNTS = [
-  { key: 'presets', label: 'Presets', config: true },
-  { key: 'renameRules', label: 'Your rename rule sets', config: true },
-  { key: 'jobs', label: 'Jobs (queue and history)' },
-  { key: 'renameHistory', label: 'Rename history' },
-  { key: 'merges', label: 'Merges' },
-  { key: 'qualityScans', label: 'Quality check results' },
+  { key: 'presets', labelKey: 'settings.backup.counts.presets', config: true },
+  { key: 'renameRules', labelKey: 'settings.backup.counts.renameRules', config: true },
+  { key: 'jobs', labelKey: 'settings.backup.counts.jobs' },
+  { key: 'renameHistory', labelKey: 'settings.backup.counts.renameHistory' },
+  { key: 'merges', labelKey: 'settings.backup.counts.merges' },
+  { key: 'qualityScans', labelKey: 'settings.backup.counts.qualityScans' },
 ];
 
 /** Downloads or keeps backups of the settings and database, and restores them (Settings → Backup and restore). */
@@ -22,7 +24,7 @@ export function BackupPanel({ run, onError, onNotice, scheduled, onScheduledChan
   const [snapshots, setSnapshots] = useState(null);
   const [inspection, setInspection] = useState(null);
   const [scope, setScope] = useState('config');
-  const [busy, setBusy] = useState(null); // text while working
+  const [busy, setBusy] = useState(null); // key of the text shown while working
   const fileInput = useRef(null);
 
   // Scheduled backups have their own list (they may be in another folder).
@@ -34,8 +36,8 @@ export function BackupPanel({ run, onError, onNotice, scheduled, onScheduledChan
     loadSnapshots();
   }, [loadSnapshots]);
 
-  async function work(text, fn) {
-    setBusy(text);
+  async function work(textKey, fn) {
+    setBusy(textKey);
     try {
       return await fn();
     } catch (e) {
@@ -47,15 +49,15 @@ export function BackupPanel({ run, onError, onNotice, scheduled, onScheduledChan
   }
 
   async function saveOnServer() {
-    const r = await work('Saving…', () => api.saveBackupSnapshot(logs));
+    const r = await work('common.saving', () => api.saveBackupSnapshot(logs));
     if (r) {
-      onNotice(`Backup saved on the server: ${r.name}`);
+      onNotice(t('settings.backup.savedOnServer', { name: r.name }));
       loadSnapshots();
     }
   }
 
   async function inspectFile(file) {
-    const r = await work('Reading the backup…', () => api.inspectBackupFile(file));
+    const r = await work('settings.backup.reading', () => api.inspectBackupFile(file));
     if (r) {
       setInspection({ ...r, label: file.name });
       setScope('config');
@@ -63,7 +65,7 @@ export function BackupPanel({ run, onError, onNotice, scheduled, onScheduledChan
   }
 
   async function inspectSnapshot(s) {
-    const r = await work('Reading the backup…', () =>
+    const r = await work('settings.backup.reading', () =>
       s.reason === 'scheduled' ? api.inspectScheduledBackup(s.name) : api.inspectBackupSnapshot(s.name));
     if (r) {
       setInspection({ ...r, label: s.name });
@@ -73,9 +75,9 @@ export function BackupPanel({ run, onError, onNotice, scheduled, onScheduledChan
 
   async function removeSnapshot(s) {
     const ok = await dialogs.confirm({
-      title: 'Delete backup',
-      message: `Delete the backup ${s.name} from the server?`,
-      confirmLabel: 'Delete',
+      title: t('settings.backup.deleteTitle'),
+      message: t('settings.backup.deleteConfirm', { name: s.name }),
+      confirmLabel: t('common.delete'),
       danger: true,
     });
     if (ok && (await run(() => api.deleteBackupSnapshot(s.name)))) loadSnapshots();
@@ -83,9 +85,9 @@ export function BackupPanel({ run, onError, onNotice, scheduled, onScheduledChan
 
   async function removeScheduled(s) {
     const ok = await dialogs.confirm({
-      title: 'Delete backup',
-      message: `Delete the scheduled backup ${s.name} from ${scheduled?.folder}?`,
-      confirmLabel: 'Delete',
+      title: t('settings.backup.deleteTitle'),
+      message: t('settings.backup.deleteScheduledConfirm', { name: s.name, folder: scheduled?.folder }),
+      confirmLabel: t('common.delete'),
       danger: true,
     });
     if (ok && (await run(() => api.deleteScheduledBackup(s.name)))) onScheduledChange?.();
@@ -94,33 +96,33 @@ export function BackupPanel({ run, onError, onNotice, scheduled, onScheduledChan
   async function restore() {
     const all = scope === 'all';
     const ok = await dialogs.choose({
-      title: 'Restore this backup?',
+      title: t('settings.backup.restoreConfirmTitle'),
       icon: 'warn',
       cancelValue: false,
       message: (
         <>
-          <p>
-            {all
-              ? 'Everything will be replaced with the backup: settings, presets, rename rules, jobs and their logs, rename history, merges and quality results.'
-              : 'Settings, presets and rename rules will be replaced with the backup. Jobs and history stay as they are.'}
-          </p>
-          <p className="muted small">The current data is saved on the server first, so you can go back to it from Settings → Backup and restore.</p>
+          <p>{all ? t('settings.backup.restoreAllMessage') : t('settings.backup.restoreConfigMessage')}</p>
+          <p className="muted small">{t('settings.backup.restoreSavedFirst')}</p>
         </>
       ),
       buttons: [
-        { label: 'Cancel', value: false, autoFocus: true },
-        { label: all ? 'Restore everything' : 'Restore configuration', value: true, danger: true },
+        { label: t('common.cancel'), value: false, autoFocus: true },
+        { label: all ? t('settings.backup.restoreAllButton') : t('settings.backup.restoreConfigButton'), value: true, danger: true },
       ],
     });
     if (!ok) return;
-    const r = await work('Restoring…', () => api.restoreBackup(inspection.source, scope));
+    const r = await work('settings.backup.restoring', () => api.restoreBackup(inspection.source, scope));
     if (!r) return;
     await dialogs.alert({
-      title: 'Restored',
+      title: t('settings.backup.restoredTitle'),
       message: (
         <>
-          <p>{r.scope === 'all' ? 'Everything was restored' : 'The configuration was restored'} from {inspection.label}.</p>
-          <p className="muted small">The data from before is saved on the server as {r.savedAs}. The page reloads now.</p>
+          <p>
+            {r.scope === 'all'
+              ? t('settings.backup.restoredAll', { name: inspection.label })
+              : t('settings.backup.restoredConfig', { name: inspection.label })}
+          </p>
+          <p className="muted small">{t('settings.backup.restoredSavedAs', { name: r.savedAs })}</p>
         </>
       ),
     });
@@ -132,28 +134,26 @@ export function BackupPanel({ run, onError, onNotice, scheduled, onScheduledChan
 
   return (
     <>
-      <Card title="Make a backup" help="backup.overview" aside={busy && <span className="muted small">{busy}</span>}>
-        <p className="set-hint">
-          Settings, presets, rename rules, the job list and history, merges and quality results. Video files are not included.
-        </p>
+      <Card title={t('settings.backup.makeTitle')} help="backup.overview" aside={busy && <span className="muted small">{t(busy)}</span>}>
+        <p className="set-hint">{t('settings.backup.makeHint')}</p>
         <label className="check">
           <input type="checkbox" checked={logs} onChange={(e) => setLogs(e.target.checked)} />
-          Include the conversion logs
+          {t('settings.backup.includeLogs')}
         </label>
         <div className="backup-actions">
           <button className="btn primary" disabled={!!busy} onClick={() => startDownload(api.backupUrl(logs))}>
-            <HardDriveDownload size={15} /> Download backup
+            <HardDriveDownload size={15} /> {t('settings.backup.download')}
           </button>
           <button className="btn" disabled={!!busy} onClick={saveOnServer}>
-            <Save size={15} /> Save on the server
+            <Save size={15} /> {t('settings.backup.saveOnServer')}
           </button>
         </div>
       </Card>
 
-      <Card title="Restore">
+      <Card title={t('settings.backup.restoreTitle')}>
         <div className="backup-actions">
           <button className="btn" disabled={!!busy} onClick={() => fileInput.current?.click()}>
-            <Upload size={15} /> Choose a backup file…
+            <Upload size={15} /> {t('settings.backup.chooseFile')}
           </button>
           <input
             ref={fileInput}
@@ -166,7 +166,7 @@ export function BackupPanel({ run, onError, onNotice, scheduled, onScheduledChan
               if (f) inspectFile(f);
             }}
           />
-          <span className="muted small">or pick one of the backups on the server below.</span>
+          <span className="muted small">{t('settings.backup.orPick')}</span>
         </div>
 
         {inspection && (
@@ -174,73 +174,75 @@ export function BackupPanel({ run, onError, onNotice, scheduled, onScheduledChan
             <p>
               <strong>{inspection.label}</strong>
               <span className="muted small">
-                {' '}· made {dateTime(m?.createdAt)}{v ? ` by version ${v}` : ''}
-                {inspection.logs ? ` · ${inspection.logs} log${inspection.logs === 1 ? '' : 's'}` : ' · no logs'}
+                {' · '}
+                {v
+                  ? t('settings.backup.madeBy', { date: dateTime(m?.createdAt), version: v })
+                  : t('settings.backup.made', { date: dateTime(m?.createdAt) })}
+                {' · '}
+                {inspection.logs ? t('settings.backup.logs', { count: inspection.logs }) : t('settings.backup.noLogs')}
               </span>
             </p>
             <table className="backup-counts small">
               <thead>
-                <tr><th /><th>In the backup</th><th>Now</th></tr>
+                <tr><th /><th>{t('settings.backup.inBackup')}</th><th>{t('settings.backup.now')}</th></tr>
               </thead>
               <tbody>
                 {COUNTS.map((c) => (
                   <tr key={c.key} className={!c.config && scope === 'config' ? 'off' : ''}>
-                    <td>{c.label}</td>
+                    <td>{t(c.labelKey)}</td>
                     <td>{inspection.counts[c.key]}</td>
                     <td>{inspection.current[c.key]}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            {inspection.warnings.map((w) => <p key={w} className="warn-text">{w}</p>)}
+            {backupWarnings(inspection).map((w) => <p key={w} className="warn-text">{w}</p>)}
             <div className="backup-scope">
               <label className="radio">
                 <input type="radio" name="scope" checked={scope === 'config'} onChange={() => setScope('config')} />
                 <span>
-                  Configuration only
-                  <span className="muted small">Settings, presets and rename rules. Jobs and history stay as they are.</span>
+                  {t('settings.backup.configOnly')}
+                  <span className="muted small">{t('settings.backup.configOnlyHint')}</span>
                 </span>
               </label>
               <label className="radio">
                 <input type="radio" name="scope" checked={scope === 'all'} onChange={() => setScope('all')} disabled={!!inspection.busy} />
                 <span>
-                  Everything
+                  {t('settings.backup.everything')}
                   <span className="muted small">
-                    {inspection.busy ? `Not possible while ${inspection.busy}.` : 'Also jobs, their logs, rename history, merges and quality results. The queue stays stopped.'}
+                    {inspection.busy ? t('settings.backup.notPossible', { reason: backupBusy(inspection) }) : t('settings.backup.everythingHint')}
                   </span>
                 </span>
               </label>
             </div>
             <div className="backup-actions">
               <button className="btn primary danger-solid" disabled={!!busy} onClick={restore}>
-                <ArchiveRestore size={15} /> Restore…
+                <ArchiveRestore size={15} /> {t('settings.backup.restoreButton')}
               </button>
-              <button className="btn ghost" onClick={() => setInspection(null)}>Cancel</button>
+              <button className="btn ghost" onClick={() => setInspection(null)}>{t('common.cancel')}</button>
             </div>
           </div>
         )}
       </Card>
 
-      <Card title="Backups on the server">
-        {snapshots?.length === 0 && <p className="set-hint">None yet. “Save on the server” and every restore add one here.</p>}
+      <Card title={t('settings.backup.onServerTitle')}>
+        {snapshots?.length === 0 && <p className="set-hint">{t('settings.backup.noneOnServer')}</p>}
         {snapshots?.length > 0 && (
           <ul className="backup-list">
             {snapshots.map((s) => (
               <li key={s.name}>
                 {s.reason === 'before-restore' ? <RotateCcw size={15} className="muted" /> : <Save size={15} className="muted" />}
                 <span className="file-name" title={s.name}>
-                  {s.reason === 'before-restore' ? 'Before a restore' : 'Saved by hand'} · {dateTime(s.createdAt)}
+                  {s.reason === 'before-restore' ? t('settings.backup.beforeRestore') : t('settings.backup.byHand')} · {dateTime(s.createdAt)}
                 </span>
                 <span className="muted small">{bytes(s.size)}</span>
-                <button className="icon-btn" title="Restore from this backup" aria-label={`Restore ${s.name}`} disabled={!!busy} onClick={() => inspectSnapshot(s)}>
-                  <ArchiveRestore size={15} />
-                </button>
-                <button className="icon-btn" title="Download" aria-label={`Download ${s.name}`} onClick={() => startDownload(api.backupSnapshotUrl(s.name))}>
-                  <Download size={15} />
-                </button>
-                <button className="icon-btn danger" title="Delete" aria-label={`Delete ${s.name}`} onClick={() => removeSnapshot(s)}>
-                  <Trash2 size={15} />
-                </button>
+                <SnapshotButtons
+                  name={s.name}
+                  busy={busy}
+                  onRestore={() => inspectSnapshot(s)}
+                  onDownload={() => startDownload(api.backupSnapshotUrl(s.name))}
+                  onDelete={() => removeSnapshot(s)}
+                />
               </li>
             ))}
           </ul>
@@ -248,35 +250,50 @@ export function BackupPanel({ run, onError, onNotice, scheduled, onScheduledChan
       </Card>
 
       {scheduled && (scheduled.enabled || scheduled.backups.length > 0) && (
-        <Card title="Kept by the schedule">
+        <Card title={t('settings.backup.keptTitle')}>
           <p className="set-hint">
-            In <code>{scheduled.folder}</code>
-            {scheduled.backups.length ? ` · ${scheduled.backups.length} kept` : ''}
+            {rich('settings.backup.inFolder', { folder: <code>{scheduled.folder}</code> })}
+            {scheduled.backups.length ? ` · ${t('settings.backup.kept', { count: scheduled.backups.length })}` : ''}
           </p>
           {scheduled.backups.length === 0 ? (
-            <p className="set-hint">None yet.</p>
+            <p className="set-hint">{t('settings.backup.noneYet')}</p>
           ) : (
             <ul className="backup-list">
               {scheduled.backups.map((s) => (
                 <li key={s.name}>
                   <CalendarClock size={15} className="muted" />
-                  <span className="file-name" title={s.name}>Scheduled · {dateTime(s.createdAt)}</span>
+                  <span className="file-name" title={s.name}>{t('settings.backup.scheduled')} · {dateTime(s.createdAt)}</span>
                   <span className="muted small">{bytes(s.size)}</span>
-                  <button className="icon-btn" title="Restore from this backup" aria-label={`Restore ${s.name}`} disabled={!!busy} onClick={() => inspectSnapshot(s)}>
-                    <ArchiveRestore size={15} />
-                  </button>
-                  <button className="icon-btn" title="Download" aria-label={`Download ${s.name}`} onClick={() => startDownload(api.scheduledBackupUrl(s.name))}>
-                    <Download size={15} />
-                  </button>
-                  <button className="icon-btn danger" title="Delete" aria-label={`Delete ${s.name}`} onClick={() => removeScheduled(s)}>
-                    <Trash2 size={15} />
-                  </button>
+                  <SnapshotButtons
+                    name={s.name}
+                    busy={busy}
+                    onRestore={() => inspectSnapshot(s)}
+                    onDownload={() => startDownload(api.scheduledBackupUrl(s.name))}
+                    onDelete={() => removeScheduled(s)}
+                  />
                 </li>
               ))}
             </ul>
           )}
         </Card>
       )}
+    </>
+  );
+}
+
+/** Restore / download / delete buttons of one backup in a list. */
+function SnapshotButtons({ name, busy, onRestore, onDownload, onDelete }) {
+  return (
+    <>
+      <button className="icon-btn" title={t('settings.backup.restoreFrom')} aria-label={t('settings.backup.restoreNamed', { name })} disabled={!!busy} onClick={onRestore}>
+        <ArchiveRestore size={15} />
+      </button>
+      <button className="icon-btn" title={t('common.download')} aria-label={t('settings.backup.downloadNamed', { name })} onClick={onDownload}>
+        <Download size={15} />
+      </button>
+      <button className="icon-btn danger" title={t('common.delete')} aria-label={t('settings.backup.deleteNamed', { name })} onClick={onDelete}>
+        <Trash2 size={15} />
+      </button>
     </>
   );
 }

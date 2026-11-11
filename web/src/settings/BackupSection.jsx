@@ -2,11 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { CheckCircle2, FolderSearch, Play, TriangleAlert } from 'lucide-react';
 import { api } from '../api.js';
 import { ago, bytes, clockTime } from '../format.js';
+import { rich, t } from '../i18n/index.js';
 import { FolderPicker } from '../components/FolderPicker.jsx';
 import { BackupPanel } from './BackupPanel.jsx';
 import { Card, Check, Field, NumberInput, Switch } from './fields.jsx';
 
-const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+// Indexed by Date.getDay() (Sunday = 0); names: settings.backup.weekday.<id>.
+const WEEKDAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
 /** Settings → Backup and restore: the backup schedule (part of the settings form), then the backups themselves. */
 export function BackupSection({ draft, set, base, run, onError, onNotice, backupStatus, dirty }) {
@@ -26,7 +28,7 @@ export function BackupSection({ draft, set, base, run, onError, onNotice, backup
 
   async function runNow() {
     setRunning(true);
-    const r = await run(() => api.runScheduledBackup(), (x) => `Backup saved: ${x.last.name}`);
+    const r = await run(() => api.runScheduledBackup(), (x) => t('settings.backup.savedToast', { name: x.last.name }));
     if (r) setStatus(r.status);
     else load();
     setRunning(false);
@@ -38,58 +40,47 @@ export function BackupSection({ draft, set, base, run, onError, onNotice, backup
   return (
     <>
       <Card
-        title="Scheduled backups"
+        title={t('settings.backup.scheduleTitle')}
         help="backup.schedule"
-        aside={<Switch checked={b.enabled} onChange={(v) => setB('enabled', v)} label={b.enabled ? 'On' : 'Off'} />}
+        aside={<Switch checked={b.enabled} onChange={(v) => setB('enabled', v)} label={b.enabled ? t('common.on') : t('common.off')} />}
       >
-        <p className="set-hint">
-          Makes a backup by itself, e.g. every night into a folder on your NAS, and keeps the newest ones. If the server was off at
-          that time, the backup is made as soon as it is back.
-        </p>
+        <p className="set-hint">{t('settings.backup.scheduleHint')}</p>
         <fieldset className="set-fieldset" disabled={!b.enabled}>
           <div className="set-row">
-            <Field label="How often">
+            <Field label={t('settings.backup.howOften')}>
               <select value={b.frequency} onChange={(e) => setB('frequency', e.target.value)}>
-                <option value="daily">Every day</option>
-                <option value="weekly">Every week</option>
+                <option value="daily">{t('settings.backup.daily')}</option>
+                <option value="weekly">{t('settings.backup.weekly')}</option>
               </select>
             </Field>
             {b.frequency === 'weekly' && (
-              <Field label="On">
+              <Field label={t('settings.backup.on')}>
                 <select value={b.weekday} onChange={(e) => setB('weekday', Number(e.target.value))}>
-                  {WEEKDAYS.map((d, i) => <option key={d} value={i}>{d}</option>)}
+                  {WEEKDAYS.map((d, i) => <option key={d} value={i}>{t(`settings.backup.weekday.${d}`)}</option>)}
                 </select>
               </Field>
             )}
-            <Field label="At">
+            <Field label={t('settings.backup.at')}>
               <input type="time" value={b.time} onChange={(e) => setB('time', e.target.value)} required />
             </Field>
-            <Field label="Keep the newest">
+            <Field label={t('settings.backup.keep')}>
               <NumberInput min="1" max="365" value={b.keep} onChange={(v) => setB('keep', v)} className="narrow" />
             </Field>
           </div>
-          <Field
-            label="Folder on the server"
-            hint={
-              <>
-                Empty = the app’s own data folder (<code>data/backups</code>). A network share works if it is mounted on the server
-                and, with Docker, inside the mounted media folder (e.g. <code>/mnt/media/backups/handbrake-ui</code>).
-              </>
-            }
-          >
+          <Field label={t('settings.backup.folder')} hint={rich('settings.backup.folderHint')}>
             <div className="inline-form">
-              <input value={b.folder} onChange={(e) => setB('folder', e.target.value)} placeholder="data/backups (default)" spellCheck={false} />
-              <button type="button" className="btn small" onClick={() => setPicking(true)} title="Pick a folder under the sources or target folders; any other path can be typed">
-                <FolderSearch size={14} /> Browse…
+              <input value={b.folder} onChange={(e) => setB('folder', e.target.value)} placeholder={t('settings.backup.folderPlaceholder')} spellCheck={false} />
+              <button type="button" className="btn small" onClick={() => setPicking(true)} title={t('settings.backup.browseTitle')}>
+                <FolderSearch size={14} /> {t('settings.browse')}
               </button>
             </div>
           </Field>
-          <Check checked={b.logs} onChange={(v) => setB('logs', v)}>Include the conversion logs</Check>
+          <Check checked={b.logs} onChange={(v) => setB('logs', v)}>{t('settings.backup.includeLogs')}</Check>
         </fieldset>
         {picking && (
           <FolderPicker
             settings={draft}
-            title="Choose the backup folder"
+            title={t('settings.backup.pickTitle')}
             kind="any"
             initial={b.folder || undefined}
             onError={onError}
@@ -105,23 +96,30 @@ export function BackupSection({ draft, set, base, run, onError, onNotice, backup
           <div className="backup-status">
             {last ? (
               last.ok ? (
-                <p className="ok-line"><CheckCircle2 size={14} className="text-good" /> Last backup {ago(last.at)}: {last.name} ({bytes(last.size)})</p>
+                <p className="ok-line">
+                  <CheckCircle2 size={14} className="text-good" />{' '}
+                  {t('settings.backup.lastOk', { ago: ago(last.at), name: last.name, size: bytes(last.size) })}
+                </p>
               ) : (
-                <p className="text-bad"><TriangleAlert size={14} /> Last backup {ago(last.at)} failed: {last.error}
-                  {status.retryAt ? ` Trying again at ${clockTime(status.retryAt)}.` : ''}</p>
+                <p className="text-bad">
+                  <TriangleAlert size={14} /> {t('settings.backup.lastFailed', { ago: ago(last.at), error: last.error })}
+                  {status.retryAt ? ` ${t('settings.backup.retryAt', { time: clockTime(status.retryAt) })}` : ''}
+                </p>
               )
             ) : status.backups[0] ? (
-              <p className="ok-line"><CheckCircle2 size={14} className="text-good" /> Newest backup {ago(status.backups[0].createdAt)}</p>
+              <p className="ok-line">
+                <CheckCircle2 size={14} className="text-good" /> {t('settings.backup.newest', { ago: ago(status.backups[0].createdAt) })}
+              </p>
             ) : null}
             <p className="set-hint">
-              {status.nextAt ? `Next at ${clockTime(status.nextAt)}` : ''}
-              {dirty ? ' · save your changes first' : ''}
+              {status.nextAt ? t('settings.backup.nextAt', { time: clockTime(status.nextAt) }) : ''}
+              {dirty ? ` · ${t('settings.saveFirst')}` : ''}
             </p>
           </div>
         )}
         <div className="set-actions">
           <button type="button" className="btn small" onClick={runNow} disabled={!saved.enabled || running || status?.running || dirty}>
-            <Play size={14} /> {running || status?.running ? 'Backing up…' : 'Back up now'}
+            <Play size={14} /> {running || status?.running ? t('settings.backup.backingUp') : t('settings.backup.backUpNow')}
           </button>
         </div>
       </Card>

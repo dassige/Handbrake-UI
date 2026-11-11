@@ -1,0 +1,157 @@
+{
+  "skip": {
+    "noVideoInFolder": "keine Videodateien im Ordner",
+    "notVideo": "keine Videodatei",
+    "alreadyQueued": "bereits in der Warteschlange",
+    "alreadyConverted": "bereits konvertiert",
+    "notAdded": "nicht hinzugefügt"
+  },
+  "quality": {
+    "issue": {
+      "cannotRead": "Nicht lesbar: {message}",
+      "oldContainer": "Alter Container: .{container}",
+      "noVideo": "Keine Videospur",
+      "oldVideoCodec": "Alter Videocodec: {codec}",
+      "oldAudioCodec": "Alter Audiocodec: {codecs}",
+      "lowResolution": "Niedrige Auflösung: {width}×{height} (unter {minHeight}p)",
+      "lowBitrate": "Niedrige Bitrate: {kbps} kbps, unter {min} kbps für {resolution}-Video",
+      "lowBitrateEstimated": "Niedrige Bitrate: {kbps} kbps (geschätzt), unter {min} kbps für {resolution}-Video",
+      "lowBitrateCodec": "Niedrige Bitrate: {kbps} kbps, unter {min} kbps für {resolution} {codec}",
+      "lowBitrateCodecEstimated": "Niedrige Bitrate: {kbps} kbps (geschätzt), unter {min} kbps für {resolution} {codec}",
+      "interlaced": "Interlaced"
+    },
+    "resolutionClass": {
+      "sd": "SD (unter 720p)",
+      "hd": "720p",
+      "fhd": "1080p",
+      "uhd": "4K"
+    }
+  },
+  "check": {
+    "label": {
+      "readable": "Lesbar",
+      "internal": "Prüfung",
+      "video": "Video",
+      "length": "Länge",
+      "lengthMatches": {
+        "source": "Länge entspricht der Quelle",
+        "parts": "Länge entspricht den Teilen"
+      },
+      "audioCount": "Tonspuren",
+      "audioLength": "Tonlänge",
+      "subtitles": "Untertitelspuren",
+      "decode": "Vollständige Decodierung",
+      "sourceErrors": "Quelle"
+    },
+    "detail": {
+      "message": "{message}",
+      "format": "{format}",
+      "readableYes": "ja",
+      "cannotRead": "Die Datei ist nicht lesbar: {message}",
+      "noVideo": "Die Datei hat keinen Videostream",
+      "videoOk": "{codec} {width}×{height}",
+      "lengthUnknown": {
+        "source": "Ausgabe {output}; die Länge der Quelle ist unbekannt",
+        "parts": "Ausgabe {output}; die Länge der Teile ist unbekannt"
+      },
+      "lengthOk": {
+        "source": "{output} (Quelle {source})",
+        "parts": "{output} (Teile {source})"
+      },
+      "lengthShorter": {
+        "source": "Ausgabe ist {diff} kürzer als die Quelle: {output} statt {source}",
+        "parts": "Ausgabe ist {diff} kürzer als die Teile: {output} statt {source}"
+      },
+      "lengthLonger": {
+        "source": "Ausgabe ist {diff} länger als die Quelle: {output} statt {source}",
+        "parts": "Ausgabe ist {diff} länger als die Teile: {output} statt {source}"
+      },
+      "audioCountOk": "{count} ({languages})",
+      "audioCountNone": "{count} (keine)",
+      "audioCountMismatch": "HandBrake hat {expected} geschrieben, die Datei hat {actual}",
+      "audioCountNoLog": "{count} (kein HandBrake-Protokoll zum Vergleich)",
+      "audioTrackEmpty": "Spur {track} ist leer",
+      "audioTrackShort": "Spur {track} ({language}) endet {diff} zu früh",
+      "audioLengthOk": "Jede Spur dauert so lange wie das Video",
+      "subtitleItem": "{language} {codec}",
+      "subtitleItemNoLines": "{language} {codec} (keine Zeilen)",
+      "subtitlesOk": "{count}: {list}",
+      "subtitlesOkBurned": "{count}: {list}; {burned} ins Bild eingebrannt",
+      "subtitlesNone": "{count}",
+      "subtitlesNoneBurned": "{count}; {burned} ins Bild eingebrannt",
+      "subtitlesMismatch": "HandBrake hat {expected} geschrieben, die Datei hat {actual}",
+      "subtitlesMismatchBurned": "HandBrake hat {expected} geschrieben, die Datei hat {actual}; {burned} ins Bild eingebrannt",
+      "decodeOk": "Alle Video- und Audioframes werden fehlerfrei decodiert",
+      "decodeErrors_one": "{count} Decodierfehler, z. B. {example}",
+      "decodeErrors_other": "{count} Decodierfehler, z. B. {example}",
+      "decodeStopped": "Gestoppt ({signal})",
+      "ffmpegExit": "ffmpeg wurde mit Code {code} beendet",
+      "sourceErrors_one": "HandBrake hat {count} Decodierfehler in der Quelle gefunden; der Schaden kann auch in der Ausgabe sichtbar sein",
+      "sourceErrors_other": "HandBrake hat {count} Decodierfehler in der Quelle gefunden; der Schaden kann auch in der Ausgabe sichtbar sein"
+    },
+    "note": {
+      "ffprobeMissing": "ffprobe ist nicht installiert",
+      "toolsMissing": "ffmpeg/ffprobe sind nicht installiert",
+      "checkStopped": "Prüfung gestoppt",
+      "checkSkipped": "Prüfung übersprungen",
+      "interrupted": "Prüfung durch einen Neustart unterbrochen"
+    }
+  },
+  "rename": {
+    "noShowName": "kein Serienname: Geben Sie ihn unter „Serienname“ ein",
+    "noEpisode": "keine Episodennummer (S01E02 oder 1x02) gefunden",
+    "noYear": "kein Jahr gefunden",
+    "textAfterYear": "Text nach dem Jahr wurde entfernt: „{text}“",
+    "nameTaken": "Name bereits vergeben; verwende „{name}“",
+    "stepFailed": "Schritt „{step}“ fehlgeschlagen: {message}"
+  },
+  "renameNote": {
+    "needsRename": "Umbenennen nötig: {warnings}",
+    "checkFailed": "Nicht automatisch umbenannt: Die Prüfung hat Probleme gefunden",
+    "failed": "Automatisches Umbenennen fehlgeschlagen: {message}",
+    "merged": "Zusammengeführt zu {name}; dieser Teil wurde entfernt"
+  },
+  "merge": {
+    "part": "{name} (Teil {part})",
+    "track": {
+      "video": "Videospur {track}",
+      "audio": "Tonspur {track}",
+      "subtitle": "Untertitelspur {track}"
+    },
+    "layoutDiff": {
+      "video_one": "{count} Videospur statt {expected}",
+      "video_other": "{count} Videospuren statt {expected}",
+      "audio_one": "{count} Tonspur statt {expected}",
+      "audio_other": "{count} Tonspuren statt {expected}",
+      "subtitle_one": "{count} Untertitelspur statt {expected}",
+      "subtitle_other": "{count} Untertitelspuren statt {expected}"
+    },
+    "problem": {
+      "tooFew": "Wählen Sie mindestens zwei Dateien zum Zusammenführen.",
+      "noLength": "{name}: Länge nicht lesbar.",
+      "noVideo": "{name}: hat kein Video.",
+      "layout": "{part} hat eine andere Spuraufteilung: {diff}. Alle Teile brauchen dieselben Spuren (konvertieren Sie sie mit derselben Voreinstellung).",
+      "layoutOrder": "{part} hat eine andere Spuraufteilung: Spuren in anderer Reihenfolge. Alle Teile brauchen dieselben Spuren (konvertieren Sie sie mit derselben Voreinstellung).",
+      "codec": "{part}: {track} ist {codec}, Teil 1 hat {firstCodec}.",
+      "audioFormat": "{part}: {track} hat {channels} Kanäle mit {rate} Hz, Teil 1 hat {firstChannels} mit {firstRate} Hz.",
+      "pictureSize": "{part}: Das Bild ist {size}, Teil 1 ist {firstSize}. Player kommen meist damit zurecht, manche können aber an den Übergängen stocken.",
+      "videoSettings": "{part}: Das Video wurde mit leicht abweichenden Einstellungen encodiert. Die meisten Player kommen damit zurecht; prüfen Sie nach dem Zusammenführen die Übergänge.",
+      "language": "{part}: {track} ist „{lang}“, Teil 1 ist „{firstLang}“. Die zusammengeführte Spur übernimmt die Sprache von Teil 1."
+    }
+  },
+  "delete": {
+    "protected": "Dateien in {root} sind vor dem Löschen geschützt (Einstellungen → Ordner)",
+    "sourcesFolder": "Ein Quellordner selbst kann nicht gelöscht werden (entfernen Sie ihn stattdessen in den Einstellungen)",
+    "pendingFile": "{name} wartet oder wird konvertiert; entfernen Sie die Datei zuerst aus der Warteschlange",
+    "pendingFiles": "{count} Dateien darin warten oder werden konvertiert; entfernen Sie sie zuerst aus der Warteschlange"
+  },
+  "backup": {
+    "busy": {
+      "conversion": "eine Konvertierung läuft",
+      "merge": "eine Zusammenführung läuft",
+      "quality": "eine Qualitätsprüfung läuft",
+      "upload": "ein Upload läuft"
+    },
+    "missingFolder": "Der Ordner {folder} existiert auf diesem Server nicht; korrigieren Sie ihn nach der Wiederherstellung in den Einstellungen."
+  }
+}

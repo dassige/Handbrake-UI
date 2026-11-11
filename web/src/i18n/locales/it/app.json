@@ -1,0 +1,81 @@
+{
+  "views": {
+    "label": "Vista",
+    "convert": "Converti",
+    "rename": "Rinomina",
+    "merge": "Unisci",
+    "quality": "Qualità",
+    "stats": "Statistiche",
+    "presets": "Preimpostazioni",
+    "settings": "Impostazioni"
+  },
+  "panes": {
+    "sources": "Sorgenti",
+    "queue": "Coda",
+    "queueCount": "Coda ({n})"
+  },
+  "leave": {
+    "settingsTitle": "Impostazioni non salvate",
+    "settingsMessage": "Uscire dalle Impostazioni senza salvare? Le modifiche andranno perse.",
+    "presetTitle": "Preimpostazione non salvata",
+    "presetMessage": "Uscire dall’editor delle preimpostazioni senza salvare? Le modifiche andranno perse.",
+    "confirm": "Esci senza salvare"
+  },
+  "add": {
+    "noPreset": "Prima crea o importa una preimpostazione",
+    "skippedReason_one": "{count} {reason}",
+    "skippedReason_other": "{count} {reason}",
+    "added_one": "Aggiunto {count} file",
+    "added_other": "Aggiunti {count} file",
+    "addedSkipped_one": "Aggiunto {count} file · saltati: {skipped}",
+    "addedSkipped_other": "Aggiunti {count} file · saltati: {skipped}",
+    "nothing": "Niente aggiunto",
+    "nothingSkipped": "Niente aggiunto: {skipped}"
+  },
+  "watch": {
+    "title": "Monitorare questa cartella?",
+    "message": "I nuovi video che compaiono in {path} verranno aggiunti alla coda da soli.",
+    "messagePreset": "I nuovi video che compaiono in {path} verranno aggiunti alla coda da soli, con la preimpostazione predefinita ({preset}).",
+    "note": "I file già presenti non vengono toccati. Cambia la preimpostazione e le altre opzioni in Impostazioni → Cartelle monitorate.",
+    "noteOff": "I file già presenti non vengono toccati. Il monitoraggio è disattivato, quindi verrà attivato. Cambia la preimpostazione e le altre opzioni in Impostazioni → Cartelle monitorate.",
+    "confirm": "Monitora",
+    "done": "Cartella monitorata"
+  },
+  "outsideWindow": {
+    "title": "Fuori dalla fascia oraria di conversione",
+    "opensAt": "Apertura della fascia oraria di conversione: {time}.",
+    "opensLater": "La fascia oraria di conversione si apre più tardi.",
+    "note": "“Avvia ora” converte subito tutta la coda, ignorando la fascia oraria finché la coda non si ferma.",
+    "startNow": "Avvia ora",
+    "wait": "Attendi la fascia oraria",
+    "startsAt": "Avvio della coda: {time}"
+  },
+  "state": {
+    "running": "Coda in esecuzione",
+    "stopped": "Coda ferma",
+    "waitingFor": "In attesa fino a: {time}",
+    "stopTitle": "Termina il processo in corso, poi interrompi",
+    "startTitle": "Avvia la conversione dei processi in coda",
+    "stopAfterCurrent": "Interrompi dopo l’attuale",
+    "queued_one": "{count} in coda",
+    "queued_other": "{count} in coda",
+    "done_one": "{count} completato",
+    "done_other": "{count} completati",
+    "failed_one": "{count} non riuscito",
+    "failed_other": "{count} non riusciti",
+    "left": "≈ {duration} rimanenti",
+    "doneAround": "Fine prevista: {time}"
+  },
+  "window": {
+    "openUntilTitle": "Fascia oraria di conversione aperta fino a: {time}",
+    "openTitle": "Fascia oraria di conversione aperta",
+    "closedTitle": "Fascia oraria di conversione chiusa; apertura: {time}",
+    "until": "fino a {time}",
+    "open": "aperta"
+  },
+  "offline": "offline",
+  "offlineTitle": "Aggiornamenti in tempo reale disconnessi; nuovo tentativo in corso",
+  "handbrakeMissing": "HandBrakeCLI non è disponibile: {error}",
+  "noPresets": "Ancora nessuna preimpostazione. {link} per iniziare a convertire.",
+  "noPresetsLink": "Crea o importa una preimpostazione"
+}

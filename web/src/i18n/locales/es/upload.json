@@ -1,0 +1,68 @@
+{
+  "dialog": {
+    "title": "Subir videos",
+    "uploadTo": "Subir a",
+    "newFolder": "Nueva carpeta",
+    "elsewhere": "Para subir a otro sitio, cierre esta ventana y abra antes esa carpeta en Orígenes.",
+    "drop": "<strong>Suelte aquí los archivos de video</strong> o haga clic para elegirlos en este equipo",
+    "notVideo": "no es un archivo de video, se omite",
+    "removeFile": "Quitar {name}",
+    "keepOpen": "Mantenga abierta esta pestaña del navegador hasta que terminen las subidas. Mientras tanto puede seguir trabajando. Si una subida se interrumpe, suba de nuevo el mismo archivo a la misma carpeta: continuará donde se detuvo.",
+    "chosen_one": "{count} archivo · {size}",
+    "chosen_other": "{count} archivos · {size}",
+    "noFiles": "No se eligió ningún archivo"
+  },
+  "newFolder": {
+    "title": "Nueva carpeta",
+    "message": "Crear una carpeta dentro de <code>{path}</code>.",
+    "label": "Nombre de la carpeta",
+    "create": "Crear",
+    "noSlashes": "Sin barras, por favor",
+    "noDot": "El nombre no puede empezar por un punto",
+    "typeName": "Escriba un nombre"
+  },
+  "existing": {
+    "title": "Algunos archivos ya existen",
+    "message_one": "Ya hay un archivo con este nombre en la carpeta. Los archivos existentes nunca se reemplazan.",
+    "message_other": "Ya hay {count} archivos con estos nombres en la carpeta. Los archivos existentes nunca se reemplazan.",
+    "more_one": "… y {count} más",
+    "more_other": "… y {count} más",
+    "skip": "Omitirlos",
+    "copies": "Subir como copias, «nombre (1)»"
+  },
+  "noSpace": {
+    "title": "No hay espacio suficiente",
+    "message": "Estos archivos necesitan {need}, pero el servidor solo tiene {free} libres en esa carpeta."
+  },
+  "panel": {
+    "label": "Subidas",
+    "uploading_one": "Subiendo · queda {count}",
+    "uploading_other": "Subiendo · quedan {count}",
+    "finished_one": "Subidas terminadas · {count} completada",
+    "finished_other": "Subidas terminadas · {count} completadas",
+    "failed_one": "{count} con error",
+    "failed_other": "{count} con error",
+    "collapse": "Contraer",
+    "expand": "Expandir",
+    "cancelTitle": "Cancelar esta subida",
+    "cancelLabel": "Cancelar {name}",
+    "retryTitle": "Intentar de nuevo",
+    "retryLabel": "Reintentar {name}",
+    "waiting": "En espera · {size}",
+    "progress": "{sent} de {size}",
+    "progressSpeed_one": "{sent} de {size} · {speed}/s · queda {count} min",
+    "progressSpeed_other": "{sent} de {size} · {speed}/s · quedan {count} min",
+    "uploaded": "Subido · {size}",
+    "cancelled": "Cancelado"
+  },
+  "cancel": {
+    "title": "Cancelar subida",
+    "message": "¿Dejar de subir «{name}» y eliminar la parte ya enviada?",
+    "confirm": "Cancelar subida",
+    "keep": "Seguir subiendo"
+  },
+  "errors": {
+    "retrying": "{error}; reintentando…",
+    "failed": "{name}: {error}"
+  }
+}

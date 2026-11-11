@@ -1,0 +1,124 @@
+{
+  "actions": {
+    "pause": "Pause",
+    "resume": "Resume",
+    "skipCheck": "Skip check",
+    "skipCheckTitle": "Keep the converted file and skip the rest of the check",
+    "cancelQueuedTitle": "Cancel (keeps it in the list)",
+    "cancelRunningTitle": "Stop and cancel this conversion",
+    "cancelConversion": "Cancel conversion",
+    "cancelMessage": "Cancel this conversion? Progress is lost.",
+    "keepGoing": "Keep going",
+    "moveTop": "Move to top",
+    "up": "Up",
+    "upTitle": "Move one place up",
+    "down": "Down",
+    "downTitle": "Move one place down",
+    "moveBottom": "Move to bottom",
+    "renameTitle": "Rename the converted file",
+    "again": "Convert again",
+    "againTitle": "Convert again (new job; the output gets a suffix)",
+    "retryTitle": "Put back in the queue",
+    "removeTitle": "Remove from the list (files are not touched)"
+  },
+  "row": {
+    "checking": "checking the converted file · {percent}",
+    "eta": "ETA {time}",
+    "elapsed": "elapsed {time}",
+    "pass": "pass {pass}/{total}",
+    "finishing": "Finishing file…",
+    "reading": "Reading source…",
+    "took": "in {time}",
+    "fpsAvg": "{fps} fps avg",
+    "toConvert": "≈ {duration} to convert",
+    "dragToReorder": "Drag to reorder"
+  },
+  "drawer": {
+    "label": "Job details",
+    "waitingForOutput": "Waiting for output…",
+    "noLog": "No log for this job.",
+    "showLog": "Show HandBrake log",
+    "hideLog": "Hide HandBrake log",
+    "convertAgainWith": "Convert again with",
+    "choosePreset": "choose preset…",
+    "addedToQueue": "Added to the queue"
+  },
+  "check": {
+    "title": "Check",
+    "checking": "Checking the converted file…",
+    "notChecked": "Not checked.",
+    "quick": "Quick check",
+    "full": "Full check",
+    "again": "Check again",
+    "started": "Checking the file…"
+  },
+  "progress": {
+    "title": "Progress",
+    "checking": "Checking {percent}",
+    "phase": "Phase",
+    "speed": "Speed",
+    "speedValue": "{fps} fps (avg {avg})",
+    "timeLeft": "Time left",
+    "elapsed": "Elapsed",
+    "pass": "Pass",
+    "passValue": "{pass} of {total}"
+  },
+  "phases": {
+    "paused": "paused",
+    "verifying": "checking the converted file",
+    "reading": "reading",
+    "scanning": "scanning",
+    "encoding": "encoding",
+    "muxing": "muxing",
+    "merging": "merging"
+  },
+  "rename": {
+    "title": "Rename"
+  },
+  "error": {
+    "error": "Error",
+    "note": "Note"
+  },
+  "files": {
+    "title": "Files",
+    "source": "Source",
+    "output": "Output",
+    "edit": "edit",
+    "suffixNote": "(a suffix is added if the file exists when it starts)",
+    "outputUpdated": "Output path updated",
+    "sizes": "Sizes",
+    "smaller": "({percent}% smaller)",
+    "larger": "({percent}% larger)",
+    "copyTitle": "Copy output path",
+    "copy": "copy output path",
+    "downloadTitle": "Download the converted file to this computer",
+    "download": "download converted file"
+  },
+  "preset": {
+    "title": "Preset",
+    "changed": "Preset changed",
+    "deleted": "{name} (deleted)"
+  },
+  "source": {
+    "title": "Source",
+    "duration": "Duration",
+    "video": "Video",
+    "audio": "Audio",
+    "subtitles": "Subtitles",
+    "chapters": "Chapters",
+    "none": "none",
+    "scanError": "Could not read source details: {error}",
+    "reading": "Reading source details…"
+  },
+  "timing": {
+    "title": "Timing",
+    "added": "Added",
+    "started": "Started",
+    "finished": "Finished",
+    "encodeTime": "Encode time",
+    "averageSpeed": "Average speed",
+    "fps": "{fps} fps",
+    "attempts": "Attempts",
+    "exitCode": "Exit code"
+  }
+}

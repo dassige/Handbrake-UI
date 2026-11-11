@@ -1,0 +1,13 @@
+{
+  "help": "Help",
+  "helpFor": "Help: {title}",
+  "searchHelp": "Search help",
+  "related": "Related:",
+  "searchPlaceholder": "Words to find, e.g. audio check",
+  "allTopics_one": "{count} topic, A to Z",
+  "allTopics_other": "All {count} topics, A to Z",
+  "hits_one": "{count} topic has every word",
+  "hits_other": "{count} topics have every word, best first",
+  "noHits": "No topic has every word: try fewer or other words.",
+  "topics": "Help topics"
+}

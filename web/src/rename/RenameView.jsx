@@ -8,20 +8,23 @@ import { RuleEditor } from './RuleEditor.jsx';
 import { HistoryDialog } from './HistoryDialog.jsx';
 import { Help } from '../help/Help.jsx';
 import { useDialogs } from '../components/Dialogs.jsx';
+import { t } from '../i18n/index.js';
+import { renameWarning } from '../i18n/serverText.js';
 
 const pad = (n) => String(n).padStart(2, '0');
 
 function InfoChip({ info }) {
   if (!info) return null;
   if (info.type === 'tv' && info.episode != null) {
-    return <span className="badge queued" title={info.show}>TV · S{pad(info.season)}e{pad(info.episode)}</span>;
+    return <span className="badge queued" title={info.show}>{t('rename.view.tvChip', { season: pad(info.season), episode: pad(info.episode) })}</span>;
   }
-  if (info.type === 'movie' && info.year) return <span className="badge done">Movie · {info.year}</span>;
+  if (info.type === 'movie' && info.year) return <span className="badge done">{t('rename.view.movieChip', { year: info.year })}</span>;
   return null;
 }
 
-/** Blocking warnings make a row start unticked. */
-const isBlocking = (w) => !w.startsWith('name already taken');
+/** Blocking warnings make a row start unticked ("name already taken" only says a number was added). */
+const warningText = (w) => (typeof w === 'string' ? w : w?.text ?? '');
+const isBlocking = (w) => !warningText(w).startsWith('name already taken');
 
 function NameInput({ row, onCommit }) {
   const [value, setValue] = useState(row.newName);
@@ -66,7 +69,7 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
       return undefined;
     }
     const mine = ++seq.current;
-    const t = setTimeout(async () => {
+    const timer = setTimeout(async () => {
       setLoading(true);
       try {
         const r = await api.previewRename({ paths, ruleId: effectiveRuleId, showOverride: showName, showOverrideAll: showAll, edits });
@@ -78,7 +81,7 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
         if (mine === seq.current) setLoading(false);
       }
     }, 250);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paths, effectiveRuleId, showName, showAll, edits, refresh, rule?.updatedAt]);
 
@@ -100,13 +103,13 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
 
   async function apply() {
     if (!toRename.length) return;
-    if (!(await dialogs.confirm({ title: 'Rename files', message: `Rename ${toRename.length} file${toRename.length > 1 ? 's' : ''}?`, confirmLabel: 'Rename' }))) return;
+    if (!(await dialogs.confirm({ title: t('rename.view.confirmTitle'), message: t('rename.view.confirmMessage', { count: toRename.length }), confirmLabel: t('common.rename') }))) return;
     const r = await run(
       () => api.applyRename(toRename.map((x) => ({ path: x.path, newName: x.newName })), rule?.name),
-      (x) => `Renamed ${x.renamed.length} file${x.renamed.length === 1 ? '' : 's'} · undo from History`,
+      (x) => t('rename.view.renamed', { count: x.renamed.length }),
     );
     if (!r) return;
-    if (r.errors.length) onError(new Error(`${r.errors.length} not renamed: ${r.errors.map((e) => `${e.path.split(/[\\/]/).pop()}: ${e.error}`).join('; ')}`));
+    if (r.errors.length) onError(new Error(t('rename.view.notRenamed', { count: r.errors.length, list: r.errors.map((e) => `${e.path.split(/[\\/]/).pop()}: ${e.error}`).join('; ') })));
     const map = new Map(r.renamed.map((x) => [x.from, x.to]));
     setPaths((p) => p.map((x) => map.get(x) ?? x));
     setEdits({});
@@ -119,7 +122,7 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
 
   const allTicked = counts.rename > 0 && toRename.length === counts.rename;
 
-  const [paneClass, paneSwitch, showPane] = usePaneSwitch(['Converted files', `Rename list${paths.length ? ` (${paths.length})` : ''}`]);
+  const [paneClass, paneSwitch, showPane] = usePaneSwitch([t('rename.view.convertedFiles'), paths.length ? t('rename.view.renameListCount', { count: paths.length }) : t('rename.view.renameList')]);
 
   return (
     <main className={`panes rename-panes ${paneClass}`}>
@@ -127,9 +130,10 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
       <SourceBrowser
         settings={settings}
         root="target"
-        title="Converted files"
-        addLabel="Add to rename"
-        hint="Drag files or folders to the rename list. Ctrl/Shift-click to select several."
+        title={t('rename.view.convertedFiles')}
+        addLabel={t('rename.view.addLabel')}
+        addTitle={t('rename.view.addTitle')}
+        hint={t('rename.view.browserHint')}
         help="rename.overview"
         changeTick={changeTick}
         onAdd={(list) => {
@@ -158,41 +162,41 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
         }}
       >
         <div className="pane-head">
-          <h2>Rename<Help id="rename.overview" /></h2>
+          <h2>{t('common.rename')}<Help id="rename.overview" /></h2>
           <div className="pane-tools">
             <label className="field-inline">
-              Rules<Help id="rename.rules" />
+              {t('rename.view.rules')}<Help id="rename.rules" />
               <select value={effectiveRuleId ?? ''} onChange={(e) => setRuleId(Number(e.target.value))}>
                 {rules.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
               </select>
             </label>
-            <button className="btn ghost small" onClick={() => setDialog('rules')}><SlidersHorizontal size={14} /> Edit rules</button>
-            <button className="btn ghost small" onClick={() => setDialog('history')}><History size={14} /> History</button>
+            <button className="btn ghost small" onClick={() => setDialog('rules')}><SlidersHorizontal size={14} /> {t('rename.view.editRules')}</button>
+            <button className="btn ghost small" onClick={() => setDialog('history')}><History size={14} /> {t('rename.view.history')}</button>
           </div>
         </div>
 
         <div className="rename-bar">
-          <label className="field-inline" title="Use when the show name is missing or wrong, e.g. “S04E07 Reacher Title”">
-            Show name<Help id="rename.showName" />
-            <input value={showName} onChange={(e) => setShowName(e.target.value)} placeholder="auto-detected" />
+          <label className="field-inline" title={t('rename.view.showNameTitle')}>
+            {t('rename.view.showName')}<Help id="rename.showName" />
+            <input value={showName} onChange={(e) => setShowName(e.target.value)} placeholder={t('rename.view.autoDetected')} />
           </label>
           <select
             value={showAll ? 'all' : 'missing'}
             onChange={(e) => setShowAll(e.target.value === 'all')}
             disabled={!showName.trim()}
-            title="Which rows get the typed show name"
+            title={t('rename.view.showNameScope')}
           >
-            <option value="missing">only where missing</option>
-            <option value="all">for all rows</option>
+            <option value="missing">{t('rename.view.onlyMissing')}</option>
+            <option value="all">{t('rename.view.allRows')}</option>
           </select>
           <span className="spacer" />
           {Object.keys(edits).length > 0 && (
-            <button className="btn ghost small" onClick={() => setEdits({})} title="Forget names typed by hand">
-              <RotateCcw size={14} /> Reset edits
+            <button className="btn ghost small" onClick={() => setEdits({})} title={t('rename.view.resetEditsTitle')}>
+              <RotateCcw size={14} /> {t('rename.view.resetEdits')}
             </button>
           )}
           <button className="btn ghost small" disabled={!paths.length} onClick={() => { setPaths([]); setEdits({}); }}>
-            <ListX size={14} /> Clear list
+            <ListX size={14} /> {t('rename.view.clearList')}
           </button>
         </div>
 
@@ -200,7 +204,7 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
           {rows.length === 0 && (
             <div className="drop-hint">
               <Upload size={28} />
-              <p>{loading ? 'Reading…' : paths.length ? 'No video files found.' : 'Drag converted files or folders here, or use “Rename” on finished jobs.'}</p>
+              <p>{loading ? t('rename.view.reading') : paths.length ? t('rename.view.noVideos') : t('rename.view.empty')}</p>
             </div>
           )}
           {rows.length > 0 && (
@@ -212,10 +216,10 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
                       type="checkbox"
                       checked={allTicked}
                       onChange={() => setTicks(new Map(rows.filter((r) => r.status === 'rename').map((r) => [r.path, !allTicked])))}
-                      aria-label="Select all"
+                      aria-label={t('common.selectAll')}
                     />
                   </th>
-                  <th>Current name → new name<Help id="rename.preview" /></th>
+                  <th>{t('rename.view.namesColumn')}<Help id="rename.preview" /></th>
                   <th />
                 </tr>
               </thead>
@@ -236,7 +240,7 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
                           disabled={r.status === 'unchanged'}
                           checked={isTicked(r)}
                           onChange={() => toggle(r)}
-                          aria-label={`Rename ${r.oldName}`}
+                          aria-label={t('rename.view.renameFile', { name: r.oldName })}
                         />
                       </td>
                       <td className="names">
@@ -244,12 +248,12 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
                         <NameInput row={r} onCommit={(v) => setEdits((e) => ({ ...e, [r.path]: v }))} />
                         {r.warnings.length > 0 && (
                           <div className={blocking.length ? 'warn-text' : 'muted small'}>
-                            <AlertTriangle size={12} /> {r.warnings.join('; ')}
+                            <AlertTriangle size={12} /> {r.warnings.map(renameWarning).join('; ')}
                           </div>
                         )}
                       </td>
                       <td className="row-meta">
-                        {r.status === 'unchanged' ? <span className="badge">no change</span> : <InfoChip info={r.info} />}
+                        {r.status === 'unchanged' ? <span className="badge">{t('rename.view.noChange')}</span> : <InfoChip info={r.info} />}
                         {r.edited && (
                           <button
                             className="link small"
@@ -259,7 +263,7 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
                               return n;
                             })}
                           >
-                            undo edit
+                            {t('rename.view.undoEdit')}
                           </button>
                         )}
                       </td>
@@ -269,19 +273,19 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
               </tbody>
             </table>
           )}
-          {dropActive && <div className="drop-overlay">Drop to add to the rename list</div>}
+          {dropActive && <div className="drop-overlay">{t('rename.view.dropHere')}</div>}
         </div>
 
         <div className="rename-foot">
           <span className="muted small">
-            {counts.rename} to rename · {counts.unchanged} unchanged
-            {counts.warnings ? <span className="warn-text">&nbsp;· {counts.warnings} need a look</span> : null}
-            {loading && ' · updating…'}
+            {t('rename.view.counts', { rename: counts.rename, unchanged: counts.unchanged })}
+            {counts.warnings ? <span className="warn-text">&nbsp;· {t('rename.view.needALook', { count: counts.warnings })}</span> : null}
+            {loading && ` · ${t('rename.view.updating')}`}
           </span>
           <span className="spacer" />
-          <button className="btn ghost small" onClick={() => setRefresh((x) => x + 1)} disabled={!paths.length}>Refresh</button>
+          <button className="btn ghost small" onClick={() => setRefresh((x) => x + 1)} disabled={!paths.length}>{t('common.refresh')}</button>
           <button className="btn primary" disabled={!toRename.length || loading} onClick={apply}>
-            <Wand2 size={15} /> Rename {toRename.length || ''} file{toRename.length === 1 ? '' : 's'}
+            <Wand2 size={15} /> {toRename.length ? t('rename.view.renameButton', { count: toRename.length }) : t('rename.view.renameButtonNone')}
           </button>
         </div>
       </section>

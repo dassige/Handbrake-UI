@@ -1,0 +1,68 @@
+{
+  "dialog": {
+    "title": "Videos hochladen",
+    "uploadTo": "Hochladen nach",
+    "newFolder": "Neuer Ordner",
+    "elsewhere": "Um woanders hochzuladen, schließen Sie dieses Fenster und öffnen Sie zuerst den gewünschten Ordner unter Quellen.",
+    "drop": "<strong>Videodateien hier ablegen</strong> oder klicken, um sie auf diesem Computer auszuwählen",
+    "notVideo": "keine Videodatei, übersprungen",
+    "removeFile": "{name} entfernen",
+    "keepOpen": "Lassen Sie diesen Browser-Tab geöffnet, bis die Uploads abgeschlossen sind. Sie können währenddessen weiterarbeiten. Wird ein Upload unterbrochen, laden Sie dieselbe Datei erneut in denselben Ordner hoch: Er wird dort fortgesetzt, wo er aufgehört hat.",
+    "chosen_one": "{count} Datei · {size}",
+    "chosen_other": "{count} Dateien · {size}",
+    "noFiles": "Keine Dateien ausgewählt"
+  },
+  "newFolder": {
+    "title": "Neuer Ordner",
+    "message": "Einen Ordner in <code>{path}</code> erstellen.",
+    "label": "Ordnername",
+    "create": "Erstellen",
+    "noSlashes": "Bitte keine Schrägstriche",
+    "noDot": "Der Name darf nicht mit einem Punkt beginnen",
+    "typeName": "Geben Sie einen Namen ein"
+  },
+  "existing": {
+    "title": "Einige Dateien sind bereits vorhanden",
+    "message_one": "Eine Datei mit diesem Namen liegt bereits im Ordner. Vorhandene Dateien werden nie ersetzt.",
+    "message_other": "{count} Dateien mit diesen Namen liegen bereits im Ordner. Vorhandene Dateien werden nie ersetzt.",
+    "more_one": "… und {count} weitere",
+    "more_other": "… und {count} weitere",
+    "skip": "Überspringen",
+    "copies": "Als Kopien hochladen, „Name (1)“"
+  },
+  "noSpace": {
+    "title": "Nicht genug Speicherplatz",
+    "message": "Diese Dateien benötigen {need}, aber der Server hat in diesem Ordner nur {free} frei."
+  },
+  "panel": {
+    "label": "Uploads",
+    "uploading_one": "Wird hochgeladen · {count} übrig",
+    "uploading_other": "Wird hochgeladen · {count} übrig",
+    "finished_one": "Uploads abgeschlossen · {count} fertig",
+    "finished_other": "Uploads abgeschlossen · {count} fertig",
+    "failed_one": "{count} fehlgeschlagen",
+    "failed_other": "{count} fehlgeschlagen",
+    "collapse": "Einklappen",
+    "expand": "Ausklappen",
+    "cancelTitle": "Diesen Upload abbrechen",
+    "cancelLabel": "{name} abbrechen",
+    "retryTitle": "Erneut versuchen",
+    "retryLabel": "{name} erneut versuchen",
+    "waiting": "Wartet · {size}",
+    "progress": "{sent} von {size}",
+    "progressSpeed_one": "{sent} von {size} · {speed}/s · noch {count} Min.",
+    "progressSpeed_other": "{sent} von {size} · {speed}/s · noch {count} Min.",
+    "uploaded": "Hochgeladen · {size}",
+    "cancelled": "Abgebrochen"
+  },
+  "cancel": {
+    "title": "Upload abbrechen",
+    "message": "Das Hochladen von „{name}“ beenden und den bereits gesendeten Teil löschen?",
+    "confirm": "Upload abbrechen",
+    "keep": "Weiter hochladen"
+  },
+  "errors": {
+    "retrying": "{error}; neuer Versuch…",
+    "failed": "{name}: {error}"
+  }
+}

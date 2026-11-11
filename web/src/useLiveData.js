@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api } from './api.js';
+import { t } from './i18n/index.js';
 
 /**
  * Loads jobs, queue state, presets and settings, then keeps them current with
@@ -107,7 +108,7 @@ export function useLiveData(onError, onNotice, onEvent) {
       const q = JSON.parse(e.data);
       setQueue(q);
       if (q.finished) {
-        noticeRef.current?.('Queue finished: every job is done. Press Start for the next ones.');
+        noticeRef.current?.(t('misc.live.queueFinished'));
         eventRef.current?.('queueFinished', q);
       }
     });

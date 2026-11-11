@@ -164,38 +164,42 @@ const classLabel = (id) => RESOLUTION_CLASSES.find((c) => c.id === id)?.label ??
 
 /**
  * Checks one file's description against the criteria. Pure, so it is unit tested.
- * Returns a list of issues: { kind, text }. kind: error | format | resolution | bitrate | interlaced.
+ * Returns a list of issues: { kind, code, params, text }. kind: error | format | resolution |
+ * bitrate | interlaced. text is the English wording (notifications, CSV); the web app shows
+ * code + params in the user's language.
  */
 export function evaluateQuality(info, criteria) {
-  if (info.error) return [{ kind: 'error', text: `Cannot read: ${info.error}` }];
+  const issue = (kind, code, params, text) => ({ kind, code, params, text });
+  if (info.error) return [issue('error', 'cannotRead', { message: info.error }, `Cannot read: ${info.error}`)];
   const issues = [];
   if (criteria.badContainers.includes(info.container)) {
-    issues.push({ kind: 'format', text: `Old container: .${info.container}` });
+    issues.push(issue('format', 'oldContainer', { container: info.container }, `Old container: .${info.container}`));
   }
   const v = info.video;
   if (!v) {
-    issues.push({ kind: 'error', text: 'No video track' });
+    issues.push(issue('error', 'noVideo', {}, 'No video track'));
     return issues;
   }
-  if (criteria.badVideoCodecs.includes(v.codec)) issues.push({ kind: 'format', text: `Old video codec: ${v.codec}` });
+  if (criteria.badVideoCodecs.includes(v.codec)) issues.push(issue('format', 'oldVideoCodec', { codec: v.codec }, `Old video codec: ${v.codec}`));
   const badAudio = [...new Set(info.audio.map((a) => a.codec).filter((c) => criteria.badAudioCodecs.includes(c)))];
-  if (badAudio.length) issues.push({ kind: 'format', text: `Old audio codec: ${badAudio.join(', ')}` });
+  if (badAudio.length) issues.push(issue('format', 'oldAudioCodec', { codecs: badAudio.join(', ') }, `Old audio codec: ${badAudio.join(', ')}`));
 
   const eff = effectiveHeight(v);
   if (criteria.minHeight && eff < criteria.minHeight * 0.97) {
-    issues.push({ kind: 'resolution', text: `Low resolution: ${v.width}×${v.height} (below ${criteria.minHeight}p)` });
+    issues.push(issue('resolution', 'lowResolution', { width: v.width, height: v.height, minHeight: criteria.minHeight },
+      `Low resolution: ${v.width}×${v.height} (below ${criteria.minHeight}p)`));
   }
 
   const cls = resolutionClass(eff);
   const efficient = criteria.efficientCodecs.includes(v.codec);
   const min = Math.round((criteria.minKbps[cls] ?? 0) * (efficient ? criteria.efficientFactor : 1));
   if (min && v.kbps != null && v.kbps < min) {
-    issues.push({
-      kind: 'bitrate',
-      text: `Low bitrate: ${v.kbps}${v.kbpsEstimated ? ' (est.)' : ''} kbps, below ${min} kbps for ${classLabel(cls)} ${efficient ? v.codec.toUpperCase() : 'video'}`,
-    });
+    // Four wordings: measured or estimated, for "video" or for an efficient codec by name.
+    const code = `lowBitrate${efficient ? 'Codec' : ''}${v.kbpsEstimated ? 'Estimated' : ''}`;
+    issues.push(issue('bitrate', code, { kbps: v.kbps, min, resolution: cls, codec: efficient ? v.codec.toUpperCase() : null },
+      `Low bitrate: ${v.kbps}${v.kbpsEstimated ? ' (est.)' : ''} kbps, below ${min} kbps for ${classLabel(cls)} ${efficient ? v.codec.toUpperCase() : 'video'}`));
   }
-  if (criteria.flagInterlaced && v.interlaced) issues.push({ kind: 'interlaced', text: 'Interlaced' });
+  if (criteria.flagInterlaced && v.interlaced) issues.push(issue('interlaced', 'interlaced', {}, 'Interlaced'));
   return issues;
 }
 

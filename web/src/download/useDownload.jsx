@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { api } from '../api.js';
 import { bytes, fileName } from '../format.js';
 import { useDialogs } from '../components/Dialogs.jsx';
+import { rich, t } from '../i18n/index.js';
 
 /** Hands a URL to the browser's own download manager (progress, pause and resume live there). */
 export function startDownload(url) {
@@ -39,26 +40,25 @@ export function useDownload(onError) {
         return;
       }
       const answer = await dialogs.choose({
-        title: 'Download',
+        title: t('common.download'),
         icon: 'question',
         message: (
           <>
             <p>
-              {zip.files} file{zip.files === 1 ? '' : 's'}, {bytes(zip.contentSize)} in all
-              {!onlyFiles && ', from the chosen folders and their sub-folders'}.
+              {onlyFiles
+                ? t('download.dialog.summary', { count: zip.files, size: bytes(zip.contentSize) })
+                : t('download.dialog.summaryFolders', { count: zip.files, size: bytes(zip.contentSize) })}
             </p>
             <p className="muted small">
-              {onlyFiles
-                ? 'Separate files can be paused and resumed in the browser; your browser may ask once whether this site may download several files. '
-                : ''}
-              One ZIP file (<code>{zip.name}</code>) keeps the folders, but an interrupted ZIP download must start again from the beginning.
+              {onlyFiles ? `${t('download.dialog.separateHint')} ` : ''}
+              {rich('download.dialog.zipHint', { name: zip.name })}
             </p>
           </>
         ),
         buttons: [
-          { label: 'Cancel', value: null },
-          ...(onlyFiles ? [{ label: 'Separate files', value: 'files' }] : []),
-          { label: `One ZIP (${bytes(zip.size)})`, value: 'zip', primary: true, autoFocus: true },
+          { label: t('common.cancel'), value: null },
+          ...(onlyFiles ? [{ label: t('download.dialog.separate'), value: 'files' }] : []),
+          { label: t('download.dialog.zip', { size: bytes(zip.size) }), value: 'zip', primary: true, autoFocus: true },
         ],
       });
       if (answer === 'zip') startDownload(api.zipUrl(zip.id));
@@ -75,4 +75,4 @@ export function useDownload(onError) {
 }
 
 export const downloadTitle = (item) =>
-  item.type === 'dir' ? `Download the folder “${fileName(item.path)}” as a ZIP` : `Download “${fileName(item.path)}”`;
+  item.type === 'dir' ? t('download.title.folder', { name: fileName(item.path) }) : t('download.title.file', { name: fileName(item.path) });

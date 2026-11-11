@@ -3,23 +3,32 @@ import { CheckCircle2, CircleAlert, CircleX, Table2, BarChart3 } from 'lucide-re
 import { api } from '../api.js';
 import { bytes, fileName, humanDuration } from '../format.js';
 import { Help } from '../help/Help.jsx';
+import { intlLocale, t } from '../i18n/index.js';
 
 const RANGES = [
-  { days: 7, label: '7 days' },
-  { days: 30, label: '30 days' },
-  { days: 90, label: '90 days' },
-  { days: 365, label: '12 months' },
-  { days: 0, label: 'All time' },
+  { days: 7, labelKey: 'stats.ranges.days7' },
+  { days: 30, labelKey: 'stats.ranges.days30' },
+  { days: 90, labelKey: 'stats.ranges.days90' },
+  { days: 365, labelKey: 'stats.ranges.months12' },
+  { days: 0, labelKey: 'stats.ranges.allTime' },
 ];
 
-const nf = new Intl.NumberFormat();
-const pct = (x) => (x == null ? '—' : `${Math.round(x * 100)}%`);
+// Number formats for the current language (made when first used, then kept).
+const formats = new Map();
+function numberFormat(options = {}) {
+  const id = `${intlLocale()} ${JSON.stringify(options)}`;
+  if (!formats.has(id)) formats.set(id, new Intl.NumberFormat(intlLocale(), options));
+  return formats.get(id);
+}
+const nf = { format: (n) => numberFormat().format(n) };
+const pct = (x) => (x == null ? '—' : numberFormat({ style: 'percent', maximumFractionDigits: 0 }).format(x));
+const speedText = (x) => `${numberFormat({ minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(x)}×`;
 
 function bucketLabel(key, bucket, short) {
   const [y, m, d] = key.split('-').map(Number);
   const date = new Date(y, m - 1, d ?? 1);
-  if (bucket === 'month') return date.toLocaleDateString(undefined, short ? { month: 'short' } : { month: 'long', year: 'numeric' });
-  return date.toLocaleDateString(undefined, short ? { day: 'numeric', month: 'short' } : { weekday: 'short', day: 'numeric', month: 'short' });
+  if (bucket === 'month') return date.toLocaleDateString(intlLocale(), short ? { month: 'short' } : { month: 'long', year: 'numeric' });
+  return date.toLocaleDateString(intlLocale(), short ? { day: 'numeric', month: 'short' } : { weekday: 'short', day: 'numeric', month: 'short' });
 }
 
 /** What the server converted: totals, per day/month, per preset. */
@@ -36,7 +45,7 @@ export function StatsView({ changeTick, onError }) {
     };
   }, [days, changeTick, onError]);
 
-  const t = stats?.totals;
+  const tot = stats?.totals;
   const checks = stats?.checks ?? {};
   const checked = (checks.ok ?? 0) + (checks.warning ?? 0) + (checks.error ?? 0);
 
@@ -45,41 +54,53 @@ export function StatsView({ changeTick, onError }) {
       <section className="page-body">
         <div className="page-content wide">
           <header className="page-head stats-head">
-            <h1>Stats<Help id="stats.overview" /></h1>
-            <div className="seg" role="group" aria-label="Period">
+            <h1>{t('stats.title')}<Help id="stats.overview" /></h1>
+            <div className="seg" role="group" aria-label={t('stats.period')}>
               {RANGES.map((r) => (
                 <button key={r.days} className={days === r.days ? 'active' : ''} aria-pressed={days === r.days} onClick={() => setDays(r.days)}>
-                  {r.label}
+                  {t(r.labelKey)}
                 </button>
               ))}
             </div>
           </header>
 
           {!stats ? (
-            <p className="muted">Loading…</p>
+            <p className="muted">{t('common.loading')}</p>
           ) : (
             <>
               <div className="stat-tiles">
                 <Tile
-                  label="Files converted"
-                  value={nf.format(t.done)}
-                  sub={[t.failed ? `${t.failed} failed` : null, t.cancelled ? `${t.cancelled} cancelled` : null, stats.watched ? `${stats.watched} from watch folders` : null].filter(Boolean).join(' · ') || 'none failed'}
+                  label={t('stats.tiles.filesConverted')}
+                  value={nf.format(tot.done)}
+                  sub={[
+                    tot.failed ? t('stats.tiles.failed', { count: tot.failed }) : null,
+                    tot.cancelled ? t('stats.tiles.cancelled', { count: tot.cancelled }) : null,
+                    stats.watched ? t('stats.tiles.watched', { count: stats.watched }) : null,
+                  ].filter(Boolean).join(' · ') || t('stats.tiles.noneFailed')}
                 />
-                <Tile label="Space saved" value={bytes(t.savedBytes)} sub={t.reduction != null ? `${pct(t.reduction)} smaller · ${bytes(t.sourceBytes)} → ${bytes(t.outputBytes)}` : '—'} />
-                <Tile label="Video converted" value={humanDuration(t.mediaSeconds)} sub={`in ${humanDuration(t.encodeSeconds)} of work`} />
-                <Tile label="Speed" value={t.speed ? `${t.speed.toFixed(2)}×` : '—'} sub={t.avgFps ? `real time · ${Math.round(t.avgFps)} fps on average` : 'real time'} />
+                <Tile
+                  label={t('stats.tiles.spaceSaved')}
+                  value={bytes(tot.savedBytes)}
+                  sub={tot.reduction != null ? t('stats.tiles.smaller', { percent: pct(tot.reduction), source: bytes(tot.sourceBytes), output: bytes(tot.outputBytes) }) : '—'}
+                />
+                <Tile label={t('stats.tiles.videoConverted')} value={humanDuration(tot.mediaSeconds)} sub={t('stats.tiles.ofWork', { time: humanDuration(tot.encodeSeconds) })} />
+                <Tile
+                  label={t('stats.tiles.speed')}
+                  value={tot.speed ? speedText(tot.speed) : '—'}
+                  sub={tot.avgFps ? t('stats.tiles.realTimeFps', { fps: nf.format(Math.round(tot.avgFps)) }) : t('stats.tiles.realTime')}
+                />
               </div>
 
               <section className="set-card">
                 <header className="set-card-head">
-                  <h3>Files converted per {stats.bucket}</h3>
+                  <h3>{t(`stats.perBucket.${stats.bucket}`)}</h3>
                   <button className="btn small ghost" onClick={() => setAsTable((x) => !x)} aria-pressed={asTable}>
-                    {asTable ? <><BarChart3 size={14} /> Chart</> : <><Table2 size={14} /> Table</>}
+                    {asTable ? <><BarChart3 size={14} /> {t('stats.chart')}</> : <><Table2 size={14} /> {t('stats.table')}</>}
                   </button>
                 </header>
                 <div className="set-card-body">
-                  {t.done + t.failed === 0 ? (
-                    <p className="set-hint">Nothing converted in this period.</p>
+                  {tot.done + tot.failed === 0 ? (
+                    <p className="set-hint">{t('stats.nothingConverted')}</p>
                   ) : asTable ? (
                     <SeriesTable series={stats.series} bucket={stats.bucket} />
                   ) : (
@@ -90,22 +111,22 @@ export function StatsView({ changeTick, onError }) {
 
               <div className="stats-grid">
                 <section className="set-card">
-                  <header className="set-card-head"><h3>Check after conversion<Help id="verify.results" /></h3></header>
+                  <header className="set-card-head"><h3>{t('stats.checks.title')}<Help id="verify.results" /></h3></header>
                   <div className="set-card-body">
                     {checked === 0 ? (
-                      <p className="set-hint">No checked files in this period.</p>
+                      <p className="set-hint">{t('stats.checks.none')}</p>
                     ) : (
                       <>
-                        <div className="segbar" role="img" aria-label={`${checks.ok ?? 0} passed, ${checks.warning ?? 0} with warnings, ${checks.error ?? 0} failed`}>
+                        <div className="segbar" role="img" aria-label={t('stats.checks.summary', { ok: checks.ok ?? 0, warning: checks.warning ?? 0, error: checks.error ?? 0 })}>
                           {['ok', 'warning', 'error'].map((k) => checks[k] ? <span key={k} className={`segbar-part ${k}`} style={{ flexGrow: checks[k] }} /> : null)}
                         </div>
                         <ul className="legend-list">
-                          <li><CheckCircle2 size={14} className="text-good" /> Checked <strong>{checks.ok ?? 0}</strong></li>
-                          <li><CircleAlert size={14} className="text-warn" /> Warnings <strong>{checks.warning ?? 0}</strong></li>
-                          <li><CircleX size={14} className="text-bad" /> Failed <strong>{checks.error ?? 0}</strong></li>
+                          <li><CheckCircle2 size={14} className="text-good" /> {t('stats.checks.ok')} <strong>{checks.ok ?? 0}</strong></li>
+                          <li><CircleAlert size={14} className="text-warn" /> {t('stats.checks.warning')} <strong>{checks.warning ?? 0}</strong></li>
+                          <li><CircleX size={14} className="text-bad" /> {t('stats.checks.error')} <strong>{checks.error ?? 0}</strong></li>
                         </ul>
                         {(checks.off || checks.skipped) && (
-                          <p className="set-hint">{(checks.off ?? 0) + (checks.skipped ?? 0)} converted without a check.</p>
+                          <p className="set-hint">{t('stats.checks.unchecked', { count: (checks.off ?? 0) + (checks.skipped ?? 0) })}</p>
                         )}
                       </>
                     )}
@@ -113,10 +134,10 @@ export function StatsView({ changeTick, onError }) {
                 </section>
 
                 <section className="set-card">
-                  <header className="set-card-head"><h3>Biggest savings</h3></header>
+                  <header className="set-card-head"><h3>{t('stats.biggestSavings')}</h3></header>
                   <div className="set-card-body">
                     {stats.top.length === 0 ? (
-                      <p className="set-hint">Nothing yet.</p>
+                      <p className="set-hint">{t('stats.nothingYet')}</p>
                     ) : (
                       <ol className="top-list">
                         {stats.top.map((x) => (
@@ -133,16 +154,23 @@ export function StatsView({ changeTick, onError }) {
               </div>
 
               <section className="set-card">
-                <header className="set-card-head"><h3>By preset</h3></header>
+                <header className="set-card-head"><h3>{t('stats.byPreset')}</h3></header>
                 <div className="set-card-body table-scroll">
                   {stats.presets.length === 0 ? (
-                    <p className="set-hint">Nothing yet.</p>
+                    <p className="set-hint">{t('stats.nothingYet')}</p>
                   ) : (
                     <table className="data-table">
                       <thead>
                         <tr>
-                          <th>Preset</th><th className="num">Converted</th><th className="num">Failed</th><th className="num">Video</th>
-                          <th className="num">Work</th><th className="num">Speed</th><th className="num">Avg fps</th><th className="num">Saved</th><th className="num">Smaller</th>
+                          <th>{t('stats.columns.preset')}</th>
+                          <th className="num">{t('stats.columns.converted')}</th>
+                          <th className="num">{t('stats.columns.failed')}</th>
+                          <th className="num">{t('stats.columns.video')}</th>
+                          <th className="num">{t('stats.columns.work')}</th>
+                          <th className="num">{t('stats.columns.speed')}</th>
+                          <th className="num">{t('stats.columns.avgFps')}</th>
+                          <th className="num">{t('stats.columns.saved')}</th>
+                          <th className="num">{t('stats.columns.smaller')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -153,8 +181,8 @@ export function StatsView({ changeTick, onError }) {
                             <td className="num">{p.failed ? nf.format(p.failed) : '—'}</td>
                             <td className="num">{humanDuration(p.mediaSeconds)}</td>
                             <td className="num">{humanDuration(p.encodeSeconds)}</td>
-                            <td className="num">{p.speed ? `${p.speed.toFixed(2)}×` : '—'}</td>
-                            <td className="num">{p.avgFps ? Math.round(p.avgFps) : '—'}</td>
+                            <td className="num">{p.speed ? speedText(p.speed) : '—'}</td>
+                            <td className="num">{p.avgFps ? nf.format(Math.round(p.avgFps)) : '—'}</td>
                             <td className="num">{bytes(p.savedBytes)}</td>
                             <td className="num">{pct(p.reduction)}</td>
                           </tr>
@@ -165,10 +193,7 @@ export function StatsView({ changeTick, onError }) {
                 </div>
               </section>
               {stats.firstAt && (
-                <p className="set-hint">
-                  History since {new Date(stats.firstAt).toLocaleDateString()}. Clearing jobs from the queue does not remove them
-                  from these figures.
-                </p>
+                <p className="set-hint">{t('stats.historySince', { date: new Date(stats.firstAt).toLocaleDateString(intlLocale()) })}</p>
               )}
             </>
           )}
@@ -193,14 +218,20 @@ function SeriesTable({ series, bucket }) {
     <div className="table-scroll short">
       <table className="data-table">
         <thead>
-          <tr><th>{bucket === 'month' ? 'Month' : 'Day'}</th><th className="num">Converted</th><th className="num">Failed</th><th className="num">Saved</th><th className="num">Work</th></tr>
+          <tr>
+            <th>{bucket === 'month' ? t('stats.columns.month') : t('stats.columns.day')}</th>
+            <th className="num">{t('stats.columns.converted')}</th>
+            <th className="num">{t('stats.columns.failed')}</th>
+            <th className="num">{t('stats.columns.saved')}</th>
+            <th className="num">{t('stats.columns.work')}</th>
+          </tr>
         </thead>
         <tbody>
           {series.filter((s) => s.done || s.failed).map((s) => (
             <tr key={s.key}>
               <td>{bucketLabel(s.key, bucket)}</td>
-              <td className="num">{s.done}</td>
-              <td className="num">{s.failed || '—'}</td>
+              <td className="num">{nf.format(s.done)}</td>
+              <td className="num">{s.failed ? nf.format(s.failed) : '—'}</td>
               <td className="num">{bytes(s.savedBytes)}</td>
               <td className="num">{humanDuration(s.encodeSeconds)}</td>
             </tr>
@@ -260,7 +291,7 @@ function ColumnChart({ series, bucket }) {
   const h = hover != null ? columns[hover] : null;
   return (
     <div className="chart" ref={box} onMouseLeave={() => setHover(null)}>
-      <svg width={width} height={height} role="img" aria-label={`Files converted per ${bucket}`}>
+      <svg width={width} height={height} role="img" aria-label={t(`stats.perBucket.${bucket}`)}>
         {ticks.map((v) => (
           <g key={v}>
             <line x1={pad.left} x2={width - pad.right} y1={y(v)} y2={y(v)} className="chart-grid" />
@@ -282,7 +313,7 @@ function ColumnChart({ series, bucket }) {
               onMouseEnter={() => setHover(i)}
               onFocus={() => setHover(i)}
               tabIndex={s.done || s.failed ? 0 : -1}
-              aria-label={`${bucketLabel(s.key, bucket)}: ${s.done} converted`}
+              aria-label={t('stats.tip.column', { date: bucketLabel(s.key, bucket), count: s.done })}
             />
           </g>
         ))}
@@ -290,8 +321,8 @@ function ColumnChart({ series, bucket }) {
       {h && (
         <div className="chart-tip" style={{ left: Math.min(Math.max(h.x + barW / 2, 90), width - 90), top: Math.max(0, y(h.s.done) - 8) }}>
           <strong>{bucketLabel(h.s.key, bucket)}</strong>
-          <span>{h.s.done} converted{h.s.failed ? ` · ${h.s.failed} failed` : ''}</span>
-          {h.s.done > 0 && <span className="muted">{bytes(h.s.savedBytes)} saved · {humanDuration(h.s.encodeSeconds)} of work</span>}
+          <span>{h.s.failed ? t('stats.tip.convertedFailed', { count: h.s.done, failed: h.s.failed }) : t('stats.tip.converted', { count: h.s.done })}</span>
+          {h.s.done > 0 && <span className="muted">{t('stats.tip.savedWork', { saved: bytes(h.s.savedBytes), time: humanDuration(h.s.encodeSeconds) })}</span>}
         </div>
       )}
     </div>

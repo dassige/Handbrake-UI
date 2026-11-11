@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { t } from '../i18n/index.js';
 
 const PHONE = '(max-width: 700px)';
 export const isPhone = () => typeof window !== 'undefined' && window.matchMedia?.(PHONE).matches;
@@ -14,7 +15,7 @@ export function usePaneSwitch(labels) {
     if (isPhone()) setActive(i);
   }, []);
   const element = (
-    <div className="pane-switch" role="tablist" aria-label="Panel">
+    <div className="pane-switch" role="tablist" aria-label={t('components.paneSwitch.label')}>
       {labels.map((label, i) => (
         <button key={i} type="button" role="tab" aria-selected={active === i} className={active === i ? 'active' : ''} onClick={() => setActive(i)}>
           {label}

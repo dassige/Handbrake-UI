@@ -1,0 +1,16 @@
+{
+  "dialog": {
+    "summary_one": "{count} Datei, insgesamt {size}.",
+    "summary_other": "{count} Dateien, insgesamt {size}.",
+    "summaryFolders_one": "{count} Datei, insgesamt {size}, aus den gewählten Ordnern und ihren Unterordnern.",
+    "summaryFolders_other": "{count} Dateien, insgesamt {size}, aus den gewählten Ordnern und ihren Unterordnern.",
+    "separateHint": "Einzelne Dateien lassen sich im Browser anhalten und fortsetzen; Ihr Browser fragt eventuell einmal, ob diese Seite mehrere Dateien herunterladen darf.",
+    "zipHint": "Eine ZIP-Datei (<code>{name}</code>) behält die Ordnerstruktur, aber ein unterbrochener ZIP-Download muss von vorn beginnen.",
+    "separate": "Einzelne Dateien",
+    "zip": "Eine ZIP-Datei ({size})"
+  },
+  "title": {
+    "folder": "Den Ordner „{name}“ als ZIP herunterladen",
+    "file": "„{name}“ herunterladen"
+  }
+}

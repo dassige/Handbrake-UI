@@ -4,6 +4,8 @@ import { api } from '../api.js';
 import { bytes, dirName, duration, elapsed, fileName, humanDuration, percent, ratio, relTo, ago } from '../format.js';
 import { StatusBadge, VerifyBadge } from './StatusBadge.jsx';
 import { useDialogs } from './Dialogs.jsx';
+import { t } from '../i18n/index.js';
+import { renameNote } from '../i18n/serverText.js';
 
 export const DRAG_JOB = 'application/x-hbui-job';
 
@@ -12,8 +14,8 @@ function useClock(active) {
   const [, setT] = useState(0);
   useEffect(() => {
     if (!active) return undefined;
-    const t = setInterval(() => setT((x) => x + 1), 1000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setT((x) => x + 1), 1000);
+    return () => clearInterval(timer);
   }, [active]);
 }
 
@@ -39,30 +41,42 @@ export function JobActions({ job, run, queueIndex = -1, labels = false, onRename
   );
   return (
     <div className="job-actions" onClick={(e) => e.stopPropagation()}>
-      {s === 'running' && canPause && btn({ icon: Pause, label: 'Pause', onClick: () => act('pause') })}
-      {s === 'paused' && btn({ icon: Play, label: 'Resume', onClick: () => act('resume') })}
+      {s === 'running' && canPause && btn({ icon: Pause, label: t('job.actions.pause'), onClick: () => act('pause') })}
+      {s === 'paused' && btn({ icon: Play, label: t('job.actions.resume'), onClick: () => act('resume') })}
       {['running', 'paused', 'queued'].includes(s) && job.phase === 'verifying' && (
-        btn({ icon: SkipForward, label: 'Skip check', title: 'Keep the converted file and skip the rest of the check', onClick: () => act('cancel') })
+        btn({ icon: SkipForward, label: t('job.actions.skipCheck'), title: t('job.actions.skipCheckTitle'), onClick: () => act('cancel') })
       )}
       {['running', 'paused', 'queued'].includes(s) && job.phase !== 'verifying' && (
-        btn({ icon: Square, danger: true, label: 'Cancel', title: s === 'queued' ? 'Cancel (keeps it in the list)' : 'Stop and cancel this conversion', onClick: async () => (s === 'queued' || (await dialogs.confirm({ title: 'Cancel conversion', message: 'Cancel this conversion? Progress is lost.', confirmLabel: 'Cancel conversion', cancelLabel: 'Keep going', danger: true }))) && act('cancel') })
+        btn({
+          icon: Square,
+          danger: true,
+          label: t('common.cancel'),
+          title: s === 'queued' ? t('job.actions.cancelQueuedTitle') : t('job.actions.cancelRunningTitle'),
+          onClick: async () => (s === 'queued' || (await dialogs.confirm({
+            title: t('job.actions.cancelConversion'),
+            message: t('job.actions.cancelMessage'),
+            confirmLabel: t('job.actions.cancelConversion'),
+            cancelLabel: t('job.actions.keepGoing'),
+            danger: true,
+          }))) && act('cancel'),
+        })
       )}
       {s === 'queued' && queueIndex > 0 && (
-        btn({ icon: ArrowUpToLine, label: 'Move to top', onClick: () => act('move', { where: 'top' }) })
+        btn({ icon: ArrowUpToLine, label: t('job.actions.moveTop'), onClick: () => act('move', { where: 'top' }) })
       )}
       {/* In the details drawer: step by step, for touch screens where dragging doesn't work. */}
-      {s === 'queued' && labels && btn({ icon: ArrowUp, label: 'Up', title: 'Move one place up', onClick: () => act('move', { where: 'up' }) })}
-      {s === 'queued' && labels && btn({ icon: ArrowDown, label: 'Down', title: 'Move one place down', onClick: () => act('move', { where: 'down' }) })}
-      {s === 'queued' && labels && btn({ icon: ArrowDownToLine, label: 'Move to bottom', onClick: () => act('move', { where: 'bottom' }) })}
-      {s === 'done' && onRename && btn({ icon: Wand2, label: 'Rename', title: 'Rename the converted file', onClick: () => onRename([job.outputPath]) })}
+      {s === 'queued' && labels && btn({ icon: ArrowUp, label: t('job.actions.up'), title: t('job.actions.upTitle'), onClick: () => act('move', { where: 'up' }) })}
+      {s === 'queued' && labels && btn({ icon: ArrowDown, label: t('job.actions.down'), title: t('job.actions.downTitle'), onClick: () => act('move', { where: 'down' }) })}
+      {s === 'queued' && labels && btn({ icon: ArrowDownToLine, label: t('job.actions.moveBottom'), onClick: () => act('move', { where: 'bottom' }) })}
+      {s === 'done' && onRename && btn({ icon: Wand2, label: t('common.rename'), title: t('job.actions.renameTitle'), onClick: () => onRename([job.outputPath]) })}
       {s === 'done' && (
-        btn({ icon: RotateCcw, label: 'Convert again', title: 'Convert again (new job; the output gets a suffix)', onClick: () => act('again', { position: 'end' }) })
+        btn({ icon: RotateCcw, label: t('job.actions.again'), title: t('job.actions.againTitle'), onClick: () => act('again', { position: 'end' }) })
       )}
       {(s === 'failed' || s === 'cancelled') && (
-        btn({ icon: RotateCcw, label: 'Retry', title: 'Put back in the queue', onClick: () => act('retry') })
+        btn({ icon: RotateCcw, label: t('common.retry'), title: t('job.actions.retryTitle'), onClick: () => act('retry') })
       )}
       {!['running', 'paused'].includes(s) && (
-        btn({ icon: Trash2, label: 'Remove', title: 'Remove from the list (files are not touched)', onClick: () => run(() => api.removeJobs([job.id])) })
+        btn({ icon: Trash2, label: t('common.remove'), title: t('job.actions.removeTitle'), onClick: () => run(() => api.removeJobs([job.id])) })
       )}
     </div>
   );
@@ -81,24 +95,24 @@ export function JobRow({
   let meta;
   if (active) {
     meta = job.phase === 'verifying'
-      ? [`checking the converted file · ${percent(job.progress)}`]
+      ? [t('job.row.checking', { percent: percent(job.progress) })]
       : job.phase === 'encoding' || job.status === 'paused'
       ? [
           percent(job.progress),
           job.status === 'running' && job.fps != null ? `${job.fps.toFixed(1)} fps` : null,
-          job.status === 'running' && job.eta ? `ETA ${duration(job.eta)}` : null,
-          `elapsed ${duration(elapsed(job))}`,
-          job.passCount > 1 ? `pass ${job.pass}/${job.passCount}` : null,
+          job.status === 'running' && job.eta ? t('job.row.eta', { time: duration(job.eta) }) : null,
+          t('job.row.elapsed', { time: duration(elapsed(job)) }),
+          job.passCount > 1 ? t('job.row.pass', { pass: job.pass, total: job.passCount }) : null,
         ]
-      : [job.phase === 'muxing' ? 'Finishing file…' : 'Reading source…'];
+      : [job.phase === 'muxing' ? t('job.row.finishing') : t('job.row.reading')];
   } else if (job.status === 'done') {
     meta = [
       `${bytes(job.sourceSize)} → ${bytes(job.outputSize)}`,
       saved != null ? `${saved > 0 ? '−' : '+'}${Math.abs(saved)}%` : null,
-      `in ${duration(elapsed(job))}`,
-      job.avgFps ? `${job.avgFps.toFixed(1)} fps avg` : null,
+      t('job.row.took', { time: duration(elapsed(job)) }),
+      job.avgFps ? t('job.row.fpsAvg', { fps: job.avgFps.toFixed(1) }) : null,
       ago(job.finishedAt),
-      job.renameNote,
+      renameNote(job.renameNote),
     ];
   } else if (job.status === 'failed') {
     meta = [job.error];
@@ -108,7 +122,7 @@ export function JobRow({
       info?.duration ? duration(info.duration) : null,
       info?.width ? `${info.width}×${info.height}` : null,
       info?.videoCodec,
-      estimate != null ? `≈ ${humanDuration(estimate)} to convert` : null,
+      estimate != null ? t('job.row.toConvert', { duration: humanDuration(estimate) }) : null,
     ];
   }
 
@@ -122,7 +136,7 @@ export function JobRow({
       onDragOver={onJobDragOver}
       onDrop={onJobDrop}
     >
-      <div className="job-grip" title={queued ? 'Drag to reorder' : undefined}>
+      <div className="job-grip" title={queued ? t('job.row.dragToReorder') : undefined}>
         {queued ? <GripVertical size={15} /> : null}
       </div>
       <div className="job-main">

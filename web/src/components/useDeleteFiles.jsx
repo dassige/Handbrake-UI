@@ -2,6 +2,8 @@ import { useCallback } from 'react';
 import { api } from '../api.js';
 import { bytes, fileName } from '../format.js';
 import { useDialogs } from './Dialogs.jsx';
+import { rich, t } from '../i18n/index.js';
+import { deleteReason } from '../i18n/serverText.js';
 
 const SHOW = 10;
 
@@ -9,14 +11,14 @@ function Blocked({ list }) {
   if (!list.length) return null;
   return (
     <>
-      <p className="small"><strong>Not deleted:</strong></p>
+      <p className="small"><strong>{t('components.delete.notDeleted')}</strong></p>
       <ul className="ask-list small">
         {list.slice(0, SHOW).map((b) => (
           <li key={b.path}>
-            {fileName(b.path)}: <span className="muted">{b.reason}</span>
+            {fileName(b.path)}: <span className="muted">{deleteReason(b)}</span>
           </li>
         ))}
-        {list.length > SHOW && <li className="muted">… and {list.length - SHOW} more</li>}
+        {list.length > SHOW && <li className="muted">{t('components.delete.more', { count: list.length - SHOW })}</li>}
       </ul>
     </>
   );
@@ -41,22 +43,27 @@ export function useDeleteFiles({ onError, onNotice }) {
       }
       const { items, blocked } = preview;
       if (!items.length) {
-        await dialogs.alert({ title: 'Nothing can be deleted', danger: true, message: <Blocked list={blocked} /> });
+        await dialogs.alert({ title: t('components.delete.nothingTitle'), danger: true, message: <Blocked list={blocked} /> });
         return false;
       }
       const folders = items.filter((i) => i.type === 'dir');
       const ok = await dialogs.choose({
-        title: 'Delete from the server?',
+        title: t('components.delete.title'),
         icon: 'warn',
         cancelValue: false,
         message: (
           <>
             <p>
-              <strong>
-                {items.length === 1 ? fileName(items[0].path) : `${items.length} items`}
-              </strong>
-              {' '}will be deleted for good: {preview.files} file{preview.files === 1 ? '' : 's'}, {bytes(preview.bytes)}
-              {folders.length > 0 && <>, including everything inside {folders.length === 1 ? 'the folder' : `${folders.length} folders`}</>}.
+              {rich(
+                folders.length === 0 ? 'components.delete.summary'
+                  : folders.length === 1 ? 'components.delete.summaryFolder' : 'components.delete.summaryFolders',
+                {
+                  what: <strong>{items.length === 1 ? fileName(items[0].path) : t('components.delete.items', { count: items.length })}</strong>,
+                  files: t('common.files.count', { count: preview.files }),
+                  size: bytes(preview.bytes),
+                  folders: t('common.folders.count', { count: folders.length }),
+                },
+              )}
             </p>
             {items.length > 1 && (
               <ul className="ask-list small">
@@ -64,30 +71,30 @@ export function useDeleteFiles({ onError, onNotice }) {
                   <li key={i.path}>
                     {fileName(i.path)}{i.type === 'dir' ? '/' : ''}{' '}
                     <span className="muted">
-                      {i.type === 'dir' ? `${i.files} file${i.files === 1 ? '' : 's'}, ` : ''}{bytes(i.bytes)}
+                      {i.type === 'dir' ? `${t('common.files.count', { count: i.files })}, ` : ''}{bytes(i.bytes)}
                     </span>
                   </li>
                 ))}
-                {items.length > SHOW && <li className="muted">… and {items.length - SHOW} more</li>}
+                {items.length > SHOW && <li className="muted">{t('components.delete.more', { count: items.length - SHOW })}</li>}
               </ul>
             )}
             <Blocked list={blocked} />
             <p className="text-bad small">
-              This cannot be undone. If a download client (e.g. Deluge) is still seeding these files, it will report them as missing.
+              {t('components.delete.warning')}
             </p>
           </>
         ),
         buttons: [
-          { label: 'Cancel', value: false, autoFocus: true },
-          { label: items.length === 1 ? 'Delete' : `Delete ${items.length} items`, value: true, danger: true },
+          { label: t('common.cancel'), value: false, autoFocus: true },
+          { label: items.length === 1 ? t('common.delete') : t('components.delete.deleteItems', { count: items.length }), value: true, danger: true },
         ],
       });
       if (!ok) return false;
       try {
         const r = await api.deleteFiles(items.map((i) => i.path));
-        if (r.deleted.length) onNotice?.(`Deleted ${r.deleted.length} item${r.deleted.length === 1 ? '' : 's'}`);
+        if (r.deleted.length) onNotice?.(t('components.delete.deleted', { count: r.deleted.length }));
         const problems = [...r.blocked, ...r.errors];
-        if (problems.length) onError?.(new Error(`Not deleted: ${problems.map((b) => `${fileName(b.path)} (${b.reason})`).join('; ')}`));
+        if (problems.length) onError?.(new Error(t('components.delete.notDeletedList', { list: problems.map((b) => `${fileName(b.path)} (${deleteReason(b)})`).join('; ') })));
         return r.deleted.length > 0;
       } catch (e) {
         onError?.(e);

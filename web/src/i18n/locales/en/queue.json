@@ -1,0 +1,46 @@
+{
+  "title": "Queue",
+  "filters": {
+    "all": "All",
+    "active": "Active",
+    "done": "Converted",
+    "failed": "Failed / cancelled",
+    "checkFailed": "Check failed",
+    "checkFailedTitle": "Converted files whose check after conversion failed"
+  },
+  "preset": "Preset",
+  "presetTitle": "Preset used for files you add",
+  "presetDefault": "{name} (default)",
+  "positionTitle": "Where new files go in the queue",
+  "position": {
+    "end": "at the end",
+    "next": "next"
+  },
+  "checkAllAgain": "Check all again",
+  "checkAllAgainTitle": "Check these converted files again, one after the other",
+  "renameThese": "Rename these",
+  "renameTheseTitle": "Open the converted files in the Rename view",
+  "mergeThese": "Merge these",
+  "mergeTheseTitle": "Open the converted files in the Merge view",
+  "clearFinished": "Clear finished",
+  "clearFinishedTitle": "Remove converted, failed and cancelled jobs from the list (files are not touched)",
+  "clearDialog": {
+    "title": "Clear finished jobs",
+    "message_one": "Remove {count} finished job(s) from the list? Files are not deleted.",
+    "message_other": "Remove {count} finished job(s) from the list? Files are not deleted."
+  },
+  "noMatch": "No jobs match this filter.",
+  "dragHere": "Drag files or folders here from Sources.",
+  "dropToAdd": "Drop to add to the queue",
+  "estimate": {
+    "left": "≈ {duration} of conversion left",
+    "notEstimated_one": "{count} job not estimated yet",
+    "notEstimated_other": "{count} jobs not estimated yet",
+    "doneAround": "done around {time}",
+    "ifStartedDoneAround": "if started, done around {time}",
+    "waitingWindow": "Waiting for the conversion window: starts {time}",
+    "windowClosed": "Window closed: the current job finishes, the rest waits until {time}",
+    "windowOpenUntil": "Window open until {time}",
+    "guessed": "(some lengths guessed)"
+  }
+}

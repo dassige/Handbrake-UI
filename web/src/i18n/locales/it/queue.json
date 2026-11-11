@@ -1,0 +1,46 @@
+{
+  "title": "Coda",
+  "filters": {
+    "all": "Tutti",
+    "active": "Attivi",
+    "done": "Convertiti",
+    "failed": "Non riusciti / annullati",
+    "checkFailed": "Verifica non riuscita",
+    "checkFailedTitle": "File convertiti la cui verifica dopo la conversione non è riuscita"
+  },
+  "preset": "Preimpostazione",
+  "presetTitle": "Preimpostazione usata per i file che aggiungi",
+  "presetDefault": "{name} (predefinita)",
+  "positionTitle": "Dove vanno i nuovi file nella coda",
+  "position": {
+    "end": "in fondo",
+    "next": "come prossimi"
+  },
+  "checkAllAgain": "Verifica di nuovo tutti",
+  "checkAllAgainTitle": "Verifica di nuovo questi file convertiti, uno dopo l’altro",
+  "renameThese": "Rinomina questi",
+  "renameTheseTitle": "Apri i file convertiti nella vista Rinomina",
+  "mergeThese": "Unisci questi",
+  "mergeTheseTitle": "Apri i file convertiti nella vista Unisci",
+  "clearFinished": "Rimuovi i terminati",
+  "clearFinishedTitle": "Rimuovi dall’elenco i processi convertiti, non riusciti e annullati (i file non vengono toccati)",
+  "clearDialog": {
+    "title": "Rimuovi i processi terminati",
+    "message_one": "Rimuovere {count} processo terminato dall’elenco? I file non vengono eliminati.",
+    "message_other": "Rimuovere {count} processi terminati dall’elenco? I file non vengono eliminati."
+  },
+  "noMatch": "Nessun processo corrisponde a questo filtro.",
+  "dragHere": "Trascina qui file o cartelle da Sorgenti.",
+  "dropToAdd": "Rilascia per aggiungere alla coda",
+  "estimate": {
+    "left": "≈ {duration} di conversione rimanenti",
+    "notEstimated_one": "{count} processo non ancora stimato",
+    "notEstimated_other": "{count} processi non ancora stimati",
+    "doneAround": "fine prevista: {time}",
+    "ifStartedDoneAround": "se avviata, fine prevista: {time}",
+    "waitingWindow": "In attesa della fascia oraria di conversione: inizio {time}",
+    "windowClosed": "Fascia oraria chiusa: il processo in corso termina, il resto attende fino a: {time}",
+    "windowOpenUntil": "Fascia oraria aperta fino a: {time}",
+    "guessed": "(alcune durate stimate)"
+  }
+}

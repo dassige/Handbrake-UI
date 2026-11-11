@@ -1,0 +1,46 @@
+{
+  "title": "Cola",
+  "filters": {
+    "all": "Todos",
+    "active": "Activos",
+    "done": "Convertidos",
+    "failed": "Con error / cancelados",
+    "checkFailed": "Comprobación fallida",
+    "checkFailedTitle": "Archivos convertidos cuya comprobación tras la conversión ha fallado"
+  },
+  "preset": "Preajuste",
+  "presetTitle": "Preajuste que se usa para los archivos que añade",
+  "presetDefault": "{name} (predeterminado)",
+  "positionTitle": "Dónde se colocan en la cola los archivos nuevos",
+  "position": {
+    "end": "al final",
+    "next": "a continuación"
+  },
+  "checkAllAgain": "Comprobar todos de nuevo",
+  "checkAllAgainTitle": "Comprobar de nuevo estos archivos convertidos, uno tras otro",
+  "renameThese": "Renombrar estos",
+  "renameTheseTitle": "Abrir los archivos convertidos en la vista Renombrar",
+  "mergeThese": "Unir estos",
+  "mergeTheseTitle": "Abrir los archivos convertidos en la vista Unir",
+  "clearFinished": "Quitar terminados",
+  "clearFinishedTitle": "Quitar de la lista los trabajos convertidos, con error y cancelados (los archivos no se tocan)",
+  "clearDialog": {
+    "title": "Quitar trabajos terminados",
+    "message_one": "¿Quitar {count} trabajo terminado de la lista? Los archivos no se eliminan.",
+    "message_other": "¿Quitar {count} trabajos terminados de la lista? Los archivos no se eliminan."
+  },
+  "noMatch": "Ningún trabajo coincide con este filtro.",
+  "dragHere": "Arrastre aquí archivos o carpetas desde Orígenes.",
+  "dropToAdd": "Suelte para añadir a la cola",
+  "estimate": {
+    "left": "≈ {duration} de conversión restantes",
+    "notEstimated_one": "{count} trabajo aún sin estimar",
+    "notEstimated_other": "{count} trabajos aún sin estimar",
+    "doneAround": "terminará hacia {time}",
+    "ifStartedDoneAround": "si se inicia, terminará hacia {time}",
+    "waitingWindow": "Esperando la franja de conversión: empieza {time}",
+    "windowClosed": "Franja cerrada: el trabajo actual termina y el resto espera hasta {time}",
+    "windowOpenUntil": "Franja abierta hasta {time}",
+    "guessed": "(algunas duraciones son estimadas)"
+  }
+}

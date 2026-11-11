@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ArchiveRestore, Bell, CalendarClock, Cpu, FolderOpen, FolderSearch, FolderTree, Gauge, Info, ListPlus, Wand2,
+  ArchiveRestore, Bell, CalendarClock, Cpu, FolderOpen, FolderSearch, FolderTree, Gauge, Info, Languages, ListPlus, Wand2,
 } from 'lucide-react';
 import { api } from '../api.js';
+import { t } from '../i18n/index.js';
 import {
   AddingSection, EncodingSection, FoldersSection, OutputSection, QualitySection, RenamingSection,
 } from './GeneralSections.jsx';
@@ -11,41 +12,45 @@ import { WatchSection } from './WatchSection.jsx';
 import { NotificationsSection } from './NotificationsSection.jsx';
 import { BackupSection } from './BackupSection.jsx';
 import { AboutSection } from './AboutSection.jsx';
+import { LanguageSection } from './LanguageSection.jsx';
 
 // keys: the settings a section edits (for its "unsaved" dot and for saving only what changed).
+// Labels are translated when rendering: settings.nav.<id> and settings.nav.group.<group>.
 export const SECTIONS = [
   {
-    group: 'General',
+    group: 'general',
     items: [
-      { id: 'folders', label: 'Folders', icon: FolderOpen, keys: ['sourceRoots', 'sourceNames', 'protectedRoots', 'targetRoot'], Component: FoldersSection },
-      { id: 'adding', label: 'Adding files', icon: ListPlus, keys: ['recursive', 'skipConverted', 'videoExtensions', 'excludePatterns'], Component: AddingSection },
-      { id: 'output', label: 'Output layout', icon: FolderTree, keys: ['outputLayout'], Component: OutputSection },
+      { id: 'folders', icon: FolderOpen, keys: ['sourceRoots', 'sourceNames', 'protectedRoots', 'targetRoot'], Component: FoldersSection },
+      { id: 'adding', icon: ListPlus, keys: ['recursive', 'skipConverted', 'videoExtensions', 'excludePatterns'], Component: AddingSection },
+      { id: 'output', icon: FolderTree, keys: ['outputLayout'], Component: OutputSection },
+      { id: 'language', icon: Languages, keys: ['language'], Component: LanguageSection },
     ],
   },
   {
-    group: 'Converting',
+    group: 'converting',
     items: [
-      { id: 'encoding', label: 'Encoding and check', icon: Cpu, keys: ['niceLevel', 'verifyMode'], Component: EncodingSection },
-      { id: 'schedule', label: 'Conversion window', icon: CalendarClock, keys: ['schedule'], Component: ScheduleSection },
-      { id: 'watch', label: 'Watch folders', icon: FolderSearch, keys: ['watch'], Component: WatchSection },
-      { id: 'notifications', label: 'Notifications', icon: Bell, keys: ['notifications'], Component: NotificationsSection },
+      { id: 'encoding', icon: Cpu, keys: ['niceLevel', 'verifyMode'], Component: EncodingSection },
+      { id: 'schedule', icon: CalendarClock, keys: ['schedule'], Component: ScheduleSection },
+      { id: 'watch', icon: FolderSearch, keys: ['watch'], Component: WatchSection },
+      { id: 'notifications', icon: Bell, keys: ['notifications'], Component: NotificationsSection },
     ],
   },
   {
-    group: 'Tools',
+    group: 'tools',
     items: [
-      { id: 'quality', label: 'Quality check', icon: Gauge, keys: ['quality'], Component: QualitySection },
-      { id: 'renaming', label: 'Renaming', icon: Wand2, keys: ['autoRename', 'autoRenameRuleId', 'renameSeparator'], Component: RenamingSection },
+      { id: 'quality', icon: Gauge, keys: ['quality'], Component: QualitySection },
+      { id: 'renaming', icon: Wand2, keys: ['autoRename', 'autoRenameRuleId', 'renameSeparator'], Component: RenamingSection },
     ],
   },
   {
-    group: 'System',
+    group: 'system',
     items: [
-      { id: 'backup', label: 'Backup and restore', icon: ArchiveRestore, keys: ['backupSchedule'], Component: BackupSection },
-      { id: 'about', label: 'About', icon: Info, keys: [] },
+      { id: 'backup', icon: ArchiveRestore, keys: ['backupSchedule'], Component: BackupSection },
+      { id: 'about', icon: Info, keys: [] },
     ],
   },
 ];
+const sectionLabel = (id) => t(`settings.nav.${id}`);
 const ALL = SECTIONS.flatMap((g) => g.items);
 const EDITABLE = ALL.flatMap((s) => s.keys);
 export const SECTION_IDS = ALL.map((s) => s.id);
@@ -84,12 +89,18 @@ export function SettingsPage({
   const [saving, setSaving] = useState(false);
   const changedKeys = useMemo(() => EDITABLE.filter((k) => !same(draft[k], settings[k])), [draft, settings]);
   const dirty = changedKeys.length > 0;
-  const dirtyRef = useRef(dirty);
-  dirtyRef.current = dirty;
 
-  // Follow changes saved elsewhere (another tab, a restore) unless there are unsaved edits.
+  // Follow changes saved elsewhere (another browser, a restore), keeping the settings edited here.
+  // Edited = different from the settings before this update (comparing with the new ones would
+  // make every key changed elsewhere look edited, and show a false "unsaved changes" bar).
+  const prevSettings = useRef(settings);
   useEffect(() => {
-    if (!dirtyRef.current) setDraft(settings);
+    const prev = prevSettings.current;
+    prevSettings.current = settings;
+    setDraft((d) => {
+      const edited = EDITABLE.filter((k) => !same(d[k], prev[k]));
+      return { ...settings, ...Object.fromEntries(edited.map((k) => [k, d[k]])) };
+    });
   }, [settings]);
   // Braces: an effect may only return a cleanup function (returning the boolean crashed on leaving the page).
   useEffect(() => {
@@ -118,7 +129,7 @@ export function SettingsPage({
     e?.preventDefault();
     setSaving(true);
     const patch = Object.fromEntries(changedKeys.map((k) => [k, clean(k, draft[k])]));
-    const r = await run(() => api.saveSettings(patch), 'Settings saved');
+    const r = await run(() => api.saveSettings(patch), t('settings.saved'));
     setSaving(false);
     if (r) {
       onSaved(r);
@@ -131,11 +142,11 @@ export function SettingsPage({
 
   return (
     <main className="page settings-page">
-      <nav ref={navRef} className="page-nav" aria-label="Settings sections">
-        <h2 className="page-nav-title">Settings</h2>
+      <nav ref={navRef} className="page-nav" aria-label={t('settings.sections')}>
+        <h2 className="page-nav-title">{t('settings.title')}</h2>
         {SECTIONS.map((g) => (
           <div key={g.group} className="page-nav-group">
-            <span className="page-nav-label">{g.group}</span>
+            <span className="page-nav-label">{t(`settings.nav.group.${g.group}`)}</span>
             {g.items.map((s) => {
               const Icon = s.icon;
               const unsaved = s.keys.some((k) => changedKeys.includes(k));
@@ -148,10 +159,10 @@ export function SettingsPage({
                   onClick={() => onSection(s.id)}
                 >
                   <Icon size={16} />
-                  <span>{s.label}</span>
-                  {unsaved && <span className="unsaved-dot" title="Unsaved changes" />}
-                  {s.id === 'schedule' && settings.schedule.enabled && !unsaved && <span className="nav-on">on</span>}
-                  {s.id === 'watch' && settings.watch.enabled && !unsaved && <span className="nav-on">on</span>}
+                  <span>{sectionLabel(s.id)}</span>
+                  {unsaved && <span className="unsaved-dot" title={t('common.unsavedChanges')} />}
+                  {s.id === 'schedule' && settings.schedule.enabled && !unsaved && <span className="nav-on">{t('settings.navOn')}</span>}
+                  {s.id === 'watch' && settings.watch.enabled && !unsaved && <span className="nav-on">{t('settings.navOn')}</span>}
                 </button>
               );
             })}
@@ -162,25 +173,25 @@ export function SettingsPage({
       <form className="page-body" onSubmit={save}>
         <div className="page-content">
           <header className="page-head">
-            <h1>{current.label}</h1>
+            <h1>{sectionLabel(current.id)}</h1>
           </header>
           {Body && <Body {...props} />}
           {current.id === 'about' && <AboutSection info={info} onError={onError} />}
         </div>
         {dirty && (
-          <div className="save-bar" role="region" aria-label="Unsaved changes">
+          <div className="save-bar" role="region" aria-label={t('common.unsavedChanges')}>
             <span>
-              Unsaved changes in{' '}
+              {t('settings.unsavedIn')}{' '}
               {ALL.filter((s) => s.keys.some((k) => changedKeys.includes(k))).map((s, i, list) => (
                 <span key={s.id}>
-                  <button type="button" className="link" onClick={() => onSection(s.id)}>{s.label}</button>
+                  <button type="button" className="link" onClick={() => onSection(s.id)}>{sectionLabel(s.id)}</button>
                   {i < list.length - 1 ? ', ' : ''}
                 </span>
               ))}
             </span>
             <span className="spacer" />
-            <button type="button" className="btn" onClick={() => setDraft(settings)} disabled={saving}>Discard</button>
-            <button type="submit" className="btn primary" disabled={saving}>{saving ? 'Saving…' : 'Save changes'}</button>
+            <button type="button" className="btn" onClick={() => setDraft(settings)} disabled={saving}>{t('common.discard')}</button>
+            <button type="submit" className="btn primary" disabled={saving}>{saving ? t('common.saving') : t('common.saveChanges')}</button>
           </div>
         )}
       </form>

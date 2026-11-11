@@ -1,0 +1,157 @@
+{
+  "skip": {
+    "noVideoInFolder": "no video files in folder",
+    "notVideo": "not a video file",
+    "alreadyQueued": "already in the queue",
+    "alreadyConverted": "already converted",
+    "notAdded": "not added"
+  },
+  "quality": {
+    "issue": {
+      "cannotRead": "Cannot read: {message}",
+      "oldContainer": "Old container: .{container}",
+      "noVideo": "No video track",
+      "oldVideoCodec": "Old video codec: {codec}",
+      "oldAudioCodec": "Old audio codec: {codecs}",
+      "lowResolution": "Low resolution: {width}×{height} (below {minHeight}p)",
+      "lowBitrate": "Low bitrate: {kbps} kbps, below {min} kbps for {resolution} video",
+      "lowBitrateEstimated": "Low bitrate: {kbps} (est.) kbps, below {min} kbps for {resolution} video",
+      "lowBitrateCodec": "Low bitrate: {kbps} kbps, below {min} kbps for {resolution} {codec}",
+      "lowBitrateCodecEstimated": "Low bitrate: {kbps} (est.) kbps, below {min} kbps for {resolution} {codec}",
+      "interlaced": "Interlaced"
+    },
+    "resolutionClass": {
+      "sd": "SD (below 720p)",
+      "hd": "720p",
+      "fhd": "1080p",
+      "uhd": "4K"
+    }
+  },
+  "check": {
+    "label": {
+      "readable": "Readable",
+      "internal": "Check",
+      "video": "Video",
+      "length": "Length",
+      "lengthMatches": {
+        "source": "Length matches the source",
+        "parts": "Length matches the parts"
+      },
+      "audioCount": "Audio tracks",
+      "audioLength": "Audio length",
+      "subtitles": "Subtitle tracks",
+      "decode": "Full decode",
+      "sourceErrors": "Source"
+    },
+    "detail": {
+      "message": "{message}",
+      "format": "{format}",
+      "readableYes": "yes",
+      "cannotRead": "Cannot read the file: {message}",
+      "noVideo": "The file has no video stream",
+      "videoOk": "{codec} {width}×{height}",
+      "lengthUnknown": {
+        "source": "Output {output}; the source length is unknown",
+        "parts": "Output {output}; the parts length is unknown"
+      },
+      "lengthOk": {
+        "source": "{output} (source {source})",
+        "parts": "{output} (parts {source})"
+      },
+      "lengthShorter": {
+        "source": "Output is {diff} shorter than the source: {output} vs {source}",
+        "parts": "Output is {diff} shorter than the parts: {output} vs {source}"
+      },
+      "lengthLonger": {
+        "source": "Output is {diff} longer than the source: {output} vs {source}",
+        "parts": "Output is {diff} longer than the parts: {output} vs {source}"
+      },
+      "audioCountOk": "{count} ({languages})",
+      "audioCountNone": "{count} (none)",
+      "audioCountMismatch": "HandBrake wrote {expected}, the file has {actual}",
+      "audioCountNoLog": "{count} (no HandBrake log to compare with)",
+      "audioTrackEmpty": "track {track} is empty",
+      "audioTrackShort": "track {track} ({language}) ends {diff} early",
+      "audioLengthOk": "Every track lasts as long as the video",
+      "subtitleItem": "{language} {codec}",
+      "subtitleItemNoLines": "{language} {codec} (no lines)",
+      "subtitlesOk": "{count}: {list}",
+      "subtitlesOkBurned": "{count}: {list}; {burned} burned into the picture",
+      "subtitlesNone": "{count}",
+      "subtitlesNoneBurned": "{count}; {burned} burned into the picture",
+      "subtitlesMismatch": "HandBrake wrote {expected}, the file has {actual}",
+      "subtitlesMismatchBurned": "HandBrake wrote {expected}, the file has {actual}; {burned} burned into the picture",
+      "decodeOk": "Every video and audio frame decodes without errors",
+      "decodeErrors_one": "{count} decoding error, e.g. {example}",
+      "decodeErrors_other": "{count} decoding errors, e.g. {example}",
+      "decodeStopped": "Stopped ({signal})",
+      "ffmpegExit": "ffmpeg exited with code {code}",
+      "sourceErrors_one": "HandBrake found {count} decoding error in the source; the damage may be visible in the output too",
+      "sourceErrors_other": "HandBrake found {count} decoding errors in the source; the damage may be visible in the output too"
+    },
+    "note": {
+      "ffprobeMissing": "ffprobe is not installed",
+      "toolsMissing": "ffmpeg/ffprobe are not installed",
+      "checkStopped": "Check stopped",
+      "checkSkipped": "Check skipped",
+      "interrupted": "Check interrupted by a restart"
+    }
+  },
+  "rename": {
+    "noShowName": "no show name: type it in “Show name”",
+    "noEpisode": "no episode number (S01E02 or 1x02) found",
+    "noYear": "no year found",
+    "textAfterYear": "text after the year was dropped: “{text}”",
+    "nameTaken": "name already taken; using “{name}”",
+    "stepFailed": "step “{step}” failed: {message}"
+  },
+  "renameNote": {
+    "needsRename": "Needs rename: {warnings}",
+    "checkFailed": "Not renamed automatically: the check found problems",
+    "failed": "Automatic rename failed: {message}",
+    "merged": "Merged into {name}; this part was removed"
+  },
+  "merge": {
+    "part": "{name} (part {part})",
+    "track": {
+      "video": "video track {track}",
+      "audio": "audio track {track}",
+      "subtitle": "subtitle track {track}"
+    },
+    "layoutDiff": {
+      "video_one": "{count} video track instead of {expected}",
+      "video_other": "{count} video tracks instead of {expected}",
+      "audio_one": "{count} audio track instead of {expected}",
+      "audio_other": "{count} audio tracks instead of {expected}",
+      "subtitle_one": "{count} subtitle track instead of {expected}",
+      "subtitle_other": "{count} subtitle tracks instead of {expected}"
+    },
+    "problem": {
+      "tooFew": "Choose at least two files to merge.",
+      "noLength": "{name}: cannot read its length.",
+      "noVideo": "{name}: has no video.",
+      "layout": "{part} has a different track layout: {diff}. Every part needs the same tracks (convert them with the same preset).",
+      "layoutOrder": "{part} has a different track layout: tracks in a different order. Every part needs the same tracks (convert them with the same preset).",
+      "codec": "{part}: {track} is {codec}, part 1 has {firstCodec}.",
+      "audioFormat": "{part}: {track} has {channels} channels at {rate} Hz, part 1 has {firstChannels} at {firstRate} Hz.",
+      "pictureSize": "{part}: the picture is {size}, part 1 is {firstSize}. Players usually cope, but some may glitch where the parts join.",
+      "videoSettings": "{part}: the video was encoded with slightly different settings. Most players cope; check the joins after merging.",
+      "language": "{part}: {track} is “{lang}”, part 1 is “{firstLang}”. The merged track keeps part 1's language."
+    }
+  },
+  "delete": {
+    "protected": "Files in {root} are protected from deletion (Settings → Folders)",
+    "sourcesFolder": "A sources folder itself cannot be deleted (remove it in Settings instead)",
+    "pendingFile": "{name} is queued or converting; remove it from the queue first",
+    "pendingFiles": "{count} files inside are queued or converting; remove them from the queue first"
+  },
+  "backup": {
+    "busy": {
+      "conversion": "a conversion is running",
+      "merge": "a merge is running",
+      "quality": "a quality check is running",
+      "upload": "an upload is in progress"
+    },
+    "missingFolder": "The folder {folder} does not exist on this server; fix it in Settings after restoring."
+  }
+}

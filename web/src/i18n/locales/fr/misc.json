@@ -1,0 +1,38 @@
+{
+  "attention": {
+    "events": {
+      "queueFinished": "La file d'attente est terminée",
+      "jobFailed": "Une conversion a échoué",
+      "checkFailed": "Une vérification après conversion a échoué",
+      "jobDone": "Chaque fichier converti"
+    },
+    "title": {
+      "paused": "En pause · {name} — {app}",
+      "checking": "Vérification · {name} — {app}",
+      "progress": "{percent} % · {name} — {app}",
+      "starting": "Démarrage · {name} — {app}",
+      "waiting": "En attente jusqu'à {time} — {app}",
+      "finished": "✓ File d'attente terminée — {app}"
+    },
+    "notify": {
+      "queueFinished": "File d'attente terminée",
+      "queueFinishedBody_one": "{count} converti",
+      "queueFinishedBody_other": "{count} convertis",
+      "queueFinishedBodyFailed_one": "{count} converti · {failed} en échec",
+      "queueFinishedBodyFailed_other": "{count} convertis · {failed} en échec",
+      "jobFailed": "Échec de la conversion",
+      "checkFailed": "Échec de la vérification",
+      "jobDone": "Converti"
+    }
+  },
+  "live": {
+    "queueFinished": "File d'attente terminée : toutes les tâches sont faites. Appuyez sur Démarrer pour les suivantes."
+  },
+  "roots": {
+    "target": "Cible"
+  },
+  "api": {
+    "networkError": "Erreur réseau",
+    "cancelled": "Annulé"
+  }
+}

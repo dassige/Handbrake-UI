@@ -1,0 +1,38 @@
+{
+  "attention": {
+    "events": {
+      "queueFinished": "Die Warteschlange ist fertig",
+      "jobFailed": "Eine Konvertierung ist fehlgeschlagen",
+      "checkFailed": "Eine Prüfung nach der Konvertierung ist fehlgeschlagen",
+      "jobDone": "Jede konvertierte Datei"
+    },
+    "title": {
+      "paused": "Angehalten · {name} — {app}",
+      "checking": "Prüfung · {name} — {app}",
+      "progress": "{percent} % · {name} — {app}",
+      "starting": "Start · {name} — {app}",
+      "waiting": "Wartet bis {time} — {app}",
+      "finished": "✓ Warteschlange fertig — {app}"
+    },
+    "notify": {
+      "queueFinished": "Warteschlange fertig",
+      "queueFinishedBody_one": "{count} konvertiert",
+      "queueFinishedBody_other": "{count} konvertiert",
+      "queueFinishedBodyFailed_one": "{count} konvertiert · {failed} fehlgeschlagen",
+      "queueFinishedBodyFailed_other": "{count} konvertiert · {failed} fehlgeschlagen",
+      "jobFailed": "Konvertierung fehlgeschlagen",
+      "checkFailed": "Prüfung fehlgeschlagen",
+      "jobDone": "Konvertiert"
+    }
+  },
+  "live": {
+    "queueFinished": "Warteschlange fertig: Alle Aufträge sind erledigt. Drücken Sie „Starten“ für die nächsten."
+  },
+  "roots": {
+    "target": "Ziel"
+  },
+  "api": {
+    "networkError": "Netzwerkfehler",
+    "cancelled": "Abgebrochen"
+  }
+}

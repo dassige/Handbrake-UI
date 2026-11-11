@@ -1,0 +1,124 @@
+{
+  "actions": {
+    "pause": "Pause",
+    "resume": "Reprendre",
+    "skipCheck": "Ignorer la vérification",
+    "skipCheckTitle": "Garder le fichier converti et ignorer le reste de la vérification",
+    "cancelQueuedTitle": "Annuler (reste dans la liste)",
+    "cancelRunningTitle": "Arrêter et annuler cette conversion",
+    "cancelConversion": "Annuler la conversion",
+    "cancelMessage": "Annuler cette conversion ? La progression sera perdue.",
+    "keepGoing": "Continuer",
+    "moveTop": "Placer en tête",
+    "up": "Monter",
+    "upTitle": "Monter d'une place",
+    "down": "Descendre",
+    "downTitle": "Descendre d'une place",
+    "moveBottom": "Placer en dernier",
+    "renameTitle": "Renommer le fichier converti",
+    "again": "Convertir à nouveau",
+    "againTitle": "Convertir à nouveau (nouvelle tâche ; le fichier de sortie reçoit un suffixe)",
+    "retryTitle": "Remettre dans la file d'attente",
+    "removeTitle": "Retirer de la liste (les fichiers ne sont pas touchés)"
+  },
+  "row": {
+    "checking": "vérification du fichier converti · {percent}",
+    "eta": "fin prévue {time}",
+    "elapsed": "écoulé {time}",
+    "pass": "passe {pass}/{total}",
+    "finishing": "Finalisation du fichier…",
+    "reading": "Lecture de la source…",
+    "took": "en {time}",
+    "fpsAvg": "{fps} i/s en moyenne",
+    "toConvert": "≈ {duration} de conversion",
+    "dragToReorder": "Faire glisser pour réordonner"
+  },
+  "drawer": {
+    "label": "Détails de la tâche",
+    "waitingForOutput": "En attente de la sortie…",
+    "noLog": "Aucun journal pour cette tâche.",
+    "showLog": "Afficher le journal HandBrake",
+    "hideLog": "Masquer le journal HandBrake",
+    "convertAgainWith": "Convertir à nouveau avec",
+    "choosePreset": "choisir un préréglage…",
+    "addedToQueue": "Ajouté à la file d'attente"
+  },
+  "check": {
+    "title": "Vérification",
+    "checking": "Vérification du fichier converti…",
+    "notChecked": "Non vérifié.",
+    "quick": "Vérification rapide",
+    "full": "Vérification complète",
+    "again": "Vérifier à nouveau",
+    "started": "Vérification du fichier…"
+  },
+  "progress": {
+    "title": "Progression",
+    "checking": "Vérification {percent}",
+    "phase": "Phase",
+    "speed": "Vitesse",
+    "speedValue": "{fps} i/s (moy. {avg})",
+    "timeLeft": "Temps restant",
+    "elapsed": "Écoulé",
+    "pass": "Passe",
+    "passValue": "{pass} sur {total}"
+  },
+  "phases": {
+    "paused": "en pause",
+    "verifying": "vérification du fichier converti",
+    "reading": "lecture",
+    "scanning": "analyse",
+    "encoding": "encodage",
+    "muxing": "multiplexage",
+    "merging": "fusion"
+  },
+  "rename": {
+    "title": "Renommer"
+  },
+  "error": {
+    "error": "Erreur",
+    "note": "Remarque"
+  },
+  "files": {
+    "title": "Fichiers",
+    "source": "Source",
+    "output": "Sortie",
+    "edit": "modifier",
+    "suffixNote": "(un suffixe est ajouté si le fichier existe au démarrage)",
+    "outputUpdated": "Chemin de sortie mis à jour",
+    "sizes": "Tailles",
+    "smaller": "({percent} % plus petit)",
+    "larger": "({percent} % plus grand)",
+    "copyTitle": "Copier le chemin de sortie",
+    "copy": "copier le chemin de sortie",
+    "downloadTitle": "Télécharger le fichier converti sur cet ordinateur",
+    "download": "télécharger le fichier converti"
+  },
+  "preset": {
+    "title": "Préréglage",
+    "changed": "Préréglage modifié",
+    "deleted": "{name} (supprimé)"
+  },
+  "source": {
+    "title": "Source",
+    "duration": "Durée",
+    "video": "Vidéo",
+    "audio": "Audio",
+    "subtitles": "Sous-titres",
+    "chapters": "Chapitres",
+    "none": "aucun",
+    "scanError": "Impossible de lire les détails de la source : {error}",
+    "reading": "Lecture des détails de la source…"
+  },
+  "timing": {
+    "title": "Durées",
+    "added": "Ajouté",
+    "started": "Démarré",
+    "finished": "Terminé",
+    "encodeTime": "Durée d'encodage",
+    "averageSpeed": "Vitesse moyenne",
+    "fps": "{fps} i/s",
+    "attempts": "Tentatives",
+    "exitCode": "Code de sortie"
+  }
+}

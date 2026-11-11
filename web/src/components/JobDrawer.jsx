@@ -6,6 +6,8 @@ import { Help } from '../help/Help.jsx';
 import { useEscape } from './Modal.jsx';
 import { StatusBadge, VerifyBadge } from './StatusBadge.jsx';
 import { JobActions } from './JobRow.jsx';
+import { has, t } from '../i18n/index.js';
+import { checkDetail, checkLabel, checkNote, renameNote } from '../i18n/serverText.js';
 
 function Row({ label, children }) {
   if (children == null || children === '' || children === false) return null;
@@ -36,11 +38,11 @@ function LogViewer({ job }) {
     let stop = false;
     const load = async () => {
       try {
-        const t = await api.jobLog(job.id);
+        const log = await api.jobLog(job.id);
         if (stop) return;
         const el = pre.current;
         const atBottom = !el || el.scrollHeight - el.scrollTop - el.clientHeight < 40;
-        setText(t);
+        setText(log);
         setError(null);
         if (atBottom) requestAnimationFrame(() => el && (el.scrollTop = el.scrollHeight));
       } catch (e) {
@@ -48,17 +50,17 @@ function LogViewer({ job }) {
       }
     };
     load();
-    const t = live ? setInterval(load, 3000) : null;
+    const timer = live ? setInterval(load, 3000) : null;
     return () => {
       stop = true;
-      clearInterval(t);
+      clearInterval(timer);
     };
   }, [job.id, live, job.status]);
 
   return (
     <div className="log">
       {error && <p className="text-bad">{error}</p>}
-      <pre ref={pre}>{text || (live ? 'Waiting for output…' : 'No log for this job.')}</pre>
+      <pre ref={pre}>{text || (live ? t('job.drawer.waitingForOutput') : t('job.drawer.noLog'))}</pre>
     </div>
   );
 }
@@ -70,38 +72,45 @@ const CHECK_ICON = {
   info: <Info size={15} className="muted" />,
 };
 
+/** The Phase row: job.phases.<phase>, or the phase id itself when it has no label. */
+function phaseText(job) {
+  const phase = job.status === 'paused' ? 'paused' : job.phase;
+  if (phase == null) return null;
+  return has(`job.phases.${phase}`) ? t(`job.phases.${phase}`) : phase;
+}
+
 function CheckSection({ job, run }) {
   const v = job.verify;
   const checking = job.verifyStatus === 'running' || (job.status !== 'done' && job.phase === 'verifying');
   return (
     <section>
-      <SectionTitle help="verify.results">Check</SectionTitle>
+      <SectionTitle help="verify.results">{t('job.check.title')}</SectionTitle>
       {checking ? (
         <>
-          <p className="muted">Checking the converted file…</p>
+          <p className="muted">{t('job.check.checking')}</p>
           {job.verifyProgress != null && job.status === 'done' && (
             <div className="progress"><div className="bar" style={{ width: `${job.verifyProgress * 100}%` }} /></div>
           )}
         </>
       ) : !v ? (
-        <p className="muted">Not checked.</p>
+        <p className="muted">{t('job.check.notChecked')}</p>
       ) : (
         <>
           <p className="check-summary">
             <VerifyBadge status={job.verifyStatus} />
             <span className="muted small">
-              {v.mode === 'quick' ? 'Quick check' : v.mode === 'full' ? 'Full check' : 'Check'}
+              {v.mode === 'quick' ? t('job.check.quick') : v.mode === 'full' ? t('job.check.full') : t('job.check.title')}
               {v.checkedAt ? ` · ${dateTime(v.checkedAt)}` : ''}
               {v.tookMs ? ` · ${duration(v.tookMs / 1000)}` : ''}
             </span>
           </p>
-          {v.note && <p className="muted">{v.note}</p>}
+          {(v.note || v.noteCode) && <p className="muted">{checkNote(v)}</p>}
           <ul className="checks">
             {v.checks.map((c) => (
               <li key={c.id} className={c.status}>
                 {CHECK_ICON[c.status] ?? CHECK_ICON.info}
                 <span>
-                  <strong>{c.label}</strong> <span className="check-detail">{c.detail}</span>
+                  <strong>{checkLabel(c)}</strong> <span className="check-detail">{checkDetail(c)}</span>
                 </span>
               </li>
             ))}
@@ -109,8 +118,8 @@ function CheckSection({ job, run }) {
         </>
       )}
       {job.status === 'done' && !checking && (
-        <button className="btn small" onClick={() => run(() => api.jobAction(job.id, 'verify'), 'Checking the file…')}>
-          <ShieldCheck size={14} /> Check again
+        <button className="btn small" onClick={() => run(() => api.jobAction(job.id, 'verify'), t('job.check.started'))}>
+          <ShieldCheck size={14} /> {t('job.check.again')}
         </button>
       )}
     </section>
@@ -133,12 +142,12 @@ export function JobDrawer({ job, presets, run, onRename, onClose, onSelect, canP
   }, [job.id]);
 
   async function convertAgain(presetId) {
-    const r = await run(() => api.jobAction(job.id, 'again', { presetId, position: 'end' }), 'Added to the queue');
+    const r = await run(() => api.jobAction(job.id, 'again', { presetId, position: 'end' }), t('job.drawer.addedToQueue'));
     if (r?.id) onSelect(r.id);
   }
 
   return (
-    <aside className="drawer" aria-label="Job details">
+    <aside className="drawer" aria-label={t('job.drawer.label')}>
       <div className="drawer-head">
         <div>
           <span className="badges">
@@ -149,7 +158,7 @@ export function JobDrawer({ job, presets, run, onRename, onClose, onSelect, canP
         </div>
         <span className="drawer-head-tools">
           <Help id="job.details" />
-          <button className="icon-btn" onClick={onClose} aria-label="Close"><X size={18} /></button>
+          <button className="icon-btn" onClick={onClose} aria-label={t('common.close')}><X size={18} /></button>
         </span>
       </div>
 
@@ -161,9 +170,9 @@ export function JobDrawer({ job, presets, run, onRename, onClose, onSelect, canP
           </span>
           {!queued && !active && presets.length > 0 && (
             <label className="field-inline">
-              <RotateCcw size={14} /> Convert again with
+              <RotateCcw size={14} /> {t('job.drawer.convertAgainWith')}
               <select value="" onChange={(e) => e.target.value && convertAgain(Number(e.target.value))}>
-                <option value="">choose preset…</option>
+                <option value="">{t('job.drawer.choosePreset')}</option>
                 {presets.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
             </label>
@@ -172,16 +181,16 @@ export function JobDrawer({ job, presets, run, onRename, onClose, onSelect, canP
 
         {active && (
           <section>
-            <SectionTitle help="job.statuses">Progress</SectionTitle>
+            <SectionTitle help="job.statuses">{t('job.progress.title')}</SectionTitle>
             <div className={`progress big ${job.status === 'paused' ? 'paused' : ''} ${job.phase === 'verifying' ? 'checking' : ''}`}>
               <div className="bar" style={{ width: `${(job.progress ?? 0) * 100}%` }} />
-              <span>{job.phase === 'verifying' ? `Checking ${percent(job.progress)}` : percent(job.progress)}</span>
+              <span>{job.phase === 'verifying' ? t('job.progress.checking', { percent: percent(job.progress) }) : percent(job.progress)}</span>
             </div>
-            <Row label="Phase">{job.status === 'paused' ? 'paused' : job.phase === 'verifying' ? 'checking the converted file' : job.phase}</Row>
-            <Row label="Speed">{job.fps != null && job.status === 'running' ? `${job.fps.toFixed(1)} fps (avg ${job.avgFps?.toFixed(1) ?? '—'})` : null}</Row>
-            <Row label="Time left">{job.eta && job.status === 'running' && job.phase !== 'verifying' ? duration(job.eta) : null}</Row>
-            <Row label="Elapsed">{duration(elapsed(job))}</Row>
-            <Row label="Pass">{job.passCount > 1 ? `${job.pass} of ${job.passCount}` : null}</Row>
+            <Row label={t('job.progress.phase')}>{phaseText(job)}</Row>
+            <Row label={t('job.progress.speed')}>{job.fps != null && job.status === 'running' ? t('job.progress.speedValue', { fps: job.fps.toFixed(1), avg: job.avgFps?.toFixed(1) ?? '—' }) : null}</Row>
+            <Row label={t('job.progress.timeLeft')}>{job.eta && job.status === 'running' && job.phase !== 'verifying' ? duration(job.eta) : null}</Row>
+            <Row label={t('job.progress.elapsed')}>{duration(elapsed(job))}</Row>
+            <Row label={t('job.progress.pass')}>{job.passCount > 1 ? t('job.progress.passValue', { pass: job.pass, total: job.passCount }) : null}</Row>
           </section>
         )}
 
@@ -189,72 +198,72 @@ export function JobDrawer({ job, presets, run, onRename, onClose, onSelect, canP
 
         {job.renameNote && (
           <section>
-            <SectionTitle help="rename.auto">Rename</SectionTitle>
-            <p className="warn-text">{job.renameNote}</p>
+            <SectionTitle help="rename.auto">{t('job.rename.title')}</SectionTitle>
+            <p className="warn-text">{renameNote(job.renameNote)}</p>
           </section>
         )}
 
         {job.error && (
           <section>
-            <SectionTitle help="job.log">{job.status === 'failed' ? 'Error' : 'Note'}</SectionTitle>
+            <SectionTitle help="job.log">{job.status === 'failed' ? t('job.error.error') : t('job.error.note')}</SectionTitle>
             <p className={job.status === 'failed' ? 'text-bad' : 'muted'}>{job.error}</p>
           </section>
         )}
 
         <section>
-          <SectionTitle help="job.files">Files</SectionTitle>
-          <Row label="Source"><code className="path">{job.sourcePath}</code></Row>
-          <Row label="Output">
+          <SectionTitle help="job.files">{t('job.files.title')}</SectionTitle>
+          <Row label={t('job.files.source')}><code className="path">{job.sourcePath}</code></Row>
+          <Row label={t('job.files.output')}>
             {queued && outputEdit != null ? (
               <form
                 className="inline-form"
                 onSubmit={async (e) => {
                   e.preventDefault();
-                  const r = await run(() => api.updateJob(job.id, { outputPath: outputEdit }), 'Output path updated');
+                  const r = await run(() => api.updateJob(job.id, { outputPath: outputEdit }), t('job.files.outputUpdated'));
                   if (r) setOutputEdit(null);
                 }}
               >
                 <input value={outputEdit} onChange={(e) => setOutputEdit(e.target.value)} autoFocus />
-                <button className="btn small primary">Save</button>
-                <button type="button" className="btn small" onClick={() => setOutputEdit(null)}>Cancel</button>
+                <button className="btn small primary">{t('common.save')}</button>
+                <button type="button" className="btn small" onClick={() => setOutputEdit(null)}>{t('common.cancel')}</button>
               </form>
             ) : (
               <>
                 <code className="path">{job.outputPath}</code>
                 {queued && (
-                  <button className="link" onClick={() => setOutputEdit(job.outputPath)}>edit</button>
+                  <button className="link" onClick={() => setOutputEdit(job.outputPath)}>{t('job.files.edit')}</button>
                 )}
-                {queued && <span className="muted small"> (a suffix is added if the file exists when it starts)</span>}
+                {queued && <span className="muted small"> {t('job.files.suffixNote')}</span>}
               </>
             )}
           </Row>
-          <Row label="Sizes">
+          <Row label={t('job.files.sizes')}>
             {bytes(job.sourceSize)}
-            {job.outputSize != null && <> → {bytes(job.outputSize)}{saved != null && ` (${saved >= 0 ? `${saved}% smaller` : `${-saved}% larger`})`}</>}
+            {job.outputSize != null && <> → {bytes(job.outputSize)}{saved != null && ` ${saved >= 0 ? t('job.files.smaller', { percent: saved }) : t('job.files.larger', { percent: -saved })}`}</>}
           </Row>
           <button
             className="link small"
             onClick={() => navigator.clipboard?.writeText(job.outputPath)}
-            title="Copy output path"
+            title={t('job.files.copyTitle')}
           >
-            <Copy size={12} /> copy output path
+            <Copy size={12} /> {t('job.files.copy')}
           </button>
           {job.status === 'done' && (
-            <a className="link small drawer-download" href={api.downloadUrl(job.outputPath)} download title="Download the converted file to this computer">
-              <Download size={12} /> download converted file
+            <a className="link small drawer-download" href={api.downloadUrl(job.outputPath)} download title={t('job.files.downloadTitle')}>
+              <Download size={12} /> {t('job.files.download')}
             </a>
           )}
         </section>
 
         <section>
-          <SectionTitle help="presets">Preset</SectionTitle>
+          <SectionTitle help="presets">{t('job.preset.title')}</SectionTitle>
           {queued ? (
             <select
               value={job.presetId ?? ''}
-              onChange={(e) => run(() => api.updateJob(job.id, { presetId: Number(e.target.value) }), 'Preset changed')}
+              onChange={(e) => run(() => api.updateJob(job.id, { presetId: Number(e.target.value) }), t('job.preset.changed'))}
             >
               {job.presetId == null || !presets.some((p) => p.id === job.presetId) ? (
-                <option value={job.presetId ?? ''}>{job.presetName} (deleted)</option>
+                <option value={job.presetId ?? ''}>{t('job.preset.deleted', { name: job.presetName })}</option>
               ) : null}
               {presets.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
             </select>
@@ -264,46 +273,46 @@ export function JobDrawer({ job, presets, run, onRename, onClose, onSelect, canP
         </section>
 
         <section>
-          <SectionTitle help="job.source">Source</SectionTitle>
+          <SectionTitle help="job.source">{t('job.source.title')}</SectionTitle>
           {info ? (
             <>
-              <Row label="Duration">{duration(info.duration)}</Row>
-              <Row label="Video">
+              <Row label={t('job.source.duration')}>{duration(info.duration)}</Row>
+              <Row label={t('job.source.video')}>
                 {[info.videoCodec, info.width && `${info.width}×${info.height}`, info.fps && `${info.fps} fps`, info.container]
                   .filter(Boolean).join(' · ')}
               </Row>
-              <Row label="Audio">
+              <Row label={t('job.source.audio')}>
                 {info.audio?.length ? (
                   <ul className="tracks">{info.audio.map((a, i) => <li key={i}>{a.description || `${a.lang} ${a.codec}`}</li>)}</ul>
-                ) : 'none'}
+                ) : t('job.source.none')}
               </Row>
-              <Row label="Subtitles">
+              <Row label={t('job.source.subtitles')}>
                 {info.subtitles?.length ? (
                   <ul className="tracks">{info.subtitles.map((s, i) => <li key={i}>{s.lang} ({s.format})</li>)}</ul>
-                ) : 'none'}
+                ) : t('job.source.none')}
               </Row>
-              <Row label="Chapters">{info.chapters || null}</Row>
+              <Row label={t('job.source.chapters')}>{info.chapters || null}</Row>
             </>
           ) : (
-            <p className="muted">{job.scanError ? `Could not read source details: ${job.scanError}` : 'Reading source details…'}</p>
+            <p className="muted">{job.scanError ? t('job.source.scanError', { error: job.scanError }) : t('job.source.reading')}</p>
           )}
         </section>
 
         <section>
-          <SectionTitle help="job.timing">Timing</SectionTitle>
-          <Row label="Added">{dateTime(job.createdAt)}</Row>
-          <Row label="Started">{job.startedAt ? dateTime(job.startedAt) : null}</Row>
-          <Row label="Finished">{job.finishedAt ? dateTime(job.finishedAt) : null}</Row>
-          <Row label="Encode time">{job.finishedAt && job.startedAt ? duration(elapsed(job)) : null}</Row>
-          <Row label="Average speed">{job.status === 'done' && job.avgFps ? `${job.avgFps.toFixed(1)} fps` : null}</Row>
-          <Row label="Attempts">{job.attempts > 1 ? job.attempts : null}</Row>
-          <Row label="Exit code">{job.exitCode != null && job.exitCode !== 0 ? job.exitCode : null}</Row>
+          <SectionTitle help="job.timing">{t('job.timing.title')}</SectionTitle>
+          <Row label={t('job.timing.added')}>{dateTime(job.createdAt)}</Row>
+          <Row label={t('job.timing.started')}>{job.startedAt ? dateTime(job.startedAt) : null}</Row>
+          <Row label={t('job.timing.finished')}>{job.finishedAt ? dateTime(job.finishedAt) : null}</Row>
+          <Row label={t('job.timing.encodeTime')}>{job.finishedAt && job.startedAt ? duration(elapsed(job)) : null}</Row>
+          <Row label={t('job.timing.averageSpeed')}>{job.status === 'done' && job.avgFps ? t('job.timing.fps', { fps: job.avgFps.toFixed(1) }) : null}</Row>
+          <Row label={t('job.timing.attempts')}>{job.attempts > 1 ? job.attempts : null}</Row>
+          <Row label={t('job.timing.exitCode')}>{job.exitCode != null && job.exitCode !== 0 ? job.exitCode : null}</Row>
         </section>
 
         <section>
           <h3>
             <button className="link" onClick={() => setShowLog((v) => !v)}>
-              <FileText size={14} /> {showLog ? 'Hide' : 'Show'} HandBrake log
+              <FileText size={14} /> {showLog ? t('job.drawer.hideLog') : t('job.drawer.showLog')}
             </button>
             <Help id="job.log" />
           </h3>

@@ -1,0 +1,157 @@
+{
+  "skip": {
+    "noVideoInFolder": "aucun fichier vidéo dans le dossier",
+    "notVideo": "pas un fichier vidéo",
+    "alreadyQueued": "déjà dans la file d'attente",
+    "alreadyConverted": "déjà converti",
+    "notAdded": "non ajouté"
+  },
+  "quality": {
+    "issue": {
+      "cannotRead": "Lecture impossible : {message}",
+      "oldContainer": "Conteneur ancien : .{container}",
+      "noVideo": "Aucune piste vidéo",
+      "oldVideoCodec": "Codec vidéo ancien : {codec}",
+      "oldAudioCodec": "Codec audio ancien : {codecs}",
+      "lowResolution": "Basse résolution : {width}×{height} (moins de {minHeight}p)",
+      "lowBitrate": "Faible débit : {kbps} kbit/s, moins de {min} kbit/s pour une vidéo {resolution}",
+      "lowBitrateEstimated": "Faible débit : {kbps} kbit/s (estimé), moins de {min} kbit/s pour une vidéo {resolution}",
+      "lowBitrateCodec": "Faible débit : {kbps} kbit/s, moins de {min} kbit/s pour du {codec} {resolution}",
+      "lowBitrateCodecEstimated": "Faible débit : {kbps} kbit/s (estimé), moins de {min} kbit/s pour du {codec} {resolution}",
+      "interlaced": "Entrelacé"
+    },
+    "resolutionClass": {
+      "sd": "SD (moins de 720p)",
+      "hd": "720p",
+      "fhd": "1080p",
+      "uhd": "4K"
+    }
+  },
+  "check": {
+    "label": {
+      "readable": "Lisible",
+      "internal": "Vérification",
+      "video": "Vidéo",
+      "length": "Durée",
+      "lengthMatches": {
+        "source": "La durée correspond à la source",
+        "parts": "La durée correspond aux parties"
+      },
+      "audioCount": "Pistes audio",
+      "audioLength": "Durée de l'audio",
+      "subtitles": "Pistes de sous-titres",
+      "decode": "Décodage complet",
+      "sourceErrors": "Source"
+    },
+    "detail": {
+      "message": "{message}",
+      "format": "{format}",
+      "readableYes": "oui",
+      "cannotRead": "Impossible de lire le fichier : {message}",
+      "noVideo": "Le fichier n'a pas de flux vidéo",
+      "videoOk": "{codec} {width}×{height}",
+      "lengthUnknown": {
+        "source": "Sortie {output} ; la durée de la source est inconnue",
+        "parts": "Sortie {output} ; la durée des parties est inconnue"
+      },
+      "lengthOk": {
+        "source": "{output} (source {source})",
+        "parts": "{output} (parties {source})"
+      },
+      "lengthShorter": {
+        "source": "La sortie est plus courte de {diff} que la source : {output} contre {source}",
+        "parts": "La sortie est plus courte de {diff} que les parties : {output} contre {source}"
+      },
+      "lengthLonger": {
+        "source": "La sortie est plus longue de {diff} que la source : {output} contre {source}",
+        "parts": "La sortie est plus longue de {diff} que les parties : {output} contre {source}"
+      },
+      "audioCountOk": "{count} ({languages})",
+      "audioCountNone": "{count} (aucune)",
+      "audioCountMismatch": "HandBrake en a écrit {expected}, le fichier en contient {actual}",
+      "audioCountNoLog": "{count} (pas de journal HandBrake pour comparer)",
+      "audioTrackEmpty": "la piste {track} est vide",
+      "audioTrackShort": "la piste {track} ({language}) se termine {diff} trop tôt",
+      "audioLengthOk": "Chaque piste dure aussi longtemps que la vidéo",
+      "subtitleItem": "{language} {codec}",
+      "subtitleItemNoLines": "{language} {codec} (aucune ligne)",
+      "subtitlesOk": "{count} : {list}",
+      "subtitlesOkBurned": "{count} : {list} ; {burned} incrustée(s) dans l'image",
+      "subtitlesNone": "{count}",
+      "subtitlesNoneBurned": "{count} ; {burned} incrustée(s) dans l'image",
+      "subtitlesMismatch": "HandBrake en a écrit {expected}, le fichier en contient {actual}",
+      "subtitlesMismatchBurned": "HandBrake en a écrit {expected}, le fichier en contient {actual} ; {burned} incrustée(s) dans l'image",
+      "decodeOk": "Chaque image vidéo et trame audio se décode sans erreur",
+      "decodeErrors_one": "{count} erreur de décodage, p. ex. {example}",
+      "decodeErrors_other": "{count} erreurs de décodage, p. ex. {example}",
+      "decodeStopped": "Arrêté ({signal})",
+      "ffmpegExit": "ffmpeg s'est terminé avec le code {code}",
+      "sourceErrors_one": "HandBrake a trouvé {count} erreur de décodage dans la source ; le défaut peut aussi être visible dans la sortie",
+      "sourceErrors_other": "HandBrake a trouvé {count} erreurs de décodage dans la source ; les défauts peuvent aussi être visibles dans la sortie"
+    },
+    "note": {
+      "ffprobeMissing": "ffprobe n'est pas installé",
+      "toolsMissing": "ffmpeg/ffprobe ne sont pas installés",
+      "checkStopped": "Vérification arrêtée",
+      "checkSkipped": "Vérification ignorée",
+      "interrupted": "Vérification interrompue par un redémarrage"
+    }
+  },
+  "rename": {
+    "noShowName": "pas de nom de série : saisissez-le dans « Nom de la série »",
+    "noEpisode": "aucun numéro d'épisode (S01E02 ou 1x02) trouvé",
+    "noYear": "aucune année trouvée",
+    "textAfterYear": "le texte après l'année a été supprimé : « {text} »",
+    "nameTaken": "nom déjà pris ; utilisation de « {name} »",
+    "stepFailed": "l'étape « {step} » a échoué : {message}"
+  },
+  "renameNote": {
+    "needsRename": "À renommer : {warnings}",
+    "checkFailed": "Non renommé automatiquement : la vérification a trouvé des problèmes",
+    "failed": "Échec du renommage automatique : {message}",
+    "merged": "Fusionné dans {name} ; cette partie a été supprimée"
+  },
+  "merge": {
+    "part": "{name} (partie {part})",
+    "track": {
+      "video": "la piste vidéo {track}",
+      "audio": "la piste audio {track}",
+      "subtitle": "la piste de sous-titres {track}"
+    },
+    "layoutDiff": {
+      "video_one": "{count} piste vidéo au lieu de {expected}",
+      "video_other": "{count} pistes vidéo au lieu de {expected}",
+      "audio_one": "{count} piste audio au lieu de {expected}",
+      "audio_other": "{count} pistes audio au lieu de {expected}",
+      "subtitle_one": "{count} piste de sous-titres au lieu de {expected}",
+      "subtitle_other": "{count} pistes de sous-titres au lieu de {expected}"
+    },
+    "problem": {
+      "tooFew": "Choisissez au moins deux fichiers à fusionner.",
+      "noLength": "{name} : impossible de lire sa durée.",
+      "noVideo": "{name} : ne contient pas de vidéo.",
+      "layout": "{part} a une disposition de pistes différente : {diff}. Toutes les parties doivent avoir les mêmes pistes (convertissez-les avec le même préréglage).",
+      "layoutOrder": "{part} a une disposition de pistes différente : pistes dans un ordre différent. Toutes les parties doivent avoir les mêmes pistes (convertissez-les avec le même préréglage).",
+      "codec": "{part} : {track} est en {codec}, la partie 1 est en {firstCodec}.",
+      "audioFormat": "{part} : {track} a {channels} canaux à {rate} Hz, la partie 1 a {firstChannels} canaux à {firstRate} Hz.",
+      "pictureSize": "{part} : l'image fait {size}, celle de la partie 1 fait {firstSize}. Les lecteurs s'en accommodent généralement, mais certains peuvent avoir des défauts aux jonctions.",
+      "videoSettings": "{part} : la vidéo a été encodée avec des réglages légèrement différents. La plupart des lecteurs s'en accommodent ; vérifiez les jonctions après la fusion.",
+      "language": "{part} : {track} est en « {lang} », la partie 1 est en « {firstLang} ». La piste fusionnée garde la langue de la partie 1."
+    }
+  },
+  "delete": {
+    "protected": "Les fichiers de {root} sont protégés contre la suppression (Paramètres → Dossiers)",
+    "sourcesFolder": "Un dossier de sources lui-même ne peut pas être supprimé (retirez-le plutôt dans les Paramètres)",
+    "pendingFile": "{name} est en attente ou en conversion ; retirez-le d'abord de la file d'attente",
+    "pendingFiles": "{count} fichiers à l'intérieur sont en attente ou en conversion ; retirez-les d'abord de la file d'attente"
+  },
+  "backup": {
+    "busy": {
+      "conversion": "une conversion est en cours",
+      "merge": "une fusion est en cours",
+      "quality": "un contrôle de qualité est en cours",
+      "upload": "un téléversement est en cours"
+    },
+    "missingFolder": "Le dossier {folder} n'existe pas sur ce serveur ; corrigez-le dans les Paramètres après la restauration."
+  }
+}

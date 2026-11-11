@@ -1,0 +1,21 @@
+{
+  "ago": {
+    "justNow": "ahora mismo",
+    "minutes_one": "hace {count} min",
+    "minutes_other": "hace {count} min",
+    "hours_one": "hace {count} h",
+    "hours_other": "hace {count} h"
+  },
+  "duration": {
+    "daysHours": "{days} d {hours} h",
+    "hoursMinutes": "{hours} h {minutes} min",
+    "hours": "{hours} h",
+    "minutes": "{minutes} min",
+    "seconds": "{seconds} s"
+  },
+  "clock": {
+    "tomorrow": "mañana {time}",
+    "weekday": "{day} {time}",
+    "date": "{date} {time}"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "help": "Guida",
+  "helpFor": "Guida: {title}",
+  "searchHelp": "Cerca nella guida",
+  "related": "Vedi anche:",
+  "searchPlaceholder": "Parole da cercare, es. verifica audio",
+  "allTopics_one": "{count} argomento, dalla A alla Z",
+  "allTopics_other": "Tutti i {count} argomenti, dalla A alla Z",
+  "hits_one": "{count} argomento contiene tutte le parole",
+  "hits_other": "{count} argomenti contengono tutte le parole, i migliori per primi",
+  "noHits": "Nessun argomento contiene tutte le parole: prova con meno parole o con altre.",
+  "topics": "Argomenti della guida"
+}

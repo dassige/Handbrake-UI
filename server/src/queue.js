@@ -94,7 +94,7 @@ export class Queue {
       this.db
         .prepare(`UPDATE jobs SET status = 'done', phase = NULL, progress = 1, eta = 0, fps = NULL, output_size = ?,
           finished_at = COALESCE(finished_at, ?), verify_status = 'skipped', verify = ? WHERE id = ?`)
-        .run(size, Date.now(), JSON.stringify({ status: 'skipped', checks: [], note: 'Check interrupted by a restart' }), j.id);
+        .run(size, Date.now(), JSON.stringify({ status: 'skipped', checks: [], note: 'Check interrupted by a restart', noteCode: 'interrupted' }), j.id);
       j.recovered = true;
     }
     for (const j of stale.filter((x) => !x.recovered)) {
@@ -238,7 +238,7 @@ export class Queue {
 
   /**
    * Adds files and folders (absolute paths under a source root).
-   * Returns { added: [ids], skipped: [{ path, reason }] }.
+   * Returns { added: [ids], skipped: [{ path, code, reason }] } (reason: English, code: for the web app).
    */
   async add({ paths, presetId, position = 'end', origin = null }) {
     if (!Array.isArray(paths) || !paths.length) throw badRequest('Nothing to add');
@@ -254,12 +254,12 @@ export class Queue {
       const stat = await fs.stat(abs);
       if (stat.isDirectory()) {
         const found = await collectVideos(abs, { recursive: this.settings.get('recursive'), matcher });
-        if (!found.length) skipped.push({ path: abs, reason: 'no video files in folder' });
+        if (!found.length) skipped.push({ path: abs, code: 'noVideoInFolder', reason: 'no video files in folder' });
         files.push(...found);
       } else if (matcher.isVideo(abs)) {
         files.push(abs);
       } else {
-        skipped.push({ path: abs, reason: 'not a video file' });
+        skipped.push({ path: abs, code: 'notVideo', reason: 'not a video file' });
       }
     }
 
@@ -268,8 +268,8 @@ export class Queue {
     const toAdd = [];
     for (const f of unique) {
       const s = statuses[f];
-      if (s === 'queued' || ACTIVE.includes(s)) skipped.push({ path: f, reason: 'already in the queue' });
-      else if (s === 'done' && this.settings.get('skipConverted')) skipped.push({ path: f, reason: 'already converted' });
+      if (s === 'queued' || ACTIVE.includes(s)) skipped.push({ path: f, code: 'alreadyQueued', reason: 'already in the queue' });
+      else if (s === 'done' && this.settings.get('skipConverted')) skipped.push({ path: f, code: 'alreadyConverted', reason: 'already converted' });
       else toAdd.push(f);
     }
 
@@ -719,7 +719,7 @@ export class Queue {
       },
     });
     if (active.cancelled || active.shuttingDown) {
-      return { ...result, status: 'skipped', checks: [], note: active.cancelled ? 'Check skipped' : 'Check interrupted by a restart' };
+      return { ...result, status: 'skipped', checks: [], note: active.cancelled ? 'Check skipped' : 'Check interrupted by a restart', noteCode: active.cancelled ? 'checkSkipped' : 'interrupted' };
     }
     this.log.info(`Job ${active.id}: check ${result.status}`);
     return result;
@@ -750,7 +750,7 @@ export class Queue {
             }
           },
         })
-        .catch((err) => ({ status: 'error', checks: [{ id: 'internal', label: 'Check', status: 'error', detail: err.message }] }));
+        .catch((err) => ({ status: 'error', checks: [{ id: 'internal', label: 'Check', labelCode: 'internal', status: 'error', detail: err.message, detailCode: 'message', detailParams: { message: err.message } }] }));
       if (!this.db.prepare('SELECT id FROM jobs WHERE id = ?').get(id)) return;
       this.db.prepare('UPDATE jobs SET verify_status = ?, verify = ? WHERE id = ?').run(result.status, JSON.stringify(result), id);
       this.emitJob(id);
