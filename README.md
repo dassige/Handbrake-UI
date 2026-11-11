@@ -15,13 +15,40 @@ the desktop app.
 > HandBrake Team. This app only runs its command-line tool. See
 > [Credits and licences](#credits-and-licences).
 
-**Contents:** [Features](#features) · [Screenshots](#screenshots) ·
-[Requirements](#requirements) · [Hardware and performance](#hardware-and-performance) ·
-[Installation](#installation) ·
-[First steps](#first-steps) · [Configuration](#configuration) ·
-[Updating](#updating) · [Hardware encoding](#hardware-encoding-intel-quick-sync) ·
-[Security](#security) · [Troubleshooting](#troubleshooting) ·
-[Development](#development) · [Credits and licences](#credits-and-licences)
+## Contents
+
+**What it is**
+
+- [Features](#features): converting, files, subtitles, tools and everything else
+- [Screenshots](#screenshots)
+
+**Getting started**
+
+- [Requirements](#requirements)
+- [Hardware and performance](#hardware-and-performance): what to expect from a mini PC or a Raspberry Pi
+- [Installation](#installation)
+  - [1. Docker on Linux](#1-docker-on-linux)
+  - [2. Docker Desktop on Windows or macOS](#2-docker-desktop-on-windows-or-macos)
+  - [3. Linux without Docker](#3-linux-without-docker)
+  - [4. Windows without Docker](#4-windows-without-docker)
+- [First steps](#first-steps)
+- [Configuration](#configuration)
+  - [Docker (`.env`)](#docker-env)
+  - [Without Docker (environment variables)](#without-docker-environment-variables)
+- [Updating](#updating)
+
+**Running it**
+
+- [Hardware encoding (Intel Quick Sync)](#hardware-encoding-intel-quick-sync)
+- [Security](#security)
+- [Troubleshooting](#troubleshooting)
+
+**The project**
+
+- [Development](#development)
+  - [Releasing (maintainers)](#releasing-maintainers)
+- [Credits and licences](#credits-and-licences)
+- [Disclaimer](#disclaimer)
 
 ## Features
 

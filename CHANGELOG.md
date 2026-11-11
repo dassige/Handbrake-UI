@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.3.3] - 2026/11/12
+
+- docs: table of contents at the top of the README
+
 ## [3.3.2] - 2026/11/12
 
 - feat: download a video with its subtitle files as one ZIP
