@@ -200,6 +200,7 @@
         "- **Edit** opens the [subtitle editor](#subtitles.editor) for text files.",
         "- **Look for subtitle files again** finds files added after the job; the choices already made are kept. Files are also looked for again when the conversion starts.",
         "After the conversion the section shows what was embedded and copied, with a download link for each copy. **Write subtitle files again** writes the copies again with the current edits, replacing the ones written before: useful to fix the timing after watching the video.",
+        "If the output format can't hold a file (WebM: no subtitles; MP4: no picture subtitles), a warning says so here and on the queue row: the file is copied instead, or not used at all when copying is off. When **Write subtitle files again** finds that a file's language or flags changed, its copy gets the new name (`Video.it.srt` becomes `Video.en.srt`).",
         "Nothing can be changed while the job is converting."
       ],
       "see": [

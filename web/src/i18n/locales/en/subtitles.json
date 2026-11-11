@@ -51,7 +51,9 @@
     "view": "View",
     "lookAgain": "Look for subtitle files again",
     "lookAgainTitle": "Look again for subtitle files next to the source (keeps the choices made here)",
-    "lookedAgain": "Subtitle files looked for again"
+    "lookedAgain": "Subtitle files looked for again",
+    "containerCopied": "{container} can't hold {names}: they won't be embedded, and are copied next to the video instead.",
+    "containerLost": "{container} can't hold {names}, and copying is off: they won't be used. Choose a copy option or an MKV preset."
   },
   "result": {
     "embedded": "Embedded:",

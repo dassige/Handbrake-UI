@@ -51,7 +51,9 @@
     "view": "Vedi",
     "lookAgain": "Cerca di nuovo i file di sottotitoli",
     "lookAgainTitle": "Cerca di nuovo i file di sottotitoli accanto alla sorgente (le scelte fatte qui restano)",
-    "lookedAgain": "File di sottotitoli cercati di nuovo"
+    "lookedAgain": "File di sottotitoli cercati di nuovo",
+    "containerCopied": "{container} non può contenere {names}: non verranno incorporati, ma copiati accanto al video.",
+    "containerLost": "{container} non può contenere {names} e la copia è disattivata: non verranno usati. Scegli un'opzione di copia o una preimpostazione MKV."
   },
   "result": {
     "embedded": "Incorporati:",

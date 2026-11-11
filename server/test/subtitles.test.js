@@ -333,6 +333,25 @@ test('queue: missing languages are embedded, every sidecar is copied next to the
     assert.deepEqual((await fs.readdir(path.join(t.out, 'Show'))).sort(), ['Episode.en.srt', 'Episode.it.forced.srt', 'Episode.mkv']);
     assert.doesNotMatch(await fs.readFile(path.join(t.out, 'Show', 'Episode.en.srt'), 'utf8'), /<i>/);
 
+    // A changed language or flag renames the copy; the two files can even swap names.
+    t.queue.updateSubtitles(id, { files: [
+      { path: path.join(t.src, 'Show', 'Ep.en.srt'), lang: 'ita', forced: true },
+      { path: path.join(t.src, 'Show', 'Ep.it.forced.srt'), lang: 'eng', forced: false },
+    ] });
+    await t.queue.rewriteSubtitles(id);
+    assert.deepEqual((await fs.readdir(path.join(t.out, 'Show'))).sort(), ['Episode.en.srt', 'Episode.it.forced.srt', 'Episode.mkv']);
+    assert.match(await fs.readFile(path.join(t.out, 'Show', 'Episode.en.srt'), 'utf8'), /Così/);
+    t.queue.updateSubtitles(id, { files: [{ path: path.join(t.src, 'Show', 'Ep.en.srt'), lang: 'ger', forced: false }] });
+    await t.queue.rewriteSubtitles(id);
+    assert.deepEqual((await fs.readdir(path.join(t.out, 'Show'))).sort(), ['Episode.de.srt', 'Episode.en.srt', 'Episode.mkv']);
+    // Back as it was, so the undo below finds the names it recorded.
+    t.queue.updateSubtitles(id, { files: [
+      { path: path.join(t.src, 'Show', 'Ep.en.srt'), lang: 'eng' },
+      { path: path.join(t.src, 'Show', 'Ep.it.forced.srt'), lang: 'ita', forced: true },
+    ] });
+    await t.queue.rewriteSubtitles(id);
+    assert.deepEqual((await fs.readdir(path.join(t.out, 'Show'))).sort(), ['Episode.en.srt', 'Episode.it.forced.srt', 'Episode.mkv']);
+
     const [h] = t.renamer.history();
     const u = await t.renamer.undo(h.id);
     assert.equal(u.restored, 1);

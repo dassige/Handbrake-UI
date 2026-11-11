@@ -963,6 +963,8 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
 
 /* ---- sidecar subtitles (subtitles/) ---- */
 .badge.subs { display: inline-flex; align-items: center; gap: 3px; background: var(--info-soft); color: var(--info); }
+.badge.subs.warn { background: var(--warn-soft); color: var(--warn); }
+.badge.subs.lost { background: var(--bad-soft); color: var(--bad); }
 .badge.sub-action.both, .badge.sub-action.embed { background: var(--good-soft); color: var(--good); }
 .badge.sub-action.copy { background: var(--info-soft); color: var(--info); }
 .badge.sub-edited { background: var(--accent-soft); color: var(--accent); }

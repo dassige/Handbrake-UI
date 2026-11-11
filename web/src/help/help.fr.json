@@ -200,6 +200,7 @@
         "- **Modifier** ouvre l'[éditeur de sous-titres](#subtitles.editor) pour les fichiers texte.",
         "- **Rechercher à nouveau les fichiers de sous-titres** trouve les fichiers ajoutés après la tâche ; les choix déjà faits sont conservés. Les fichiers sont aussi recherchés à nouveau au démarrage de la conversion.",
         "Après la conversion, la section montre ce qui a été intégré et copié, avec un lien de téléchargement pour chaque copie. **Écrire à nouveau les fichiers de sous-titres** réécrit les copies avec les modifications actuelles, en remplaçant celles écrites précédemment : utile pour corriger le minutage après avoir regardé la vidéo.",
+        "Si le format de sortie ne peut pas contenir un fichier (WebM : aucun sous-titre ; MP4 : pas de sous-titres en images), un avertissement le signale ici et sur la ligne de la file d'attente : le fichier est copié à la place, ou pas utilisé du tout si la copie est désactivée. Quand **Écrire à nouveau les fichiers de sous-titres** constate que la langue ou les indicateurs d'un fichier ont changé, sa copie prend le nouveau nom (`Video.it.srt` devient `Video.en.srt`).",
         "Rien ne peut être modifié pendant la conversion de la tâche."
       ],
       "see": [

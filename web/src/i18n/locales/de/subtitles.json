@@ -51,7 +51,9 @@
     "view": "Ansehen",
     "lookAgain": "Erneut nach Untertiteldateien suchen",
     "lookAgainTitle": "Erneut nach Untertiteldateien neben der Quelle suchen (die hier getroffene Auswahl bleibt erhalten)",
-    "lookedAgain": "Erneut nach Untertiteldateien gesucht"
+    "lookedAgain": "Erneut nach Untertiteldateien gesucht",
+    "containerCopied": "{container} kann {names} nicht aufnehmen: sie werden nicht eingebettet, sondern neben das Video kopiert.",
+    "containerLost": "{container} kann {names} nicht aufnehmen, und Kopieren ist aus: sie werden nicht verwendet. Wählen Sie eine Kopieroption oder eine MKV-Voreinstellung."
   },
   "result": {
     "embedded": "Eingebettet:",

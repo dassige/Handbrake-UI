@@ -238,26 +238,24 @@ export class Subtitles {
   // ---------------------------------------------------------------- copying
 
   /**
-   * Writes the sidecars to copy next to the output (UTF-8, with the edits). previous: the files
-   * written last time, overwritten instead of getting new names ("Write again").
-   * Returns [{ name, from, to }] and [{ name, error }].
+   * Writes the sidecars to copy next to the output (UTF-8, with the edits).
+   * previous: the files written last time ("Write again"). Their names are free to be used again,
+   * so each copy gets the name its current language and flags give (Video.it.srt becomes
+   * Video.en.srt when the language changed); a previous copy that got another name is removed.
+   * Previous copies of files not written this time stay, and stay listed.
+   * Returns { copied: [{ name, from, to }], errors: [{ name, error }], removed: [paths] }.
    */
   async copy(planFiles, outputPath, { previous = [] } = {}) {
     const dir = path.dirname(outputPath);
     const copied = [];
     const errors = [];
-    const prevBySource = new Map(previous.map((p) => [p.from, p.to]));
+    const subOf = (p) => `${p.slice(0, -4)}.sub`;
+    const withData = (p) => (p.endsWith('.idx') ? [p, subOf(p)] : [p]);
+    const prev = previous.filter((p) => path.dirname(p.to) === dir);
     const existing = new Set((await fs.readdir(dir).catch(() => [])).map((n) => n.toLowerCase()));
-    for (const p of previous) {
-      existing.delete(path.basename(p.to).toLowerCase());
-      if (p.to.endsWith('.idx')) existing.delete(path.basename(p.to.slice(0, -4) + '.sub').toLowerCase());
-    }
+    for (const p of prev) for (const x of withData(p.to)) existing.delete(path.basename(x).toLowerCase());
     for (const f of planFiles.filter((x) => x.copy)) {
-      const reuse = prevBySource.get(f.path);
-      const name = reuse && path.dirname(reuse) === dir && !existing.has(path.basename(reuse).toLowerCase())
-        ? path.basename(reuse)
-        : targetName(outputPath, f, existing);
-      existing.add(name.toLowerCase());
+      const name = targetName(outputPath, f, existing);
       const to = path.join(dir, name);
       try {
         if (TEXT_FORMATS.includes(f.format)) {
@@ -272,7 +270,22 @@ export class Subtitles {
         errors.push({ name: f.name, error: err.message });
       }
     }
-    return { copied, errors };
+    // Previous copies: replaced under another name → removed; not written again → kept.
+    const written = new Set(copied.flatMap((c) => withData(c.to)).map((p) => p.toLowerCase()));
+    const rewritten = new Set(copied.map((c) => c.from));
+    const removed = [];
+    for (const p of prev) {
+      if (written.has(p.to.toLowerCase())) continue;
+      if (!rewritten.has(p.from)) {
+        if (await fs.access(p.to).then(() => true, () => false)) copied.push(p);
+        continue;
+      }
+      for (const x of withData(p.to)) {
+        if (written.has(x.toLowerCase())) continue;
+        await fs.rm(x, { force: true }).then(() => removed.push(x), (err) => this.log?.warn?.(`Could not remove ${x}: ${err.message}`));
+      }
+    }
+    return { copied, errors, removed };
   }
 }
 

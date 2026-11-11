@@ -200,6 +200,7 @@
         "- **Bearbeiten** öffnet den [Untertitel-Editor](#subtitles.editor) für Textdateien.",
         "- **Erneut nach Untertiteldateien suchen** findet Dateien, die nach dem Auftrag hinzugekommen sind; die bereits getroffene Auswahl bleibt erhalten. Auch beim Start der Konvertierung wird erneut gesucht.",
         "Nach der Konvertierung zeigt der Abschnitt, was eingebettet und kopiert wurde, mit einem Download-Link für jede Kopie. **Untertiteldateien erneut schreiben** schreibt die Kopien mit den aktuellen Änderungen erneut und ersetzt die zuvor geschriebenen: nützlich, um die Zeitverschiebung zu korrigieren, nachdem Sie das Video angesehen haben.",
+        "Kann das Ausgabeformat eine Datei nicht aufnehmen (WebM: keine Untertitel; MP4: keine Bilduntertitel), weist ein Hinweis hier und in der Zeile der Warteschlange darauf hin: Die Datei wird stattdessen kopiert, oder gar nicht verwendet, wenn Kopieren aus ist. Stellt **Untertiteldateien erneut schreiben** fest, dass sich Sprache oder Kennzeichen einer Datei geändert haben, erhält ihre Kopie den neuen Namen (`Video.it.srt` wird zu `Video.en.srt`).",
         "Während der Konvertierung lässt sich nichts ändern."
       ],
       "see": [

@@ -29,6 +29,33 @@ export function inherited(settings) {
 // Text formats can be edited; .idx/.sup are pictures.
 export const TEXT_FORMATS = ['srt', 'vtt', 'ass', 'ssa'];
 
+/** "WebM", "MP4" or "MOV" for a HandBrake format; null for MKV (which holds every kind). */
+export function containerName(format) {
+  if (/webm/.test(format ?? '')) return 'WebM';
+  if (/mov/.test(format ?? '')) return 'MOV';
+  if (/mp4|m4v/.test(format ?? '')) return 'MP4';
+  return null;
+}
+
+/** Same rule as the server (subtitles/plan.js canEmbed): WebM holds none, MP4/MOV text only. */
+export function fitsContainer(fileFormat, format) {
+  const name = containerName(format);
+  if (!name) return true;
+  return name !== 'WebM' && TEXT_FORMATS.includes(fileFormat);
+}
+
+/**
+ * Subtitle files of a job that its output format can't hold, while embedding is on:
+ * { container, names, lost } (lost: copying is off, so they won't be used at all), or null.
+ */
+export function containerProblem(job, settings) {
+  const files = (job.subtitles ?? []).filter((f) => f.include !== false && !fitsContainer(f.format, job.format));
+  if (!files.length) return null;
+  const inh = inherited(settings);
+  if ((job.subEmbed ?? inh.embed) === 'never') return null;
+  return { container: containerName(job.format), names: files.map((f) => f.name), lost: (job.subCopy ?? inh.copy) === 'never' };
+}
+
 export const CODESETS = [
   { value: 'UTF-8', label: 'UTF-8' },
   { value: 'windows-1252', label: 'Windows-1252 (Western Europe)' },

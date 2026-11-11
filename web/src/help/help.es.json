@@ -200,6 +200,7 @@
         "- **Editar** abre el [editor de subtítulos](#subtitles.editor) para los archivos de texto.",
         "- **Buscar archivos de subtítulos de nuevo** encuentra los archivos añadidos después del trabajo; se conservan las elecciones ya hechas. Los archivos también se buscan de nuevo cuando empieza la conversión.",
         "Tras la conversión, la sección muestra lo que se integró y se copió, con un enlace de descarga para cada copia. **Escribir los archivos de subtítulos de nuevo** vuelve a escribir las copias con las ediciones actuales, reemplazando las escritas antes: útil para corregir los tiempos después de ver el video.",
+        "Si el formato de salida no admite un archivo (WebM: ningún subtítulo; MP4: ningún subtítulo de imagen), un aviso lo indica aquí y en la fila de la cola: el archivo se copia en su lugar, o no se usa en absoluto si la copia está desactivada. Cuando **Escribir los archivos de subtítulos de nuevo** detecta que el idioma o los indicadores de un archivo han cambiado, su copia recibe el nuevo nombre (`Video.it.srt` pasa a ser `Video.en.srt`).",
         "No se puede cambiar nada mientras el trabajo se está convirtiendo."
       ],
       "see": [

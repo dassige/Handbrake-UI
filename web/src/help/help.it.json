@@ -200,6 +200,7 @@
         "- **Modifica** apre l’[editor dei sottotitoli](#subtitles.editor) per i file di testo.",
         "- **Cerca di nuovo i file di sottotitoli** trova i file aggiunti dopo il processo; le scelte già fatte restano. I file vengono cercati di nuovo anche all’avvio della conversione.",
         "Dopo la conversione la sezione mostra cosa è stato incorporato e copiato, con un link per scaricare ogni copia. **Scrivi di nuovo i file di sottotitoli** riscrive le copie con le modifiche attuali, sostituendo quelle scritte prima: utile per correggere i tempi dopo aver guardato il video.",
+        "Se il formato di uscita non può contenere un file (WebM: nessun sottotitolo; MP4: niente sottotitoli a immagini), un avviso lo segnala qui e nella riga della coda: il file viene copiato invece che incorporato, o non viene usato affatto se la copia è disattivata. Quando **Scrivi di nuovo i file di sottotitoli** trova che la lingua o i flag di un file sono cambiati, la sua copia prende il nuovo nome (`Video.it.srt` diventa `Video.en.srt`).",
         "Niente si può cambiare mentre il processo sta convertendo."
       ],
       "see": [

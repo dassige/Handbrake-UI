@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Captions, Download, PenLine, RefreshCw, Save } from 'lucide-react';
+import { AlertTriangle, Captions, Download, PenLine, RefreshCw, Save } from 'lucide-react';
 import { api } from '../api.js';
 import { fileName } from '../format.js';
 import { Help } from '../help/Help.jsx';
 import { t } from '../i18n/index.js';
 import { langName, languageOptions } from './languages.js';
-import { COPY_MODES, EMBED_MODES, copyLabel, embedLabel, inherited, isEdited, TEXT_FORMATS } from './modes.js';
+import { COPY_MODES, EMBED_MODES, containerName, copyLabel, embedLabel, inherited, isEdited, TEXT_FORMATS } from './modes.js';
 import { SubtitleEditor } from './SubtitleEditor.jsx';
 
 /** "Embed + copy", "Embed", "Copy" or "Not used", with why it is (not) embedded as a tooltip. */
@@ -61,6 +61,10 @@ export function JobSubtitles({ job, settings, run }) {
   const errors = (result?.errors ?? []).filter((e) => ERROR_CODES.includes(e.code));
   const editingFile = editing && files.find((f) => f.path === editing);
   const inheritedText = (from, label) => t(from === 'queue' ? 'subtitles.followQueue' : 'subtitles.followSettings', { mode: label });
+  // Files the output format can't hold (from the server's plan), shown before the conversion.
+  const blocked = files.filter((f) => f.why === 'container');
+  const showBlocked = blocked.length > 0 && job.status !== 'done' && info?.effective?.embed !== 'never';
+  const lost = info?.effective?.copy === 'never';
 
   return (
     <section>
@@ -92,6 +96,15 @@ export function JobSubtitles({ job, settings, run }) {
               onChange={(v) => save({ copy: v })}
             />
           </div>
+          {showBlocked && (
+            <p className={`small ${lost ? 'text-bad' : 'warn-text'}`}>
+              <AlertTriangle size={13} />{' '}
+              {t(lost ? 'subtitles.job.containerLost' : 'subtitles.job.containerCopied', {
+                container: containerName(job.format) ?? job.format,
+                names: blocked.map((f) => f.name).join(', '),
+              })}
+            </p>
+          )}
           <ul className="sub-files">
             {files.map((f) => (
               <li key={f.path} className={f.include === false ? 'off' : ''}>
