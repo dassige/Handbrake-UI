@@ -1,0 +1,6 @@
+Using the icon you just made as the base, create the full LOGO MARK. Same symbol, same palette, same style rules (no text of any kind, no pineapple/cocktail/HandBrake-like shapes).
+
+- This is the richer, more detailed version of the icon, for use at large sizes (README header, about page, splash screen). You may add secondary detail (e.g. motion lines, layered frames, a second tone) that the small icon had to leave out, but it must clearly be the same symbol.
+- No tile/background shape: the symbol stands on its own.
+- Square 1:1, 2048x2048, centered, generous padding.
+- Plain pure-white background so it can be cut out cleanly. Make sure it also works on a dark (#14171C) background: no colours that disappear on either.

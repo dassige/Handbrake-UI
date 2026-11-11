@@ -1,0 +1,16 @@
+I'm designing the visual identity for a self-hosted web app that converts video files. Users drag videos into a queue and a server re-encodes them one after another into smaller, cleaner files. The app is calm, precise and dependable: a quiet workshop tool, not a flashy consumer app.
+
+Visual direction:
+- Concept: raw video being shaped into a refined result. Use film frames or a play-triangle being compressed, streamlined or forged into a tighter, sharper form. A subtle "forge / workshop" feel (shaping, heat, precision) is welcome, but keep it abstract.
+- Palette: one strong burnt-orange accent (#D9480F, with a lighter #FF7A3D for highlights) plus near-black charcoal (#14171C) and off-white (#F4F5F7). No other hues.
+- Style: modern flat vector, geometric, clean edges, generous negative space. No photorealism, no 3D bevels, no glossy reflections, no drop shadows, no gradients except at most one very subtle one.
+
+Hard rules for every image:
+- Absolutely NO text, letters, numbers, words, initials, monograms, watermarks or signatures of any kind.
+- Do NOT use a pineapple, a cocktail glass, a clapperboard, or anything that looks like the HandBrake logo or another existing brand's logo.
+
+Now create the APP ICON. It will also be used as the browser favicon:
+- Square 1:1, 1024x1024, the symbol centered with about 12% padding on every side.
+- It must still be recognisable at 16x16 pixels: one bold, simple silhouette, at most 2-3 flat colours, thick shapes, no thin lines or small details.
+- Put it on a rounded-square tile in the burnt-orange accent with the symbol in off-white (or the reverse if that reads better).
+- Plain flat background outside the tile (pure white) so it's easy to cut out.

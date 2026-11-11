@@ -1,5 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Copy, CopyPlus, Download, FileJson, Pencil, Plus, Star, Trash2, Upload } from 'lucide-react';
+import { Copy, CopyPlus, Download, Pencil, Plus, Star, Trash2, Upload } from 'lucide-react';
 import { api } from '../api.js';
 import { bytes, dateTime, humanDuration } from '../format.js';
 import { Help } from '../help/Help.jsx';
@@ -234,7 +234,7 @@ export function PresetsPage({ presets, selectedId, onSelect, run, onError, onDir
           <div className="page-content">
             {!current ? (
               <div className="empty-page">
-                <FileJson size={40} className="muted" />
+                <img className="brand-logo empty-logo" src="/logo.png" alt="" width={120} height={120} />
                 <h1>{t('presets.page.emptyTitle')}</h1>
                 <p className="muted">{rich('presets.page.emptyText')}</p>
                 <div className="set-actions">

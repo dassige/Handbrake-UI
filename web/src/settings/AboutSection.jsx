@@ -61,7 +61,7 @@ export function AboutSection({ info, onError }) {
   return (
     <>
       <section className="set-card about-hero">
-        <img src="/favicon.svg" alt="" width={52} height={52} />
+        <img className="brand-logo" src="/logo.png" alt="" width={112} height={112} />
         <div className="about-hero-text">
           <h2>HandBrake Queue</h2>
           <div className="muted small">

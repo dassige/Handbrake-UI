@@ -75,6 +75,12 @@ h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 }
 .brand { display: flex; align-items: center; gap: 8px; font-weight: 650; font-size: 15px; color: var(--accent); }
 .brand span { color: var(--text); white-space: nowrap; }
+.brand-icon { flex: none; display: block; }
+/* The logo's black outlines vanish on the dark theme: a faint light outline keeps them. */
+@media (prefers-color-scheme: dark) {
+  .brand-logo { filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.45)); }
+}
+.empty-logo { opacity: 0.85; margin-bottom: 4px; }
 /* No min-width: 0 here: if the row is too narrow the block wraps to its own line instead of
    shrinking and spilling its unwrapped text over the buttons on the right. */
 .queue-state { display: flex; align-items: center; gap: 10px; white-space: nowrap; }

@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.3.4] - 2026/11/12
+
+- feat: app icon, logo and README banner
+
+The browser tab, phone home screen, top bar and notifications use the new
+icon. The logo appears in Settings → About and on the empty queue and
+Presets pages, with a faint outline in the dark theme. The README opens
+with a banner, and a GitHub social preview image is included.
+docs/branding/ holds the Gemini prompts and the script that rebuilds every
+file from the generated images.
+
 ## [3.3.3] - 2026/11/12
 
 - docs: table of contents at the top of the README

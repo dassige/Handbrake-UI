@@ -1,0 +1,7 @@
+Now create a BACKGROUND IMAGE in the same visual language as the icon and logo (same palette, same geometric flat-vector style, no text of any kind, no logos, no recognisable brand shapes).
+
+- Use: a background behind the web app's interface (login / empty-state screens) and a banner for the project page. UI elements and text will sit on top of it, so it must stay quiet.
+- Wide 16:9, 3840x2160.
+- Mostly dark charcoal (#14171C) with low-contrast, abstract motifs drawn from the icon: flowing streams of film frames, faint play-triangle shapes, soft lines suggesting video moving through a pipeline and being compressed. Burnt orange (#D9480F / #FF7A3D) only as sparse, subtle accents, like glowing embers or a thin light trail.
+- Keep the centre third calm and fairly empty; put the detail towards the edges and corners.
+- No focal object, no people, no photos, no busy texture. It should tile or crop well at different screen sizes.

@@ -1,3 +1,5 @@
+![HandBrake Queue](docs/branding/banner.jpg)
+
 # HandBrake Queue (Handbrake-UI)
 
 A web UI that turns a headless Linux box (or a Windows PC) into a HandBrake

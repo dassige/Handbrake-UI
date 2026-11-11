@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CalendarClock, Clapperboard, Pause, Play, Settings as SettingsIcon, SlidersHorizontal, WifiOff } from 'lucide-react';
+import { CalendarClock, Pause, Play, Settings as SettingsIcon, SlidersHorizontal, WifiOff } from 'lucide-react';
 import { RenameView } from './rename/RenameView.jsx';
 import { MergeView } from './merge/MergeView.jsx';
 import { QualityView } from './quality/QualityView.jsx';
@@ -251,7 +251,7 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <Clapperboard size={20} />
+          <img className="brand-icon" src="/icon-192.png" alt="" width={24} height={24} />
           <span>HandBrake Queue</span>
           <Help id="app.overview" />
         </div>

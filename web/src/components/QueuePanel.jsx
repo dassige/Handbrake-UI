@@ -158,7 +158,7 @@ export function QueuePanel({
       <div className="job-list" onDragOver={(e) => dragJob != null && e.preventDefault()} onDrop={() => dragJob != null && reorderDrop(null)}>
         {visible.length === 0 && (
           <div className="drop-hint">
-            <Upload size={28} />
+            {jobs.length ? <Upload size={28} /> : <img className="brand-logo empty-logo" src="/logo.png" alt="" width={120} height={120} />}
             <p>{jobs.length ? t('queue.noMatch') : t('queue.dragHere')}</p>
           </div>
         )}

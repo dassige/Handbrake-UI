@@ -63,7 +63,7 @@ export function useBrowserNotifyPrefs() {
 function show(title, body, tag) {
   if (!browserNotifySupported() || Notification.permission !== 'granted') return;
   try {
-    const n = new Notification(title, { body, tag, icon: '/favicon.svg' });
+    const n = new Notification(title, { body, tag, icon: '/icon-192.png' });
     n.onclick = () => {
       window.focus();
       n.close();
