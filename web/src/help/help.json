@@ -747,7 +747,8 @@
         "- **One file** downloads straight away. The browser's own download list shows the progress, and an interrupted download can be resumed there.",
         "- **A folder** (sub-folders included) comes as **one ZIP file** that keeps the folders inside. The files are stored as they are, not compressed, so it starts at once and the browser knows the size. A ZIP download that is interrupted must start again.",
         "- **Several files** can come as one ZIP or as separate files. For separate files, your browser may ask once whether the site may download several files.",
-        "A converted file can also be downloaded from its job details (**download converted file**). Hidden files and unfinished conversions (`.part`) are left out of ZIP files."
+        "A converted file can also be downloaded from its job details (**download converted file**). Hidden files and unfinished conversions (`.part`) are left out of ZIP files.",
+        "A video with [subtitle files](#subtitles.overview) next to it (e.g. `Movie.en.srt`, or a `Subs` folder in the sources) asks whether to download them too, as one ZIP; when several files are downloaded, the videos' subtitle files are included. In the job details, **Download with subtitles (ZIP)** does the same for a converted video."
       ],
       "see": [
         "convert.sources",

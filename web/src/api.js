@@ -69,7 +69,9 @@ export const api = {
   deleteFiles: (paths) => post('/api/files/delete', { paths }),
 
   downloadUrl: (path) => `/api/download?path=${encodeURIComponent(path)}`,
-  prepareZip: (paths, name) => post('/api/download/zip', { paths, name }),
+  prepareZip: (paths, name, withSubtitles = false) => post('/api/download/zip', { paths, name, withSubtitles }),
+  // { files: { video: [subtitle paths] }, count }
+  downloadSubtitles: (paths) => post('/api/download/subtitles', { paths }),
   zipUrl: (id) => `/api/download/zip/${id}`,
 
   backupUrl: (logs) => `/api/backup${logs ? '' : '?logs=0'}`,

@@ -9,6 +9,7 @@ import { JobActions } from './JobRow.jsx';
 import { has, t } from '../i18n/index.js';
 import { checkDetail, checkLabel, checkNote, renameNote } from '../i18n/serverText.js';
 import { JobSubtitles } from '../subtitles/JobSubtitles.jsx';
+import { startDownload } from '../download/useDownload.jsx';
 
 function Row({ label, children }) {
   if (children == null || children === '' || children === false) return null;
@@ -253,6 +254,18 @@ export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSe
             <a className="link small drawer-download" href={api.downloadUrl(job.outputPath)} download title={t('job.files.downloadTitle')}>
               <Download size={12} /> {t('job.files.download')}
             </a>
+          )}
+          {job.status === 'done' && job.subtitleResult?.copied?.length > 0 && (
+            <button
+              className="link small drawer-download"
+              title={t('subtitles.result.downloadZipTitle')}
+              onClick={async () => {
+                const zip = await run(() => api.prepareZip([job.outputPath], undefined, true));
+                if (zip) startDownload(api.zipUrl(zip.id));
+              }}
+            >
+              <Download size={12} /> {t('subtitles.result.downloadZip')}
+            </button>
           )}
         </section>
 

@@ -747,7 +747,8 @@
         "- **Un fichier** se télécharge tout de suite. La liste de téléchargements du navigateur affiche la progression, et un téléchargement interrompu peut y être repris.",
         "- **Un dossier** (sous-dossiers compris) arrive sous la forme d'**un seul fichier ZIP** qui conserve les dossiers. Les fichiers y sont stockés tels quels, sans compression : le téléchargement démarre donc aussitôt et le navigateur connaît la taille. Un téléchargement ZIP interrompu doit recommencer.",
         "- **Plusieurs fichiers** peuvent arriver en un seul ZIP ou sous forme de fichiers séparés. Pour des fichiers séparés, votre navigateur peut demander une fois si le site est autorisé à télécharger plusieurs fichiers.",
-        "Un fichier converti peut aussi être téléchargé depuis les détails de sa tâche (**télécharger le fichier converti**). Les fichiers cachés et les conversions inachevées (`.part`) sont exclus des fichiers ZIP."
+        "Un fichier converti peut aussi être téléchargé depuis les détails de sa tâche (**télécharger le fichier converti**). Les fichiers cachés et les conversions inachevées (`.part`) sont exclus des fichiers ZIP.",
+        "Pour une vidéo accompagnée de [fichiers de sous-titres](#subtitles.overview) (par exemple `Movie.en.srt`, ou un dossier `Subs` dans les sources), l'application demande s'il faut les télécharger aussi, dans un seul ZIP ; quand plusieurs fichiers sont téléchargés, les fichiers de sous-titres des vidéos sont inclus. Dans les détails de la tâche, **Télécharger avec les sous-titres (ZIP)** fait de même pour une vidéo convertie."
       ],
       "see": [
         "convert.sources",

@@ -7,10 +7,19 @@
     "separateHint": "Les fichiers séparés peuvent être mis en pause et repris dans le navigateur ; votre navigateur peut demander une fois si ce site peut télécharger plusieurs fichiers.",
     "zipHint": "Un seul fichier ZIP (<code>{name}</code>) conserve les dossiers, mais un téléchargement ZIP interrompu doit recommencer depuis le début.",
     "separate": "Fichiers séparés",
-    "zip": "Un seul ZIP ({size})"
+    "zip": "Un seul ZIP ({size})",
+    "withSubtitles_one": "Inclut {count} fichier de sous-titres des vidéos choisies.",
+    "withSubtitles_other": "Inclut {count} fichiers de sous-titres des vidéos choisies."
   },
   "title": {
     "folder": "Télécharger le dossier « {name} » en ZIP",
     "file": "Télécharger « {name} »"
+  },
+  "subtitles": {
+    "title": "Télécharger avec les sous-titres ?",
+    "message_one": "{name} a {count} fichier de sous-titres. Les télécharger ensemble dans un seul ZIP ?",
+    "message_other": "{name} a {count} fichiers de sous-titres. Les télécharger ensemble dans un seul ZIP ?",
+    "videoOnly": "Vidéo seule",
+    "zip": "Vidéo + sous-titres, un seul ZIP ({size})"
   }
 }

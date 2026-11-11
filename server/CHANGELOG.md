@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.3.2] - 2026/11/12
+
+- feat: download a video with its subtitle files as one ZIP
+
 ## [3.3.1] - 2026/11/12
 
 - feat: subtitle copies renamed when their language changes; warn when the format can't hold them

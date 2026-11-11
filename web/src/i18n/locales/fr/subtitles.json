@@ -59,6 +59,8 @@
     "embedded": "Intégrés :",
     "copied": "Copiés à côté de la vidéo :",
     "download": "Télécharger",
+    "downloadZip": "Télécharger avec les sous-titres (ZIP)",
+    "downloadZipTitle": "Télécharger la vidéo convertie et ses fichiers de sous-titres dans un seul ZIP",
     "writeAgain": "Écrire à nouveau les fichiers de sous-titres",
     "writeAgainTitle": "Écrit à nouveau les fichiers de sous-titres à côté de la vidéo convertie, avec les modifications actuelles (en remplaçant ceux écrits précédemment)",
     "written": "Fichiers de sous-titres écrits",

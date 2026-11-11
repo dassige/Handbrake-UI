@@ -408,3 +408,42 @@ test('queue: preview of edits and deleting a source takes its sidecars', async (
     await t.done();
   }
 });
+
+test('download: a video with its subtitle files, from the target and from a sources folder', async () => {
+  const { Downloads } = await import('../src/download.js');
+  const dir = await tmpDir('hbui-subdl-');
+  try {
+    const src = path.join(dir, 'src');
+    const out = path.join(dir, 'out');
+    await touch(path.join(out, 'Show', 'Ep.mkv'), 'video');
+    await touch(path.join(out, 'Show', 'Ep.en.srt'), SRT);
+    await touch(path.join(out, 'Show', 'Ep.it.forced.srt'), SRT);
+    await touch(path.join(out, 'Show', 'Other.srt'), SRT);
+    await touch(path.join(src, 'Film', 'Film.mkv'), 'video');
+    await touch(path.join(src, 'Film', 'Subs', '2_English.srt'), SRT);
+    const settings = new Settings(openDb(':memory:'), { initialSourceRoot: src, initialTargetRoot: out });
+    const subtitles = new Subtitles({ settings, tmpDir: dir, log: quiet });
+    const downloads = new Downloads({ settings, log: quiet, subtitles });
+
+    const ep = path.join(out, 'Show', 'Ep.mkv');
+    const film = path.join(src, 'Film', 'Film.mkv');
+    const found = await downloads.subtitlesFor([ep, film]);
+    assert.equal(found.count, 3);
+    assert.deepEqual(found.files[ep].map((p) => path.basename(p)).sort(), ['Ep.en.srt', 'Ep.it.forced.srt']);
+    assert.deepEqual(found.files[film], [path.join(src, 'Film', 'Subs', '2_English.srt')]);
+
+    const zip = await downloads.prepareZip({ paths: [film], withSubtitles: true });
+    assert.equal(zip.name, 'Film.zip');
+    assert.equal(zip.subtitles, 1);
+    const names = downloads.tokens.get(zip.id).plan.items.map((i) => i.name);
+    assert.deepEqual(names, ['Film.mkv', 'Subs/2_English.srt']);
+    // Without asking for them: only the video, named as before.
+    const plain = await downloads.prepareZip({ paths: [ep] });
+    assert.deepEqual([plain.name, plain.files, plain.subtitles], ['Ep.mkv.zip', 1, 0]);
+    // Turned off: no subtitle files.
+    settings.set('subtitleExtensions', []);
+    assert.equal((await downloads.subtitlesFor([ep])).count, 0);
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+});

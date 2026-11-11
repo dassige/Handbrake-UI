@@ -7,10 +7,19 @@
     "separateHint": "Separate files can be paused and resumed in the browser; your browser may ask once whether this site may download several files.",
     "zipHint": "One ZIP file (<code>{name}</code>) keeps the folders, but an interrupted ZIP download must start again from the beginning.",
     "separate": "Separate files",
-    "zip": "One ZIP ({size})"
+    "zip": "One ZIP ({size})",
+    "withSubtitles_one": "Includes {count} subtitle file that goes with the chosen videos.",
+    "withSubtitles_other": "Includes {count} subtitle files that go with the chosen videos."
   },
   "title": {
     "folder": "Download the folder “{name}” as a ZIP",
     "file": "Download “{name}”"
+  },
+  "subtitles": {
+    "title": "Download with subtitles?",
+    "message_one": "{name} has {count} subtitle file with it. Download them together as one ZIP?",
+    "message_other": "{name} has {count} subtitle files with it. Download them together as one ZIP?",
+    "videoOnly": "Video only",
+    "zip": "Video + subtitles, one ZIP ({size})"
   }
 }

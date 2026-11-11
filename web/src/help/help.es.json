@@ -747,7 +747,8 @@
         "- **Un archivo** se descarga de inmediato. La lista de descargas del propio navegador muestra el progreso, y una descarga interrumpida puede reanudarse allí.",
         "- **Una carpeta** (subcarpetas incluidas) llega como **un archivo ZIP** que conserva las carpetas del interior. Los archivos se guardan tal cual, sin comprimir, así que empieza al instante y el navegador conoce el tamaño. Una descarga ZIP interrumpida debe empezar de nuevo.",
         "- **Varios archivos** pueden llegar como un ZIP o como archivos separados. Para archivos separados, su navegador puede preguntar una vez si el sitio puede descargar varios archivos.",
-        "Un archivo convertido también puede descargarse desde los detalles de su trabajo (**descargar el archivo convertido**). Los archivos ocultos y las conversiones sin terminar (`.part`) se dejan fuera de los archivos ZIP."
+        "Un archivo convertido también puede descargarse desde los detalles de su trabajo (**descargar el archivo convertido**). Los archivos ocultos y las conversiones sin terminar (`.part`) se dejan fuera de los archivos ZIP.",
+        "Un video con [archivos de subtítulos](#subtitles.overview) al lado (por ejemplo `Movie.en.srt`, o una carpeta `Subs` en los orígenes) pregunta si descargarlos también, en un solo ZIP; al descargar varios archivos, se incluyen los archivos de subtítulos de los videos. En los detalles del trabajo, **Descargar con subtítulos (ZIP)** hace lo mismo para un video convertido."
       ],
       "see": [
         "convert.sources",

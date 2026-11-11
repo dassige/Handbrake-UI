@@ -7,10 +7,19 @@
     "separateHint": "Einzelne Dateien lassen sich im Browser anhalten und fortsetzen; Ihr Browser fragt eventuell einmal, ob diese Seite mehrere Dateien herunterladen darf.",
     "zipHint": "Eine ZIP-Datei (<code>{name}</code>) behält die Ordnerstruktur, aber ein unterbrochener ZIP-Download muss von vorn beginnen.",
     "separate": "Einzelne Dateien",
-    "zip": "Eine ZIP-Datei ({size})"
+    "zip": "Eine ZIP-Datei ({size})",
+    "withSubtitles_one": "Enthält {count} Untertiteldatei zu den gewählten Videos.",
+    "withSubtitles_other": "Enthält {count} Untertiteldateien zu den gewählten Videos."
   },
   "title": {
     "folder": "Den Ordner „{name}“ als ZIP herunterladen",
     "file": "„{name}“ herunterladen"
+  },
+  "subtitles": {
+    "title": "Mit Untertiteln herunterladen?",
+    "message_one": "Zu {name} gehört {count} Untertiteldatei. Beides zusammen als ein ZIP herunterladen?",
+    "message_other": "Zu {name} gehören {count} Untertiteldateien. Alles zusammen als ein ZIP herunterladen?",
+    "videoOnly": "Nur das Video",
+    "zip": "Video + Untertitel, ein ZIP ({size})"
   }
 }

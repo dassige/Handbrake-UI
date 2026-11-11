@@ -19,7 +19,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /**
  * Returns download(items), items = [{ path, type: 'file' | 'dir', size? }].
- * One file downloads straight away; folders, or several files, ask first.
+ * One file downloads straight away, unless it is a video with subtitle files: then it asks
+ * whether to take them too (one ZIP). Folders, or several files, ask first; the chosen videos'
+ * subtitle files are included.
  */
 export function useDownload(onError) {
   const dialogs = useDialogs();
@@ -28,13 +30,40 @@ export function useDownload(onError) {
     async (items) => {
       if (!items.length) return;
       if (items.length === 1 && items[0].type === 'file') {
-        startDownload(api.downloadUrl(items[0].path));
+        const file = items[0].path;
+        let withSubs = null;
+        try {
+          if ((await api.downloadSubtitles([file])).count) withSubs = await api.prepareZip([file], undefined, true);
+        } catch {
+          // Asking failed: download the file alone.
+        }
+        if (!withSubs) {
+          startDownload(api.downloadUrl(file));
+          return;
+        }
+        const choice = await dialogs.choose({
+          title: t('download.subtitles.title'),
+          icon: 'question',
+          message: (
+            <>
+              <p>{rich('download.subtitles.message', { count: withSubs.subtitles, name: <strong>{fileName(file)}</strong> })}</p>
+              <p className="muted small">{rich('download.dialog.zipHint', { name: withSubs.name })}</p>
+            </>
+          ),
+          buttons: [
+            { label: t('common.cancel'), value: null },
+            { label: t('download.subtitles.videoOnly'), value: 'video' },
+            { label: t('download.subtitles.zip', { size: bytes(withSubs.size) }), value: 'zip', primary: true, autoFocus: true },
+          ],
+        });
+        if (choice === 'video') startDownload(api.downloadUrl(file));
+        if (choice === 'zip') startDownload(api.zipUrl(withSubs.id));
         return;
       }
       const onlyFiles = items.every((i) => i.type === 'file');
       let zip;
       try {
-        zip = await api.prepareZip(items.map((i) => i.path));
+        zip = await api.prepareZip(items.map((i) => i.path), undefined, true);
       } catch (e) {
         onError?.(e);
         return;
@@ -53,6 +82,7 @@ export function useDownload(onError) {
               {onlyFiles ? `${t('download.dialog.separateHint')} ` : ''}
               {rich('download.dialog.zipHint', { name: zip.name })}
             </p>
+            {zip.subtitles > 0 && <p className="muted small">{t('download.dialog.withSubtitles', { count: zip.subtitles })}</p>}
           </>
         ),
         buttons: [
@@ -63,8 +93,8 @@ export function useDownload(onError) {
       });
       if (answer === 'zip') startDownload(api.zipUrl(zip.id));
       if (answer === 'files') {
-        for (const i of items) {
-          startDownload(api.downloadUrl(i.path));
+        for (const p of [...items.map((i) => i.path), ...(zip.subtitlePaths ?? [])]) {
+          startDownload(api.downloadUrl(p));
           // Browsers drop clicks that come too close together.
           await sleep(600);
         }

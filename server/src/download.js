@@ -11,7 +11,7 @@ import { randomUUID } from 'node:crypto';
 import { Readable } from 'node:stream';
 import { crc32 } from 'node:zlib';
 import { badRequest, notFound } from './errors.js';
-import { isHiddenName, naturalCompare, resolveUnderAny } from './paths.js';
+import { isHiddenName, isInside, makeFileMatcher, naturalCompare, resolveUnderAny } from './paths.js';
 
 const MAX_FILES = 10_000;
 const TOKEN_TTL = 6 * 3600 * 1000;
@@ -205,9 +205,11 @@ export function parseRange(header, size) {
 // ------------------------------------------------------------------ the service
 
 export class Downloads {
-  constructor({ settings, log }) {
+  constructor({ settings, log, subtitles = null }) {
     this.settings = settings;
     this.log = log;
+    // A video can be downloaded with its subtitle files (subtitles/service.js).
+    this.subtitles = subtitles;
     this.tokens = new Map(); // id -> { name, entries, plan, expires }
   }
 
@@ -246,13 +248,49 @@ export class Downloads {
     return reply.send(createReadStream(abs, { start, end, highWaterMark: 1 << 20 }));
   }
 
-  /** Expands the chosen files and folders and remembers them under a token for the GET that follows. */
-  async prepareZip({ paths, name }) {
+  /**
+   * The subtitle files that go with the chosen video files (folders are left out: everything in
+   * them is downloaded anyway). In the target folder: the files named after the video
+   * (Video.en.srt); in a sources folder: every sidecar found for it, Subs folder included.
+   * Returns { files: { video: [paths] }, count }.
+   */
+  async subtitlesFor(paths) {
+    if (!Array.isArray(paths) || !paths.length) throw badRequest('Choose files to download');
+    const files = {};
+    let count = 0;
+    if (!this.subtitles?.enabled()) return { files, count };
+    const roots = this.roots();
+    const target = this.settings.get('targetRoot');
+    const { isVideo } = makeFileMatcher(this.settings);
+    const chosen = [];
+    for (const p of paths) chosen.push((await resolveUnderAny(roots, p)).path);
+    const taken = new Set(chosen);
+    for (const p of chosen) {
+      if (!isVideo(p) || !(await fs.stat(p).catch(() => null))?.isFile()) continue;
+      const list = isInside(target, p)
+        ? (await this.subtitles.companions(p)).map((c) => c.path)
+        : await this.subtitles.sidecarPaths(p);
+      const extra = list.filter((x) => !taken.has(x));
+      for (const x of extra) taken.add(x);
+      if (extra.length) {
+        files[p] = extra;
+        count += extra.length;
+      }
+    }
+    return { files, count };
+  }
+
+  /**
+   * Expands the chosen files and folders and remembers them under a token for the GET that follows.
+   * withSubtitles: the chosen videos' subtitle files are added (see subtitlesFor).
+   */
+  async prepareZip({ paths, name, withSubtitles = false }) {
     if (!Array.isArray(paths) || !paths.length) throw badRequest('Choose files or folders to download');
     const roots = this.roots();
     const chosen = [];
     for (const p of paths) chosen.push((await resolveUnderAny(roots, p)).path);
-    const base = commonParent(chosen);
+    const subtitlePaths = withSubtitles ? Object.values((await this.subtitlesFor(chosen)).files).flat() : [];
+    const base = commonParent([...chosen, ...subtitlePaths]);
 
     const entries = [];
     const add = async (file, st) => {
@@ -275,14 +313,23 @@ export class Downloads {
       if (st.isDirectory()) await walk(p);
       else if (st.isFile()) await add(p, st);
     }
+    for (const p of subtitlePaths) {
+      const st = await fs.stat(p).catch(() => null);
+      if (st?.isFile()) await add(p, st);
+    }
     if (!entries.length) throw badRequest('There are no files in what you chose');
 
-    const zipName = `${cleanZipName(name) ?? (chosen.length === 1 ? path.basename(chosen[0]) : path.basename(base) || 'download')}.zip`;
+    // One video with its subtitles: "Movie.zip" rather than "Movie.mkv.zip".
+    const single = chosen.length === 1 ? (subtitlePaths.length ? path.parse(chosen[0]).name : path.basename(chosen[0])) : null;
+    const zipName = `${cleanZipName(name) ?? (single ?? (path.basename(base) || 'download'))}.zip`;
     const plan = planZip(entries);
     this.prune();
     const id = randomUUID();
     this.tokens.set(id, { name: zipName, plan, expires: Date.now() + TOKEN_TTL });
-    return { id, name: zipName, files: entries.length, size: plan.size, contentSize: entries.reduce((s, e) => s + e.size, 0) };
+    return {
+      id, name: zipName, files: entries.length, size: plan.size, contentSize: entries.reduce((s, e) => s + e.size, 0),
+      subtitles: subtitlePaths.length, subtitlePaths,
+    };
   }
 
   /** Streams a prepared ZIP. The token stays valid for a while, so a failed download can be started again. */

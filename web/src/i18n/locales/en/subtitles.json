@@ -59,6 +59,8 @@
     "embedded": "Embedded:",
     "copied": "Copied next to the video:",
     "download": "Download",
+    "downloadZip": "Download with subtitles (ZIP)",
+    "downloadZipTitle": "Download the converted video and its subtitle files as one ZIP",
     "writeAgain": "Write subtitle files again",
     "writeAgainTitle": "Writes the subtitle files next to the converted video again, with the current edits (replacing the ones written before)",
     "written": "Subtitle files written",

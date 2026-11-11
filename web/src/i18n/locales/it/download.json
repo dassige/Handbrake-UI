@@ -7,10 +7,19 @@
     "separateHint": "I file separati si possono sospendere e riprendere nel browser; il browser potrebbe chiedere una volta se questo sito può scaricare più file.",
     "zipHint": "Un unico file ZIP (<code>{name}</code>) mantiene le cartelle, ma un download ZIP interrotto deve ripartire dall’inizio.",
     "separate": "File separati",
-    "zip": "Un unico ZIP ({size})"
+    "zip": "Un unico ZIP ({size})",
+    "withSubtitles_one": "Include {count} file di sottotitoli dei video scelti.",
+    "withSubtitles_other": "Include {count} file di sottotitoli dei video scelti."
   },
   "title": {
     "folder": "Scarica la cartella “{name}” come ZIP",
     "file": "Scarica “{name}”"
+  },
+  "subtitles": {
+    "title": "Scaricare anche i sottotitoli?",
+    "message_one": "{name} ha {count} file di sottotitoli. Scaricarli insieme in un unico ZIP?",
+    "message_other": "{name} ha {count} file di sottotitoli. Scaricarli insieme in un unico ZIP?",
+    "videoOnly": "Solo il video",
+    "zip": "Video + sottotitoli, un unico ZIP ({size})"
   }
 }

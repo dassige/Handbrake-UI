@@ -59,6 +59,8 @@
     "embedded": "Incorporati:",
     "copied": "Copiati accanto al video:",
     "download": "Scarica",
+    "downloadZip": "Scarica con i sottotitoli (ZIP)",
+    "downloadZipTitle": "Scarica il video convertito e i suoi file di sottotitoli in un unico ZIP",
     "writeAgain": "Scrivi di nuovo i file di sottotitoli",
     "writeAgainTitle": "Scrive di nuovo i file di sottotitoli accanto al video convertito, con le modifiche attuali (sostituendo quelli scritti prima)",
     "written": "File di sottotitoli scritti",

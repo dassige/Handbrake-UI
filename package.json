@@ -1,12 +1,12 @@
 {
   "name": "handbrake-ui",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "private": true,
   "license": "GPL-2.0-only",
   "description": "Project (global) version — managed by DGS AutoVersion",
   "scripts": {
     "release": "node scripts/release.cjs"
   },
-  "versionDate": "2026/11/12 10:50",
-  "git-parentCommit-ID": "635aa78754827b1a0b23150bccacec188e3f9e18"
+  "versionDate": "2026/11/12 10:59",
+  "git-parentCommit-ID": "280b96b904dc7553136a8e40aa970d39a207fd1f"
 }

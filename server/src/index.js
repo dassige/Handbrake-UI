@@ -73,7 +73,7 @@ const merger = new Merger({
 });
 const uploads = new Uploads({ db, settings, events, log: app.log });
 const sourceFiles = new SourceFiles({ settings, queue, events, log: app.log, subtitles });
-const downloads = new Downloads({ settings, log: app.log });
+const downloads = new Downloads({ settings, log: app.log, subtitles });
 const quality = new QualityScanner({ db, settings, verifier, events, queue, log: app.log });
 const backups = new Backups({
   db, dataDir: config.dataDir, settings, queue, merger, quality, uploads, renamer, watcher, events, log: app.log, versions: version,

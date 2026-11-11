@@ -59,6 +59,8 @@
     "embedded": "Eingebettet:",
     "copied": "Neben das Video kopiert:",
     "download": "Herunterladen",
+    "downloadZip": "Mit Untertiteln herunterladen (ZIP)",
+    "downloadZipTitle": "Das konvertierte Video und seine Untertiteldateien als ein ZIP herunterladen",
     "writeAgain": "Untertiteldateien erneut schreiben",
     "writeAgainTitle": "Schreibt die Untertiteldateien erneut neben das konvertierte Video, mit den aktuellen Änderungen (die zuvor geschriebenen werden ersetzt)",
     "written": "Untertiteldateien geschrieben",

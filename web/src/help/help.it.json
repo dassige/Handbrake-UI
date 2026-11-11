@@ -747,7 +747,8 @@
         "- **Un file** si scarica subito. L’elenco dei download del browser mostra l’avanzamento, e un download interrotto può essere ripreso da lì.",
         "- **Una cartella** (sottocartelle comprese) arriva come **un unico file ZIP** che mantiene le cartelle al suo interno. I file vengono archiviati così come sono, senza compressione, quindi parte subito e il browser conosce la dimensione. Un download ZIP interrotto deve ripartire da capo.",
         "- **Più file** possono arrivare come un solo ZIP o come file separati. Per i file separati, il browser potrebbe chiedere una volta se il sito può scaricare più file.",
-        "Un file convertito si può scaricare anche dai dettagli del suo processo (**scarica file convertito**). I file nascosti e le conversioni non terminate (`.part`) restano fuori dai file ZIP."
+        "Un file convertito si può scaricare anche dai dettagli del suo processo (**scarica file convertito**). I file nascosti e le conversioni non terminate (`.part`) restano fuori dai file ZIP.",
+        "Un video con dei [file di sottotitoli](#subtitles.overview) accanto (per esempio `Movie.en.srt`, o una cartella `Subs` nelle sorgenti) chiede se scaricare anche quelli, in un unico ZIP; quando si scaricano più file, i file di sottotitoli dei video sono inclusi. Nei dettagli del processo, **Scarica con i sottotitoli (ZIP)** fa lo stesso per un video convertito."
       ],
       "see": [
         "convert.sources",

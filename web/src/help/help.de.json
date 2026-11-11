@@ -747,7 +747,8 @@
         "- **Eine Datei** wird sofort heruntergeladen. Die eigene Download-Liste des Browsers zeigt den Fortschritt, und ein unterbrochener Download kann dort fortgesetzt werden.",
         "- **Ein Ordner** (Unterordner eingeschlossen) kommt als **eine ZIP-Datei**, die die Ordner darin beibehält. Die Dateien werden unverändert abgelegt, nicht komprimiert, sodass der Download sofort beginnt und der Browser die Größe kennt. Ein unterbrochener ZIP-Download muss von vorn beginnen.",
         "- **Mehrere Dateien** können als eine ZIP-Datei oder als einzelne Dateien kommen. Bei einzelnen Dateien fragt Ihr Browser eventuell einmal, ob die Seite mehrere Dateien herunterladen darf.",
-        "Eine konvertierte Datei lässt sich auch aus ihren Auftragsdetails herunterladen (**konvertierte Datei herunterladen**). Versteckte Dateien und unfertige Konvertierungen (`.part`) bleiben in ZIP-Dateien außen vor."
+        "Eine konvertierte Datei lässt sich auch aus ihren Auftragsdetails herunterladen (**konvertierte Datei herunterladen**). Versteckte Dateien und unfertige Konvertierungen (`.part`) bleiben in ZIP-Dateien außen vor.",
+        "Bei einem Video mit [Untertiteldateien](#subtitles.overview) daneben (z. B. `Movie.en.srt` oder ein Ordner `Subs` in den Quellen) wird gefragt, ob sie mit heruntergeladen werden sollen, als ein ZIP; werden mehrere Dateien heruntergeladen, sind die Untertiteldateien der Videos enthalten. In den Auftragsdetails macht **Mit Untertiteln herunterladen (ZIP)** dasselbe für ein konvertiertes Video."
       ],
       "see": [
         "convert.sources",
