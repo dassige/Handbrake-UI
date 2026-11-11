@@ -304,7 +304,7 @@ export class Merger {
       // no chapters
     }
     const st = await fs.stat(file);
-    return { ...describePart(file, identify, chapters), size: st.size };
+    return { ...describePart(file, identify, chapters), size: st.size, mtime: st.mtimeMs };
   }
 
   /** Everything the UI shows before merging. */

@@ -307,6 +307,43 @@ test('queue: the window opening starts a queue with waiting jobs (autoStart), on
   }
 });
 
+test('queue: "convert now" encodes one job while the queue is stopped and leaves the rest queued', async () => {
+  const t = await setup();
+  try {
+    for (const n of ['a.mkv', 'b.mkv']) await fs.writeFile(path.join(t.src, n), 'x');
+    const { added: [a, b] } = await t.queue.add({ paths: [path.join(t.src, 'a.mkv'), path.join(t.src, 'b.mkv')] });
+    // Outside the conversion window too: it is a manual action.
+    const now = new Date();
+    t.settings.set('schedule', {
+      enabled: true, start: hhmm(new Date(now.getTime() + 2 * 3600e3)), end: hhmm(new Date(now.getTime() + 3 * 3600e3)),
+      days: [0, 1, 2, 3, 4, 5, 6], autoStart: false,
+    });
+    const convertNow = t.queue.convertNow(b);
+    await assert.rejects(() => t.queue.convertNow(a), /Another conversion is running/);
+    await convertNow;
+    assert.equal(t.queue.state().activeSingle, true);
+    await until(() => t.queue.get(b).status === 'done');
+    await new Promise((r) => setTimeout(r, 30));
+    assert.equal(t.encodes.length, 1);
+    assert.equal(t.queue.get(a).status, 'queued');
+    assert.equal(t.settings.get('queueRunning'), false);
+    assert.equal(t.queue.state().activeSingle, false);
+    // The job's own notification, but no "queue finished".
+    assert.deepEqual(t.notes.map((n) => n.event), ['jobDone']);
+
+    await assert.rejects(() => t.queue.convertNow(b), /Only queued jobs/);
+    t.queue.setRunning(true, { now: true });
+    await assert.rejects(() => t.queue.convertNow(a), /queue is running/);
+    await until(() => t.settings.get('queueRunning') === false);
+    assert.equal(t.queue.get(a).status, 'done');
+    // The queue run reports only its own job.
+    assert.equal(t.notes.at(-1).event, 'queueFinished');
+    assert.equal(t.notes.at(-1).data.jobs.length, 1);
+  } finally {
+    await t.done();
+  }
+});
+
 test('watch: existing files are left alone; new ones are added once they stop changing', async () => {
   const t = await setup();
   try {

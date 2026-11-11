@@ -10,6 +10,10 @@ import { Help } from '../help/Help.jsx';
 import { useDialogs } from '../components/Dialogs.jsx';
 import { t } from '../i18n/index.js';
 import { renameWarning } from '../i18n/serverText.js';
+import { compareNames, sortList, useRememberedSort } from '../sort.js';
+import { SortControl } from '../components/SortControl.jsx';
+
+const SORT_KEYS = ['name', 'date', 'type', 'size'];
 
 const pad = (n) => String(n).padStart(2, '0');
 
@@ -100,6 +104,13 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
     warnings: rows.filter((r) => r.warnings.some(isBlocking)).length,
   }), [rows]);
   const multiDir = new Set(rows.map((r) => r.dir)).size > 1;
+  // Grouped by folder; sorted within each folder.
+  const [sort, setSort] = useRememberedSort('renameList', SORT_KEYS);
+  const sortedRows = useMemo(() => {
+    const dirs = [...new Set(rows.map((r) => r.dir))].sort(compareNames);
+    const get = (r) => ({ name: r.oldName, mtime: r.mtime, size: r.size });
+    return dirs.flatMap((d) => sortList(rows.filter((r) => r.dir === d), sort, get));
+  }, [rows, sort]);
 
   async function apply() {
     if (!toRename.length) return;
@@ -130,6 +141,7 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
       <SourceBrowser
         settings={settings}
         root="target"
+        sortId="rename"
         title={t('rename.view.convertedFiles')}
         addLabel={t('rename.view.addLabel')}
         addTitle={t('rename.view.addTitle')}
@@ -190,6 +202,7 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
             <option value="all">{t('rename.view.allRows')}</option>
           </select>
           <span className="spacer" />
+          <SortControl sort={sort} onChange={setSort} options={SORT_KEYS} />
           {Object.keys(edits).length > 0 && (
             <button className="btn ghost small" onClick={() => setEdits({})} title={t('rename.view.resetEditsTitle')}>
               <RotateCcw size={14} /> {t('rename.view.resetEdits')}
@@ -224,8 +237,8 @@ export function RenameView({ settings, rules, paths, setPaths, changeTick, run, 
                 </tr>
               </thead>
               <tbody>
-                {rows.map((r, i) => {
-                  const showDir = multiDir && (i === 0 || rows[i - 1].dir !== r.dir);
+                {sortedRows.map((r, i) => {
+                  const showDir = multiDir && (i === 0 || sortedRows[i - 1].dir !== r.dir);
                   const blocking = r.warnings.filter(isBlocking);
                   return [
                     showDir && (

@@ -64,5 +64,15 @@
     "deleteItems_other": "{count} Elemente löschen",
     "deleted_one": "{count} Element gelöscht",
     "deleted_other": "{count} Elemente gelöscht"
+  },
+  "sort": {
+    "label": "Sortieren nach",
+    "name": "Name",
+    "date": "Datum",
+    "type": "Dateityp",
+    "size": "Größe",
+    "manual": "Eigene Reihenfolge",
+    "ascending": "Aufsteigend: zum Umkehren klicken",
+    "descending": "Absteigend: zum Umkehren klicken"
   }
 }

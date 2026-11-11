@@ -10,6 +10,8 @@
     "cancelMessage": "Annullare questa conversione? L’avanzamento andrà perso.",
     "keepGoing": "Continua",
     "moveTop": "Sposta in cima",
+    "convertNow": "Converti ora",
+    "convertNowTitle": "Converti ora solo questo file; la coda resta ferma",
     "up": "Su",
     "upTitle": "Sposta su di un posto",
     "down": "Giù",

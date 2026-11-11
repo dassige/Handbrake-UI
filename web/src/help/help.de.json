@@ -46,6 +46,7 @@
         "- **Doppelklicken** Sie einen Ordner, um ihn zu öffnen, oder eine Datei, um sie zur Warteschlange hinzuzufügen.",
         "- **Ziehen** Sie Dateien oder Ordner in die Warteschlange, um sie hinzuzufügen. Mit Strg-Klick und Umschalt-Klick wählen Sie mehrere aus; das Kontrollkästchen ganz oben wählt alles aus.",
         "- **Zur Warteschlange hinzufügen** fügt das Ausgewählte hinzu.",
+        "- **Sortieren nach** ordnet die Liste nach Name, Datum, Dateityp oder Größe; der Pfeil daneben kehrt die Reihenfolge um. Ordner bleiben oben. Jede Ansicht (Konvertieren, Umbenennen, Zusammenfügen, Qualitätsprüfung) merkt sich ihre eigene Sortierung in diesem Browser.",
         "- Beim Hinzufügen eines Ordners wird jedes darin liegende Video hinzugefügt, Unterordner eingeschlossen. Bereits eingereihte Dateien werden übersprungen, ebenso bereits konvertierte, sofern Sie das nicht abgeschaltet haben.",
         "Abzeichen zeigen, was mit jeder Datei geschehen ist: **Wartend**, **Wird konvertiert**, **Konvertiert**, **Fehlgeschlagen**. Bei Ordnern zählen sie die enthaltenen Dateien.",
         "- **Hochladen** sendet Videos von Ihrem Computer in den geöffneten Ordner; das Ablegen von Dateien von Ihrem Computer auf dem Bereich bewirkt dasselbe. Siehe [Videos hochladen](#upload.overview).",
@@ -87,6 +88,7 @@
         "- Solange sie läuft, werden hinzugefügte Dateien in den Durchlauf aufgenommen.",
         "- Ist der letzte Auftrag erledigt, stoppt die Warteschlange wieder; die nächsten Dateien warten dann auf **Starten**.",
         "- **Nach aktuellem stoppen** lässt den laufenden Auftrag fertig konvertieren und stoppt danach. Um sofort zu stoppen, halten Sie diesen Auftrag an oder brechen Sie ihn ab.",
+        "- **Jetzt konvertieren** bei einem wartenden Auftrag konvertiert nur diese Datei und lässt die Warteschlange gestoppt; die obere Leiste zeigt „Eine Datei wird konvertiert“. Wer währenddessen **Starten** drückt, lässt den Rest der Warteschlange danach laufen.",
         "- Wird der Server während eines Durchlaufs neu gestartet, läuft der Durchlauf danach weiter. Der Auftrag, der gerade konvertiert wurde, beginnt wieder bei 0 %, weil HandBrake eine Encodierung nicht mittendrin fortsetzen kann.",
         "Zwei Einstellungen können sie für Sie starten: das [Zeitfenster](#settings.schedule) (Start, wenn das Zeitfenster öffnet) und [überwachte Ordner](#settings.watch) (Start nach dem Hinzufügen neuer Dateien).",
         "Bei einem Zeitfenster fragt **Starten** außerhalb des Fensters, ob Sie **auf das Zeitfenster warten** möchten (die obere Leiste zeigt dann „Wartet bis 23:00“) oder **jetzt starten**, was das Zeitfenster ignoriert, bis die Warteschlange stoppt."
@@ -123,6 +125,7 @@
         "- **Anhalten / Fortsetzen**: friert die Konvertierung (oder die Prüfung) ein und setzt sie später fort. Ein Neustart des Servers im angehaltenen Zustand startet die Konvertierung wieder bei 0 %. Nicht verfügbar, wenn der Server unter Windows ohne Docker läuft: Brechen Sie stattdessen ab.",
         "- **Abbrechen**: stoppt die Konvertierung und löscht die halb geschriebene Datei. Bei einem wartenden Auftrag wird er nur als abgebrochen markiert. Während die Datei geprüft wird, behält **Prüfung überspringen** die konvertierte Datei und überspringt den Rest der Prüfung.",
         "- **An den Anfang**: konvertiert diesen wartenden Auftrag als Nächstes.",
+        "- **Jetzt konvertieren**: Wenn die Warteschlange gestoppt ist und nichts konvertiert wird, konvertiert nur diesen wartenden Auftrag, auch außerhalb des [Konvertierungsfensters](#settings.schedule). Die Warteschlange bleibt danach gestoppt; die anderen Aufträge warten auf **Starten**.",
         "- **Erneut versuchen**: stellt einen fehlgeschlagenen oder abgebrochenen Auftrag wieder in die Warteschlange.",
         "- **Erneut konvertieren**: ein neuer Auftrag für dieselbe Quelle. Die neue Datei erhält ein Suffix wie `name (1).mkv`, die erste bleibt also erhalten. In den Details können Sie eine andere Voreinstellung wählen.",
         "- **Umbenennen**: öffnet die konvertierte Datei in der [Ansicht „Umbenennen“](#rename.overview).",
@@ -510,6 +513,7 @@
       "body": [
         "Die zusammengeführte Datei spielt die Teile von oben nach unten ab. Ein abgelegter Ordner fügt seine Videodateien in Namensreihenfolge hinzu (`Disc 1`, `Disc 2`, … `Disc 10`).",
         "- **Ziehen** Sie einen Teil am Griff oder verwenden Sie die Pfeile, um die Reihenfolge zu ändern.",
+        "- **Sortieren nach** ordnet die Teile nach Name, Datum, Dateityp oder Größe und hält auch später hinzugefügte Teile in dieser Reihenfolge. Ziehen oder die Pfeile schalten auf **Eigene Reihenfolge** um. Die Wahl wird in diesem Browser gemerkt.",
         "- ✕ nimmt einen Teil aus der Liste (die Datei bleibt unberührt).",
         "Jede Zeile zeigt Länge, Kapitel, Tonsprachen, Untertitelspuren, Bildgröße und Dateigröße des Teils, aus der Datei gelesen."
       ],

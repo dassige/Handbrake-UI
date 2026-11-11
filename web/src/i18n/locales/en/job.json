@@ -10,6 +10,8 @@
     "cancelMessage": "Cancel this conversion? Progress is lost.",
     "keepGoing": "Keep going",
     "moveTop": "Move to top",
+    "convertNow": "Convert now",
+    "convertNowTitle": "Convert only this file now; the queue stays stopped",
     "up": "Up",
     "upTitle": "Move one place up",
     "down": "Down",

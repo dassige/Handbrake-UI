@@ -10,6 +10,8 @@
     "cancelMessage": "Diese Konvertierung abbrechen? Der Fortschritt geht verloren.",
     "keepGoing": "Weiterlaufen lassen",
     "moveTop": "An den Anfang",
+    "convertNow": "Jetzt konvertieren",
+    "convertNowTitle": "Nur diese Datei jetzt konvertieren; die Warteschlange bleibt gestoppt",
     "up": "Hoch",
     "upTitle": "Eine Position nach oben",
     "down": "Runter",

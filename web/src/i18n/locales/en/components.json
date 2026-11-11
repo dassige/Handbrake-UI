@@ -64,5 +64,15 @@
     "deleteItems_other": "Delete {count} items",
     "deleted_one": "Deleted {count} item",
     "deleted_other": "Deleted {count} items"
+  },
+  "sort": {
+    "label": "Sort by",
+    "name": "Name",
+    "date": "Date",
+    "type": "File type",
+    "size": "Size",
+    "manual": "Your order",
+    "ascending": "Ascending: click to reverse",
+    "descending": "Descending: click to reverse"
   }
 }

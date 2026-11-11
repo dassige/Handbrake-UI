@@ -336,13 +336,15 @@ export class QualityScanner {
   }
 
   async inspect(file, a) {
-    const size = await fs.stat(file).then((s) => s.size, () => null);
+    const st = await fs.stat(file).catch(() => null);
+    const size = st?.size ?? null;
+    const mtime = st?.mtimeMs ?? null; // for sorting by date
     try {
       const probe = await this.verifier.probe(file, { nice: this.settings.get('niceLevel'), onChild: (c) => (a.child = c) });
-      return { path: file, ...describeMedia(probe, { file, size }) };
+      return { path: file, mtime, ...describeMedia(probe, { file, size }) };
     } catch (err) {
       if (err.code === 'ENOENT') throw new Error('ffprobe is not installed');
-      return { path: file, size, container: path.extname(file).slice(1).toLowerCase(), error: err.message };
+      return { path: file, size, mtime, container: path.extname(file).slice(1).toLowerCase(), error: err.message };
     } finally {
       a.child = null;
     }

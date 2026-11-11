@@ -54,6 +54,7 @@
     "running": "Queue running",
     "stopped": "Queue stopped",
     "waitingFor": "Waiting for {time}",
+    "convertingOne": "Converting one file",
     "stopTitle": "Finish the current job, then stop",
     "startTitle": "Start converting queued jobs",
     "stopAfterCurrent": "Stop after current",

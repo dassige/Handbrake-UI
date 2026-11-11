@@ -142,6 +142,8 @@ export class Queue {
     return {
       running,
       activeJobId: this.active?.id ?? null,
+      // The active job was started alone with "Convert now"; the queue stays stopped after it.
+      activeSingle: !!this.active?.single,
       canPause: CAN_PAUSE,
       counts,
       schedule: {
@@ -455,6 +457,23 @@ export class Queue {
     this.tick();
   }
 
+  /**
+   * "Convert now": encodes one queued job while the queue is stopped and idle, ignoring the
+   * conversion window. The queue stays stopped afterwards (Start still runs the rest).
+   */
+  async convertNow(id) {
+    const job = this.get(id);
+    if (job.status !== 'queued') throw conflict('Only queued jobs can be converted now');
+    if (this.settings.get('queueRunning')) throw conflict('The queue is running; move the job to the top instead');
+    if (this.active || this.starting) throw conflict('Another conversion is running; wait for it to finish');
+    this.starting = true;
+    try {
+      await this.start(id, { single: true });
+    } finally {
+      this.starting = false;
+    }
+  }
+
   pause(id) {
     const a = this.requireActive(id);
     if (!CAN_PAUSE) throw conflict('Pausing a conversion is not supported on Windows; cancel it instead');
@@ -536,16 +555,21 @@ export class Queue {
       });
   }
 
-  async start(id) {
+  /** Starts one job. single: started with "Convert now", so not part of a queue run. */
+  async start(id, { single = false } = {}) {
     const row = this.db.prepare('SELECT * FROM jobs WHERE id = ?').get(id);
+    const countInRun = () => {
+      if (single) return;
+      this.ranSinceStart = true;
+      this.run ??= { startedAt: Date.now(), ids: [] };
+      this.run.ids.push(id);
+    };
     const fail = (msg) => {
       this.db
         .prepare(`UPDATE jobs SET status = 'failed', error = ?, finished_at = ?, attempts = attempts + 1 WHERE id = ?`)
         .run(msg, Date.now(), id);
       this.emitJob(id);
-      this.ranSinceStart = true;
-      this.run ??= { startedAt: Date.now(), ids: [] };
-      this.run.ids.push(id);
+      countInRun();
       this.notifier?.notify('jobFailed', this.get(id));
     };
 
@@ -572,7 +596,7 @@ export class Queue {
         attempts = attempts + 1 WHERE id = ?`)
       .run(finalPath, Date.now(), sourceStat.size, id);
 
-    const active = { id, partPath, finalPath, presetFile, source: row.source_path, cancelled: false, pausedAt: null };
+    const active = { id, partPath, finalPath, presetFile, source: row.source_path, cancelled: false, pausedAt: null, single };
     active.exited = new Promise((resolve) => {
       active.child = this.hb.encode({
         presetFile,
@@ -589,10 +613,8 @@ export class Queue {
       });
     });
     this.active = active;
-    this.ranSinceStart = true;
-    this.run ??= { startedAt: Date.now(), ids: [] };
-    this.run.ids.push(id);
-    this.log.info(`Job ${id}: encoding ${row.source_path} -> ${finalPath}`);
+    countInRun();
+    this.log.info(`Job ${id}${single ? ' (convert now)' : ''}: encoding ${row.source_path} -> ${finalPath}`);
     this.emitJob(id);
     this.events.emit('queue', this.state());
   }

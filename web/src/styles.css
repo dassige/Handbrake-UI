@@ -146,7 +146,13 @@ select, textarea, input[type='text'], input:not([type]), input[type='number'], i
 /* ------------------------------------------------------------------ sources */
 .crumbs { display: flex; align-items: center; flex-wrap: wrap; gap: 2px; padding: 8px 12px; min-height: 40px; }
 .crumb { display: inline-flex; align-items: center; gap: 2px; }
-.select-bar { display: flex; align-items: center; justify-content: space-between; padding: 4px 12px 8px; }
+.select-bar { display: flex; align-items: center; gap: 10px; padding: 4px 12px 8px; }
+.select-bar .select-actions { margin-left: auto; }
+/* "Sort by [Name] [↑]" on the file and folder lists (components/SortControl.jsx). */
+.sort-control { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; }
+.sort-control select { padding: 3px 6px; font-size: 13px; color: var(--text); }
+.sort-control .sort-dir { width: 26px; height: 26px; }
+.sort-control.crumbs-end { margin-left: auto; }
 .file-list { list-style: none; margin: 0; padding: 0 6px; overflow: auto; flex: 1; }
 .file-row {
   display: flex; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 6px;

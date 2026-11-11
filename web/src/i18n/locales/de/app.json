@@ -54,6 +54,7 @@
     "running": "Warteschlange läuft",
     "stopped": "Warteschlange gestoppt",
     "waitingFor": "Wartet bis {time}",
+    "convertingOne": "Eine Datei wird konvertiert",
     "stopTitle": "Aktuellen Auftrag abschließen, dann stoppen",
     "startTitle": "Wartende Aufträge konvertieren",
     "stopAfterCurrent": "Nach aktuellem stoppen",

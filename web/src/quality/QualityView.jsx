@@ -10,6 +10,8 @@ import { Help } from '../help/Help.jsx';
 import { intlLocale, rich, t } from '../i18n/index.js';
 import { qualityIssue } from '../i18n/serverText.js';
 import { rootLabel } from '../roots.js';
+import { compareNames, fileType, useRememberedSort } from '../sort.js';
+import { SortControl } from '../components/SortControl.jsx';
 
 const KINDS = [
   { id: 'format', labelKey: 'quality.kinds.format' },
@@ -25,7 +27,11 @@ const SORTS = {
   kbps: (a, b) => (a.video?.kbps ?? 0) - (b.video?.kbps ?? 0),
   size: (a, b) => (a.size ?? 0) - (b.size ?? 0),
   issues: (a, b) => a.issues.length - b.issues.length,
+  // Results of older scans have no file date: they sort as oldest.
+  date: (a, b) => (a.mtime ?? 0) - (b.mtime ?? 0),
+  type: (a, b) => compareNames(a.container ?? fileType(a.path), b.container ?? fileType(b.path)),
 };
+const SORT_KEYS = Object.keys(SORTS);
 
 const PAGE = 500;
 
@@ -65,7 +71,7 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
   const [scan, setScan] = useState(null);
   const [filter, setFilter] = useState('flagged');
   const [search, setSearch] = useState('');
-  const [sort, setSort] = useState({ key: 'name', dir: 1 });
+  const [sort, setSort] = useRememberedSort('qualityResults', SORT_KEYS);
   const [selected, setSelected] = useState(() => new Set());
   const [shown, setShown] = useState(PAGE);
   const roots = browserRoots(settings, 'any');
@@ -185,6 +191,7 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
         }}
         onError={onError}
         root="any"
+        sortId="quality"
         title={t('quality.folders')}
         addLabel={t('quality.checkQuality')}
         addTitle={t('quality.checkQualityTitle')}
@@ -271,6 +278,16 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
                 )
               ))}
               <span className="spacer" />
+              <SortControl
+                sort={sort}
+                onChange={setSort}
+                options={[
+                  'name', 'date', 'type', 'size',
+                  { key: 'height', label: t('quality.columns.video') },
+                  { key: 'kbps', label: 'kbps' },
+                  { key: 'issues', label: t('quality.columns.issues') },
+                ]}
+              />
               <input className="quality-search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('quality.filterPlaceholder')} />
             </div>
 

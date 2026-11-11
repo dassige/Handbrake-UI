@@ -201,6 +201,12 @@ export class Renamer {
       };
     });
     await this.resolveCollisions(rows);
+    // Date and size, for sorting the list in the web app.
+    await Promise.all(rows.map(async (row) => {
+      const st = await fs.stat(row.path).catch(() => null);
+      row.mtime = st?.mtimeMs ?? null;
+      row.size = st?.size ?? null;
+    }));
     return rows;
   }
 

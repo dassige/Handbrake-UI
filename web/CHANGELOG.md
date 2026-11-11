@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.2.1] - 2026/11/12
+
+- feat: convert one queued file now; remembered sorting on every file list
+
+A queued job can be converted on its own while the queue is stopped,
+and every file and folder list can be sorted, each remembering its
+last sort.
+
+- Convert now: new button on queued jobs (queue row and details
+  panel), shown while the queue is stopped and nothing converts;
+  converts only that job, also outside the conversion window, and
+  the queue stays stopped afterwards; the top bar shows "Converting
+  one file"; Start meanwhile runs the rest of the queue after it
+- The job's own done/failed notification is sent, but no "Queue
+  finished" message; the next queue run reports only its own jobs
+- Server: POST /api/jobs/:id/convert-now (refused when the queue is
+  running, another job converts or the job is not queued); queue
+  state gets activeSingle
+- Sort by name, date, file type or size, with an arrow to reverse;
+  folders stay on top; each list remembers its sort in the browser
+  (localStorage hbui.sort.<list>)
+- Sorting on: the file browsers of Convert, Rename, Merge and Quality
+  check (each its own), the folder picker in Settings (name, date),
+  the rename list (sorted within each folder) and the quality
+  results (now remembered; date and file type added, column headers
+  still work)
+- Merge parts: also "Your order"; a sort keeps parts added later in
+  that order, and dragging or the arrows switch back to "Your order"
+- Server: rename preview rows, merge parts and quality results now
+  include the file date (and size for rename) for sorting; older
+  quality scans have no date and sort as oldest
+- Help: Convert now in "Job actions" and "Starting and stopping the
+  queue"; sorting in "Sources" and "Merge parts"; all five languages
+- Tests: Convert now alone, while busy, with the queue running, and
+  its notifications
+
 ## [3.2.0] - 2026/11/11
 
 - feat: the app in five languages (English, Italian, German, French, Spanish)

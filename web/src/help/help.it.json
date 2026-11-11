@@ -46,6 +46,7 @@
         "- **Doppio clic** su una cartella per aprirla, o su un file per aggiungerlo alla coda.",
         "- **Trascina** file o cartelle sulla Coda per aggiungerli. Ctrl-clic e Maiusc-clic ne selezionano più di uno; la casella in alto seleziona tutto.",
         "- **Aggiungi alla coda** aggiunge ciò che è selezionato.",
+        "- **Ordina per** ordina l’elenco per nome, data, tipo di file o dimensione; la freccia accanto inverte l’ordine. Le cartelle restano in cima. Ogni vista (Converti, Rinomina, Unisci, Controllo qualità) ricorda il proprio ordinamento in questo browser.",
         "- Aggiungendo una cartella si aggiungono tutti i video al suo interno, sottocartelle comprese. I file già in coda vengono saltati, e anche quelli già convertiti a meno che tu non l’abbia disattivato.",
         "I badge mostrano cosa è successo a ogni file: **In coda**, **In conversione**, **Convertito**, **Non riuscito**. Sulle cartelle contano i file al loro interno.",
         "- **Carica** invia video dal tuo computer nella cartella aperta; trascinare file dal computer sul pannello fa lo stesso. Vedi [Caricare i video](#upload.overview).",
@@ -87,6 +88,7 @@
         "- Mentre è in esecuzione, i file che aggiungi si uniscono all’esecuzione.",
         "- Quando l’ultimo processo è finito la coda si ferma di nuovo, quindi i file aggiunti dopo aspettano **Avvia**.",
         "- **Interrompi dopo l’attuale** lascia finire il processo in conversione, poi si ferma. Per fermarti subito, sospendi o annulla quel processo.",
+        "- **Converti ora** su un processo in coda converte solo quel file e lascia la coda ferma; la barra in alto mostra “Conversione di un file”. Premendo **Avvia** nel frattempo, il resto della coda parte dopo di esso.",
         "- Se il server si riavvia durante un’esecuzione, questa prosegue dopo il riavvio. Il processo che era in conversione riparte da 0%, perché HandBrake non può riprendere una codifica a metà.",
         "Due impostazioni possono avviarla per te: la [fascia oraria di conversione](#settings.schedule) (parte quando la fascia si apre) e le [cartelle monitorate](#settings.watch) (parte dopo aver aggiunto nuovi file).",
         "Con una fascia oraria di conversione, **Avvia** fuori dalla fascia chiede se **attendere la fascia oraria** (la barra in alto mostra allora “In attesa delle 23:00”) oppure **avviare ora**, ignorando la fascia finché la coda non si ferma."
@@ -123,6 +125,7 @@
         "- **Sospendi / Riprendi**: blocca la conversione (o la verifica) e la continua più tardi. Se il server si riavvia mentre è in pausa, la conversione ricomincia da 0%. Non disponibile quando il server gira su Windows senza Docker: annulla invece.",
         "- **Annulla**: ferma la conversione ed elimina il file scritto a metà. Su un processo in coda lo segna soltanto come annullato. Mentre il file viene verificato, **Salta verifica** mantiene il file convertito e salta il resto della verifica.",
         "- **Sposta in cima**: converte questo processo in coda come prossimo.",
+        "- **Converti ora**: quando la coda è ferma e nulla è in conversione, converte solo questo processo in coda, anche fuori dalla [finestra di conversione](#settings.schedule). Dopo la coda resta ferma; gli altri processi aspettano **Avvia**.",
         "- **Riprova**: rimette in coda un processo non riuscito o annullato.",
         "- **Converti di nuovo**: un nuovo processo per la stessa sorgente. Il nuovo file riceve un suffisso come `name (1).mkv`, così il primo viene mantenuto. Nei dettagli puoi scegliere un’altra preimpostazione.",
         "- **Rinomina**: apre il file convertito nella [vista Rinomina](#rename.overview).",
@@ -510,6 +513,7 @@
       "body": [
         "Il file unito riproduce le parti dall’alto verso il basso. Una cartella trascinata aggiunge i suoi file video in ordine di nome (`Disc 1`, `Disc 2`, … `Disc 10`).",
         "- **Trascina** una parte dalla sua maniglia, o usa le frecce, per cambiare l’ordine.",
+        "- **Ordina per** mette le parti in ordine di nome, data, tipo di file o dimensione, e mantiene in quell’ordine anche le parti aggiunte dopo. Trascinare o usare le frecce passa a **Ordine personale**. La scelta viene ricordata in questo browser.",
         "- ✕ toglie una parte dall’elenco (il file non viene toccato).",
         "Ogni riga mostra la durata della parte, i capitoli, le lingue audio, le tracce dei sottotitoli, le dimensioni dell’immagine e del file, lette dal file."
       ],

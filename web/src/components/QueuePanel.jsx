@@ -31,6 +31,8 @@ export function QueuePanel({
   const counts = useMemo(() => Object.fromEntries(FILTERS.map((f) => [f.key, jobs.filter(f.match).length])), [jobs]);
   const queuedIds = jobs.filter((j) => j.status === 'queued').map((j) => j.id);
   const finishedCount = jobs.filter((j) => ['done', 'failed', 'cancelled'].includes(j.status)).length;
+  // "Convert now" on a queued job: only while the queue is stopped and nothing converts.
+  const canConvertNow = !!queueState && !queueState.running && queueState.activeJobId == null;
 
   const isPathDrag = (e) => e.dataTransfer.types.includes(DRAG_PATHS);
 
@@ -170,6 +172,7 @@ export function QueuePanel({
             queueIndex={queuedIds.indexOf(job.id)}
             queueLength={queuedIds.length}
             canPause={queueState?.canPause !== false}
+            canConvertNow={canConvertNow}
             estimate={job.status === 'queued' ? estimate?.perJob.get(job.id) : undefined}
             dropBefore={dropTarget === job.id}
             onJobDragStart={(e) => {

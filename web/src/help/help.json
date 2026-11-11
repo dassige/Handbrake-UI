@@ -46,6 +46,7 @@
         "- **Double-click** a folder to open it, or a file to add it to the queue.",
         "- **Drag** files or folders onto the Queue to add them. Ctrl-click and Shift-click select several; the checkbox at the top selects everything.",
         "- **Add to queue** adds what is selected.",
+        "- **Sort by** orders the list by name, date, file type or size; the arrow next to it reverses the order. Folders stay on top. Each view (Convert, Rename, Merge, Quality check) remembers its own sort in this browser.",
         "- Adding a folder adds every video inside it, sub-folders included. Files already queued are skipped, and so are files already converted unless you turned that off.",
         "Badges show what happened to each file: **Queued**, **Converting**, **Converted**, **Failed**. On folders they count the files inside.",
         "- **Upload** sends videos from your computer into the open folder; dropping files from your computer onto the panel does the same. See [Uploading videos](#upload.overview).",
@@ -87,6 +88,7 @@
         "- While it runs, files you add join the run.",
         "- When the last job is done the queue stops again, so the next files you add wait for **Start**.",
         "- **Stop after current** lets the job being converted finish, then stops. To stop at once, pause or cancel that job.",
+        "- **Convert now** on a queued job converts only that file and leaves the queue stopped; the top bar shows “Converting one file”. Pressing **Start** meanwhile runs the rest of the queue after it.",
         "- If the server restarts during a run, the run continues after the restart. The job that was converting starts again from 0%, because HandBrake cannot resume an encode halfway.",
         "Two settings can start it for you: the [conversion window](#settings.schedule) (start when the window opens) and [watch folders](#settings.watch) (start after adding new files).",
         "With a conversion window, **Start** outside the window asks whether to **wait for the window** (the top bar then shows “Waiting for 23:00”) or **start now**, which ignores the window until the queue stops."
@@ -123,6 +125,7 @@
         "- **Pause / Resume**: freezes the conversion (or the check) and continues it later. Restarting the server while paused starts the conversion again from 0%. Not available when the server runs on Windows without Docker: cancel instead.",
         "- **Cancel**: stops the conversion and deletes the half-written file. On a queued job it only marks it cancelled. While the file is being checked, **Skip check** keeps the converted file and skips the rest of the check.",
         "- **Move to top**: converts this queued job next.",
+        "- **Convert now**: while the queue is stopped and nothing is converting, converts only this queued job, even outside the [conversion window](#settings.schedule). The queue stays stopped afterwards; the other jobs wait for **Start**.",
         "- **Retry**: puts a failed or cancelled job back in the queue.",
         "- **Convert again**: a new job for the same source. The new file gets a suffix such as `name (1).mkv`, so the first one is kept. In the details you can choose another preset.",
         "- **Rename**: opens the converted file in the [Rename view](#rename.overview).",
@@ -510,6 +513,7 @@
       "body": [
         "The merged file plays the parts top to bottom. A dropped folder adds its video files in name order (`Disc 1`, `Disc 2`, … `Disc 10`).",
         "- **Drag** a part by its handle, or use the arrows, to change the order.",
+        "- **Sort by** puts the parts in name, date, file type or size order, and keeps parts you add later in that order. Dragging or the arrows switch it to **Your order**. The choice is remembered in this browser.",
         "- ✕ takes a part out of the list (the file is not touched).",
         "Each row shows the part’s length, chapters, audio languages, subtitle tracks, picture size and file size, read from the file."
       ],

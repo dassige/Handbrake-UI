@@ -54,6 +54,7 @@
     "running": "File en cours",
     "stopped": "File arrêtée",
     "waitingFor": "En attente jusqu'à {time}",
+    "convertingOne": "Conversion d’un fichier",
     "stopTitle": "Terminer la tâche en cours, puis s'arrêter",
     "startTitle": "Commencer à convertir les tâches en attente",
     "stopAfterCurrent": "Arrêter après la tâche en cours",

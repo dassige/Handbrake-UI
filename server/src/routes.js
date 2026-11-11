@@ -206,6 +206,8 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
   action('again', async (jobId, body) => ({ id: await queue.convertAgain(jobId, body) }));
   action('move', (jobId, body) => queue.move(jobId, body.where));
   action('verify', (jobId) => queue.verifyJob(jobId));
+  // Converts this queued job alone while the queue is stopped.
+  action('convert-now', (jobId) => queue.convertNow(jobId));
 
   // body.now: start even outside the conversion window.
   app.post('/api/queue/start', async (req) => {

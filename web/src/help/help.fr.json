@@ -46,6 +46,7 @@
         "- **Double-cliquez** sur un dossier pour l'ouvrir, ou sur un fichier pour l'ajouter à la file d'attente.",
         "- **Faites glisser** des fichiers ou des dossiers vers la file d'attente pour les ajouter. Ctrl-clic et Maj-clic en sélectionnent plusieurs ; la case en haut sélectionne tout.",
         "- **Ajouter à la file** ajoute la sélection.",
+        "- **Trier par** classe la liste par nom, date, type de fichier ou taille ; la flèche à côté inverse l'ordre. Les dossiers restent en haut. Chaque vue (Convertir, Renommer, Fusionner, Contrôle qualité) mémorise son propre tri dans ce navigateur.",
         "- Ajouter un dossier ajoute toutes les vidéos qu'il contient, sous-dossiers compris. Les fichiers déjà dans la file sont ignorés, de même que les fichiers déjà convertis, sauf si vous avez désactivé cette option.",
         "Des pastilles indiquent ce qui est arrivé à chaque fichier : **En attente**, **Conversion**, **Converti**, **Échec**. Sur les dossiers, elles comptent les fichiers qu'ils contiennent.",
         "- **Téléverser** envoie des vidéos de votre ordinateur dans le dossier ouvert ; déposer des fichiers de votre ordinateur sur le panneau fait la même chose. Voir [Téléverser des vidéos](#upload.overview).",
@@ -87,6 +88,7 @@
         "- Pendant qu'elle tourne, les fichiers que vous ajoutez rejoignent l'exécution en cours.",
         "- Quand la dernière tâche est terminée, la file s'arrête de nouveau : les fichiers ajoutés ensuite attendent donc **Démarrer**.",
         "- **Arrêter après la tâche en cours** laisse la tâche en cours de conversion se terminer, puis s'arrête. Pour arrêter tout de suite, mettez cette tâche en pause ou annulez-la.",
+        "- **Convertir maintenant** sur une tâche en attente convertit seulement ce fichier et laisse la file arrêtée ; la barre du haut affiche « Conversion d’un fichier ». Appuyer sur **Démarrer** pendant ce temps lance le reste de la file après lui.",
         "- Si le serveur redémarre pendant une exécution, celle-ci reprend après le redémarrage. La tâche qui était en cours de conversion repart de 0 %, car HandBrake ne peut pas reprendre un encodage à mi-chemin.",
         "Deux paramètres peuvent la démarrer pour vous : la [plage de conversion](#settings.schedule) (démarrer à l'ouverture de la plage) et les [dossiers surveillés](#settings.watch) (démarrer après l'ajout de nouveaux fichiers).",
         "Avec une plage de conversion, **Démarrer** en dehors de la plage demande s'il faut **Attendre la plage horaire** (la barre du haut affiche alors « En attente de la plage de conversion : démarrage 23:00 ») ou **Démarrer maintenant**, ce qui ignore la plage jusqu'à l'arrêt de la file."
@@ -123,6 +125,7 @@
         "- **Pause / Reprendre** : fige la conversion (ou la vérification) et la continue plus tard. Redémarrer le serveur pendant une pause relance la conversion depuis 0 %. Indisponible quand le serveur tourne sous Windows sans Docker : annulez plutôt.",
         "- **Annuler** : arrête la conversion et supprime le fichier à moitié écrit. Sur une tâche en attente, elle est simplement marquée comme annulée. Pendant la vérification du fichier, **Ignorer la vérification** conserve le fichier converti et saute le reste de la vérification.",
         "- **Placer en tête** : convertit cette tâche en attente en suivant.",
+        "- **Convertir maintenant** : quand la file est arrêtée et que rien n'est en conversion, convertit seulement cette tâche en attente, même hors de la [plage de conversion](#settings.schedule). La file reste arrêtée ensuite ; les autres tâches attendent **Démarrer**.",
         "- **Réessayer** : remet une tâche échouée ou annulée dans la file d'attente.",
         "- **Convertir à nouveau** : une nouvelle tâche pour la même source. Le nouveau fichier reçoit un suffixe, par exemple `name (1).mkv`, de sorte que le premier est conservé. Dans les détails, vous pouvez choisir un autre préréglage.",
         "- **Renommer** : ouvre le fichier converti dans la [vue Renommer](#rename.overview).",
@@ -510,6 +513,7 @@
       "body": [
         "Le fichier fusionné lit les parties de haut en bas. Un dossier déposé ajoute ses fichiers vidéo dans l'ordre des noms (`Disc 1`, `Disc 2`, … `Disc 10`).",
         "- **Faites glisser** une partie par sa poignée, ou utilisez les flèches, pour changer l'ordre.",
+        "- **Trier par** range les parties par nom, date, type de fichier ou taille, et garde aussi dans cet ordre les parties ajoutées ensuite. Glisser ou utiliser les flèches passe à **Votre ordre**. Le choix est mémorisé dans ce navigateur.",
         "- ✕ retire une partie de la liste (le fichier n'est pas touché).",
         "Chaque ligne affiche la durée, les chapitres, les langues audio, les pistes de sous-titres, la taille d'image et la taille du fichier de la partie, lus dans le fichier."
       ],

@@ -19,8 +19,11 @@ function useClock(active) {
   }, [active]);
 }
 
-/** Job buttons: icons in the queue list, labelled buttons in the details drawer. */
-export function JobActions({ job, run, queueIndex = -1, labels = false, onRename, canPause = true }) {
+/**
+ * Job buttons: icons in the queue list, labelled buttons in the details drawer.
+ * canConvertNow: the queue is stopped and idle, so a queued job can be converted on its own.
+ */
+export function JobActions({ job, run, queueIndex = -1, labels = false, onRename, canPause = true, canConvertNow = false }) {
   const dialogs = useDialogs();
   const act = (name, body) => run(() => api.jobAction(job.id, name, body));
   const s = job.status;
@@ -61,6 +64,9 @@ export function JobActions({ job, run, queueIndex = -1, labels = false, onRename
           }))) && act('cancel'),
         })
       )}
+      {s === 'queued' && canConvertNow && (
+        btn({ icon: Play, label: t('job.actions.convertNow'), title: t('job.actions.convertNowTitle'), onClick: () => act('convert-now') })
+      )}
       {s === 'queued' && queueIndex > 0 && (
         btn({ icon: ArrowUpToLine, label: t('job.actions.moveTop'), onClick: () => act('move', { where: 'top' }) })
       )}
@@ -84,7 +90,7 @@ export function JobActions({ job, run, queueIndex = -1, labels = false, onRename
 
 export function JobRow({
   job, settings, selected, onSelect, run, onRename, queueIndex, dropBefore,
-  onJobDragStart, onJobDragEnd, onJobDragOver, onJobDrop, estimate, canPause,
+  onJobDragStart, onJobDragEnd, onJobDragOver, onJobDrop, estimate, canPause, canConvertNow,
 }) {
   const active = job.status === 'running' || job.status === 'paused';
   useClock(job.status === 'running');
@@ -158,7 +164,7 @@ export function JobRow({
           {meta.filter(Boolean).join(' · ')}
         </div>
       </div>
-      <JobActions job={job} run={run} queueIndex={queueIndex} onRename={onRename} canPause={canPause} />
+      <JobActions job={job} run={run} queueIndex={queueIndex} onRename={onRename} canPause={canPause} canConvertNow={canConvertNow} />
     </div>
   );
 }

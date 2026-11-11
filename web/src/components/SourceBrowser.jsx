@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowUp, ChevronRight, Download, Eye, FileVideo, Folder, FolderOpen, ListPlus, Lock, RefreshCw, Trash2, Upload } from 'lucide-react';
 import { rootLabel, watchedFolder } from '../roots.js';
 import { api } from '../api.js';
@@ -8,8 +8,11 @@ import { Help } from '../help/Help.jsx';
 import { downloadTitle, useDownload } from '../download/useDownload.jsx';
 import { useDeleteFiles } from './useDeleteFiles.jsx';
 import { t } from '../i18n/index.js';
+import { sortList, useRememberedSort } from '../sort.js';
+import { SortControl } from './SortControl.jsx';
 
 export const DRAG_PATHS = 'application/x-hbui-paths';
+const SORT_KEYS = ['name', 'date', 'type', 'size'];
 
 const storeKey = (kind) => `hbui.browserRoot.${kind}`;
 const readStore = (k) => {
@@ -40,10 +43,11 @@ export function browserRoots(settings, kind) {
  * dragged out or added with a button. With onUpload, it also takes files dropped from
  * the computer and shows an Upload button: onUpload(dir, root, files).
  * addLabel is the add button's text; addTitle the tooltip of a file row ("Double-click or drag to …").
+ * sortId names the feature (convert, quality, rename, merge): each remembers its own sort.
  */
 export function SourceBrowser({
   settings, changeTick, onAdd, onError, root = 'source', title = t('sources.title'), addLabel, addTitle,
-  hint = t('sources.hint'), help, onUpload, allowDelete, onNotice, onWatch,
+  hint = t('sources.hint'), help, onUpload, allowDelete, onNotice, onWatch, sortId = root,
 }) {
   const addText = addLabel ?? t('sources.addLabel');
   // Without addTitle, a custom addLabel is fitted into the English-style sentence (callers should pass addTitle).
@@ -94,7 +98,11 @@ export function SourceBrowser({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [changeTick]);
 
-  const items = listing?.items ?? [];
+  const [sort, setSort] = useRememberedSort(`browser.${sortId}`, SORT_KEYS);
+  const items = useMemo(
+    () => sortList(listing?.items ?? [], sort, (i) => ({ name: i.name, mtime: i.mtime, size: i.size, dir: i.type === 'dir' })),
+    [listing, sort],
+  );
 
   function onRowClick(e, item) {
     const next = new Set(e.ctrlKey || e.metaKey ? selected : []);
@@ -254,6 +262,7 @@ export function SourceBrowser({
           />
           {selected.size ? t('sources.selected', { count: selected.size }) : t('common.selectAll')}
         </label>
+        <SortControl sort={sort} onChange={setSort} options={SORT_KEYS} />
         <div className="select-actions">
           {allowDelete && !isProtected && (
             <button

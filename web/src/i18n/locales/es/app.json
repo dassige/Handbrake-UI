@@ -54,6 +54,7 @@
     "running": "Cola en marcha",
     "stopped": "Cola detenida",
     "waitingFor": "Esperando hasta {time}",
+    "convertingOne": "Convirtiendo un archivo",
     "stopTitle": "Terminar el trabajo actual y luego detener",
     "startTitle": "Empezar a convertir los trabajos en cola",
     "stopAfterCurrent": "Detener tras el actual",

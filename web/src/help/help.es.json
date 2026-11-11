@@ -46,6 +46,7 @@
         "- **Doble clic** en una carpeta para abrirla, o en un archivo para añadirlo a la cola.",
         "- **Arrastre** archivos o carpetas a la cola para añadirlos. Ctrl+clic y Mayús+clic seleccionan varios; la casilla de la parte superior selecciona todo.",
         "- **Añadir a la cola** añade lo seleccionado.",
+        "- **Ordenar por** ordena la lista por nombre, fecha, tipo de archivo o tamaño; la flecha de al lado invierte el orden. Las carpetas quedan arriba. Cada vista (Convertir, Renombrar, Unir, Control de calidad) recuerda su propio orden en este navegador.",
         "- Al añadir una carpeta se añaden todos los videos que contiene, subcarpetas incluidas. Los archivos que ya están en la cola se omiten, y también los ya convertidos, salvo que lo haya desactivado.",
         "Las insignias muestran qué ha pasado con cada archivo: **En cola**, **Convirtiendo**, **Convertido**, **Con error**. En las carpetas cuentan los archivos que contienen.",
         "- **Subir** envía videos desde su equipo a la carpeta abierta; soltar archivos de su equipo sobre el panel hace lo mismo. Consulte [Subir videos](#upload.overview).",
@@ -87,6 +88,7 @@
         "- Mientras se ejecuta, los archivos que añada se incorporan a la ejecución.",
         "- Cuando termina el último trabajo, la cola se detiene de nuevo, así que los siguientes archivos que añada esperan a **Iniciar**.",
         "- **Detener tras el actual** deja terminar el trabajo que se está convirtiendo y después se detiene. Para detenerlo de inmediato, ponga en pausa o cancele ese trabajo.",
+        "- **Convertir ahora** en un trabajo en cola convierte solo ese archivo y deja la cola detenida; la barra superior muestra «Convirtiendo un archivo». Si pulsa **Iniciar** mientras tanto, el resto de la cola se ejecuta después.",
         "- Si el servidor se reinicia durante una ejecución, esta continúa tras el reinicio. El trabajo que se estaba convirtiendo vuelve a empezar desde el 0 %, porque HandBrake no puede reanudar una codificación a medias.",
         "Dos ajustes pueden iniciarla por usted: la [franja de conversión](#settings.schedule) (iniciar cuando se abre la franja) y las [carpetas vigiladas](#settings.watch) (iniciar tras añadir archivos nuevos).",
         "Con una franja de conversión, **Iniciar** fuera de la franja pregunta si desea **Esperar a la franja** (la barra superior muestra entonces «Esperando hasta 23:00») o **Iniciar ahora**, que ignora la franja hasta que la cola se detiene."
@@ -123,6 +125,7 @@
         "- **Pausar / Reanudar**: congela la conversión (o la comprobación) y la continúa más tarde. Si se reinicia el servidor mientras está en pausa, la conversión vuelve a empezar desde el 0 %. No está disponible cuando el servidor se ejecuta en Windows sin Docker: cancele en su lugar.",
         "- **Cancelar**: detiene la conversión y elimina el archivo escrito a medias. En un trabajo en cola solo lo marca como cancelado. Mientras se comprueba el archivo, **Omitir comprobación** conserva el archivo convertido y se salta el resto de la comprobación.",
         "- **Mover al principio**: convierte este trabajo en cola a continuación.",
+        "- **Convertir ahora**: cuando la cola está detenida y no se convierte nada, convierte solo este trabajo en cola, incluso fuera de la [ventana de conversión](#settings.schedule). Después la cola sigue detenida; los demás trabajos esperan a **Iniciar**.",
         "- **Reintentar**: devuelve a la cola un trabajo fallido o cancelado.",
         "- **Convertir de nuevo**: un trabajo nuevo para el mismo origen. El archivo nuevo recibe un sufijo como `name (1).mkv`, así que se conserva el primero. En los detalles puede elegir otro preajuste.",
         "- **Renombrar**: abre el archivo convertido en la [vista Renombrar](#rename.overview).",
@@ -510,6 +513,7 @@
       "body": [
         "El archivo unido reproduce las partes de arriba abajo. Una carpeta soltada añade sus archivos de video por orden de nombre (`Disc 1`, `Disc 2`, … `Disc 10`).",
         "- **Arrastre** una parte por su asa, o use las flechas, para cambiar el orden.",
+        "- **Ordenar por** pone las partes en orden de nombre, fecha, tipo de archivo o tamaño, y mantiene en ese orden las partes que añada después. Arrastrar o usar las flechas cambia a **Orden propio**. La elección se recuerda en este navegador.",
         "- ✕ quita una parte de la lista (el archivo no se toca).",
         "Cada fila muestra la duración de la parte, los capítulos, los idiomas de audio, las pistas de subtítulos, el tamaño de imagen y el tamaño del archivo, leídos del archivo."
       ],

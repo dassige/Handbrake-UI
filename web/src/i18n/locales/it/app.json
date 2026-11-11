@@ -54,6 +54,7 @@
     "running": "Coda in esecuzione",
     "stopped": "Coda ferma",
     "waitingFor": "In attesa fino a: {time}",
+    "convertingOne": "Conversione di un file",
     "stopTitle": "Termina il processo in corso, poi interrompi",
     "startTitle": "Avvia la conversione dei processi in coda",
     "stopAfterCurrent": "Interrompi dopo l’attuale",

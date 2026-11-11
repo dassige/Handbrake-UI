@@ -1,9 +1,13 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowUp, ChevronRight, Folder } from 'lucide-react';
 import { api } from '../api.js';
 import { rootLabel } from '../roots.js';
 import { Modal } from './Modal.jsx';
 import { t } from '../i18n/index.js';
+import { sortList, useRememberedSort } from '../sort.js';
+import { SortControl } from './SortControl.jsx';
+
+const SORT_KEYS = ['name', 'date'];
 
 /**
  * Lets you pick a folder under the sources folders by browsing the server, instead
@@ -36,7 +40,11 @@ export function FolderPicker({ settings, title = t('components.folderPicker.titl
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const dirs = (listing?.items ?? []).filter((i) => i.type === 'dir');
+  const [sort, setSort] = useRememberedSort('folderPicker', SORT_KEYS);
+  const dirs = useMemo(
+    () => sortList((listing?.items ?? []).filter((i) => i.type === 'dir'), sort, (i) => ({ name: i.name, mtime: i.mtime })),
+    [listing, sort],
+  );
 
   return (
     <Modal
@@ -81,6 +89,7 @@ export function FolderPicker({ settings, title = t('components.folderPicker.titl
             {i < all.length - 1 ? <button className="link" onClick={() => load(c.path)}>{c.name}</button> : <strong>{c.name}</strong>}
           </span>
         ))}
+        <SortControl sort={sort} onChange={setSort} options={SORT_KEYS} className="crumbs-end" />
       </nav>
       <ul className="picker-list">
         {!loading && dirs.length === 0 && <li className="muted small">{t('components.folderPicker.empty')}</li>}

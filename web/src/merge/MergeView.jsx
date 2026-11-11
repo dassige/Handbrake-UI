@@ -11,8 +11,17 @@ import { Help } from '../help/Help.jsx';
 import { useDialogs } from '../components/Dialogs.jsx';
 import { t } from '../i18n/index.js';
 import { checkDetail, checkLabel, mergeProblem } from '../i18n/serverText.js';
+import { sortList, useRememberedSort } from '../sort.js';
+import { SortControl } from '../components/SortControl.jsx';
 
 const DRAG_PART = 'application/x-hbui-part';
+
+// The parts' order is the merge order: 'manual' keeps the user's own (drag, arrows).
+const SORT_KEYS = ['manual', 'name', 'date', 'type', 'size'];
+/** The parts' paths in the chosen order. */
+const orderParts = (parts, sort) => (sort.key === 'manual'
+  ? parts.map((p) => p.path)
+  : sortList(parts, sort, (p) => ({ name: fileName(p.path), mtime: p.mtime, size: p.size })).map((p) => p.path));
 
 // Each status is also the badge's class; its label is merge.status.<status> (plus .verifying / .reading).
 const STATUSES = ['queued', 'running', 'done', 'failed', 'cancelled'];
@@ -96,6 +105,9 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
   const [dropIndex, setDropIndex] = useState(null);
   const [starting, setStarting] = useState(false);
   const seq = useRef(0);
+  const [sort, setSort] = useRememberedSort('mergeParts', SORT_KEYS, { key: 'manual', dir: 1 });
+  const sortRef = useRef(sort);
+  sortRef.current = sort;
 
   // Read the parts (tracks, length, chapters) whenever the list or options change.
   useEffect(() => {
@@ -111,8 +123,8 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
         if (mine !== seq.current) return;
         setInfo(r);
         if (!nameEdited) setName(r.outputName);
-        // Folders are expanded into their files, in order.
-        const files = r.parts.map((p) => p.path);
+        // Folders are expanded into their files, in order; then the chosen sort applies.
+        const files = orderParts(r.parts, sortRef.current);
         if (files.join('\n') !== paths.join('\n')) setPaths(files);
       } catch (e) {
         if (mine === seq.current) {
@@ -128,7 +140,9 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
   }, [paths, chapterMode, name, nameEdited, changeTick]);
 
   const addPaths = useCallback((list) => setPaths((p) => [...new Set([...p, ...list])]), [setPaths]);
-  const move = (from, to) =>
+  const move = (from, to) => {
+    // Your own order from now on.
+    if (sort.key !== 'manual') setSort({ key: 'manual', dir: sort.dir });
     setPaths((p) => {
       if (to < 0 || to >= p.length || from === to) return p;
       const next = p.slice();
@@ -136,6 +150,17 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
       next.splice(to, 0, x);
       return next;
     });
+  };
+
+  function chooseSort(next) {
+    setSort(next);
+    const known = info?.parts ?? [];
+    // Parts not read yet are sorted when they are (the list changes, so they are read again).
+    if (next.key !== 'manual' && paths.every((p) => known.some((k) => k.path === p))) {
+      const ordered = orderParts(known.filter((k) => paths.includes(k.path)), next);
+      if (ordered.join('\n') !== paths.join('\n')) setPaths(ordered);
+    }
+  }
 
   async function merge() {
     if (!info?.canMerge) return;
@@ -171,6 +196,7 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
       <SourceBrowser
         settings={settings}
         root="target"
+        sortId="merge"
         title={t('merge.view.convertedFiles')}
         addLabel={t('merge.view.addLabel')}
         addTitle={t('merge.view.addTitle')}
@@ -205,6 +231,7 @@ export function MergeView({ settings, merges, paths, setPaths, changeTick, run, 
         <div className="pane-head">
           <h2>{t('merge.view.title')}<Help id="merge.overview" /></h2>
           <div className="pane-tools">
+            <SortControl sort={sort} onChange={chooseSort} options={SORT_KEYS} />
             <button className="btn ghost small" disabled={!paths.length} onClick={() => setPaths([])}>
               <ListX size={14} /> {t('merge.view.clearList')}
             </button>

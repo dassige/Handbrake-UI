@@ -126,7 +126,7 @@ function CheckSection({ job, run }) {
   );
 }
 
-export function JobDrawer({ job, presets, run, onRename, onClose, onSelect, canPause = true }) {
+export function JobDrawer({ job, presets, run, onRename, onClose, onSelect, canPause = true, canConvertNow = false }) {
   const [showLog, setShowLog] = useState(job.status === 'failed');
   const [outputEdit, setOutputEdit] = useState(null);
   const info = job.sourceInfo;
@@ -165,7 +165,7 @@ export function JobDrawer({ job, presets, run, onRename, onClose, onSelect, canP
       <div className="drawer-body">
         <div className="drawer-actions">
           <span className="row-inline">
-            <JobActions job={job} run={run} queueIndex={queued ? 1 : -1} labels onRename={onRename} canPause={canPause} />
+            <JobActions job={job} run={run} queueIndex={queued ? 1 : -1} labels onRename={onRename} canPause={canPause} canConvertNow={canConvertNow} />
             <Help id="job.actions" />
           </span>
           {!queued && !active && presets.length > 0 && (

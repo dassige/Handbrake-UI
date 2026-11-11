@@ -242,6 +242,9 @@ export default function App() {
 
   let stateText = running ? t('app.state.running') : t('app.state.stopped');
   if (running && sched?.waiting) stateText = t('app.state.waitingFor', { time: clockTime(sched.nextStart) });
+  // One job started with "Convert now"; the queue itself stays stopped.
+  const single = !running && !!queue?.activeSingle;
+  if (single) stateText = t('app.state.convertingOne');
 
   return (
     <HelpProvider>
@@ -264,7 +267,7 @@ export default function App() {
           <button className={view === 'stats' ? 'active' : ''} onClick={() => switchView('stats')}>{t('app.views.stats')}</button>
         </nav>
         <div className="queue-state">
-          <span className={`dot ${running ? (sched?.waiting ? 'wait' : 'on') : 'off'}`} />
+          <span className={`dot ${running ? (sched?.waiting ? 'wait' : 'on') : single ? 'on' : 'off'}`} />
           <span>{stateText}</span>
           <button
             className="btn small"
@@ -393,6 +396,7 @@ export default function App() {
           onAdd={addPaths}
           onError={onError}
           help="convert.sources"
+          sortId="convert"
           allowDelete
           onNotice={onNotice}
           onUpload={(dir, root, files) => setUpload({ dir, root, files })}
@@ -426,6 +430,7 @@ export default function App() {
           run={run}
           onRename={openRename}
           canPause={queue?.canPause !== false}
+          canConvertNow={!!queue && !queue.running && queue.activeJobId == null}
           onClose={() => setSelectedJobId(null)}
           onSelect={setSelectedJobId}
         />
