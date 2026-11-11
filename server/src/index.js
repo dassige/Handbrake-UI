@@ -3,7 +3,7 @@ import path from 'node:path';
 import Fastify from 'fastify';
 import fastifyStatic from '@fastify/static';
 import { config } from './config.js';
-import { openDb } from './db.js';
+import { adoptDbFile, openDb } from './db.js';
 import { Settings } from './settings.js';
 import { HandBrake } from './handbrake.js';
 import { Presets } from './presets.js';
@@ -53,7 +53,9 @@ const app = Fastify({
   bodyLimit: 10 * 1024 * 1024,
 });
 
-const db = openDb(path.join(config.dataDir, 'handbrake-ui.db'));
+const dbFile = adoptDbFile(config.dataDir);
+if (dbFile.renamedFrom) app.log.info(`Database renamed: ${dbFile.renamedFrom} -> ${dbFile.file}`);
+const db = openDb(dbFile.file);
 const settings = new Settings(db, config);
 const handbrake = new HandBrake(config.handbrakeCli);
 const events = new Events();

@@ -11,9 +11,9 @@
       ]
     },
     "app.overview": {
-      "title": "How HandBrake Queue works",
+      "title": "How EncForge works",
       "body": [
-        "HandBrake Queue converts videos on the server, using HandBrakeCLI with HandBrake presets: made in the [preset editor](#presets.editor) or imported from the HandBrake desktop app. Videos that are on your computer can be [uploaded](#upload.overview) first.",
+        "EncForge converts videos on the server, using HandBrakeCLI with HandBrake presets: made in the [preset editor](#presets.editor) or imported from the HandBrake desktop app. Videos that are on your computer can be [uploaded](#upload.overview) first.",
         "### The usual workflow",
         "1. Upload a [preset](#presets) exported from HandBrake.",
         "1. In **Convert**, drag files or folders from [Sources](#convert.sources) into the [Queue](#convert.queue).",
@@ -169,7 +169,7 @@
     "subtitles.overview": {
       "title": "Subtitle files next to the videos",
       "body": [
-        "Videos often come with separate subtitle files (\"sidecars\"). HandBrake Queue finds them, and can **embed** them into the converted video, **copy** them next to it, or both.",
+        "Videos often come with separate subtitle files (\"sidecars\"). EncForge finds them, and can **embed** them into the converted video, **copy** them next to it, or both.",
         "### Which files are found",
         "- Files named after the video in the same folder: `Movie.srt`, `Movie.en.srt`, `Movie.ita.forced.srt`, `Movie.en.sdh.srt`.",
         "- Files in a `Subs` or `Subtitles` folder next to the video: `Subs/2_English.srt`, or `Subs/Movie/3_Italian.srt` for a folder per episode.",
@@ -329,7 +329,7 @@
     "presets.qsv": {
       "title": "Quick Sync (GPU) presets",
       "body": [
-        "A preset with an Intel **Quick Sync** encoder converts on the server's Intel GPU instead of the CPU. On a 10th-gen Intel i3 it was about **twice as fast** as x264 at the same bitrate, with files of the same size and nearly the same quality. Quick Sync works on Intel iGPUs from 6th generation on, when the server passes the GPU (`/dev/dri`) to HandBrake Queue. If `qsv_h264` is listed in Settings → About, it's ready.",
+        "A preset with an Intel **Quick Sync** encoder converts on the server's Intel GPU instead of the CPU. On a 10th-gen Intel i3 it was about **twice as fast** as x264 at the same bitrate, with files of the same size and nearly the same quality. Quick Sync works on Intel iGPUs from 6th generation on, when the server passes the GPU (`/dev/dri`) to EncForge. If `qsv_h264` is listed in Settings → About, it's ready.",
         "### Making one in HandBrake for Windows",
         "1. Open any video, then select the preset to start from.",
         "1. On the **Video** tab, set **Video Encoder** to `H.264 (Intel QSV)` and **Encoder Preset** to `Balanced`. Keep the same average bitrate, or add about 10–15% to match x264's quality.",

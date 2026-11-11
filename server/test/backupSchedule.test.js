@@ -85,7 +85,7 @@ test('backup schedule: runs into the chosen folder, once per due time, keeping t
 
     // A restore can read a scheduled backup.
     const info = await t.backups.inspect(`scheduled:${list[0].name}`);
-    assert.equal(info.manifest.app, 'handbrake-ui');
+    assert.equal(info.manifest.app, 'encforge');
     const st = await t.scheduler.status();
     assert.equal(st.folder, nas);
     assert.ok(st.nextAt > Date.now() - 86_400_000);

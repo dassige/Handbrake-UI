@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { clockTime, fileName } from './format.js';
 import { t } from './i18n/index.js';
 
-const APP = 'HandBrake Queue';
+const APP = 'EncForge';
 const KEY = 'hbui.browserNotify';
 
 // label is translated each time it is read (t(e.labelKey) does the same).

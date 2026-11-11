@@ -25,7 +25,7 @@ const SECURITY = [
 
 // What the server sends (always in English).
 const EXAMPLE = `{
-  "app": "HandBrake Queue",
+  "app": "EncForge",
   "event": "jobFailed",
   "title": "Conversion failed: Show S01E02.mkv",
   "message": "…",

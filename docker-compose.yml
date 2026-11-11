@@ -1,8 +1,8 @@
 services:
-  handbrake-ui:
+  encforge:
     build: .
-    image: handbrake-ui:latest
-    container_name: handbrake-ui
+    image: encforge:latest
+    container_name: encforge
     restart: unless-stopped
     # Run as the owner of your media files so outputs get the right owner.
     user: "${PUID:-1000}:${PGID:-1000}"

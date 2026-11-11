@@ -63,7 +63,7 @@ export function AboutSection({ info, onError }) {
       <section className="set-card about-hero">
         <img className="brand-logo" src="/logo.png" alt="" width={112} height={112} />
         <div className="about-hero-text">
-          <h2>HandBrake Queue</h2>
+          <h2>EncForge</h2>
           <div className="muted small">
             {rich('settings.about.version', { version: app?.version ?? '…' })}
             {app?.date && <> · {t('settings.about.released', { date: released(app.date) })}</>}
@@ -136,7 +136,7 @@ export function AboutSection({ info, onError }) {
 
       <Card title={t('settings.about.installation')}>
         <dl className="versions">
-          <VersionRow label="HandBrake Queue" v={app} repo={about?.repositoryUrl} />
+          <VersionRow label="EncForge" v={app} repo={about?.repositoryUrl} />
           <VersionRow label={t('settings.about.server')} v={about?.versions?.server} repo={about?.repositoryUrl} />
           <VersionRow label={t('settings.about.webUi')} v={WEB_VERSION} repo={about?.repositoryUrl} />
           <dt>HandBrakeCLI</dt>

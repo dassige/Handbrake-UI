@@ -1,6 +1,6 @@
 {
-  "name": "handbrake-ui-web",
-  "version": "3.3.4",
+  "name": "encforge-web",
+  "version": "4.0.0",
   "private": true,
   "license": "GPL-2.0-only",
   "type": "module",
@@ -18,6 +18,6 @@
     "@vitejs/plugin-react": "^6.2.1",
     "vite": "^8.3.6"
   },
-  "versionDate": "2026/11/12 11:59",
-  "git-parentCommit-ID": "22aaa7163b6030570bb1e22b2ad0963a0c938945"
+  "versionDate": "2026/11/12 12:12",
+  "git-parentCommit-ID": "816c06905ca465d5ee4bc363ca2043f12b9cf817"
 }

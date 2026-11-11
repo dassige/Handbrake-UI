@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Updates a Docker install of HandBrake Queue to what is on GitHub and rebuilds
+# Updates a Docker install of EncForge to what is on GitHub and rebuilds
 # it. Only pushed commits are deployed, never local or uncommitted changes.
 #
 # On the server, in the folder you cloned:
@@ -9,7 +9,7 @@
 #   scripts/deploy.sh <ssh-host> [remote-dir]
 #
 # <ssh-host> is anything ssh accepts (user@host or an alias from ~/.ssh/config).
-# [remote-dir] is relative to the remote home folder (default: handbrake-ui).
+# [remote-dir] is relative to the remote home folder (default: encforge).
 # The first remote deploy clones the repository there.
 #
 # Environment (or put them in .deploy.env, git-ignored; see .deploy.env.example):
@@ -21,7 +21,7 @@
 #   REPO_URL                 repository to clone on first deploy
 #                            (default: this checkout's origin)
 #   DEPLOY_KEY               private key the server uses for GitHub, for a private
-#                            repository or fork (default ~/.ssh/handbrake-ui-deploy,
+#                            repository or fork (default ~/.ssh/encforge-deploy,
 #                            used only when it exists). A public repository needs none.
 #
 # The server's .env is created from .env.example once and never overwritten;
@@ -29,10 +29,23 @@
 set -euo pipefail
 
 # ------------------------------------------------------------------ on the server
+# The key the server uses for GitHub: DEPLOY_KEY, else ~/.ssh/encforge-deploy, else
+# ~/.ssh/handbrake-ui-deploy (its name before the rename to EncForge).
+deploy_key() {
+  if [ -n "${DEPLOY_KEY:-}" ]; then
+    echo "$DEPLOY_KEY"
+  elif [ ! -f "$HOME/.ssh/encforge-deploy" ] && [ -f "$HOME/.ssh/handbrake-ui-deploy" ]; then
+    echo "$HOME/.ssh/handbrake-ui-deploy"
+  else
+    echo "$HOME/.ssh/encforge-deploy"
+  fi
+}
+
 # Runs inside the install folder. Args: branch, commit to deploy (empty = latest).
 update_here() {
   local branch=$1 target=${2:-}
-  local key=${DEPLOY_KEY:-$HOME/.ssh/handbrake-ui-deploy}
+  local key
+  key=$(deploy_key)
 
   [ -d .git ] || { echo "$PWD is not a git checkout" >&2; exit 1; }
   command -v docker >/dev/null || { echo "docker is not installed on $(hostname)" >&2; exit 1; }
@@ -73,7 +86,10 @@ update_here() {
     exit 1
   fi
   mkdir -p data
-  docker compose up -d --build
+  # --remove-orphans: drops containers of services no longer in the compose file,
+  # such as "handbrake-ui" from before the rename to EncForge (it would keep the port).
+  docker compose up -d --build --remove-orphans
+  docker image rm handbrake-ui:latest >/dev/null 2>&1 || true # its image, if still there
   docker image prune -f >/dev/null
   docker compose ps
 }
@@ -83,7 +99,7 @@ if [ "${1:-}" = "--remote-step" ]; then
   shift
   DIR=$1 BRANCH=$2 TARGET=$3 REPO_URL=$4
   if [ ! -d ~/"$DIR"/.git ]; then
-    key=${DEPLOY_KEY:-$HOME/.ssh/handbrake-ui-deploy}
+    key=$(deploy_key)
     echo "==> First deploy: cloning $REPO_URL into ~/$DIR"
     mkdir -p ~/"$DIR" && cd ~/"$DIR"
     git init -q
@@ -108,7 +124,7 @@ fi
 
 # ------------------------------------------------------------------ from another machine
 HOST="${1:-${DEPLOY_HOST:-}}"
-DIR="${2:-${DEPLOY_DIR:-handbrake-ui}}"
+DIR="${2:-${DEPLOY_DIR:-encforge}}"
 if [ -z "$HOST" ] || [ "${HOST#-}" != "$HOST" ]; then
   sed -n '2,28p' "$0" | sed 's/^# \{0,1\}//' >&2
   exit 1

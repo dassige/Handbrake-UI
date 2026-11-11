@@ -1,12 +1,12 @@
 {
-  "name": "handbrake-ui",
-  "version": "3.3.5",
+  "name": "encforge",
+  "version": "4.0.0",
   "private": true,
   "license": "GPL-2.0-only",
   "description": "Project (global) version — managed by DGS AutoVersion",
   "scripts": {
     "release": "node scripts/release.cjs"
   },
-  "versionDate": "2026/11/12 11:59",
-  "git-parentCommit-ID": "22aaa7163b6030570bb1e22b2ad0963a0c938945"
+  "versionDate": "2026/11/12 12:12",
+  "git-parentCommit-ID": "816c06905ca465d5ee4bc363ca2043f12b9cf817"
 }

@@ -1,6 +1,6 @@
 // Backup and restore of the configuration and the database.
 //
-// A backup is a ZIP: manifest.json, handbrake-ui.db (a consistent copy made with
+// A backup is a ZIP: manifest.json, encforge.db (a consistent copy made with
 // VACUUM INTO, safe while the app runs) and, optionally, logs/ (the HandBrake log
 // of each job). It can be downloaded or kept on the server in DATA_DIR/backups.
 //
@@ -10,6 +10,7 @@
 // - scope "all": everything, plus the job logs. Refused while something runs.
 // Before every restore the current data is saved on the server, so it can be undone.
 // Scheduled backups (backupSchedule.js) go to a chosen folder, possibly a network share.
+// Backups made before the rename to EncForge (app "handbrake-ui", handbrake-ui.db) still restore.
 import { createReadStream, createWriteStream } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -29,6 +30,11 @@ const KEEP_SNAPSHOTS = 10;
 const MAX_UPLOAD = 1024 * 1024 * 1024;
 const SNAPSHOT_NAME = /^[\w.-]+\.zip$/;
 const LOG_NAME = /^logs\/[\w.-]+\.log$/;
+const APP = 'encforge';
+const DB_NAME = 'encforge.db';
+// What backups made before the rename to EncForge used instead.
+const LEGACY_APP = 'handbrake-ui';
+const LEGACY_DB_NAME = 'handbrake-ui.db';
 
 const stamp = (d = new Date()) => {
   const p = (n) => String(n).padStart(2, '0');
@@ -66,13 +72,13 @@ export class Backups {
   async build({ logs = true } = {}) {
     const work = path.join(this.tmpDir, `backup-${randomUUID()}`);
     await fs.mkdir(work, { recursive: true });
-    const dbFile = path.join(work, 'handbrake-ui.db');
+    const dbFile = path.join(work, DB_NAME);
     this.db.prepare('VACUUM INTO ?').run(dbFile);
     const logFiles = logs
       ? (await fs.readdir(this.logDir).catch(() => [])).filter((f) => /^[\w.-]+\.log$/.test(f)).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
       : [];
     const manifest = {
-      app: 'handbrake-ui',
+      app: APP,
       format: FORMAT,
       createdAt: Date.now(),
       versions: this.versions,
@@ -85,7 +91,7 @@ export class Backups {
       const st = await fs.stat(file);
       return { path: file, name, size: st.size, mtime: st.mtimeMs };
     };
-    const entries = [await entry(manifestFile, 'manifest.json'), await entry(dbFile, 'handbrake-ui.db')];
+    const entries = [await entry(manifestFile, 'manifest.json'), await entry(dbFile, DB_NAME)];
     for (const f of logFiles) {
       const e = await entry(path.join(this.logDir, f), `logs/${f}`).catch(() => null); // a log may vanish meanwhile
       if (e) entries.push(e);
@@ -98,7 +104,7 @@ export class Backups {
     const { work, plan } = await this.build({ logs: req.query.logs !== '0' });
     reply.headers({
       'Content-Type': 'application/zip',
-      'Content-Disposition': attachment(`handbrake-ui-backup-${stamp()}.zip`),
+      'Content-Disposition': attachment(`encforge-backup-${stamp()}.zip`),
       'Content-Length': plan.size,
       'Cache-Control': 'no-store',
     });
@@ -245,11 +251,12 @@ export class Backups {
     try {
       entries = await readZipEntries(file);
     } catch (err) {
-      throw badRequest(err instanceof ZipError ? `Not a HandBrake Queue backup: ${err.message}` : err.message);
+      throw badRequest(err instanceof ZipError ? `Not an EncForge backup: ${err.message}` : err.message);
     }
     const byName = new Map(entries.map((e) => [e.name, e]));
-    if (!byName.has('manifest.json') || !byName.has('handbrake-ui.db')) {
-      throw badRequest('Not a HandBrake Queue backup (manifest.json or handbrake-ui.db is missing)');
+    const dbEntry = byName.get(DB_NAME) ?? byName.get(LEGACY_DB_NAME);
+    if (!byName.has('manifest.json') || !dbEntry) {
+      throw badRequest(`Not an EncForge backup (manifest.json or ${DB_NAME} is missing)`);
     }
     const work = path.join(this.tmpDir, `unpack-${randomUUID()}`);
     await fs.mkdir(path.join(work, 'logs'), { recursive: true });
@@ -261,10 +268,10 @@ export class Backups {
       } catch {
         throw badRequest('The backup manifest is damaged');
       }
-      if (manifest.app !== 'handbrake-ui') throw badRequest('Not a HandBrake Queue backup');
+      if (manifest.app !== APP && manifest.app !== LEGACY_APP) throw badRequest('Not an EncForge backup');
       if (manifest.format > FORMAT) throw badRequest('This backup was made by a newer version of the app; update first');
-      const dbFile = path.join(work, 'handbrake-ui.db');
-      await extractEntry(file, byName.get('handbrake-ui.db'), dbFile);
+      const dbFile = path.join(work, DB_NAME);
+      await extractEntry(file, dbEntry, dbFile);
       const logs = [];
       for (const e of entries.filter((x) => LOG_NAME.test(x.name))) {
         const dest = path.join(work, e.name);

@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.0.0] - 2026/11/12
+
+- feat: rename the project to EncForge
+
+HandBrake Queue (repository Handbrake-UI) is now EncForge: the app
+title, home-screen name, About page, notifications and emails, the
+help and Settings texts in all five languages, package names, the
+Docker service, container and image, and the README. HandBrake is
+still named where it means the encoding engine (HandBrakeCLI).
+
+Existing installs update without losing anything:
+- data/handbrake-ui.db (with its -wal/-shm files) is renamed to
+  encforge.db on the first start.
+- Backups and exported rename rules made under the old name still
+  restore and import.
+- deploy.sh runs docker compose with --remove-orphans and removes the
+  old handbrake-ui image, so the old container can't keep the port;
+  it still finds a deploy key named ~/.ssh/handbrake-ui-deploy.
+
+The README says the project was formerly Handbrake-UI and has a
+section on updating an install from before the rename.
+
 ## [3.3.2] - 2026/11/12
 
 - feat: download a video with its subtitle files as one ZIP

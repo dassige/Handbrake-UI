@@ -23,7 +23,7 @@ test('release: the version comes from the root package.json', () => {
 });
 
 test('release: the config points at this repo and only counts vX.Y.Z tags', () => {
-  assert.equal(config.GITHUB_REPO, 'https://github.com/dassige/Handbrake-UI');
+  assert.equal(config.GITHUB_REPO, 'https://github.com/dassige/encforge');
   // The same pattern git describe --match uses: v1.3.1 yes, server-v2.0.0 / web-v2.0.0 no.
   const glob = new RegExp(`^${config.TAG_PATTERN.replace('*', '.*')}$`);
   assert.ok(glob.test('v2.0.0'));
@@ -37,7 +37,7 @@ test('release: conventional commits become grouped notes with a compare link', (
     'v2.1.0',
     'v2.0.0',
   );
-  assert.match(notes, /^## HandBrake Queue v2\.1\.0/);
+  assert.match(notes, /^## EncForge v2\.1\.0/);
   assert.ok(notes.indexOf('✨ Features') < notes.indexOf('🐛 Bug Fixes'));
   assert.match(notes, /- \*\*queue:\*\* Keep the order/);
   assert.match(notes, /⚠️ \*\*Breaking:\*\* Drop Node 20/);

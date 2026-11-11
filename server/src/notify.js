@@ -203,7 +203,7 @@ export function buildMessage(event, data = {}) {
       return {
         event: 'test',
         title: 'Test notification',
-        text: 'This is a test from HandBrake Queue. If you can read it, notifications work.',
+        text: 'This is a test from EncForge. If you can read it, notifications work.',
         data: {},
       };
   }
@@ -283,7 +283,7 @@ export class Notifier {
     if (!w?.url) throw new Error('No webhook URL');
     if (!w.enabled && !force) return;
     const body = {
-      app: 'HandBrake Queue',
+      app: 'EncForge',
       event: message.event,
       title: message.title,
       message: message.text,
@@ -320,17 +320,17 @@ export class Notifier {
       greetingTimeout: TIMEOUT,
       socketTimeout: TIMEOUT * 2,
     });
-    const link = cfg.appUrl ? `\n\nOpen HandBrake Queue: ${cfg.appUrl}` : '';
+    const link = cfg.appUrl ? `\n\nOpen EncForge: ${cfg.appUrl}` : '';
     const html = `<div style="font-family:system-ui,sans-serif;font-size:14px">
 <h2 style="font-size:16px;margin:0 0 12px">${escapeHtml(message.title)}</h2>
 <pre style="font-family:inherit;white-space:pre-wrap;margin:0">${escapeHtml(message.text)}</pre>
-${cfg.appUrl ? `<p style="margin-top:16px"><a href="${escapeHtml(cfg.appUrl)}">Open HandBrake Queue</a></p>` : ''}
+${cfg.appUrl ? `<p style="margin-top:16px"><a href="${escapeHtml(cfg.appUrl)}">Open EncForge</a></p>` : ''}
 </div>`;
     try {
       await transport.sendMail({
-        from: e.from ? (e.from.includes('<') ? e.from : `"HandBrake Queue" <${e.from}>`) : `"HandBrake Queue" <${e.user}>`,
+        from: e.from ? (e.from.includes('<') ? e.from : `"EncForge" <${e.from}>`) : `"EncForge" <${e.user}>`,
         to,
-        subject: `[HandBrake Queue] ${message.title}`,
+        subject: `[EncForge] ${message.title}`,
         text: message.text + link,
         html,
       });

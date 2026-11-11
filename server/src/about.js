@@ -6,7 +6,7 @@ import path from 'node:path';
 
 export const AUTHOR = 'Gerry Dassi (DGSoft)';
 export const LICENSE = 'GPL-2.0-only';
-export const REPOSITORY = 'https://github.com/dassige/Handbrake-UI';
+export const REPOSITORY = 'https://github.com/dassige/encforge';
 
 const ROOT = path.join(import.meta.dirname, '../..');
 const MAX_RELEASES = 30;
@@ -53,7 +53,7 @@ export function aboutInfo({ version, dataDir }) {
   const app = version.app?.version ?? null;
   const changelog = parseChangelog(readText(path.join(ROOT, 'CHANGELOG.md')));
   return {
-    name: 'HandBrake Queue',
+    name: 'EncForge',
     author: AUTHOR,
     license: LICENSE,
     licenseText: readText(path.join(ROOT, 'LICENSE')),

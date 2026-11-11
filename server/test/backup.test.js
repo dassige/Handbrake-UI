@@ -117,7 +117,8 @@ test('backup: everything is refused while a conversion runs; the configuration i
 test('backup: an older backup without newer columns or tables still restores', async () => {
   const t = await setup();
   addJob(t.db, '/src/old.mkv');
-  // Build a backup by hand from a database that lacks jobs.verify and quality_scans.
+  // Build a backup by hand from a database that lacks jobs.verify and quality_scans, with the
+  // names backups had before the rename to EncForge (app "handbrake-ui", handbrake-ui.db).
   const work = path.join(t.dir, 'old');
   await fs.mkdir(work);
   t.db.prepare('VACUUM INTO ?').run(path.join(work, 'handbrake-ui.db'));
@@ -141,12 +142,12 @@ test('backup: refuses files that are not backups, and bad names', async () => {
   const t = await setup();
   const bad = path.join(t.dir, 'data', 'backups', 'manual-bad.zip');
   await fs.writeFile(bad, 'not a zip at all');
-  await assert.rejects(t.backups.inspect('snapshot:manual-bad.zip'), /Not a HandBrake Queue backup: Not a ZIP/);
+  await assert.rejects(t.backups.inspect('snapshot:manual-bad.zip'), /Not an EncForge backup: Not a ZIP/);
   // A real ZIP without a manifest.
   const f = path.join(t.dir, 'x.txt');
   await fs.writeFile(f, 'x');
   await pipeline(zipStream(planZip([{ path: f, name: 'x.txt', size: 1, mtime: Date.now() }])), createWriteStream(bad));
-  await assert.rejects(t.backups.inspect('snapshot:manual-bad.zip'), /manifest.json or handbrake-ui.db is missing/);
+  await assert.rejects(t.backups.inspect('snapshot:manual-bad.zip'), /manifest.json or encforge.db is missing/);
   await assert.rejects(t.backups.inspect('snapshot:../../etc.zip'), /Invalid backup name/);
   await assert.rejects(t.backups.inspect('upload:../x'), /Invalid backup source/);
   await assert.rejects(t.backups.restore({ source: 'snapshot:manual-bad.zip', scope: 'nope' }), /scope/);

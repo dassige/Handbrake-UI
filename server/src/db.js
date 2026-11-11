@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { backfillHistory } from './history.js';
 import { DatabaseSync } from 'node:sqlite';
 
@@ -161,6 +163,22 @@ const MIGRATIONS = [
   ['jobs', 'sub_copy', 'TEXT'], // this job's copy mode (NULL: the queue's or Settings')
   ['jobs', 'subtitle_result', 'TEXT'], // JSON: what was embedded and copied
 ];
+
+/**
+ * The database file in dataDir: encforge.db. Before the rename to EncForge it was
+ * handbrake-ui.db; that file, with the SQLite -wal/-shm files that belong to it, is moved
+ * to the new name once. The main file goes last, so an interrupted move ends on the next start.
+ * Returns { file, renamedFrom } (renamedFrom: the old path, when it was just moved).
+ */
+export function adoptDbFile(dataDir) {
+  const file = path.join(dataDir, 'encforge.db');
+  const legacy = path.join(dataDir, 'handbrake-ui.db');
+  if (fs.existsSync(file) || !fs.existsSync(legacy)) return { file, renamedFrom: null };
+  for (const ext of ['-wal', '-shm', '']) {
+    if (fs.existsSync(legacy + ext)) fs.renameSync(legacy + ext, file + ext);
+  }
+  return { file, renamedFrom: legacy };
+}
 
 export function openDb(file) {
   const db = new DatabaseSync(file);

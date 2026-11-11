@@ -25,7 +25,9 @@ const BUILTINS = [
   },
 ];
 
-const EXPORT_TYPE = 'handbrake-ui-rename-rules';
+const EXPORT_TYPE = 'encforge-rename-rules';
+// What rule sets exported before the rename to EncForge say instead; still imported.
+const LEGACY_EXPORT_TYPE = 'handbrake-ui-rename-rules';
 
 function splitName(fileName) {
   const i = fileName.lastIndexOf('.');
@@ -126,7 +128,7 @@ export class Renamer {
       // not JSON: try Advanced Renamer
     }
     if (data) {
-      if (data.type !== EXPORT_TYPE) throw badRequest('Unknown JSON file: expected a rename rule set exported from this app');
+      if (data.type !== EXPORT_TYPE && data.type !== LEGACY_EXPORT_TYPE) throw badRequest('Unknown JSON file: expected a rename rule set exported from this app');
       return { rule: this.createRule({ name: data.name || baseName, description: data.description, steps: data.steps }), skipped: [] };
     }
     const { steps, skipped } = importAren(content);

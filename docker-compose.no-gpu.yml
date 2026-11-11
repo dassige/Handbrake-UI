@@ -3,7 +3,7 @@
 # Enable it in .env (on Windows use ";" instead of ":" between the files):
 #   COMPOSE_FILE=docker-compose.yml:docker-compose.no-gpu.yml
 services:
-  handbrake-ui:
+  encforge:
     devices: !reset []
     group_add: !override
       - "${MEDIA_GID:-100}"

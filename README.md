@@ -1,6 +1,10 @@
-![HandBrake Queue](docs/branding/banner.jpg)
+![EncForge](docs/branding/banner.jpg)
 
-# HandBrake Queue (Handbrake-UI)
+# EncForge
+
+> **Formerly Handbrake-UI** (shown in the app as "HandBrake Queue"). The project
+> was renamed; links to `github.com/dassige/Handbrake-UI` redirect here. An
+> existing install keeps its data when updated: see [Updating an install from before the rename](#updating-an-install-from-before-the-rename).
 
 A web UI that turns a headless Linux box (or a Windows PC) into a HandBrake
 conversion server. Browse the folders on the server or upload videos from your
@@ -202,7 +206,7 @@ Docker image includes all of them.
 
 ## Hardware and performance
 
-HandBrake Queue itself is light (a Node.js server using ~100 MB of RAM). The
+EncForge itself is light (a Node.js server using ~100 MB of RAM). The
 conversion speed depends on the CPU, or on the GPU with Intel Quick Sync.
 
 **What you need:**
@@ -236,12 +240,12 @@ conversion adds a little time on top.
 preset, so read it as ±10%. The Raspberry Pi 5 has no hardware H.264 encoder,
 so x264 is the only option there.
 
-² A Chromebox does not run HandBrake Queue as sold: ChromeOS has to be
+² A Chromebox does not run EncForge as sold: ChromeOS has to be
 replaced by a regular Linux distribution, which on these machines usually
 means installing UEFI firmware first. With that done it is a small, quiet and
 low-power home server with an Intel iGPU for Quick Sync.
 
-**In real use:** the repurposed Chromebox 4 above runs HandBrake Queue with the
+**In real use:** the repurposed Chromebox 4 above runs EncForge with the
 Quick Sync preset. Its first 139 TV episodes (about 60 hours of 1080p HEVC
 video, read from a NAS over NFS) took 17.7 hours in total, an average of
 3.4× real time, or about 13 minutes per 43-minute episode. Quality was
@@ -275,8 +279,8 @@ docker compose version                          # must be v2.24 or newer
 **Get the app and configure it:**
 
 ```bash
-git clone https://github.com/dassige/Handbrake-UI.git handbrake-ui
-cd handbrake-ui
+git clone https://github.com/dassige/encforge.git encforge
+cd encforge
 cp .env.example .env
 nano .env
 ```
@@ -320,8 +324,8 @@ backups are in `./data`.
 2. In PowerShell (Windows) or Terminal (macOS):
 
    ```powershell
-   git clone https://github.com/dassige/Handbrake-UI.git handbrake-ui
-   cd handbrake-ui
+   git clone https://github.com/dassige/encforge.git encforge
+   cd encforge
    copy .env.example .env        # macOS: cp .env.example .env
    notepad .env                  # macOS: open -e .env
    ```
@@ -370,9 +374,9 @@ and HandBrake come from RPM Fusion).
 **Build the app:**
 
 ```bash
-sudo git clone https://github.com/dassige/Handbrake-UI.git /opt/handbrake-ui
-sudo chown -R "$USER" /opt/handbrake-ui
-cd /opt/handbrake-ui
+sudo git clone https://github.com/dassige/encforge.git /opt/encforge
+sudo chown -R "$USER" /opt/encforge
+cd /opt/encforge
 (cd web && npm ci && npm run build)
 (cd server && npm ci --omit=dev)
 ```
@@ -380,26 +384,26 @@ cd /opt/handbrake-ui
 **Try it** (Ctrl+C to stop):
 
 ```bash
-cd /opt/handbrake-ui/server
-DATA_DIR=$HOME/.handbrake-ui SOURCE_ROOT=/srv/media/downloads TARGET_ROOT=/srv/media/converted npm start
+cd /opt/encforge/server
+DATA_DIR=$HOME/.encforge SOURCE_ROOT=/srv/media/downloads TARGET_ROOT=/srv/media/converted npm start
 ```
 
 Open `http://<server-ip>:8095`.
 
-**Run it as a service.** Create `/etc/systemd/system/handbrake-ui.service`,
+**Run it as a service.** Create `/etc/systemd/system/encforge.service`,
 with `User=` set to the owner of your media files:
 
 ```ini
 [Unit]
-Description=HandBrake Queue
+Description=EncForge
 After=network-online.target remote-fs.target
 Wants=network-online.target
 
 [Service]
 User=media
-WorkingDirectory=/opt/handbrake-ui/server
-StateDirectory=handbrake-ui
-Environment=DATA_DIR=/var/lib/handbrake-ui
+WorkingDirectory=/opt/encforge/server
+StateDirectory=encforge
+Environment=DATA_DIR=/var/lib/encforge
 Environment=PORT=8095
 Environment=SOURCE_ROOT=/srv/media/downloads
 Environment=TARGET_ROOT=/srv/media/converted
@@ -414,8 +418,8 @@ WantedBy=multi-user.target
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable --now handbrake-ui
-journalctl -u handbrake-ui -f
+sudo systemctl enable --now encforge
+journalctl -u encforge -f
 ```
 
 Use the path from `which node` in `ExecStart` if Node.js is not in `/usr/bin`.
@@ -446,8 +450,8 @@ ffprobe -version
 **Build the app:**
 
 ```powershell
-git clone https://github.com/dassige/Handbrake-UI.git C:\handbrake-ui
-cd C:\handbrake-ui\web
+git clone https://github.com/dassige/encforge.git C:\encforge
+cd C:\encforge\web
 npm ci; npm run build
 cd ..\server
 npm ci --omit=dev
@@ -456,8 +460,8 @@ npm ci --omit=dev
 **Start it:**
 
 ```powershell
-cd C:\handbrake-ui\server
-$env:DATA_DIR      = "C:\handbrake-ui\data"
+cd C:\encforge\server
+$env:DATA_DIR      = "C:\encforge\data"
 $env:SOURCE_ROOT   = "D:\Videos\Downloads"
 $env:TARGET_ROOT   = "D:\Videos\Converted"
 $env:HANDBRAKE_CLI = "C:\Tools\HandBrakeCLI\HandBrakeCLI.exe"
@@ -472,11 +476,11 @@ asked if other devices should reach it.
 [NSSM](https://nssm.cc/), for example:
 
 ```powershell
-nssm install HandBrakeQueue "C:\Program Files\nodejs\node.exe" "--disable-warning=ExperimentalWarning src\index.js"
-nssm set HandBrakeQueue AppDirectory C:\handbrake-ui\server
-nssm set HandBrakeQueue AppEnvironmentExtra DATA_DIR=C:\handbrake-ui\data HANDBRAKE_CLI=C:\Tools\HandBrakeCLI\HandBrakeCLI.exe "MKVMERGE=C:\Program Files\MKVToolNix\mkvmerge.exe"
-nssm set HandBrakeQueue ObjectName .\YourUser YourPassword
-nssm start HandBrakeQueue
+nssm install EncForge "C:\Program Files\nodejs\node.exe" "--disable-warning=ExperimentalWarning src\index.js"
+nssm set EncForge AppDirectory C:\encforge\server
+nssm set EncForge AppEnvironmentExtra DATA_DIR=C:\encforge\data HANDBRAKE_CLI=C:\Tools\HandBrakeCLI\HandBrakeCLI.exe "MKVMERGE=C:\Program Files\MKVToolNix\mkvmerge.exe"
+nssm set EncForge ObjectName .\YourUser YourPassword
+nssm start EncForge
 ```
 
 Run the service as your own user (`ObjectName`), not the default system
@@ -546,14 +550,14 @@ To do the same by hand:
 
 ```bash
 git pull
-docker compose up -d --build
+docker compose up -d --build --remove-orphans
 ```
 
 **Docker, from another computer** (Linux, macOS, or Git Bash on Windows), over
 SSH. The server pulls from GitHub itself, so only what is on GitHub is deployed:
 
 ```bash
-scripts/deploy.sh user@server [folder]      # folder default: ~/handbrake-ui
+scripts/deploy.sh user@server [folder]      # folder default: ~/encforge
 ```
 
 The first run clones the repository on the server. Defaults for the host,
@@ -566,11 +570,29 @@ folder and SSH options can go in a git-ignored `.deploy.env`: copy
 git pull
 (cd web && npm ci && npm run build)
 (cd server && npm ci --omit=dev)
-sudo systemctl restart handbrake-ui     # or restart the Windows service / npm start
+sudo systemctl restart encforge     # or restart the Windows service / npm start
 ```
 
 Back up first if you want to be able to go back: **Settings → Backup and
 restore**.
+
+### Updating an install from before the rename
+
+EncForge used to be called Handbrake-UI ("HandBrake Queue" in the app). An
+install made under the old name updates like any other, and keeps its data:
+
+- The database `data/handbrake-ui.db` is renamed to `encforge.db` on the first
+  start. Backups and exported rename rules made under the old name still
+  restore and import.
+- Docker: the container is now called `encforge`. `scripts/deploy.sh` removes
+  the old `handbrake-ui` container and image; by hand, add `--remove-orphans`
+  as above, or the old container keeps the port.
+- Your install folder, `.env` and `data/` stay where they are; there is no need
+  to move them. Existing Linux services (`handbrake-ui.service`) and Windows
+  services (`HandBrakeQueue`) keep working under their old names.
+- `git pull` keeps working, because GitHub redirects the old address. To point
+  the checkout at the new one:
+  `git remote set-url origin https://github.com/dassige/encforge.git`
 
 ## Hardware encoding (Intel Quick Sync)
 
@@ -622,7 +644,7 @@ change its settings.
 | Red banner "HandBrakeCLI is not available" | Without Docker: install it, or set `HANDBRAKE_CLI` to its full path |
 | Network share mounted after the container started doesn't show up | The bind mount uses `rslave` propagation, so mounts made later under `MEDIA_DIR` should appear. Otherwise `docker compose restart` |
 | The conversion window starts at the wrong time | Set `TZ` (Docker) or the system time zone. Settings → Conversion window warns when it differs from your browser's |
-| Logs | Docker: `docker compose logs -f`. Without Docker: the console, or `journalctl -u handbrake-ui -f`. Per-job HandBrake logs: job details in the app |
+| Logs | Docker: `docker compose logs -f`. Without Docker: the console, or `journalctl -u encforge -f`. Per-job HandBrake logs: job details in the app |
 
 ## Development
 
@@ -664,7 +686,7 @@ to the GitHub release of the running version.
 
 ## Credits and licences
 
-HandBrake Queue is © 2026 Gerry Dassi (DGSoft). It is free software: you can
+EncForge is © 2026 Gerry Dassi (DGSoft). It is free software: you can
 redistribute it and/or modify it under the terms of the
 [GNU General Public License, version 2](LICENSE) (GPL-2.0-only), as published
 by the Free Software Foundation.
@@ -697,11 +719,11 @@ HandBrakeCLI, FFmpeg and MKVToolNix are separate programs: the app starts them
 as external processes and does not link to them. The Docker image you build
 *contains* them, so if you **redistribute that image** (e.g. push it to a
 public registry), you must follow the GPL/LGPL for everything in it, including
-offering the source code: this repository for HandBrake Queue, and the
+offering the source code: this repository for EncForge, and the
 upstream sources for the rest. The `Dockerfile` builds HandBrake from its
 official, unmodified source tag.
 
-If you distribute a modified version of HandBrake Queue, the GPL requires you
+If you distribute a modified version of EncForge, the GPL requires you
 to publish your changes under the same licence.
 
 ## Disclaimer

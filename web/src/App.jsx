@@ -252,7 +252,7 @@ export default function App() {
       <header className="topbar">
         <div className="brand">
           <img className="brand-icon" src="/icon-192.png" alt="" width={24} height={24} />
-          <span>HandBrake Queue</span>
+          <span>EncForge</span>
           <Help id="app.overview" />
         </div>
         <nav className="tabs" aria-label={t('app.views.label')}>

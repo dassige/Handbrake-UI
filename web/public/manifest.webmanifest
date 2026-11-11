@@ -1,6 +1,6 @@
 {
-  "name": "HandBrake Queue",
-  "short_name": "HB Queue",
+  "name": "EncForge",
+  "short_name": "EncForge",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#14171c",

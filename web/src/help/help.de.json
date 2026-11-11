@@ -11,9 +11,9 @@
       ]
     },
     "app.overview": {
-      "title": "So funktioniert HandBrake Queue",
+      "title": "So funktioniert EncForge",
       "body": [
-        "HandBrake Queue konvertiert Videos auf dem Server mit HandBrakeCLI und HandBrake-Voreinstellungen: im [Voreinstellungseditor](#presets.editor) erstellt oder aus der HandBrake-Desktop-App importiert. Videos, die auf Ihrem Computer liegen, können zuerst [hochgeladen](#upload.overview) werden.",
+        "EncForge konvertiert Videos auf dem Server mit HandBrakeCLI und HandBrake-Voreinstellungen: im [Voreinstellungseditor](#presets.editor) erstellt oder aus der HandBrake-Desktop-App importiert. Videos, die auf Ihrem Computer liegen, können zuerst [hochgeladen](#upload.overview) werden.",
         "### Der übliche Ablauf",
         "1. Laden Sie eine aus HandBrake exportierte [Voreinstellung](#presets) hoch.",
         "1. Ziehen Sie unter **Konvertieren** Dateien oder Ordner aus den [Quellen](#convert.sources) in die [Warteschlange](#convert.queue).",
@@ -169,7 +169,7 @@
     "subtitles.overview": {
       "title": "Untertiteldateien neben den Videos",
       "body": [
-        "Videos haben oft separate Untertiteldateien („Sidecars“). HandBrake Queue findet sie und kann sie in das konvertierte Video **einbetten**, neben es **kopieren** oder beides.",
+        "Videos haben oft separate Untertiteldateien („Sidecars“). EncForge findet sie und kann sie in das konvertierte Video **einbetten**, neben es **kopieren** oder beides.",
         "### Welche Dateien gefunden werden",
         "- Dateien, die wie das Video benannt sind und im selben Ordner liegen: `Movie.srt`, `Movie.en.srt`, `Movie.ita.forced.srt`, `Movie.en.sdh.srt`.",
         "- Dateien in einem Ordner `Subs` oder `Subtitles` neben dem Video: `Subs/2_English.srt` oder `Subs/Movie/3_Italian.srt` bei einem Ordner pro Folge.",
@@ -329,7 +329,7 @@
     "presets.qsv": {
       "title": "Quick-Sync-Voreinstellungen (GPU)",
       "body": [
-        "Eine Voreinstellung mit einem Intel-**Quick-Sync**-Encoder konvertiert auf der Intel-GPU des Servers statt auf der CPU. Auf einem Intel i3 der 10. Generation war sie bei gleicher Bitrate etwa **doppelt so schnell** wie x264, mit gleich großen Dateien und fast gleicher Qualität. Quick Sync funktioniert auf Intel-iGPUs ab der 6. Generation, wenn der Server die GPU (`/dev/dri`) an HandBrake Queue durchreicht. Steht `qsv_h264` unter Einstellungen → Über, ist alles bereit.",
+        "Eine Voreinstellung mit einem Intel-**Quick-Sync**-Encoder konvertiert auf der Intel-GPU des Servers statt auf der CPU. Auf einem Intel i3 der 10. Generation war sie bei gleicher Bitrate etwa **doppelt so schnell** wie x264, mit gleich großen Dateien und fast gleicher Qualität. Quick Sync funktioniert auf Intel-iGPUs ab der 6. Generation, wenn der Server die GPU (`/dev/dri`) an EncForge durchreicht. Steht `qsv_h264` unter Einstellungen → Über, ist alles bereit.",
         "### Eine in HandBrake für Windows erstellen",
         "1. Öffnen Sie ein beliebiges Video und wählen Sie die Voreinstellung, von der Sie ausgehen.",
         "1. Setzen Sie im Tab **Video** den **Videoencoder** auf `H.264 (Intel QSV)` und die **Encoder-Voreinstellung** auf `Balanced`. Behalten Sie dieselbe durchschnittliche Bitrate bei oder geben Sie etwa 10–15 % dazu, um die Qualität von x264 zu erreichen.",
