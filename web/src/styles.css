@@ -313,7 +313,7 @@ select, textarea, input[type='text'], input:not([type]), input[type='number'], i
 .rename-table th { position: sticky; top: 0; background: var(--panel); text-align: left; font-size: 12px; color: var(--muted); font-weight: 550; padding: 6px 8px; border-bottom: 1px solid var(--border); z-index: 1; }
 .rename-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
 .rename-table td:first-child, .rename-table th:first-child { width: 32px; padding-right: 0; }
-.rename-table tr.unchanged .name-input, .rename-table tr.off .name-input { color: var(--muted); }
+.rename-table tr.unchanged .name-input, .rename-table tr.off .name-input, .rename-table tr.blocked .name-input { color: var(--muted); }
 .rename-table tr.dir-row td { background: var(--panel-2); font-size: 12px; font-weight: 600; color: var(--muted); padding: 4px 8px; }
 .rename-table .names { min-width: 0; }
 .old-name { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 0; min-width: 100%; }

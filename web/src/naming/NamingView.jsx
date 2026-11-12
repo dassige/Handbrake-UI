@@ -5,8 +5,8 @@ import { api } from '../api.js';
 import { SourceBrowser } from '../components/SourceBrowser.jsx';
 import { useDialogs } from '../components/Dialogs.jsx';
 import { Help } from '../help/Help.jsx';
-import { dateTime, fileName, relTo } from '../format.js';
-import { rootLabel } from '../roots.js';
+import { dateTime, fileName } from '../format.js';
+import { displayPath } from '../roots.js';
 import { rich, t } from '../i18n/index.js';
 import { renameWarning } from '../i18n/serverText.js';
 import { compareNames, sortList, useRememberedSort } from '../sort.js';
@@ -120,12 +120,13 @@ export function NamingView({ settings, rules, ruleId, setRuleId, checks, changeT
     return dirs.flatMap((d) => sortList(list.filter((r) => r.dir === d), sort, get));
   }, [all, filter, search, sort]);
 
-  const selectable = rows.filter((r) => !r.gone);
+  // Gone, in a protected folder or queued: not offered for fixing.
+  const selectable = rows.filter((r) => !r.gone && !r.blocked);
   const selectedRows = selectable.filter((r) => selected.has(r.path));
   const allTicked = selectable.length > 0 && selectable.every((r) => selected.has(r.path));
   const tooMany = selectedRows.length > RENAME_MAX;
   const toggle = (r) => {
-    if (r.gone) return;
+    if (r.gone || r.blocked) return;
     setSelected((s) => {
       const n = new Set(s);
       if (n.has(r.path)) n.delete(r.path);
@@ -134,12 +135,8 @@ export function NamingView({ settings, rules, ruleId, setRuleId, checks, changeT
     });
   };
 
-  const root = settings?.targetRoot;
-  // Paths shown inside the target folder; the folder itself by its name ("Target").
-  const folder = (p) => {
-    const rel = relTo(root, p);
-    return rel === '.' ? rootLabel(settings, root) : rel;
-  };
+  // "Downloads / Show" or "Target / Movies": the folder's name, then the path inside it.
+  const folder = (p) => displayPath(settings, p);
   const resultRule = rules.find((r) => r.id === result?.ruleId);
   const rulesChanged = !!result && !!resultRule && resultRule.updatedAt > result.createdAt;
   const shownResult = result?.id === effectiveId ? result : null;
@@ -157,7 +154,7 @@ export function NamingView({ settings, rules, ruleId, setRuleId, checks, changeT
           showPane(1);
         }}
         onError={onError}
-        root="target"
+        root="any"
         sortId="naming"
         title={t('naming.folders')}
         addLabel={t('naming.checkNames')}
@@ -274,7 +271,7 @@ export function NamingView({ settings, rules, ruleId, setRuleId, checks, changeT
                             <input
                               type="checkbox"
                               checked={selected.has(r.path)}
-                              disabled={r.gone}
+                              disabled={r.gone || !!r.blocked}
                               onChange={() => toggle(r)}
                               onClick={(e) => e.stopPropagation()}
                               aria-label={t('naming.selectFile', { name: r.oldName })}
@@ -291,9 +288,9 @@ export function NamingView({ settings, rules, ruleId, setRuleId, checks, changeT
                             ) : (
                               <div className="muted small">{t('naming.nameUnchanged')}</div>
                             )}
-                            {!r.gone && r.warnings.length > 0 && (
+                            {!r.gone && (r.blocked || r.warnings.length > 0) && (
                               <div className="warn-text">
-                                <AlertTriangle size={12} /> {r.warnings.map(renameWarning).join('; ')}
+                                <AlertTriangle size={12} /> {[r.blocked, ...r.warnings].filter(Boolean).map(renameWarning).join('; ')}
                               </div>
                             )}
                           </td>

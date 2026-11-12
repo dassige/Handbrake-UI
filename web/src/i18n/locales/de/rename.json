@@ -105,7 +105,7 @@
     }
   },
   "view": {
-    "convertedFiles": "Konvertierte Dateien",
+    "convertedFiles": "Ordner",
     "renameList": "Umbenennungsliste",
     "renameListCount": "Umbenennungsliste ({count})",
     "addLabel": "Zum Umbenennen hinzufügen",
@@ -124,7 +124,7 @@
     "clearList": "Liste leeren",
     "reading": "Wird gelesen…",
     "noVideos": "Keine Videodateien gefunden.",
-    "empty": "Ziehen Sie konvertierte Dateien oder Ordner hierher, oder verwenden Sie „Umbenennen“ bei fertigen Aufträgen.",
+    "empty": "Ziehen Sie Dateien oder Ordner hierher, oder verwenden Sie „Umbenennen“ bei fertigen Aufträgen.",
     "namesColumn": "Aktueller Name → neuer Name",
     "renameFile": "{name} umbenennen",
     "tvChip": "Serie · S{season}E{episode}",

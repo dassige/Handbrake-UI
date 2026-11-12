@@ -103,7 +103,9 @@
     "noYear": "no year found",
     "textAfterYear": "text after the year was dropped: “{text}”",
     "nameTaken": "name already taken; using “{name}”",
-    "stepFailed": "step “{step}” failed: {message}"
+    "stepFailed": "step “{step}” failed: {message}",
+    "protectedFolder": "in a protected folder: it can't be renamed (Settings → Folders)",
+    "queued": "queued or converting: remove it from the queue first"
   },
   "renameNote": {
     "needsRename": "Needs rename: {warnings}",

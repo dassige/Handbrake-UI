@@ -355,7 +355,7 @@
         "Ordner auf dem Server (nicht auf Ihrem Computer). Auf dem Server eingebundene NAS-Freigaben funktionieren ebenfalls.",
         "- **Quellordner**: wo die zu konvertierenden Dateien liegen. Fügen Sie so viele hinzu, wie Sie brauchen, mit **Quellordner hinzufügen**; der Bereich „Quellen“ zeigt jeweils einen und kann nicht darüber hinaus navigieren. Das Entfernen eines Ordners aus der Liste löscht nichts.",
         "- **Name** (optional) bei einem Quellordner: ein Anzeigename wie „Downloads“, der im Bereich „Quellen“, in den Ordnerlisten und in der Ansicht „Qualität“ statt des Pfads angezeigt wird. Jeder Name kann nur einmal vergeben werden, höchstens 40 Zeichen; bei leerem Namen wird der eigene Name des Ordners angezeigt.",
-        "- **Schützen** bei einem Quellordner: verhindert, dass seine Dateien und Ordner aus der App gelöscht werden, z. B. den Ordner, aus dem ein Download-Client noch seedet. Im Bereich „Quellen“ zeigt ein solcher Ordner **Geschützt** statt der Schaltfläche „Löschen“, und auch der Server lehnt dort das Löschen ab.",
+        "- **Schützen** bei einem Quellordner: verhindert, dass seine Dateien und Ordner aus der App gelöscht oder umbenannt werden, z. B. den Ordner, aus dem ein Download-Client noch seedet. Im Bereich „Quellen“ zeigt ein solcher Ordner **Geschützt** statt der Schaltfläche „Löschen“, und auch der Server lehnt dort Löschen und Umbenennen ab.",
         "- **Zielordner**: wohin konvertierte Dateien geschrieben werden. Die Ansichten „Umbenennen“ und „Zusammenführen“ arbeiten nur hier.",
         "Alle müssen existieren. Das Ziel darf nicht in einem Quellordner liegen, und ein Quellordner nicht in einem anderen. In Docker müssen sie im Ordner liegen, der in den Container eingebunden ist (`MEDIA_DIR`, meist `/mnt`).",
         "Die Ausgabestrukturen **Name des Quellordners** und **Vollständiger Quellpfad** werden aus dem Quellordner berechnet, in dem die jeweilige Datei liegt."
@@ -448,11 +448,11 @@
       "title": "Dateien umbenennen",
       "body": [
         "Heruntergeladene Dateien haben Namen wie `The.Rookie.6x01.Title.ITA.ENG.1080p.NFRip.AAC.x265-Pir8`. Die Ansicht „Umbenennen“ macht daraus mit [Regelsätzen](#rename.rules) `The Rookie S06e01 - Title`.",
-        "1. Durchsuchen Sie links den **Zielordner** und ziehen Sie konvertierte Dateien oder Ordner in die Umbenennungsliste (oder verwenden Sie **Umbenennen** bei einem konvertierten Auftrag).",
+        "1. Durchsuchen Sie links den Zielordner oder einen Quellordner und ziehen Sie Dateien oder Ordner in die Umbenennungsliste (oder verwenden Sie **Umbenennen** bei einem konvertierten Auftrag).",
         "1. Wählen Sie die **Regeln**. Das integrierte **Auto** erkennt sowohl Serienfolgen als auch Filme.",
         "1. Sehen Sie sich die [Vorschau](#rename.preview) an: Korrigieren Sie jeden Namen von Hand und geben Sie einen [Serienname](#rename.showName) ein, wo keiner gefunden wurde.",
         "1. Klicken Sie auf **Umbenennen**. Jeder Stapel lässt sich im [Verlauf](#rename.history) rückgängig machen.",
-        "Umbenannt werden können nur Dateien im Zielordner, nie die Quellen (Downloads werden vielleicht noch geseedet)."
+        "Dateien in einem Quellordner, der in den [Einstellungen](#settings.folders) mit **Schützen** markiert ist, können nicht umbenannt werden (ein Download-Client seedet sie vielleicht noch), ebenso wenig Dateien in der Warteschlange oder in Konvertierung. Eine umbenannte Quelle zählt weiterhin als konvertiert, und ein überwachter Ordner hält sie nicht für eine neue Datei."
       ],
       "see": [
         "rename.preview",
@@ -729,7 +729,7 @@
     "naming.overview": {
       "title": "Namensprüfung",
       "body": [
-        "Findet die Videos im Zielordner, deren Name nicht dem entspricht, den Ihre Umbenennungsregeln ihnen geben würden. So lässt sich eine ganze Bibliothek aufräumen, ohne jeden Ordner zu öffnen.",
+        "Findet die Videos in Ihren Ordnern, deren Name nicht dem entspricht, den Ihre Umbenennungsregeln ihnen geben würden. So lässt sich eine ganze Bibliothek aufräumen, ohne jeden Ordner zu öffnen.",
         "1. Wählen Sie unter **Namen** die **Regeln** für die Prüfung: **Auto**, **TV series**, **Movies** oder eine Ihrer eigenen [Regelsätze](#rename.rules).",
         "1. Wählen Sie Ordner oder Dateien im Bereich **Ordner** und klicken Sie auf **Namen prüfen**.",
         "1. Die [Ergebnisse](#naming.results) listen nur die auffälligen Dateien. Setzen Sie Häkchen bei denen, die korrigiert werden sollen, und klicken Sie auf **In Umbenennen korrigieren**.",
@@ -746,7 +746,7 @@
     "naming.folders": {
       "title": "Was geprüft wird",
       "body": [
-        "Der Bereich Ordner zeigt den Zielordner, denselben, mit dem Umbenennen arbeitet.",
+        "Der Bereich Ordner zeigt jeden Quellordner und den Zielordner, dieselben, mit denen Umbenennen arbeitet; wählen Sie einen in der Liste oben.",
         "Setzen Sie Häkchen bei Ordnern und Dateien (Strg-Klick und Umschalt-Klick wählen mehrere aus) und klicken Sie auf **Namen prüfen**. Ein Ordner umfasst alles darin, auch Unterordner."
       ],
       "see": [
@@ -760,7 +760,7 @@
         "- **Falscher Name**: Die Regeln würden die Datei umbenennen.",
         "- **Nicht erkannt**: Den Regeln fehlt etwas, z. B. eine Episodennummer bei **TV series** oder ein Jahr bei **Movies**. Die Datei kann trotzdem richtig benannt sein; prüfen Sie sie in Umbenennen und geben Sie den Namen bei Bedarf von Hand ein.",
         "- **Umbenannt oder verschoben**: Dateien, die es unter diesem Namen nicht mehr gibt, z. B. weil Sie sie in Umbenennen korrigiert haben. Sie bleiben im Ergebnis, können aber nicht ausgewählt werden.",
-        "Dateien, die bereits richtig benannt sind, werden gezählt, aber nicht aufgeführt. **In Umbenennen korrigieren** nimmt bis zu 5000 Dateien auf einmal."
+        "Dateien, die bereits richtig benannt sind, werden gezählt, aber nicht aufgeführt. Dateien in einem geschützten Ordner oder in der Warteschlange werden aufgeführt, können aber nicht ausgewählt werden. **In Umbenennen korrigieren** nimmt bis zu 5000 Dateien auf einmal."
       ],
       "see": [
         "naming.overview",

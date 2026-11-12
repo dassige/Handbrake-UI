@@ -355,7 +355,7 @@
         "Carpetas del servidor (no de su equipo). Los recursos compartidos de un NAS montados en el servidor también sirven.",
         "- **Carpetas de origen**: dónde están los archivos que se van a convertir. Añada tantas como necesite con **Añadir una carpeta de origen**; el panel Orígenes muestra una cada vez y no puede subir por encima de ella. Quitar una carpeta de la lista no elimina nada.",
         "- **Nombre** (opcional) en una carpeta de origen: un nombre descriptivo como «Descargas», que se muestra en lugar de la ruta en el panel Orígenes, en las listas de carpetas y en la vista Calidad. Cada nombre puede usarse una vez, con un máximo de 40 caracteres; si se deja vacío se muestra el nombre propio de la carpeta.",
-        "- **Proteger** en una carpeta de origen: impide que sus archivos y carpetas se eliminen desde la aplicación, por ejemplo, la carpeta desde la que un cliente de descargas sigue compartiendo. En el panel Orígenes, una carpeta así muestra **Protegida** en lugar del botón Eliminar, y el servidor también rechaza allí las eliminaciones.",
+        "- **Proteger** en una carpeta de origen: impide que sus archivos y carpetas se eliminen o renombren desde la aplicación, por ejemplo, la carpeta desde la que un cliente de descargas sigue compartiendo. En el panel Orígenes, una carpeta así muestra **Protegida** en lugar del botón Eliminar, y el servidor también rechaza allí las eliminaciones y los renombrados.",
         "- **Carpeta de destino**: dónde se escriben los archivos convertidos. Las vistas Renombrar y Unir solo trabajan aquí.",
         "Todas deben existir. El destino no puede estar dentro de una carpeta de origen, y una carpeta de origen no puede estar dentro de otra. En Docker deben estar dentro de la carpeta montada en el contenedor (`MEDIA_DIR`, normalmente `/mnt`).",
         "Las disposiciones de salida **Nombre de la carpeta de origen** y **Ruta de origen completa** se calculan a partir de la carpeta de origen en la que está cada archivo."
@@ -448,11 +448,11 @@
       "title": "Renombrar archivos",
       "body": [
         "Los archivos descargados tienen nombres como `The.Rookie.6x01.Title.ITA.ENG.1080p.NFRip.AAC.x265-Pir8`. La vista Renombrar los convierte en `The Rookie S06e01 - Title`, usando [conjuntos de reglas](#rename.rules).",
-        "1. A la izquierda, explore la **carpeta de destino** y arrastre archivos o carpetas convertidos a la lista de renombrado (o use **Renombrar** en un trabajo convertido).",
+        "1. A la izquierda, explore la carpeta de destino o una carpeta de origen y arrastre archivos o carpetas a la lista de renombrado (o use **Renombrar** en un trabajo convertido).",
         "1. Elija las **Reglas**. La opción integrada **Auto** reconoce tanto episodios de series como películas.",
         "1. Revise la [vista previa](#rename.preview): corrija cualquier nombre a mano y escriba un [nombre de la serie](#rename.showName) donde no se haya encontrado ninguno.",
         "1. Pulse **Renombrar**. Cada lote puede deshacerse desde el [Historial](#rename.history).",
-        "Solo se pueden renombrar archivos de la carpeta de destino, nunca los orígenes (las descargas pueden seguir compartiéndose)."
+        "Los archivos de una carpeta de origen marcada con **Proteger** en [Ajustes](#settings.folders) no se pueden renombrar (un cliente de descargas puede seguir compartiéndolos), ni tampoco los archivos en cola o en conversión. Un origen renombrado sigue contando como convertido, y una carpeta vigilada no lo toma por un archivo nuevo."
       ],
       "see": [
         "rename.preview",
@@ -729,7 +729,7 @@
     "naming.overview": {
       "title": "Control de nombres",
       "body": [
-        "Encuentra los videos de la carpeta de destino cuyo nombre no es el que les darían sus reglas de renombrado, para poner en orden una biblioteca entera sin abrir cada carpeta.",
+        "Encuentra los videos de sus carpetas cuyo nombre no es el que les darían sus reglas de renombrado, para poner en orden una biblioteca entera sin abrir cada carpeta.",
         "1. En **Nombres**, elija las **Reglas** con las que comprobar: **Auto**, **TV series**, **Movies** o uno de sus [conjuntos de reglas](#rename.rules).",
         "1. Elija carpetas o archivos en el panel **Carpetas** y pulse **Comprobar nombres**.",
         "1. Los [resultados](#naming.results) muestran solo los archivos que requieren revisión. Marque los que quiera corregir y pulse **Corregir en Renombrar**.",
@@ -746,7 +746,7 @@
     "naming.folders": {
       "title": "Elegir qué comprobar",
       "body": [
-        "El panel Carpetas muestra la carpeta de destino, la misma con la que trabaja Renombrar.",
+        "El panel Carpetas muestra cada carpeta de origen y la carpeta de destino, las mismas con las que trabaja Renombrar; elija una en la lista de arriba.",
         "Marque carpetas y archivos (Ctrl+clic y Mayús+clic seleccionan varios) y pulse **Comprobar nombres**. Una carpeta incluye todo lo que contiene, también las subcarpetas."
       ],
       "see": [
@@ -760,7 +760,7 @@
         "- **Nombre incorrecto**: las reglas renombrarían el archivo.",
         "- **No reconocido**: a las reglas les falta algo, por ejemplo un número de episodio con **TV series** o un año con **Movies**. El archivo puede tener igualmente el nombre correcto; revíselo en Renombrar y escriba el nombre a mano si hace falta.",
         "- **Renombrados o movidos**: archivos que ya no existen con ese nombre, por ejemplo porque los corrigió en Renombrar. Siguen en el resultado pero no se pueden seleccionar.",
-        "Los archivos que ya tienen el nombre correcto se cuentan pero no se muestran. **Corregir en Renombrar** admite hasta 5000 archivos a la vez."
+        "Los archivos que ya tienen el nombre correcto se cuentan pero no se muestran. Los archivos de una carpeta protegida, o en cola para convertir, se muestran pero no se pueden seleccionar. **Corregir en Renombrar** admite hasta 5000 archivos a la vez."
       ],
       "see": [
         "naming.overview",

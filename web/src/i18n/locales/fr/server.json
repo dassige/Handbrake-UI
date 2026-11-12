@@ -103,7 +103,9 @@
     "noYear": "aucune année trouvée",
     "textAfterYear": "le texte après l'année a été supprimé : « {text} »",
     "nameTaken": "nom déjà pris ; utilisation de « {name} »",
-    "stepFailed": "l'étape « {step} » a échoué : {message}"
+    "stepFailed": "l'étape « {step} » a échoué : {message}",
+    "protectedFolder": "dans un dossier protégé : il ne peut pas être renommé (Paramètres → Dossiers)",
+    "queued": "en file d’attente ou en conversion : retirez-le d’abord de la file"
   },
   "renameNote": {
     "needsRename": "À renommer : {warnings}",

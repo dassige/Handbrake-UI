@@ -73,6 +73,8 @@ const RENAME_WARNINGS = [
   [/^text after the year was dropped: “(?<text>.*)”$/s, 'textAfterYear'],
   [/^name already taken; using “(?<name>.*)”$/s, 'nameTaken'],
   [/^step “(?<step>.*?)” failed: (?<message>.*)$/s, 'stepFailed'],
+  [/^in a protected folder: it can't be renamed \(Settings → Folders\)$/, 'protectedFolder'],
+  [/^queued or converting: remove it from the queue first$/, 'queued'],
 ];
 
 /** A rename warning (a string, or { code, params, text }) → "no year found". */

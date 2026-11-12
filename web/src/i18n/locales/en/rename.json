@@ -105,7 +105,7 @@
     }
   },
   "view": {
-    "convertedFiles": "Converted files",
+    "convertedFiles": "Folders",
     "renameList": "Rename list",
     "renameListCount": "Rename list ({count})",
     "addLabel": "Add to rename",
@@ -124,7 +124,7 @@
     "clearList": "Clear list",
     "reading": "Reading…",
     "noVideos": "No video files found.",
-    "empty": "Drag converted files or folders here, or use “Rename” on finished jobs.",
+    "empty": "Drag files or folders here, or use “Rename” on finished jobs.",
     "namesColumn": "Current name → new name",
     "renameFile": "Rename {name}",
     "tvChip": "TV · S{season}e{episode}",

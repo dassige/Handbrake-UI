@@ -79,14 +79,23 @@ test('Advanced Renamer presets import with all methods', async () => {
   assert.equal(movie.steps[3].replaceWith, ' ($2)');
 });
 
+// dir is the target folder, src a sources folder; both inside one temporary folder.
 async function setup() {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'hbui-rename-'));
+  const base = await fs.mkdtemp(path.join(os.tmpdir(), 'hbui-rename-'));
+  const dir = path.join(base, 'target');
+  const src = path.join(base, 'src');
+  await fs.mkdir(dir);
+  await fs.mkdir(src);
   const db = openDb(':memory:');
-  const settings = new Settings(db, { initialSourceRoot: os.tmpdir(), initialTargetRoot: dir });
+  const settings = new Settings(db, { initialSourceRoot: src, initialTargetRoot: dir });
   const events = { emit() {} };
   const renamer = new Renamer({ db, settings, events, log: console });
-  return { dir, renamer, settings, cleanup: () => fs.rm(dir, { recursive: true, force: true }) };
+  return { dir, src, db, renamer, settings, cleanup: () => fs.rm(base, { recursive: true, force: true }) };
 }
+
+const addJob = (db, status, source, output = '/out/x.mkv') =>
+  db.prepare(`INSERT INTO jobs (status, position, source_path, output_path, preset_name, preset_json, format, created_at)
+    VALUES (?, 1, ?, ?, 'P', '{}', 'av_mkv', 0)`).run(status, source, output);
 
 test('preview, collisions with _1, apply and undo on disk', async () => {
   const { dir, renamer, cleanup } = await setup();
@@ -195,6 +204,66 @@ test('naming checks are saved, mark renamed files as gone and keep the newest 20
     naming.remove(ids[0]);
     assert.equal(naming.list().length, 19);
     await assert.rejects(naming.get(ids[0]), /not found/);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('sources folders can be renamed too, except protected folders and queued files', async () => {
+  const { dir, src, db, renamer, settings, cleanup } = await setup();
+  try {
+    const auto = renamer.listRules()[0];
+    const done = path.join(src, 'Silo.S03E07.Radio.1080p.WEBRip.x265.mkv');
+    const queued = path.join(src, 'Silo.S03E08.Flood.1080p.mkv');
+    await fs.writeFile(done, '');
+    await fs.writeFile(queued, '');
+    addJob(db, 'done', done);
+    addJob(db, 'queued', queued);
+    db.prepare(`INSERT INTO watch_seen (path, folder, seen_at, action) VALUES (?, ?, 0, 'added')`).run(done, src);
+
+    const rows = await renamer.preview({ paths: [src], ruleId: auto.id });
+    const byOld = Object.fromEntries(rows.map((r) => [r.oldName, r]));
+    assert.equal(byOld['Silo.S03E07.Radio.1080p.WEBRip.x265.mkv'].status, 'rename');
+    const q = byOld['Silo.S03E08.Flood.1080p.mkv'];
+    assert.equal(q.status, 'blocked');
+    assert.equal(q.newName, 'Silo S03e08 - Flood.mkv');
+    assert.match(q.warnings[0], /^queued or converting/);
+
+    const r = await renamer.apply({ items: [{ path: done, newName: 'Silo S03e07 - Radio.mkv' }, { path: queued, newName: 'x.mkv' }] });
+    const to = path.join(src, 'Silo S03e07 - Radio.mkv');
+    assert.deepEqual(r.renamed.map((x) => x.to), [to]);
+    assert.match(r.errors[0].error, /^queued or converting/);
+    assert.ok(await fs.access(queued).then(() => true));
+    // The job and the watch folder follow the renamed source.
+    assert.equal(db.prepare(`SELECT source_path FROM jobs WHERE status = 'done'`).get().source_path, to);
+    assert.equal(db.prepare('SELECT path FROM watch_seen').get().path, to);
+
+    // Undo is refused for a file queued under its new name meanwhile.
+    addJob(db, 'queued', to);
+    const [h] = renamer.history();
+    const undo = await renamer.undo(h.id);
+    assert.equal(undo.restored, 0);
+    assert.ok(undo.errors.some((e) => /queued or converting/.test(e.error)));
+    db.prepare(`DELETE FROM jobs WHERE status = 'queued' AND source_path = ?`).run(to);
+
+    // A protected sources folder: shown, never renamed.
+    await settings.update({ protectedRoots: [src] });
+    const [p] = await renamer.preview({ paths: [to], ruleId: auto.id });
+    assert.equal(p.status, 'unchanged');
+    const [p2] = await renamer.preview({ paths: [queued], ruleId: auto.id });
+    assert.match(p2.warnings[0], /protected folder/);
+    const r2 = await renamer.apply({ items: [{ path: to, newName: 'other.mkv' }] });
+    assert.equal(r2.renamed.length, 0);
+    assert.match(r2.errors[0].error, /protected folder/);
+    // The target folder is not affected.
+    await fs.writeFile(path.join(dir, 'a.mkv'), '');
+    assert.equal((await renamer.apply({ items: [{ path: path.join(dir, 'a.mkv'), newName: 'b.mkv' }] })).renamed.length, 1);
+
+    // The naming check reads sources folders and marks blocked files.
+    const naming = new NamingChecks({ db, renamer, events: { emit() {} } });
+    const c = await naming.run({ paths: [src], ruleId: auto.id });
+    assert.deepEqual(c.rows.map((x) => x.oldName), ['Silo.S03E08.Flood.1080p.mkv']);
+    assert.match(c.rows[0].blocked, /protected folder/);
   } finally {
     await cleanup();
   }

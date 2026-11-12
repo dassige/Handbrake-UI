@@ -3,7 +3,7 @@ import { usePaneSwitch } from '../components/PaneSwitch.jsx';
 import { AlertTriangle, Captions, History, ListX, RotateCcw, SlidersHorizontal, Upload, Wand2 } from 'lucide-react';
 import { api } from '../api.js';
 import { SourceBrowser, DRAG_PATHS } from '../components/SourceBrowser.jsx';
-import { relTo } from '../format.js';
+import { displayPath } from '../roots.js';
 import { RuleEditor } from './RuleEditor.jsx';
 import { HistoryDialog } from './HistoryDialog.jsx';
 import { Help } from '../help/Help.jsx';
@@ -30,7 +30,7 @@ function InfoChip({ info }) {
 const warningText = (w) => (typeof w === 'string' ? w : w?.text ?? '');
 const isBlocking = (w) => !warningText(w).startsWith('name already taken');
 
-function NameInput({ row, onCommit }) {
+function NameInput({ row, onCommit, disabled }) {
   const [value, setValue] = useState(row.newName);
   useEffect(() => setValue(row.newName), [row.newName]);
   const commit = () => value.trim() && value !== row.newName && onCommit(value.trim());
@@ -38,6 +38,7 @@ function NameInput({ row, onCommit }) {
     <input
       className={`name-input ${row.edited ? 'edited' : ''}`}
       value={value}
+      disabled={disabled}
       spellCheck={false}
       onChange={(e) => setValue(e.target.value)}
       onBlur={commit}
@@ -119,7 +120,7 @@ export function RenameView({ settings, rules, ruleId, setRuleId, paths, setPaths
       (x) => t('rename.view.renamed', { count: x.renamed.filter((y) => !y.companion).length }),
     );
     if (!r) return;
-    if (r.errors.length) onError(new Error(t('rename.view.notRenamed', { count: r.errors.length, list: r.errors.map((e) => `${e.path.split(/[\\/]/).pop()}: ${e.error}`).join('; ') })));
+    if (r.errors.length) onError(new Error(t('rename.view.notRenamed', { count: r.errors.length, list: r.errors.map((e) => `${e.path.split(/[\\/]/).pop()}: ${renameWarning(e.error)}`).join('; ') })));
     const map = new Map(r.renamed.map((x) => [x.from, x.to]));
     setPaths((p) => p.map((x) => map.get(x) ?? x));
     setEdits({});
@@ -139,7 +140,7 @@ export function RenameView({ settings, rules, ruleId, setRuleId, paths, setPaths
       {paneSwitch}
       <SourceBrowser
         settings={settings}
-        root="target"
+        root="any"
         sortId="rename"
         title={t('rename.view.convertedFiles')}
         addLabel={t('rename.view.addLabel')}
@@ -242,14 +243,14 @@ export function RenameView({ settings, rules, ruleId, setRuleId, paths, setPaths
                   return [
                     showDir && (
                       <tr key={`${r.dir}-dir`} className="dir-row">
-                        <td colSpan={3}>{relTo(settings?.targetRoot, r.dir)}</td>
+                        <td colSpan={3}>{displayPath(settings, r.dir)}</td>
                       </tr>
                     ),
                     <tr key={r.path} className={`${r.status} ${r.status === 'rename' && !isTicked(r) ? 'off' : ''}`}>
                       <td>
                         <input
                           type="checkbox"
-                          disabled={r.status === 'unchanged'}
+                          disabled={r.status !== 'rename'}
                           checked={isTicked(r)}
                           onChange={() => toggle(r)}
                           aria-label={t('rename.view.renameFile', { name: r.oldName })}
@@ -257,7 +258,7 @@ export function RenameView({ settings, rules, ruleId, setRuleId, paths, setPaths
                       </td>
                       <td className="names">
                         <div className="old-name" title={r.path}>{r.oldName}</div>
-                        <NameInput row={r} onCommit={(v) => setEdits((e) => ({ ...e, [r.path]: v }))} />
+                        <NameInput row={r} disabled={r.status === 'blocked'} onCommit={(v) => setEdits((e) => ({ ...e, [r.path]: v }))} />
                         {r.warnings.length > 0 && (
                           <div className={blocking.length ? 'warn-text' : 'muted small'}>
                             <AlertTriangle size={12} /> {r.warnings.map(renameWarning).join('; ')}

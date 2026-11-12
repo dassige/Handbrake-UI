@@ -105,7 +105,7 @@
     }
   },
   "view": {
-    "convertedFiles": "File convertiti",
+    "convertedFiles": "Cartelle",
     "renameList": "Elenco da rinominare",
     "renameListCount": "Elenco da rinominare ({count})",
     "addLabel": "Aggiungi da rinominare",
@@ -124,7 +124,7 @@
     "clearList": "Svuota elenco",
     "reading": "Lettura…",
     "noVideos": "Nessun file video trovato.",
-    "empty": "Trascina qui file o cartelle convertiti, oppure usa “Rinomina” sui processi terminati.",
+    "empty": "Trascina qui file o cartelle, oppure usa “Rinomina” sui processi terminati.",
     "namesColumn": "Nome attuale → nuovo nome",
     "renameFile": "Rinomina {name}",
     "tvChip": "TV · S{season}e{episode}",

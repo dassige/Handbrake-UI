@@ -355,7 +355,7 @@
         "Cartelle sul server (non sul tuo computer). Funzionano anche le condivisioni NAS montate sul server.",
         "- **Cartelle sorgenti**: dove si trovano i file da convertire. Aggiungine quante ti servono con **Aggiungi una cartella sorgenti**; il pannello Sorgenti ne mostra una alla volta e non può salire oltre di essa. Rimuovere una cartella dall’elenco non elimina niente.",
         "- **Nome** (facoltativo) di una cartella sorgenti: un nome più semplice come “Downloads”, mostrato al posto del percorso nel pannello Sorgenti, negli elenchi di cartelle e nella vista Qualità. Ogni nome si può usare una sola volta, fino a 40 caratteri; con un nome vuoto viene mostrato il nome della cartella stessa.",
-        "- **Proteggi** su una cartella sorgenti: impedisce che i suoi file e le sue cartelle vengano eliminati dall’app, per esempio la cartella da cui un client di download sta ancora facendo il seeding. Nel pannello Sorgenti una cartella così mostra **Protetta** al posto del pulsante Elimina, e anche il server rifiuta le eliminazioni lì.",
+        "- **Proteggi** su una cartella sorgenti: impedisce che i suoi file e le sue cartelle vengano eliminati o rinominati dall’app, per esempio la cartella da cui un client di download sta ancora facendo il seeding. Nel pannello Sorgenti una cartella così mostra **Protetta** al posto del pulsante Elimina, e anche il server rifiuta lì eliminazioni e rinomine.",
         "- **Cartella di destinazione**: dove vengono scritti i file convertiti. Le viste Rinomina e Unisci funzionano solo qui.",
         "Tutte devono esistere. La destinazione non può trovarsi dentro una cartella sorgenti, e una cartella sorgenti non può trovarsi dentro un’altra. In Docker devono trovarsi dentro la cartella montata nel container (`MEDIA_DIR`, di solito `/mnt`).",
         "Le strutture di output **Nome della cartella sorgente** e **Percorso completo della sorgente** vengono calcolate a partire dalla cartella sorgenti in cui si trova ciascun file."
@@ -448,11 +448,11 @@
       "title": "Rinominare i file",
       "body": [
         "I file scaricati hanno nomi come `The.Rookie.6x01.Title.ITA.ENG.1080p.NFRip.AAC.x265-Pir8`. La vista Rinomina li trasforma in `The Rookie S06e01 - Title`, usando i [set di regole](#rename.rules).",
-        "1. A sinistra, sfoglia la **cartella di destinazione** e trascina i file o le cartelle convertiti nell’elenco di rinomina (oppure usa **Rinomina** su un processo convertito).",
+        "1. A sinistra, sfoglia la cartella di destinazione o una cartella sorgenti e trascina file o cartelle nell’elenco di rinomina (oppure usa **Rinomina** su un processo convertito).",
         "1. Scegli le **Regole**. Quella integrata **Auto** riconosce sia gli episodi TV sia i film.",
         "1. Guarda l’[anteprima](#rename.preview): correggi a mano qualsiasi nome e scrivi un [nome della serie](#rename.showName) dove non ne è stato trovato nessuno.",
         "1. Premi **Rinomina**. Ogni gruppo di rinomine si può annullare dalla [Cronologia](#rename.history).",
-        "Si possono rinominare solo i file nella cartella di destinazione, mai le sorgenti (i download potrebbero essere ancora in seeding)."
+        "Non si possono rinominare i file in una cartella sorgenti segnata come **Proteggi** nelle [Impostazioni](#settings.folders) (un client di download potrebbe ancora farne il seeding), né i file in coda o in conversione. Una sorgente rinominata conta ancora come convertita, e una cartella monitorata non la prende per un file nuovo."
       ],
       "see": [
         "rename.preview",
@@ -729,7 +729,7 @@
     "naming.overview": {
       "title": "Controllo nomi",
       "body": [
-        "Trova i video nella cartella di destinazione il cui nome non è quello che darebbero le tue regole di rinomina, così puoi riordinare un’intera libreria senza aprire ogni cartella.",
+        "Trova i video nelle tue cartelle il cui nome non è quello che darebbero le tue regole di rinomina, così puoi riordinare un’intera libreria senza aprire ogni cartella.",
         "1. In **Nomi**, scegli le **Regole** da usare per il controllo: **Auto**, **TV series**, **Movies** o una delle tue [regole](#rename.rules).",
         "1. Scegli cartelle o file nel pannello **Cartelle** e premi **Controlla i nomi**.",
         "1. I [risultati](#naming.results) elencano solo i file da controllare. Spunta quelli da correggere e premi **Correggi in Rinomina**.",
@@ -746,7 +746,7 @@
     "naming.folders": {
       "title": "Scegliere cosa controllare",
       "body": [
-        "Il pannello Cartelle mostra la cartella di destinazione, la stessa su cui lavora Rinomina.",
+        "Il pannello Cartelle mostra ogni cartella sorgenti e la cartella di destinazione, le stesse su cui lavora Rinomina; scegline una nell’elenco in alto.",
         "Spunta cartelle e file (Ctrl-clic e Maiusc-clic ne selezionano più di uno) e premi **Controlla i nomi**. Una cartella include tutto ciò che contiene, sottocartelle comprese."
       ],
       "see": [
@@ -760,7 +760,7 @@
         "- **Nome sbagliato**: le regole rinominerebbero il file.",
         "- **Non riconosciuto**: le regole non hanno trovato qualcosa, ad esempio il numero dell’episodio con **TV series** o l’anno con **Movies**. Il file può comunque avere il nome giusto; controllalo in Rinomina e scrivi il nome a mano se serve.",
         "- **Rinominati o spostati**: file che non ci sono più con quel nome, ad esempio perché li hai corretti in Rinomina. Restano nel risultato ma non si possono selezionare.",
-        "I file che hanno già il nome giusto vengono contati ma non elencati. **Correggi in Rinomina** accetta fino a 5000 file alla volta."
+        "I file che hanno già il nome giusto vengono contati ma non elencati. I file in una cartella protetta, o in coda per la conversione, sono elencati ma non si possono selezionare. **Correggi in Rinomina** accetta fino a 5000 file alla volta."
       ],
       "see": [
         "naming.overview",

@@ -103,7 +103,9 @@
     "noYear": "nessun anno trovato",
     "textAfterYear": "il testo dopo l’anno è stato eliminato: “{text}”",
     "nameTaken": "nome già usato; si usa “{name}”",
-    "stepFailed": "il passo “{step}” non è riuscito: {message}"
+    "stepFailed": "il passo “{step}” non è riuscito: {message}",
+    "protectedFolder": "in una cartella protetta: non si può rinominare (Impostazioni → Cartelle)",
+    "queued": "in coda o in conversione: toglilo prima dalla coda"
   },
   "renameNote": {
     "needsRename": "Da rinominare: {warnings}",

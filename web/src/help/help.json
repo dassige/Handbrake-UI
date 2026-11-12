@@ -355,7 +355,7 @@
         "Folders on the server (not on your computer). NAS shares mounted on the server work too.",
         "- **Sources folders**: where the files to convert are. Add as many as you need with **Add a sources folder**; the Sources panel shows one at a time and can't go above it. Removing a folder from the list deletes nothing.",
         "- **Name** (optional) on a sources folder: a friendly name such as “Downloads”, shown instead of the path in the Sources panel, the folder lists and the Quality view. Each name can be used once, up to 40 characters; an empty name shows the folder’s own name.",
-        "- **Protect** on a sources folder: stops its files and folders being deleted from the app, for example the folder a download client is still seeding from. In the Sources panel such a folder shows **Protected** instead of the Delete button, and the server refuses deletes there too.",
+        "- **Protect** on a sources folder: stops its files and folders being deleted or renamed from the app, for example the folder a download client is still seeding from. In the Sources panel such a folder shows **Protected** instead of the Delete button, and the server refuses deletes and renames there too.",
         "- **Target folder**: where converted files are written. The Rename and Merge views work only here.",
         "All must exist. The target cannot be inside a sources folder, and a sources folder cannot be inside another one. In Docker they must be inside the folder mounted into the container (`MEDIA_DIR`, usually `/mnt`).",
         "The output layouts **Source folder name** and **Full source path** are worked out from the sources folder each file is in."
@@ -448,11 +448,11 @@
       "title": "Renaming files",
       "body": [
         "Downloaded files have names like `The.Rookie.6x01.Title.ITA.ENG.1080p.NFRip.AAC.x265-Pir8`. The Rename view turns them into `The Rookie S06e01 - Title`, using [rule sets](#rename.rules).",
-        "1. On the left, browse the **target folder** and drag converted files or folders to the rename list (or use **Rename** on a converted job).",
+        "1. On the left, browse the target folder or a sources folder and drag files or folders to the rename list (or use **Rename** on a converted job).",
         "1. Pick the **Rules**. The built-in **Auto** recognises both TV episodes and movies.",
         "1. Look at the [preview](#rename.preview): fix any name by hand, and type a [show name](#rename.showName) where none was found.",
         "1. Press **Rename**. Every batch can be undone from [History](#rename.history).",
-        "Only files in the target folder can be renamed, never the sources (downloads may still be seeding)."
+        "Files in a sources folder marked **Protect** in [Settings](#settings.folders) can’t be renamed (a download client may still be seeding them), nor can files that are queued or converting. A renamed source still counts as converted, and a watch folder doesn’t take it for a new file."
       ],
       "see": [
         "rename.preview",
@@ -729,7 +729,7 @@
     "naming.overview": {
       "title": "Naming check",
       "body": [
-        "Finds the videos in the target folder whose name is not the one your rename rules would give them, so a whole library can be tidied up without opening every folder.",
+        "Finds the videos in your folders whose name is not the one your rename rules would give them, so a whole library can be tidied up without opening every folder.",
         "1. In **Naming**, pick the **Rules** to check against: **Auto**, **TV series**, **Movies** or one of your own [rule sets](#rename.rules).",
         "1. Choose folders or files in the **Folders** panel and press **Check names**.",
         "1. The [results](#naming.results) list only the files that need a look. Tick the ones to fix and press **Fix in Rename**.",
@@ -746,7 +746,7 @@
     "naming.folders": {
       "title": "Choosing what to check",
       "body": [
-        "The Folders panel shows the target folder, the same one Rename works on.",
+        "The Folders panel shows every sources folder and the target folder, the same ones Rename works on; choose one in the list at the top.",
         "Tick folders and files (Ctrl-click and Shift-click select several) and press **Check names**. A folder includes everything inside it, sub-folders too."
       ],
       "see": [
@@ -760,7 +760,7 @@
         "- **Wrong name**: the rules would rename the file.",
         "- **Not recognised**: the rules found something missing, such as no episode number with **TV series** or no year with **Movies**. The file may still have the right name; check it in Rename and type the name by hand if needed.",
         "- **Renamed or moved**: files that are no longer there under that name, for example because you fixed them in Rename. They stay in the result but can’t be selected.",
-        "Files that already have the right name are counted but not listed. **Fix in Rename** takes up to 5000 files at once."
+        "Files that already have the right name are counted but not listed. Files in a protected folder, or queued for conversion, are listed but can’t be selected. **Fix in Rename** takes up to 5000 files at once."
       ],
       "see": [
         "naming.overview",

@@ -103,7 +103,9 @@
     "noYear": "no se encontró el año",
     "textAfterYear": "se descartó el texto que seguía al año: «{text}»",
     "nameTaken": "el nombre ya existe; se usa «{name}»",
-    "stepFailed": "falló el paso «{step}»: {message}"
+    "stepFailed": "falló el paso «{step}»: {message}",
+    "protectedFolder": "en una carpeta protegida: no se puede renombrar (Ajustes → Carpetas)",
+    "queued": "en cola o en conversión: quítelo antes de la cola"
   },
   "renameNote": {
     "needsRename": "Requiere renombrado: {warnings}",

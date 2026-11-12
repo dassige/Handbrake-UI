@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.1.1] - 2026/11/12
+
+- feat: Rename and Naming check also work in the sources folders
+
+Rename and the Naming check can now browse and rename files in the
+sources folders as well as the target folder. Files in a folder marked
+Protect (a download client may be seeding them) and files that are
+queued or converting are shown but can't be renamed; the server
+refuses them too. A renamed source still counts as converted, and a
+watch folder doesn't take it for a new file. Protect now means "can't
+be deleted or renamed from the app".
+
 ## [4.1.0] - 2026/11/12
 
 - feat: Naming check, find files whose names don't follow a rename rule set

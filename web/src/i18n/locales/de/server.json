@@ -103,7 +103,9 @@
     "noYear": "kein Jahr gefunden",
     "textAfterYear": "Text nach dem Jahr wurde entfernt: „{text}“",
     "nameTaken": "Name bereits vergeben; verwende „{name}“",
-    "stepFailed": "Schritt „{step}“ fehlgeschlagen: {message}"
+    "stepFailed": "Schritt „{step}“ fehlgeschlagen: {message}",
+    "protectedFolder": "in einem geschützten Ordner: kann nicht umbenannt werden (Einstellungen → Ordner)",
+    "queued": "in der Warteschlange oder wird konvertiert: zuerst aus der Warteschlange entfernen"
   },
   "renameNote": {
     "needsRename": "Umbenennen nötig: {warnings}",

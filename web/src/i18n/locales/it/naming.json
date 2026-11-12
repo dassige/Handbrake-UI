@@ -4,7 +4,7 @@
   "results": "Risultati",
   "checkNames": "Controlla i nomi",
   "checkNamesTitle": "Doppio clic o trascina per controllare i nomi",
-  "browserHint": "Seleziona cartelle o file nella cartella di destinazione e premi Controlla i nomi; le sottocartelle sono incluse.",
+  "browserHint": "Seleziona cartelle o file e premi Controlla i nomi; le sottocartelle sono incluse.",
   "rules": "Regole",
   "checkAgain": "Ricontrolla",
   "checkAgainTitle": "Controlla di nuovo le stesse cartelle, ad esempio dopo aver rinominato",

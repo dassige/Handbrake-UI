@@ -52,6 +52,8 @@ export class NamingChecks {
       await Promise.all(rows.slice(i, i + 32).map(async (row) => {
         const st = await fs.stat(row.path).catch(() => null);
         row.gone = !st;
+        // In a protected folder, or queued since the check: shown, but not offered for fixing.
+        row.blocked = st ? this.renamer.blockReason(row.path) : null;
         row.mtime = st?.mtimeMs ?? null;
         row.size = st?.size ?? null;
       }));

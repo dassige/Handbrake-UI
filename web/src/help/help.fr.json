@@ -355,7 +355,7 @@
         "Des dossiers sur le serveur (pas sur votre ordinateur). Les partages NAS montés sur le serveur fonctionnent aussi.",
         "- **Dossiers de sources** : l'emplacement des fichiers à convertir. Ajoutez-en autant que nécessaire avec **Ajouter un dossier de sources** ; le panneau Sources en affiche un à la fois et ne peut pas remonter au-dessus. Retirer un dossier de la liste ne supprime rien.",
         "- **Nom** (facultatif) sur un dossier de sources : un nom convivial tel que « Téléchargements », affiché à la place du chemin dans le panneau Sources, les listes de dossiers et la vue Qualité. Chaque nom ne peut servir qu'une fois, 40 caractères au maximum ; un nom vide affiche le nom du dossier lui-même.",
-        "- **Protéger** sur un dossier de sources : empêche la suppression de ses fichiers et dossiers depuis l'application, par exemple le dossier dont un client de téléchargement assure encore le partage. Dans le panneau Sources, un tel dossier affiche **Protégé** à la place du bouton Supprimer, et le serveur refuse aussi les suppressions à cet endroit.",
+        "- **Protéger** sur un dossier de sources : empêche la suppression et le renommage de ses fichiers et dossiers depuis l'application, par exemple le dossier dont un client de téléchargement assure encore le partage. Dans le panneau Sources, un tel dossier affiche **Protégé** à la place du bouton Supprimer, et le serveur refuse aussi les suppressions et les renommages à cet endroit.",
         "- **Dossier cible** : l'emplacement où les fichiers convertis sont écrits. Les vues Renommer et Fusionner ne travaillent qu'ici.",
         "Tous doivent exister. La cible ne peut pas se trouver dans un dossier de sources, et un dossier de sources ne peut pas se trouver dans un autre. Dans Docker, ils doivent se trouver dans le dossier monté dans le conteneur (`MEDIA_DIR`, généralement `/mnt`).",
         "Les organisations de sortie **Nom du dossier source** et **Chemin source complet** sont calculées à partir du dossier de sources où se trouve chaque fichier."
@@ -448,11 +448,11 @@
       "title": "Renommer des fichiers",
       "body": [
         "Les fichiers téléchargés ont des noms comme `The.Rookie.6x01.Title.ITA.ENG.1080p.NFRip.AAC.x265-Pir8`. La vue Renommer les transforme en `The Rookie S06e01 - Title`, à l'aide de [jeux de règles](#rename.rules).",
-        "1. À gauche, parcourez le **dossier cible** et faites glisser les fichiers ou dossiers convertis vers la liste à renommer (ou utilisez **Renommer** sur une tâche convertie).",
+        "1. À gauche, parcourez le dossier cible ou un dossier de sources et faites glisser des fichiers ou des dossiers vers la liste à renommer (ou utilisez **Renommer** sur une tâche convertie).",
         "1. Choisissez les **Règles**. Le jeu intégré **Auto** reconnaît aussi bien les épisodes de séries que les films.",
         "1. Regardez l'[aperçu](#rename.preview) : corrigez un nom à la main si besoin, et saisissez un [nom de série](#rename.showName) là où aucun n'a été trouvé.",
         "1. Appuyez sur **Renommer**. Chaque lot peut être annulé depuis l'[Historique](#rename.history).",
-        "Seuls les fichiers du dossier cible peuvent être renommés, jamais les sources (les téléchargements peuvent encore être partagés)."
+        "Les fichiers d’un dossier de sources marqué **Protéger** dans les [Paramètres](#settings.folders) ne peuvent pas être renommés (un client de téléchargement les partage peut-être encore), pas plus que les fichiers en file d’attente ou en conversion. Une source renommée compte toujours comme convertie, et un dossier surveillé ne la prend pas pour un nouveau fichier."
       ],
       "see": [
         "rename.preview",
@@ -729,7 +729,7 @@
     "naming.overview": {
       "title": "Contrôle des noms",
       "body": [
-        "Trouve les vidéos du dossier cible dont le nom n’est pas celui que leur donneraient vos règles de renommage : vous pouvez ainsi ranger toute une bibliothèque sans ouvrir chaque dossier.",
+        "Trouve les vidéos de vos dossiers dont le nom n’est pas celui que leur donneraient vos règles de renommage : vous pouvez ainsi ranger toute une bibliothèque sans ouvrir chaque dossier.",
         "1. Dans **Noms**, choisissez les **Règles** à utiliser : **Auto**, **TV series**, **Movies** ou l’un de vos [jeux de règles](#rename.rules).",
         "1. Choisissez des dossiers ou des fichiers dans le panneau **Dossiers** et appuyez sur **Contrôler les noms**.",
         "1. Les [résultats](#naming.results) ne listent que les fichiers à revoir. Cochez ceux à corriger et appuyez sur **Corriger dans Renommer**.",
@@ -746,7 +746,7 @@
     "naming.folders": {
       "title": "Choisir ce qu’il faut contrôler",
       "body": [
-        "Le panneau Dossiers montre le dossier cible, celui sur lequel travaille Renommer.",
+        "Le panneau Dossiers montre chaque dossier de sources et le dossier cible, ceux sur lesquels travaille Renommer ; choisissez-en un dans la liste en haut.",
         "Cochez des dossiers et des fichiers (Ctrl-clic et Maj-clic en sélectionnent plusieurs) et appuyez sur **Contrôler les noms**. Un dossier inclut tout ce qu’il contient, sous-dossiers compris."
       ],
       "see": [
@@ -760,7 +760,7 @@
         "- **Nom incorrect** : les règles renommeraient le fichier.",
         "- **Non reconnu** : il manque quelque chose aux règles, par exemple un numéro d’épisode avec **TV series** ou une année avec **Movies**. Le fichier peut quand même avoir le bon nom ; vérifiez-le dans Renommer et tapez le nom à la main si besoin.",
         "- **Renommés ou déplacés** : fichiers qui n’existent plus sous ce nom, par exemple parce que vous les avez corrigés dans Renommer. Ils restent dans le résultat mais ne peuvent pas être sélectionnés.",
-        "Les fichiers qui ont déjà le bon nom sont comptés mais pas listés. **Corriger dans Renommer** accepte jusqu’à 5000 fichiers à la fois."
+        "Les fichiers qui ont déjà le bon nom sont comptés mais pas listés. Les fichiers d’un dossier protégé, ou en file d’attente pour une conversion, sont listés mais ne peuvent pas être sélectionnés. **Corriger dans Renommer** accepte jusqu’à 5000 fichiers à la fois."
       ],
       "see": [
         "naming.overview",

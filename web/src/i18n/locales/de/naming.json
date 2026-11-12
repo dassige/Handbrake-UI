@@ -4,7 +4,7 @@
   "results": "Ergebnisse",
   "checkNames": "Namen prüfen",
   "checkNamesTitle": "Doppelklicken oder ziehen, um die Namen zu prüfen",
-  "browserHint": "Wählen Sie Ordner oder Dateien im Zielordner und drücken Sie „Namen prüfen“; Unterordner sind eingeschlossen.",
+  "browserHint": "Wählen Sie Ordner oder Dateien und drücken Sie „Namen prüfen“; Unterordner sind eingeschlossen.",
   "rules": "Regeln",
   "checkAgain": "Erneut prüfen",
   "checkAgainTitle": "Dieselben Ordner erneut prüfen, z. B. nach dem Umbenennen",

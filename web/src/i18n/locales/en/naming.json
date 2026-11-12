@@ -4,7 +4,7 @@
   "results": "Results",
   "checkNames": "Check names",
   "checkNamesTitle": "Double-click or drag to check the names",
-  "browserHint": "Select folders or files in the target folder and press Check names; sub-folders are included.",
+  "browserHint": "Select folders or files and press Check names; sub-folders are included.",
   "rules": "Rules",
   "checkAgain": "Check again",
   "checkAgainTitle": "Check the same folders again, e.g. after renaming",

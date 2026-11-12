@@ -105,7 +105,7 @@
     }
   },
   "view": {
-    "convertedFiles": "Archivos convertidos",
+    "convertedFiles": "Carpetas",
     "renameList": "Lista para renombrar",
     "renameListCount": "Lista para renombrar ({count})",
     "addLabel": "Añadir para renombrar",
@@ -124,7 +124,7 @@
     "clearList": "Vaciar la lista",
     "reading": "Leyendo…",
     "noVideos": "No se encontraron archivos de video.",
-    "empty": "Arrastre aquí archivos o carpetas convertidos, o use «Renombrar» en los trabajos terminados.",
+    "empty": "Arrastre aquí archivos o carpetas, o use «Renombrar» en los trabajos terminados.",
     "namesColumn": "Nombre actual → nombre nuevo",
     "renameFile": "Renombrar {name}",
     "tvChip": "Serie · S{season}e{episode}",

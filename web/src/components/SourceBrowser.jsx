@@ -208,7 +208,7 @@ export function SourceBrowser({
             >
               {roots.map((r) => (
                 <option key={r} value={r} title={r}>
-                  {root === 'source' && settings.protectedRoots?.includes(r)
+                  {root !== 'target' && settings.protectedRoots?.includes(r)
                     ? t('sources.rootProtected', { name: rootLabel(settings, r) })
                     : rootLabel(settings, r)}
                 </option>

@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { badRequest, conflict, notFound } from '../errors.js';
-import { collectVideos, makeFileMatcher, resolveUnder } from '../paths.js';
+import { collectVideos, makeFileMatcher, resolveUnderAny, rootOf } from '../paths.js';
 import { sanitizeFileName } from './parse.js';
 import { importAren, normalizeSteps, runSteps } from './steps.js';
 
@@ -159,14 +159,30 @@ export class Renamer {
 
   // ---------------------------------------------------------------- preview / apply
 
-  /** Expands files and folders (under the target root) into a list of files. */
+  /** Every folder files can be renamed in: the sources folders and the target folder. */
+  roots() {
+    return [...this.settings.get('sourceRoots'), this.settings.get('targetRoot')];
+  }
+
+  /**
+   * Why a file can't be renamed (a warning, in English), or null. Files in a protected sources
+   * folder (a download client may be seeding them) and files queued or converting stay as they are.
+   */
+  blockReason(file) {
+    const root = rootOf(this.roots(), file);
+    if (root && this.settings.get('protectedRoots').includes(root)) return "in a protected folder: it can't be renamed (Settings → Folders)";
+    const busy = this.db.prepare(`SELECT 1 FROM jobs WHERE source_path = ? AND status IN ('queued', 'running', 'paused') LIMIT 1`).get(file);
+    return busy ? 'queued or converting: remove it from the queue first' : null;
+  }
+
+  /** Expands files and folders (in the sources folders or the target folder) into a list of files. */
   async expand(paths, max = MAX_FILES) {
     if (!Array.isArray(paths) || !paths.length) return [];
-    const root = this.settings.get('targetRoot');
+    const roots = this.roots();
     const matcher = makeFileMatcher(this.settings);
     const out = [];
     for (const p of paths) {
-      const abs = await resolveUnder(root, p);
+      const { path: abs } = await resolveUnderAny(roots, p);
       const stat = await fs.stat(abs);
       if (stat.isDirectory()) out.push(...(await collectVideos(abs, { recursive: true, matcher: { ...matcher, excluded: () => false } })));
       else if (stat.isFile()) out.push(abs);
@@ -234,9 +250,17 @@ export class Renamer {
         edited: edit != null,
         info: r.info,
         warnings: r.warnings,
+        blocked: this.blockReason(file),
       };
     });
-    await this.resolveCollisions(rows);
+    // Blocked files keep their names: they are shown with the proposed name, but never renamed.
+    const blocked = rows.filter((r) => r.blocked);
+    for (const r of blocked) {
+      r.newName = r.wanted;
+      r.status = r.wanted === r.oldName ? 'unchanged' : 'blocked';
+      r.warnings = [r.blocked, ...r.warnings];
+    }
+    await this.resolveCollisions(rows.filter((r) => !r.blocked));
     // Subtitle files that will follow each renamed video.
     const listed = new Set(rows.map((r) => r.path));
     await Promise.all(rows.map(async (row) => {
@@ -292,10 +316,16 @@ export class Renamer {
    */
   async apply({ items, ruleName = null, auto = false }) {
     if (!Array.isArray(items) || !items.length) throw badRequest('Nothing to rename');
-    const root = this.settings.get('targetRoot');
+    const roots = this.roots();
     const rows = [];
+    const blocked = [];
     for (const it of items) {
-      const abs = await resolveUnder(root, it.path);
+      const { path: abs } = await resolveUnderAny(roots, it.path);
+      const reason = this.blockReason(abs);
+      if (reason) {
+        blocked.push({ path: abs, error: reason });
+        continue;
+      }
       const oldName = path.basename(abs);
       const [, ext] = splitName(oldName);
       rows.push({ path: abs, dir: path.dirname(abs), oldName, wanted: cleanEdit(it.newName, ext), warnings: [] });
@@ -311,7 +341,7 @@ export class Renamer {
       }
     }
     const result = await this.renameMany(pairs);
-    result.errors.push(...skipped);
+    result.errors.push(...blocked, ...skipped);
     if (result.renamed.length) {
       this.db
         .prepare('INSERT INTO rename_history (created_at, rule_name, auto, items) VALUES (?, ?, ?, ?)')
@@ -349,7 +379,15 @@ export class Renamer {
     }
     if (renamed.length) {
       const stmt = this.db.prepare('UPDATE jobs SET output_path = ?, rename_note = NULL WHERE output_path = ?');
-      for (const r of renamed) if (!r.companion) stmt.run(r.to, r.from);
+      // A renamed source still counts as converted, and a watch folder does not take it for a new file.
+      const source = this.db.prepare('UPDATE jobs SET source_path = ? WHERE source_path = ?');
+      const seen = this.db.prepare('UPDATE OR REPLACE watch_seen SET path = ? WHERE path = ?');
+      for (const r of renamed) {
+        if (r.companion) continue;
+        stmt.run(r.to, r.from);
+        source.run(r.to, r.from);
+        seen.run(r.to, r.from);
+      }
       this.followCopiedSubtitles(renamed);
       this.events.emit('jobs');
     }
@@ -421,8 +459,10 @@ export class Renamer {
       const [toExists, fromExists] = await Promise.all(
         [it.to, it.from].map((p) => fs.access(p).then(() => true, () => false)),
       );
+      const reason = toExists && !it.companion ? this.blockReason(it.to) : null;
       if (!toExists) errors.push({ path: it.to, error: 'file no longer exists' });
       else if (fromExists) errors.push({ path: it.from, error: 'the original name is in use again' });
+      else if (reason) errors.push({ path: it.to, error: reason });
       else pairs.push({ from: it.to, to: it.from, ...(it.companion ? { companion: true } : {}) });
     }
     const result = await this.renameMany(pairs);

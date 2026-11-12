@@ -4,7 +4,7 @@
   "results": "Résultats",
   "checkNames": "Contrôler les noms",
   "checkNamesTitle": "Double-cliquez ou faites glisser pour contrôler les noms",
-  "browserHint": "Sélectionnez des dossiers ou des fichiers dans le dossier cible et appuyez sur Contrôler les noms ; les sous-dossiers sont inclus.",
+  "browserHint": "Sélectionnez des dossiers ou des fichiers et appuyez sur Contrôler les noms ; les sous-dossiers sont inclus.",
   "rules": "Règles",
   "checkAgain": "Contrôler à nouveau",
   "checkAgainTitle": "Contrôler à nouveau les mêmes dossiers, par exemple après un renommage",

@@ -4,7 +4,7 @@
   "results": "Resultados",
   "checkNames": "Comprobar nombres",
   "checkNamesTitle": "Doble clic o arrastre para comprobar los nombres",
-  "browserHint": "Seleccione carpetas o archivos en la carpeta de destino y pulse Comprobar nombres; se incluyen las subcarpetas.",
+  "browserHint": "Seleccione carpetas o archivos y pulse Comprobar nombres; se incluyen las subcarpetas.",
   "rules": "Reglas",
   "checkAgain": "Volver a comprobar",
   "checkAgainTitle": "Comprobar de nuevo las mismas carpetas, por ejemplo después de renombrar",

@@ -137,10 +137,11 @@ the desktop app.
   year), drops release tags (`1080p`, `WEB-DL`, `x265`…) and builds clean names
   from templates (`Show S01e02 - Episode title`, `Movie Title (2020)`). Preview
   and edit before applying, undo any batch, and optionally rename after each
-  conversion. Rule sets work like Advanced Renamer methods and can import
-  Advanced Renamer `.aren` presets.
-- **Naming check:** compares every video in chosen folders of the target
-  folder with the name a rename rule set would give it, and lists the files
+  conversion. Works in the target folder and in the sources folders, except
+  folders marked **Protect** and files in the queue. Rule sets work like
+  Advanced Renamer methods and can import Advanced Renamer `.aren` presets.
+- **Naming check:** compares every video in chosen folders (sources or
+  target) with the name a rename rule set would give it, and lists the files
   with a different name or that the rules can't fully recognise. Only names are
   read, so a whole library takes seconds; **Fix in Rename** opens the chosen
   files in Rename with the same rules. The last 20 results are kept, and files
