@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.1.6] - 2026/11/13
+
+- feat: Add ENG tag rule for marking English-only files
+
 ## [4.1.5] - 2026/11/13
 
 - feat: Quality check can re-check the selected files

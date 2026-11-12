@@ -1,0 +1,30 @@
+{
+  "type": "encforge-rename-rules",
+  "version": 1,
+  "name": "Add ENG tag",
+  "description": "Marks English-only files. Run after the TV series / Movies presets. TV: Show S01e02 (ENG) - Title. Movies: Title (Year) - ENG. Already tagged names are left alone.",
+  "steps": [
+    {
+      "type": "replace",
+      "active": true,
+      "description": "TV: add (ENG) after the episode number",
+      "find": "^(.*\\bS\\d{2,}e\\d{2,}(?:-e\\d{2,})?)(?![\\d-])(?! \\(ENG\\))",
+      "replaceWith": "$1 (ENG)",
+      "regex": true,
+      "caseSensitive": false,
+      "occurrence": "first",
+      "applyTo": "name"
+    },
+    {
+      "type": "replace",
+      "active": true,
+      "description": "Movies: add - ENG at the end",
+      "find": "^(?!.*\\bS\\d{2,}e\\d{2,})(?!.* - ENG$)(.+)$",
+      "replaceWith": "$1 - ENG",
+      "regex": true,
+      "caseSensitive": false,
+      "occurrence": "first",
+      "applyTo": "name"
+    }
+  ]
+}
