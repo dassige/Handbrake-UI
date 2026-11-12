@@ -156,5 +156,17 @@
       "upload": "è in corso un caricamento"
     },
     "missingFolder": "La cartella {folder} non esiste su questo server; correggila nelle Impostazioni dopo il ripristino."
+  },
+  "error": {
+    "signInRequired": "Accedi prima",
+    "invalidApiKey": "Chiave API sconosciuta o revocata",
+    "browserOnly": "Accesso e chiavi API si gestiscono solo da un browser connesso",
+    "scope": "Questa chiave API non lo permette",
+    "crossSite": "Le richieste da altri siti web vengono rifiutate",
+    "wrongPassword": "Password errata",
+    "tooManyAttempts": "Troppi tentativi falliti: attendi qualche minuto e riprova",
+    "passwordTooShort": "La password deve avere almeno 8 caratteri",
+    "passwordTooLong": "La password è troppo lunga",
+    "noPassword": "Imposta prima una password"
   }
 }

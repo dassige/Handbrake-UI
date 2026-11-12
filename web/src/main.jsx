@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App.jsx';
+import { AuthGate } from './auth/AuthGate.jsx';
 import { DialogProvider } from './components/Dialogs.jsx';
 import { initLanguage, useLanguage } from './i18n/index.js';
 import './styles.css';
@@ -10,7 +10,7 @@ function Root() {
   useLanguage();
   return (
     <DialogProvider>
-      <App />
+      <AuthGate />
     </DialogProvider>
   );
 }

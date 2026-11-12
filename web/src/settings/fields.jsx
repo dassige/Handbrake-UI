@@ -41,10 +41,10 @@ export function Check({ checked, onChange, children, hint, disabled }) {
 }
 
 /** An on/off switch for turning a whole feature on. */
-export function Switch({ checked, onChange, label }) {
+export function Switch({ checked, onChange, label, disabled }) {
   return (
-    <label className="switch">
-      <input type="checkbox" role="switch" checked={!!checked} onChange={(e) => onChange(e.target.checked)} />
+    <label className={`switch ${disabled ? 'disabled' : ''}`}>
+      <input type="checkbox" role="switch" checked={!!checked} disabled={disabled} onChange={(e) => onChange(e.target.checked)} />
       <span className="switch-track" aria-hidden="true"><span className="switch-thumb" /></span>
       <span>{label}</span>
     </label>

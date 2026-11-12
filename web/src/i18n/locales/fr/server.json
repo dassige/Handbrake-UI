@@ -156,5 +156,17 @@
       "upload": "un téléversement est en cours"
     },
     "missingFolder": "Le dossier {folder} n'existe pas sur ce serveur ; corrigez-le dans les Paramètres après la restauration."
+  },
+  "error": {
+    "signInRequired": "Connectez-vous d’abord",
+    "invalidApiKey": "Clé API inconnue ou révoquée",
+    "browserOnly": "La connexion et les clés API ne se gèrent que depuis un navigateur connecté",
+    "scope": "Cette clé API ne le permet pas",
+    "crossSite": "Les requêtes provenant d’autres sites web sont refusées",
+    "wrongPassword": "Mot de passe incorrect",
+    "tooManyAttempts": "Trop de tentatives échouées : patientez quelques minutes et réessayez",
+    "passwordTooShort": "Le mot de passe doit comporter au moins 8 caractères",
+    "passwordTooLong": "Le mot de passe est trop long",
+    "noPassword": "Définissez d’abord un mot de passe"
   }
 }

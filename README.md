@@ -157,6 +157,9 @@ the desktop app.
   e-mail over SMTP when the queue finishes, a conversion or check fails, a file
   is converted or a watch folder adds files. In the browser, the tab title
   shows progress and desktop notifications can be turned on.
+- **Login and API keys** (both optional): a password for the web app, and API
+  keys for other programs (scripts, n8n, Home Assistant…), each limited to
+  read only, queue control or full access.
 - **Backup and restore:** a ZIP with the database (settings, presets, rename
   rules, jobs, histories) and optionally the logs; never video files.
   Downloadable, saved on the server, or scheduled. Restore runs live.
@@ -525,6 +528,7 @@ Every page and setting has a **?** with help.
 | `MEDIA_MOUNT` | `MEDIA_DIR` | Where `MEDIA_DIR` appears inside the container. Set it on Windows (e.g. `/media`) |
 | `SOURCE_ROOT` / `TARGET_ROOT` | `/mnt/downloads`, `/mnt/converted` | Initial folders, as seen inside the container. Used on first start only; change them later in Settings |
 | `TZ` | `UTC` | Time zone of the server clock. The conversion window follows it |
+| `DISABLE_LOGIN` | – | `true` turns login off, whatever Settings → Security says. Only to get back in after forgetting the password: see [Security](#security) |
 
 ### Without Docker (environment variables)
 
@@ -539,6 +543,7 @@ Every page and setting has a **?** with help.
 | `MKVMERGE` | `mkvmerge` | MKVToolNix merge program |
 | `WEB_DIR` | `../web/dist` | Built web UI |
 | `LOG_LEVEL` | `info` | `debug`, `info`, `warn` or `error` |
+| `DISABLE_LOGIN` | – | `true` turns login off, whatever Settings → Security says (see [Security](#security)) |
 
 Everything else (folders, output layout, check mode, CPU priority, conversion
 window, watch folders, notifications, backups…) is set in the app, on the
@@ -628,19 +633,49 @@ fails in the muxer ("non monotonically increasing dts").
 
 ## Security
 
-The app has **no login**. Anyone who can open its web page can browse,
+Login is **off** by default: anyone who can open the web page can browse,
 upload, download, rename and **delete files** in the configured folders, and
-change its settings.
+change the settings. Turn it on in **Settings → Security**:
 
-- Run it only on a trusted home or office network. **Do not expose port 8095
-  to the internet.**
-- For remote access, use a VPN (WireGuard, Tailscale…) or a reverse proxy with
-  authentication and HTTPS in front of it.
+1. Set a password (at least 8 characters).
+2. Turn on **Login**. The browser you are using stays signed in; every other
+   one gets a sign-in page. Browsers stay signed in until they go unused for
+   30 days, or until you sign out, change the password, or use **Sign out
+   other browsers**.
+
+After 5 wrong passwords, sign-in from that address is blocked for 15 minutes.
+
+**API keys.** Other programs use the same API as the web app (`/api/…`),
+with a key made in Settings → Security, sent as `Authorization: Bearer ef_…`
+(or `X-API-Key: ef_…`). Each key has an access level:
+
+| Access | Allows |
+|---|---|
+| Read only | `GET` requests: queue, jobs, presets, settings (webhook headers hidden), stats, folder lists, file downloads, the event stream |
+| Queue | also adding and controlling jobs, the queue, uploads, new folders, quality and naming checks |
+| Full | also settings, presets, rename rule sets, renaming and deleting files, merges, backups and restore |
+
+Keys never manage login or other keys; that needs a signed-in browser. A key is
+shown once when created; only its hash is stored. While login is off, keys are
+optional, but a key that is sent is still checked, so an integration can be
+tested first. `GET /api/health` always answers, for health checks.
+
+**Forgot the password?** Start the app with `DISABLE_LOGIN=true` (Docker: add it
+to `.env` and run `docker compose up -d`). Login is then off, and a new
+password can be set without the current one. Remove the variable and restart
+to turn login back on.
+
+- The password, sessions and API keys are not in backups, and a restore never
+  changes them. Backups do hold the settings, including the SMTP password and
+  webhook headers: keep `data/` and backup files private.
+- Requests from other websites that would change something are refused, so a
+  page you visit cannot use the app through your browser.
+- Login protects the app, not the connection: it is plain HTTP. **Do not
+  expose port 8095 to the internet.** For remote access, use a VPN (WireGuard,
+  Tailscale…) or a reverse proxy with HTTPS in front of it.
 - Give it only the folders it needs: `MEDIA_DIR` in Docker, and the sources and
   target folders in Settings. The app refuses paths outside the configured
   folders.
-- The SMTP password is stored in its database and backups, so keep `data/` and
-  backup files private.
 
 ## Troubleshooting
 

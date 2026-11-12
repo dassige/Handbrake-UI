@@ -156,5 +156,17 @@
       "upload": "an upload is in progress"
     },
     "missingFolder": "The folder {folder} does not exist on this server; fix it in Settings after restoring."
+  },
+  "error": {
+    "signInRequired": "Sign in first",
+    "invalidApiKey": "Unknown or revoked API key",
+    "browserOnly": "Login and API keys can only be managed from a signed-in browser",
+    "scope": "This API key does not allow that",
+    "crossSite": "Requests from other websites are refused",
+    "wrongPassword": "Wrong password",
+    "tooManyAttempts": "Too many failed attempts: wait a few minutes and try again",
+    "passwordTooShort": "The password must be at least 8 characters",
+    "passwordTooLong": "The password is too long",
+    "noPassword": "Set a password first"
   }
 }

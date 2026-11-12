@@ -983,6 +983,48 @@
         "presets",
         "presets.editor"
       ]
+    },
+    "settings.security": {
+      "title": "Seguridad: inicio de sesión",
+      "body": [
+        "EncForge no pide contraseña hasta que se activa el inicio de sesión. Mientras esté desactivado, cualquiera que pueda abrir la página puede explorar, convertir, renombrar y **eliminar archivos**, y cambiar los ajustes.",
+        "Para activarlo:",
+        "1. Establezca una contraseña (al menos 8 caracteres).",
+        "2. Active **Inicio de sesión**. Este navegador sigue con la sesión iniciada; los demás muestran una página de inicio de sesión.",
+        "- Un navegador mantiene la sesión hasta que pasan 30 días sin usarlo. **Cerrar sesión** (arriba a la derecha) la termina al momento.",
+        "- **Cambiar la contraseña** cierra la sesión en los demás navegadores, igual que **Cerrar sesión en los demás navegadores**.",
+        "- Tras 5 contraseñas incorrectas desde una misma dirección, el inicio de sesión desde ella se bloquea durante 15 minutos.",
+        "- Los demás programas usan [claves API](#settings.apiKeys) en lugar de la contraseña.",
+        "**¿Ha olvidado la contraseña?** Inicie la aplicación con la variable de entorno `DISABLE_LOGIN=true` (con Docker: añádala a `.env` y vuelva a crear el contenedor). El inicio de sesión queda desactivado y se puede establecer una nueva contraseña sin la actual. Quite la variable y reinicie para volver a activarlo.",
+        "La contraseña, los navegadores con sesión iniciada y las claves API no forman parte de las [copias de seguridad](#backup.overview), y una restauración nunca los cambia.",
+        "El inicio de sesión protege la aplicación, no la conexión: para acceder desde fuera de su red, use una VPN o un proxy inverso con HTTPS."
+      ],
+      "see": [
+        "settings.apiKeys",
+        "backup.overview"
+      ]
+    },
+    "settings.apiKeys": {
+      "title": "Claves API",
+      "body": [
+        "Las claves API permiten que otros programas (scripts, n8n, Home Assistant…) usen la API de EncForge: las mismas peticiones que hace la aplicación web, bajo `/api/`.",
+        "El programa envía la clave con cada petición, en una de estas cabeceras:",
+        "- `Authorization: Bearer ef_…`",
+        "- `X-API-Key: ef_…`",
+        "Cada clave tiene un nivel de acceso:",
+        "- **Solo lectura**: la cola, los trabajos, los preajustes, los ajustes (sin las cabeceras de los webhooks, que suelen contener tokens) y las estadísticas; listar carpetas y descargar archivos.",
+        "- **Cola**: además añadir y controlar trabajos, iniciar y detener la cola, subir archivos, crear carpetas, comprobaciones de calidad y de nombres.",
+        "- **Completo**: también todo lo demás: ajustes, preajustes y conjuntos de reglas de renombrado, renombrar y eliminar archivos, unir, copias de seguridad y restauración.",
+        "Ninguna clave puede gestionar el inicio de sesión ni las claves API: eso se hace aquí, en un navegador con la sesión iniciada.",
+        "- La clave se muestra una sola vez, al crearla. Solo se guarda una huella, así que una clave perdida no se puede volver a mostrar: revóquela y cree una nueva.",
+        "- La lista muestra cuándo se usó cada clave por última vez y desde qué dirección.",
+        "- Mientras el [inicio de sesión](#settings.security) esté desactivado, las claves son opcionales; aun así, una clave enviada se comprueba, de modo que una integración se puede probar antes de activarlo.",
+        "Ejemplo: añadir un archivo a la cola con el preajuste predeterminado (añada `\"presetId\"` para elegir otro):",
+        "`curl -H \"Authorization: Bearer ef_…\" -H \"Content-Type: application/json\" -d '{\"paths\":[\"/mnt/downloads/Movie.mkv\"]}' http://server:8095/api/jobs`"
+      ],
+      "see": [
+        "settings.security"
+      ]
     }
   }
 }

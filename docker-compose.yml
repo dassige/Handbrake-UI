@@ -13,6 +13,8 @@ services:
       # Used only on first start; change them later in the UI (Settings).
       SOURCE_ROOT: ${SOURCE_ROOT:-/mnt/downloads}
       TARGET_ROOT: ${TARGET_ROOT:-/mnt/converted}
+      # true turns login off (Settings → Security): the way back in after forgetting the password.
+      DISABLE_LOGIN: ${DISABLE_LOGIN:-}
     volumes:
       - ./data:/data
       # The host folder that holds your sources and targets. On Linux it is

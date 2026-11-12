@@ -1,5 +1,22 @@
 import { t } from './i18n/index.js';
 
+/**
+ * Fired on window when the sign-in state may have changed (a request answered 401, the
+ * server said login settings changed, the event stream was cut): AuthGate checks again.
+ */
+export const AUTH_EVENT = 'encforge:auth';
+export const authChanged = () => window.dispatchEvent(new Event(AUTH_EVENT));
+
+/** An Error with the server's message, plus its status and code (e.g. 'wrongPassword'). */
+function apiError(status, statusText, data, url) {
+  // A 401 means the session ended (signed out elsewhere, password changed, login turned on).
+  if (status === 401 && !url.startsWith('/api/auth/')) authChanged();
+  const err = new Error(data?.error || (typeof data === 'string' && data) || `${status} ${statusText}`);
+  err.status = status;
+  if (data?.code) err.code = data.code;
+  return err;
+}
+
 async function request(method, url, body) {
   const res = await fetch(url, {
     method,
@@ -8,7 +25,7 @@ async function request(method, url, body) {
   });
   const type = res.headers.get('content-type') || '';
   const data = type.includes('application/json') ? await res.json() : await res.text();
-  if (!res.ok) throw new Error(data?.error || data || `${res.status} ${res.statusText}`);
+  if (!res.ok) throw apiError(res.status, res.statusText, data, url);
   return data;
 }
 
@@ -16,6 +33,19 @@ const get = (url) => request('GET', url);
 const post = (url, body = {}) => request('POST', url, body);
 
 export const api = {
+  // Login and API keys (server/src/auth.js)
+  authStatus: () => get('/api/auth/status'),
+  login: (password) => post('/api/auth/login', { password }),
+  logout: () => post('/api/auth/logout'),
+  setPassword: (current, password) => request('PUT', '/api/auth/password', { current, password }),
+  setLoginRequired: (enabled) => request('PUT', '/api/auth/settings', { enabled }),
+  authSessions: () => get('/api/auth/sessions'),
+  signOutOthers: () => request('DELETE', '/api/auth/sessions'),
+  apiKeys: () => get('/api/auth/keys'),
+  // scope: read | queue | admin → { key, token }
+  createApiKey: (name, scope) => post('/api/auth/keys', { name, scope }),
+  deleteApiKey: (id) => request('DELETE', `/api/auth/keys/${id}`),
+
   info: () => get('/api/info'),
   about: () => get('/api/about'),
   settings: () => get('/api/settings'),
@@ -83,7 +113,7 @@ export const api = {
   inspectBackupFile: async (file) => {
     const res = await fetch('/api/backup/inspect', { method: 'POST', headers: { 'Content-Type': 'application/octet-stream' }, body: file });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error || `${res.status} ${res.statusText}`);
+    if (!res.ok) throw apiError(res.status, res.statusText, data, '/api/backup/inspect');
     return data;
   },
   restoreBackup: (source, scope) => post('/api/backup/restore', { source, scope }),
@@ -151,11 +181,7 @@ export function sendChunk({ dir, name, size, offset }, blob, onProgress) {
         // not JSON
       }
       if (xhr.status >= 200 && xhr.status < 300) resolve(data);
-      else {
-        const err = new Error(data?.error || `${xhr.status} ${xhr.statusText}`);
-        err.status = xhr.status;
-        reject(err);
-      }
+      else reject(apiError(xhr.status, xhr.statusText, data, '/api/upload'));
     };
     xhr.onerror = () => reject(Object.assign(new Error(t('misc.api.networkError')), { network: true }));
     xhr.onabort = () => reject(Object.assign(new Error(t('misc.api.cancelled')), { aborted: true }));

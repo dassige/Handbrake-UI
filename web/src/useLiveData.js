@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { api } from './api.js';
+import { api, authChanged } from './api.js';
 import { t } from './i18n/index.js';
 
 /**
@@ -75,13 +75,18 @@ export function useLiveData(onError, onNotice, onEvent) {
       if (wasDown) {
         loadAll();
         bump();
+        authChanged();
       }
       wasDown = false;
     };
     es.onerror = () => {
       setConnected(false);
       wasDown = true;
+      // Closed for good (e.g. 401 after signing out elsewhere): see whether login is needed.
+      if (es.readyState === EventSource.CLOSED) authChanged();
     };
+    // Login, password or API keys changed (here or in another browser).
+    es.addEventListener('auth', () => authChanged());
     es.addEventListener('job', (e) => {
       const job = JSON.parse(e.data);
       setJobs((list) => {

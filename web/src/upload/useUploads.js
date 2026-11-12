@@ -71,7 +71,8 @@ export function useUploads({ onError } = {}) {
           patch(item.id, { sent: offset });
         } catch (e) {
           if (e.aborted || cancelled.current.has(item.id)) return;
-          if (e.status === 400 || ++retries > MAX_RETRIES) throw e;
+          // Refused (bad request, signed out, not allowed): trying again would not help.
+          if ([400, 401, 403].includes(e.status) || ++retries > MAX_RETRIES) throw e;
           patch(item.id, { error: t('upload.errors.retrying', { error: e.message }) });
           await sleep(Math.min(30_000, 1000 * 2 ** (retries - 1)));
           offset = await serverOffset(item);

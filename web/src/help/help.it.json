@@ -983,6 +983,48 @@
         "presets",
         "presets.editor"
       ]
+    },
+    "settings.security": {
+      "title": "Sicurezza: accesso",
+      "body": [
+        "EncForge non chiede una password finché non si attiva l’accesso. Finché è disattivato, chiunque possa aprire la pagina può sfogliare, convertire, rinominare ed **eliminare file**, e cambiare le impostazioni.",
+        "Per attivarlo:",
+        "1. Imposta una password (almeno 8 caratteri).",
+        "2. Attiva **Accesso**. Questo browser resta connesso; tutti gli altri mostrano una pagina di accesso.",
+        "- Un browser resta connesso finché non passano 30 giorni senza usarlo. **Esci** (in alto a destra) lo disconnette subito.",
+        "- **Cambiare la password** disconnette tutti gli altri browser, come **Disconnetti gli altri browser**.",
+        "- Dopo 5 password errate da uno stesso indirizzo, l’accesso da lì è bloccato per 15 minuti.",
+        "- Gli altri programmi usano le [chiavi API](#settings.apiKeys) invece della password.",
+        "**Password dimenticata?** Avvia l’app con la variabile d’ambiente `DISABLE_LOGIN=true` (con Docker: aggiungila a `.env` e ricrea il container). L’accesso è allora disattivato e si può impostare una nuova password senza quella attuale. Togli la variabile e riavvia per riattivare l’accesso.",
+        "La password, i browser connessi e le chiavi API non sono nei [backup](#backup.overview), e un ripristino non li cambia mai.",
+        "L’accesso protegge l’app, non la connessione: per usarla da fuori casa, usa una VPN o un reverse proxy con HTTPS."
+      ],
+      "see": [
+        "settings.apiKeys",
+        "backup.overview"
+      ]
+    },
+    "settings.apiKeys": {
+      "title": "Chiavi API",
+      "body": [
+        "Le chiavi API permettono ad altri programmi (script, n8n, Home Assistant…) di usare l’API di EncForge: le stesse richieste che fa l’app web, sotto `/api/`.",
+        "Il programma invia la chiave con ogni richiesta, in una di queste intestazioni:",
+        "- `Authorization: Bearer ef_…`",
+        "- `X-API-Key: ef_…`",
+        "Ogni chiave ha dei permessi:",
+        "- **Sola lettura**: coda, lavori, preimpostazioni, impostazioni (senza le intestazioni dei webhook, che spesso contengono token) e statistiche; elenco delle cartelle e download dei file.",
+        "- **Coda**: anche aggiungere e gestire i lavori, avviare e fermare la coda, caricare file, creare cartelle, controlli di qualità e dei nomi.",
+        "- **Completi**: anche tutto il resto: impostazioni, preimpostazioni e set di regole di rinomina, rinominare ed eliminare file, unire, backup e ripristino.",
+        "Nessuna chiave può gestire l’accesso o le chiavi API: si fa qui, da un browser connesso.",
+        "- La chiave viene mostrata una sola volta, quando viene creata. Se ne conserva solo un’impronta, quindi una chiave persa non si può rivedere: revocala e creane una nuova.",
+        "- L’elenco mostra quando ogni chiave è stata usata l’ultima volta, e da quale indirizzo.",
+        "- Finché l’[accesso](#settings.security) è disattivato le chiavi sono facoltative; una chiave inviata però viene verificata, così un’integrazione si può provare prima di attivare l’accesso.",
+        "Esempio: aggiungere un file alla coda con la preimpostazione predefinita (aggiungi `\"presetId\"` per sceglierne un’altra):",
+        "`curl -H \"Authorization: Bearer ef_…\" -H \"Content-Type: application/json\" -d '{\"paths\":[\"/mnt/downloads/Movie.mkv\"]}' http://server:8095/api/jobs`"
+      ],
+      "see": [
+        "settings.security"
+      ]
     }
   }
 }

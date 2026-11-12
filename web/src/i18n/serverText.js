@@ -132,3 +132,6 @@ export function backupWarnings(inspection) {
   if (!Array.isArray(missing) || missing.length !== inspection.warnings.length) return inspection.warnings;
   return missing.map((folder) => t('server.backup.missingFolder', { folder }));
 }
+
+/** An API error in the user's language when the server gave it a code (server.error.<code>), else its English message. */
+export const errorText = (e) => fromCode('server.error', e?.code) ?? e?.message ?? String(e);

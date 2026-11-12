@@ -983,6 +983,48 @@
         "presets",
         "presets.editor"
       ]
+    },
+    "settings.security": {
+      "title": "Sicherheit: Anmeldung",
+      "body": [
+        "EncForge verlangt kein Passwort, bis Sie die Anmeldung einschalten. Solange sie aus ist, kann jeder, der die Seite öffnen kann, Ordner durchsuchen, konvertieren, umbenennen, **Dateien löschen** und die Einstellungen ändern.",
+        "So schalten Sie sie ein:",
+        "1. Legen Sie ein Passwort fest (mindestens 8 Zeichen).",
+        "2. Schalten Sie **Anmeldung** ein. Dieser Browser bleibt angemeldet; alle anderen zeigen eine Anmeldeseite.",
+        "- Ein Browser bleibt angemeldet, bis er 30 Tage lang nicht benutzt wurde. **Abmelden** (oben rechts) beendet die Anmeldung sofort.",
+        "- **Eine Passwortänderung** meldet alle anderen Browser ab, ebenso **Andere Browser abmelden**.",
+        "- Nach 5 falschen Passwörtern von einer Adresse ist die Anmeldung von dort 15 Minuten lang gesperrt.",
+        "- Andere Programme benutzen [API-Schlüssel](#settings.apiKeys) statt des Passworts.",
+        "**Passwort vergessen?** Starten Sie die App mit der Umgebungsvariable `DISABLE_LOGIN=true` (mit Docker: in `.env` eintragen und den Container neu erstellen). Die Anmeldung ist dann aus, und ein neues Passwort lässt sich ohne das aktuelle festlegen. Entfernen Sie die Variable und starten Sie neu, um die Anmeldung wieder einzuschalten.",
+        "Das Passwort, die angemeldeten Browser und die API-Schlüssel sind nicht in [Sicherungen](#backup.overview) enthalten, und eine Wiederherstellung ändert sie nie.",
+        "Die Anmeldung schützt die App, nicht die Verbindung: Für den Zugriff von außerhalb Ihres Netzwerks verwenden Sie ein VPN oder einen Reverse-Proxy mit HTTPS."
+      ],
+      "see": [
+        "settings.apiKeys",
+        "backup.overview"
+      ]
+    },
+    "settings.apiKeys": {
+      "title": "API-Schlüssel",
+      "body": [
+        "Mit API-Schlüsseln können andere Programme (Skripte, n8n, Home Assistant…) die API von EncForge benutzen: dieselben Anfragen, die die Web-App stellt, unter `/api/`.",
+        "Das Programm sendet den Schlüssel bei jeder Anfrage in einem dieser Header mit:",
+        "- `Authorization: Bearer ef_…`",
+        "- `X-API-Key: ef_…`",
+        "Jeder Schlüssel hat eine Zugriffsstufe:",
+        "- **Nur lesen**: Warteschlange, Aufträge, Voreinstellungen, Einstellungen (ohne Webhook-Header, die oft Tokens enthalten) und Statistiken; Ordner auflisten und Dateien herunterladen.",
+        "- **Warteschlange**: außerdem Aufträge hinzufügen und steuern, die Warteschlange starten und stoppen, Dateien hochladen, Ordner anlegen, Qualitäts- und Namensprüfungen.",
+        "- **Voll**: auch alles andere: Einstellungen, Voreinstellungen und Umbenennungsregeln, Dateien umbenennen und löschen, zusammenführen, Sicherungen und Wiederherstellung.",
+        "Kein Schlüssel kann die Anmeldung oder API-Schlüssel verwalten: Das geschieht hier, in einem angemeldeten Browser.",
+        "- Der Schlüssel wird einmal angezeigt, wenn er erstellt wird. Gespeichert wird nur ein Fingerabdruck, daher lässt sich ein verlorener Schlüssel nicht erneut anzeigen: Widerrufen Sie ihn und erstellen Sie einen neuen.",
+        "- Die Liste zeigt, wann jeder Schlüssel zuletzt benutzt wurde und von welcher Adresse.",
+        "- Solange die [Anmeldung](#settings.security) aus ist, sind Schlüssel optional; ein mitgesendeter Schlüssel wird aber geprüft, so lässt sich eine Integration vor dem Einschalten testen.",
+        "Beispiel: eine Datei mit der Standard-Voreinstellung in die Warteschlange stellen (mit `\"presetId\"` wählen Sie eine andere):",
+        "`curl -H \"Authorization: Bearer ef_…\" -H \"Content-Type: application/json\" -d '{\"paths\":[\"/mnt/downloads/Movie.mkv\"]}' http://server:8095/api/jobs`"
+      ],
+      "see": [
+        "settings.security"
+      ]
     }
   }
 }

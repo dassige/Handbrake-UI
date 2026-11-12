@@ -9,6 +9,7 @@
 // - scope "config": settings, presets and rename rules; jobs and history stay.
 // - scope "all": everything, plus the job logs. Refused while something runs.
 // Before every restore the current data is saved on the server, so it can be undone.
+// The password, sessions and API keys (auth.js) are never in a backup, so never restored either.
 // Scheduled backups (backupSchedule.js) go to a chosen folder, possibly a network share.
 // Backups made before the rename to EncForge (app "handbrake-ui", handbrake-ui.db) still restore.
 import { createReadStream, createWriteStream } from 'node:fs';
@@ -19,6 +20,7 @@ import { Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { DatabaseSync } from 'node:sqlite';
 import { tx } from './db.js';
+import { AUTH_TABLES } from './auth.js';
 import { badRequest, conflict, notFound } from './errors.js';
 import { attachment, planZip, zipStream } from './download.js';
 import { ZipError, extractEntry, readZipEntries } from './zipReader.js';
@@ -75,6 +77,14 @@ export class Backups {
     await fs.mkdir(work, { recursive: true });
     const dbFile = path.join(work, DB_NAME);
     this.db.prepare('VACUUM INTO ?').run(dbFile);
+    // Login and API keys stay out of backups; VACUUM so nothing of them is left in free pages.
+    const copy = new DatabaseSync(dbFile);
+    try {
+      for (const t of AUTH_TABLES) copy.exec(`DROP TABLE IF EXISTS ${t}`);
+      copy.exec('VACUUM');
+    } finally {
+      copy.close();
+    }
     const logFiles = logs
       ? (await fs.readdir(this.logDir).catch(() => [])).filter((f) => /^[\w.-]+\.log$/.test(f)).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
       : [];

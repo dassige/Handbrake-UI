@@ -983,6 +983,48 @@
         "presets",
         "presets.editor"
       ]
+    },
+    "settings.security": {
+      "title": "Security: login",
+      "body": [
+        "EncForge has no login until you turn it on. While it is off, anyone who can open the page can browse, convert, rename and **delete files**, and change the settings.",
+        "To turn it on:",
+        "1. Set a password (at least 8 characters).",
+        "2. Turn on **Login**. This browser stays signed in; every other browser shows a sign-in page.",
+        "- A browser stays signed in until it has not been used for 30 days. **Sign out** (top right) ends it at once.",
+        "- **Changing the password** signs every other browser out, and so does **Sign out other browsers**.",
+        "- After 5 wrong passwords from one address, signing in from there is blocked for 15 minutes.",
+        "- Other programs use [API keys](#settings.apiKeys) instead of the password.",
+        "**Forgot the password?** Start the app with the environment variable `DISABLE_LOGIN=true` (with Docker: add it to `.env` and recreate the container). Login is then off, and a new password can be set without the current one. Remove the variable and restart to turn login back on.",
+        "The password, the signed-in browsers and the API keys are not in [backups](#backup.overview), and a restore never changes them.",
+        "Login protects the app, not the connection: for access from outside your network, use a VPN or a reverse proxy with HTTPS."
+      ],
+      "see": [
+        "settings.apiKeys",
+        "backup.overview"
+      ]
+    },
+    "settings.apiKeys": {
+      "title": "API keys",
+      "body": [
+        "API keys let other programs (scripts, n8n, Home Assistant…) use EncForge’s API: the same requests the web app makes, under `/api/`.",
+        "The program sends the key with every request, in either header:",
+        "- `Authorization: Bearer ef_…`",
+        "- `X-API-Key: ef_…`",
+        "Each key has an access level:",
+        "- **Read only**: the queue, jobs, presets, settings (without webhook headers, which often hold tokens) and statistics; listing folders and downloading files.",
+        "- **Queue**: also adding and controlling jobs, starting and stopping the queue, uploading files, making folders, quality and naming checks.",
+        "- **Full**: everything else too: settings, presets and rename rule sets, renaming and deleting files, merging, backups and restore.",
+        "No key can manage login or API keys: that is done here, in a signed-in browser.",
+        "- The key is shown once, when it is created. Only a fingerprint of it is kept, so a lost key cannot be shown again: revoke it and create a new one.",
+        "- The list shows when each key was last used, and from which address.",
+        "- While [login](#settings.security) is off, keys are optional; but a key that is sent is checked, so an integration can be tested before turning login on.",
+        "Example: add a file to the queue with the default preset (add `\"presetId\"` to choose another):",
+        "`curl -H \"Authorization: Bearer ef_…\" -H \"Content-Type: application/json\" -d '{\"paths\":[\"/mnt/downloads/Movie.mkv\"]}' http://server:8095/api/jobs`"
+      ],
+      "see": [
+        "settings.security"
+      ]
     }
   }
 }

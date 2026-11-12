@@ -983,6 +983,48 @@
         "presets",
         "presets.editor"
       ]
+    },
+    "settings.security": {
+      "title": "Sécurité : connexion",
+      "body": [
+        "EncForge ne demande pas de mot de passe tant que vous n’activez pas la connexion. Tant qu’elle est désactivée, toute personne qui peut ouvrir la page peut parcourir, convertir, renommer et **supprimer des fichiers**, et modifier les paramètres.",
+        "Pour l’activer :",
+        "1. Définissez un mot de passe (au moins 8 caractères).",
+        "2. Activez **Connexion**. Ce navigateur reste connecté ; tous les autres affichent une page de connexion.",
+        "- Un navigateur reste connecté tant qu’il a servi au cours des 30 derniers jours. **Se déconnecter** (en haut à droite) met fin à la connexion immédiatement.",
+        "- **Changer le mot de passe** déconnecte tous les autres navigateurs, tout comme **Déconnecter les autres navigateurs**.",
+        "- Après 5 mots de passe erronés depuis une même adresse, la connexion depuis celle-ci est bloquée pendant 15 minutes.",
+        "- Les autres programmes utilisent des [clés API](#settings.apiKeys) au lieu du mot de passe.",
+        "**Mot de passe oublié ?** Démarrez l’application avec la variable d’environnement `DISABLE_LOGIN=true` (avec Docker : ajoutez-la à `.env` et recréez le conteneur). La connexion est alors désactivée et un nouveau mot de passe peut être défini sans l’actuel. Retirez la variable et redémarrez pour réactiver la connexion.",
+        "Le mot de passe, les navigateurs connectés et les clés API ne font pas partie des [sauvegardes](#backup.overview), et une restauration ne les modifie jamais.",
+        "La connexion protège l’application, pas la liaison : pour un accès depuis l’extérieur de votre réseau, utilisez un VPN ou un proxy inverse avec HTTPS."
+      ],
+      "see": [
+        "settings.apiKeys",
+        "backup.overview"
+      ]
+    },
+    "settings.apiKeys": {
+      "title": "Clés API",
+      "body": [
+        "Les clés API permettent à d’autres programmes (scripts, n8n, Home Assistant…) d’utiliser l’API d’EncForge : les mêmes requêtes que l’application web, sous `/api/`.",
+        "Le programme envoie la clé avec chaque requête, dans l’un de ces en-têtes :",
+        "- `Authorization: Bearer ef_…`",
+        "- `X-API-Key: ef_…`",
+        "Chaque clé a un niveau d’accès :",
+        "- **Lecture seule** : la file d’attente, les tâches, les préréglages, les paramètres (sans les en-têtes des webhooks, qui contiennent souvent des jetons) et les statistiques ; lister les dossiers et télécharger les fichiers.",
+        "- **File d’attente** : aussi ajouter et piloter des tâches, démarrer et arrêter la file, téléverser des fichiers, créer des dossiers, contrôles de qualité et de noms.",
+        "- **Complet** : tout le reste aussi : paramètres, préréglages et jeux de règles de renommage, renommer et supprimer des fichiers, fusionner, sauvegardes et restauration.",
+        "Aucune clé ne peut gérer la connexion ni les clés API : cela se fait ici, dans un navigateur connecté.",
+        "- La clé est affichée une seule fois, à sa création. Seule une empreinte est conservée : une clé perdue ne peut donc pas être réaffichée ; révoquez-la et créez-en une nouvelle.",
+        "- La liste indique quand chaque clé a servi pour la dernière fois, et depuis quelle adresse.",
+        "- Tant que la [connexion](#settings.security) est désactivée, les clés sont facultatives ; une clé envoyée est néanmoins vérifiée, ce qui permet de tester une intégration avant d’activer la connexion.",
+        "Exemple : ajouter un fichier à la file avec le préréglage par défaut (ajoutez `\"presetId\"` pour en choisir un autre) :",
+        "`curl -H \"Authorization: Bearer ef_…\" -H \"Content-Type: application/json\" -d '{\"paths\":[\"/mnt/downloads/Movie.mkv\"]}' http://server:8095/api/jobs`"
+      ],
+      "see": [
+        "settings.security"
+      ]
     }
   }
 }

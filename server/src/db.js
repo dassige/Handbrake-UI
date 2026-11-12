@@ -164,6 +164,32 @@ CREATE TABLE IF NOT EXISTS watch_folders (
   path          TEXT PRIMARY KEY,
   baselined_at  INTEGER NOT NULL
 );
+
+-- Login and API keys (auth.js). Credentials: left out of backups (AUTH_TABLES), never restored.
+CREATE TABLE IF NOT EXISTS auth (
+  key   TEXT PRIMARY KEY,          -- enabled | passwordHash
+  value TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS auth_sessions (
+  id_hash      TEXT PRIMARY KEY,   -- SHA-256 of the cookie value
+  created_at   INTEGER NOT NULL,
+  last_seen_at INTEGER NOT NULL,
+  expires_at   INTEGER NOT NULL,
+  ip           TEXT,
+  user_agent   TEXT
+);
+
+CREATE TABLE IF NOT EXISTS api_keys (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  name         TEXT NOT NULL,
+  scope        TEXT NOT NULL,      -- read | queue | admin
+  hash         TEXT NOT NULL UNIQUE, -- SHA-256 of the key
+  prefix       TEXT NOT NULL,      -- first characters, to tell keys apart
+  created_at   INTEGER NOT NULL,
+  last_used_at INTEGER,
+  last_used_ip TEXT
+);
 `;
 
 /** Columns added after the first release. */

@@ -16,4 +16,6 @@ export const config = {
   initialTargetRoot: env.TARGET_ROOT || '/mnt/converted',
   webDir: path.resolve(env.WEB_DIR || path.join(import.meta.dirname, '../../web/dist')),
   logLevel: env.LOG_LEVEL || 'info',
+  // Turns login off whatever the setting says: the way back in after forgetting the password.
+  disableLogin: /^(1|true|yes|on)$/i.test(env.DISABLE_LOGIN ?? ''),
 };

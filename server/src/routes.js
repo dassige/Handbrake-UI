@@ -3,12 +3,18 @@ import path from 'node:path';
 import { badRequest } from './errors.js';
 import { isHiddenName, makeFileMatcher, naturalCompare, resolveUnderAny } from './paths.js';
 import { aboutInfo } from './about.js';
+import { hasScope } from './auth.js';
+import { redactNotifications } from './notify.js';
 
 const id = (req) => {
   const n = Number(req.params.id);
   if (!Number.isInteger(n)) throw badRequest('Invalid id');
   return n;
 };
+
+/** The browser and admin keys see all settings; other API keys get them without secrets. */
+const isAdmin = (req) => !req.auth || hasScope(req.auth.scope, 'admin');
+const forViewer = (s) => ({ ...s, notifications: redactNotifications(s.notifications) });
 
 export function registerRoutes(app, { settings, presets, queue, events, handbrake, renamer, watcher, backupScheduler, subtitles, version, dataDir }) {
   // ------------------------------------------------------------- status
@@ -26,13 +32,18 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
     return { ...aboutInfo({ version, dataDir }), handbrake: hbInfo };
   });
 
+  // For health checks (Docker): answers also when login is on.
+  app.get('/api/health', async () => ({ ok: true }));
+
   app.get('/api/events', (req, reply) => {
     reply.hijack();
-    events.attach(req.raw, reply.raw);
+    // Below admin (an API key), settings events come without webhook headers.
+    const transform = isAdmin(req) ? null : (type, data) => (type === 'settings' ? forViewer(data) : data);
+    events.attach(req.raw, reply.raw, { transform });
   });
 
   // ------------------------------------------------------------- settings
-  app.get('/api/settings', async () => settings.public());
+  app.get('/api/settings', async (req) => (isAdmin(req) ? settings.public() : forViewer(settings.public())));
   app.put('/api/settings', async (req) => {
     if (req.body?.autoRenameRuleId != null) renamer.getRule(Number(req.body.autoRenameRuleId));
     for (const f of req.body?.watch?.folders ?? []) {

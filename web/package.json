@@ -1,6 +1,6 @@
 {
   "name": "encforge-web",
-  "version": "4.1.5",
+  "version": "4.2.0",
   "private": true,
   "license": "GPL-2.0-only",
   "type": "module",
@@ -18,6 +18,6 @@
     "@vitejs/plugin-react": "^6.2.1",
     "vite": "^8.3.6"
   },
-  "versionDate": "2026/11/13 07:36",
-  "git-parentCommit-ID": "744a80c873efa0954f8c6749339e273494677109"
+  "versionDate": "2026/11/13 10:04",
+  "git-parentCommit-ID": "e644500c5467d5271a44ecfb3ef466737972a35d"
 }

@@ -31,6 +31,9 @@ import { Watcher } from './watch.js';
 import { registerAutomationRoutes } from './automationRoutes.js';
 import { BackupScheduler } from './backupSchedule.js';
 import { Subtitles } from './subtitles/service.js';
+import { Auth } from './auth.js';
+import { registerAuthRoutes } from './authRoutes.js';
+import { HttpError } from './errors.js';
 
 /** version, date and commit from a package.json (managed by DGS AutoVersion); null when missing. */
 function readVersion(file) {
@@ -58,6 +61,8 @@ const dbFile = adoptDbFile(config.dataDir);
 if (dbFile.renamedFrom) app.log.info(`Database renamed: ${dbFile.renamedFrom} -> ${dbFile.file}`);
 const db = openDb(dbFile.file);
 const settings = new Settings(db, config);
+const auth = new Auth({ db, forcedOff: config.disableLogin });
+if (config.disableLogin) app.log.warn('Login is turned off by DISABLE_LOGIN');
 const handbrake = new HandBrake(config.handbrakeCli);
 const events = new Events();
 const presets = new Presets({ db, settings, handbrake, tmpDir: path.join(config.dataDir, 'tmp') });
@@ -88,13 +93,18 @@ backups.scheduler = backupScheduler;
 app.setErrorHandler((err, req, reply) => {
   const status = err.statusCode ?? (err.code === 'ENOENT' ? 404 : 500);
   if (status >= 500) req.log.error(err);
-  reply.status(status).send({ error: err.message });
+  // code: a machine-readable reason, for errors that have one (auth.js).
+  reply.status(status).send(err instanceof HttpError && err.errorCode ? { error: err.message, code: err.errorCode } : { error: err.message });
 });
+
+// Login and API keys: checked before every /api route (auth.js).
+app.addHook('onRequest', auth.hook());
 
 // Per-request access logs are noise here (the UI polls); keep warnings and errors.
 await app.register(
   async (api) => {
     registerRoutes(api, { settings, presets, queue, events, handbrake, renamer, watcher, backupScheduler, subtitles, version, dataDir: config.dataDir });
+    registerAuthRoutes(api, { auth, events });
     registerAutomationRoutes(api, { history, watcher, notifier });
     registerRenameRoutes(api, { renamer, naming });
     registerMergeRoutes(api, { merger });

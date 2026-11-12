@@ -104,6 +104,11 @@ export function publicNotifications(n) {
   return { ...n, email: { ...email, hasPassword: !!password } };
 }
 
+/** For API keys below admin: webhook headers often hold tokens, so only whether there are any. */
+export function redactNotifications(n) {
+  return { ...n, webhooks: n.webhooks.map(({ headers, ...w }) => ({ ...w, headers: '', hasHeaders: !!String(headers ?? '').trim() })) };
+}
+
 /** "Name: value" lines → headers object. */
 export function parseHeaders(text) {
   const out = {};

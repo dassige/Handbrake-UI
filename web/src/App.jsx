@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CalendarClock, Pause, Play, Settings as SettingsIcon, SlidersHorizontal, WifiOff } from 'lucide-react';
+import { CalendarClock, LogOut, Pause, Play, Settings as SettingsIcon, SlidersHorizontal, WifiOff } from 'lucide-react';
 import { RenameView } from './rename/RenameView.jsx';
 import { MergeView } from './merge/MergeView.jsx';
 import { QualityView } from './quality/QualityView.jsx';
@@ -24,7 +24,7 @@ import { useDialogs } from './components/Dialogs.jsx';
 import { usePaneSwitch } from './components/PaneSwitch.jsx';
 import { displayPath } from './roots.js';
 import { rich, setLanguage, t } from './i18n/index.js';
-import { skipReason } from './i18n/serverText.js';
+import { errorText, skipReason } from './i18n/serverText.js';
 
 const VIEWS = ['convert', 'rename', 'merge', 'quality', 'naming', 'stats', 'presets', 'settings'];
 
@@ -43,10 +43,11 @@ function useMinuteClock() {
   }, []);
 }
 
-export default function App() {
+/** auth: GET /api/auth/status (AuthGate); onAuthChange: replaces it, e.g. after turning login on or off. */
+export default function App({ auth, onAuthChange }) {
   const toasts = useToasts();
   const dialogs = useDialogs();
-  const onError = useCallback((e) => toasts.error(e.message || String(e)), [toasts]);
+  const onError = useCallback((e) => toasts.error(errorText(e)), [toasts]);
   const onNotice = useCallback((text) => toasts.info(text), [toasts]);
   const eventRef = useRef(null);
   const onEvent = useCallback((type, d) => eventRef.current?.(type, d), []);
@@ -246,6 +247,19 @@ export default function App() {
     run(() => api.startQueue());
   }
 
+  async function signOut() {
+    if (view === 'settings' && settingsDirty.current) {
+      const ok = await dialogs.confirm({
+        title: t('app.leave.settingsTitle'),
+        message: t('app.leave.settingsMessage'),
+        confirmLabel: t('app.leave.confirm'),
+        danger: true,
+      });
+      if (!ok) return;
+    }
+    if (await run(() => api.logout())) onAuthChange(await api.authStatus().catch(() => ({ enabled: true, via: null })));
+  }
+
   let stateText = running ? t('app.state.running') : t('app.state.stopped');
   if (running && sched?.waiting) stateText = t('app.state.waitingFor', { time: clockTime(sched.nextStart) });
   // One job started with "Convert now"; the queue itself stays stopped.
@@ -322,6 +336,11 @@ export default function App() {
           <button className={`btn ghost ${view === 'settings' ? 'active' : ''}`} onClick={() => switchView('settings')} title={t('app.views.settings')} aria-label={t('app.views.settings')}>
             <SettingsIcon size={16} /> <span className="btn-label">{t('app.views.settings')}</span>
           </button>
+          {auth?.via === 'session' && (
+            <button className="btn ghost" onClick={signOut} title={t('auth.signOut')} aria-label={t('auth.signOut')}>
+              <LogOut size={16} />
+            </button>
+          )}
         </div>
       </header>
 
@@ -351,6 +370,8 @@ export default function App() {
           onError={onError}
           onNotice={onNotice}
           onDirtyChange={onSettingsDirty}
+          auth={auth}
+          onAuthChange={onAuthChange}
         />
       ) : view === 'presets' ? (
         <PresetsPage

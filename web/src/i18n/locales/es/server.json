@@ -156,5 +156,17 @@
       "upload": "hay una subida en curso"
     },
     "missingFolder": "La carpeta {folder} no existe en este servidor; corríjala en Ajustes después de restaurar."
+  },
+  "error": {
+    "signInRequired": "Inicie sesión primero",
+    "invalidApiKey": "Clave API desconocida o revocada",
+    "browserOnly": "El inicio de sesión y las claves API solo se gestionan desde un navegador con la sesión iniciada",
+    "scope": "Esta clave API no lo permite",
+    "crossSite": "Se rechazan las peticiones de otros sitios web",
+    "wrongPassword": "Contraseña incorrecta",
+    "tooManyAttempts": "Demasiados intentos fallidos: espere unos minutos y vuelva a intentarlo",
+    "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+    "passwordTooLong": "La contraseña es demasiado larga",
+    "noPassword": "Establezca primero una contraseña"
   }
 }

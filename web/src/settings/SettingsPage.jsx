@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ArchiveRestore, Bell, CalendarClock, Captions, Cpu, FolderOpen, FolderSearch, FolderTree, Gauge, Info, Languages, ListPlus, Wand2,
+  ArchiveRestore, Bell, CalendarClock, Captions, Cpu, FolderOpen, FolderSearch, FolderTree, Gauge, Info, Languages, ListPlus, ShieldCheck, Wand2,
 } from 'lucide-react';
 import { api } from '../api.js';
 import { t } from '../i18n/index.js';
@@ -14,6 +14,7 @@ import { BackupSection } from './BackupSection.jsx';
 import { AboutSection } from './AboutSection.jsx';
 import { LanguageSection } from './LanguageSection.jsx';
 import { SubtitlesSection } from './SubtitlesSection.jsx';
+import { SecuritySection } from './SecuritySection.jsx';
 
 // keys: the settings a section edits (for its "unsaved" dot and for saving only what changed).
 // Labels are translated when rendering: settings.nav.<id> and settings.nav.group.<group>.
@@ -47,6 +48,8 @@ export const SECTIONS = [
   {
     group: 'system',
     items: [
+      // Saved at once, not through this form (server/src/auth.js).
+      { id: 'security', icon: ShieldCheck, keys: [], Component: SecuritySection },
       { id: 'backup', icon: ArchiveRestore, keys: ['backupSchedule'], Component: BackupSection },
       { id: 'about', icon: Info, keys: [] },
     ],
@@ -85,7 +88,7 @@ function clean(key, value) {
  * edits the same draft; the bar at the bottom saves (only what changed) or discards it.
  */
 export function SettingsPage({
-  settings, info, presets, renameRules, watchStatus, backupStatus, section, onSection, run, onSaved, onError, onNotice, onDirtyChange,
+  settings, info, presets, renameRules, watchStatus, backupStatus, section, onSection, run, onSaved, onError, onNotice, onDirtyChange, auth, onAuthChange,
 }) {
   const [draft, setDraft] = useState(settings);
   const [saving, setSaving] = useState(false);
@@ -139,7 +142,7 @@ export function SettingsPage({
     }
   }
 
-  const props = { draft, set, base: settings, info, presets, renameRules, run, onError, onNotice, liveStatus: watchStatus, backupStatus, dirty };
+  const props = { draft, set, base: settings, info, presets, renameRules, run, onError, onNotice, liveStatus: watchStatus, backupStatus, dirty, auth, onAuthChange };
   const Body = current.Component;
 
   return (
@@ -165,6 +168,7 @@ export function SettingsPage({
                   {unsaved && <span className="unsaved-dot" title={t('common.unsavedChanges')} />}
                   {s.id === 'schedule' && settings.schedule.enabled && !unsaved && <span className="nav-on">{t('settings.navOn')}</span>}
                   {s.id === 'watch' && settings.watch.enabled && !unsaved && <span className="nav-on">{t('settings.navOn')}</span>}
+                  {s.id === 'security' && auth?.enabled && <span className="nav-on">{t('settings.navOn')}</span>}
                 </button>
               );
             })}

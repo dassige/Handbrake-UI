@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.2.0] - 2026/11/13
+
+- feat: Optional login for the web app and API keys for other programs
+
+Settings → Security can set a password and turn login on. It is off by
+default, so existing installs work as before. Once it is on, browsers
+show a sign-in page; the browser that turned it on stays signed in. A
+browser stays signed in until it goes unused for 30 days. Signing out,
+changing the password or "Sign out other browsers" end it sooner. After
+5 wrong passwords, sign-in from that address is blocked for 15 minutes.
+
+API keys let other programs use the same /api routes, sent as
+"Authorization: Bearer ef_…" or "X-API-Key: ef_…". Each key is read
+only, queue (add and control jobs, uploads, checks) or full (settings,
+presets, renaming and deleting files, merges, backups). A key is shown
+once; only its hash is stored. No key can manage login or other keys.
+While login is off, keys are optional, but a key that is sent is still
+checked, so an integration can be tried first. Keys below full access
+never see webhook headers, in /api/settings or in the event stream.
+
+DISABLE_LOGIN=true (also passed through docker-compose) turns login off
+and lets a new password be set without the old one. The password,
+sessions and keys are left out of backups and never restored. Requests
+from other websites that would change something are now refused, even
+with login off. The Docker health check uses the new /api/health,
+which answers also when login is on. Errors from these checks carry a
+code, so the app shows them in all five languages. The help and the
+README describe login and API keys in every language.
+
 ## [4.1.7] - 2026/11/13
 
 - feat: Output layout with show and season folders for TV shows
