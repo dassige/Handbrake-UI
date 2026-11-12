@@ -62,6 +62,7 @@
     "title": "Struttura della cartella di output",
     "layout": {
       "parent": "Nome della cartella sorgente",
+      "season": "Cartelle serie e stagione",
       "mirror": "Percorso completo della sorgente",
       "flat": "Tutto nella cartella di destinazione"
     },

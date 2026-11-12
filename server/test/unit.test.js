@@ -65,6 +65,28 @@ test('plannedOutputPath follows the output layout', () => {
   assert.equal(other, path.resolve('/out/Film/f.mkv'));
 });
 
+test('plannedOutputPath season layout: target/Show/S01/episode', () => {
+  const settings = fakeSettings({ sourceRoots: [path.resolve('/src')], targetRoot: path.resolve('/out'), outputLayout: 'season' });
+  const out = (rel) => plannedOutputPath(path.resolve('/src', rel), settings, 'av_mkv');
+  assert.equal(out('Completed/Show.S01/ep1.avi'), path.resolve('/out/Show/S01/ep1.mkv'));
+  assert.equal(out('The.Office.US.S03.1080p.WEB-DL/e.mkv'), path.resolve('/out/The Office US/S03/e.mkv'));
+  assert.equal(out('Show.2019.S2.720p/e.mkv'), path.resolve('/out/Show (2019)/S02/e.mkv'));
+  assert.equal(out('Show (2019) - Season 4/e.mkv'), path.resolve('/out/Show (2019)/S04/e.mkv'));
+  assert.equal(out('Mostro/Stagione 1/e.mkv'), path.resolve('/out/Mostro/S01/e.mkv'));
+  assert.equal(out('Show/S02/e.mkv'), path.resolve('/out/Show/S02/e.mkv'));
+  // An episode's own folder names the season too.
+  assert.equal(out('Show.S01E05.1080p/Show.S01E05.mkv'), path.resolve('/out/Show/S01/Show.S01E05.mkv'));
+  // A multi-season folder: the file name says the season.
+  assert.equal(out('Show.S01-S03/Show.S02E01.mkv'), path.resolve('/out/Show/S02/Show.S02E01.mkv'));
+  assert.equal(out('Show Seasons 1-3/Show 3x04.mkv'), path.resolve('/out/Show/S03/Show 3x04.mkv'));
+  // No season folder: like "Source folder name".
+  assert.equal(out('Completed/Film (2020)/f.mkv'), path.resolve('/out/Film (2020)/f.mkv'));
+  assert.equal(out('Show.S01-S03/extras.mkv'), path.resolve('/out/Show.S01-S03/extras.mkv'));
+  assert.equal(out('Season 1/e.mkv'), path.resolve('/out/Season 1/e.mkv'));
+  assert.equal(out('Pulp Fiction S/e.mkv'), path.resolve('/out/Pulp Fiction S/e.mkv'));
+  assert.equal(out('x.mkv'), path.resolve('/out/x.mkv'));
+});
+
 test('rootOf picks the deepest root that contains the path', () => {
   const roots = [path.resolve('/a'), path.resolve('/a/b'), path.resolve('/c')];
   assert.equal(rootOf(roots, path.resolve('/a/b/x.mkv')), path.resolve('/a/b'));

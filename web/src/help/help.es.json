@@ -358,7 +358,7 @@
         "- **Proteger** en una carpeta de origen: impide que sus archivos y carpetas se eliminen o renombren desde la aplicación, por ejemplo, la carpeta desde la que un cliente de descargas sigue compartiendo. En el panel Orígenes, una carpeta así muestra **Protegida** en lugar del botón Eliminar, y el servidor también rechaza allí las eliminaciones y los renombrados.",
         "- **Carpeta de destino**: dónde se escriben los archivos convertidos. Las vistas Renombrar y Unir solo trabajan aquí.",
         "Todas deben existir. El destino no puede estar dentro de una carpeta de origen, y una carpeta de origen no puede estar dentro de otra. En Docker deben estar dentro de la carpeta montada en el contenedor (`MEDIA_DIR`, normalmente `/mnt`).",
-        "Las disposiciones de salida **Nombre de la carpeta de origen** y **Ruta de origen completa** se calculan a partir de la carpeta de origen en la que está cada archivo."
+        "Las disposiciones de salida **Nombre de la carpeta de origen**, **Carpetas de serie y temporada** y **Ruta de origen completa** se calculan a partir de la carpeta de origen en la que está cada archivo."
       ],
       "see": [
         "settings.layout",
@@ -373,6 +373,7 @@
       "body": [
         "Dónde, dentro de la carpeta de destino, va cada archivo convertido:",
         "- **Nombre de la carpeta de origen**: `target/Show.S01/episode.mkv`, usando solo el nombre de la carpeta en la que está el origen. Útil para carpetas de temporada.",
+        "- **Carpetas de serie y temporada** (series de TV): `target/Show/S01/episode.mkv`. La serie y la temporada salen de la carpeta en la que está el origen: `Show.S01.1080p`, `Show - Temporada 1` o la carpeta propia de un episodio como `Show.S01E05.1080p`; una carpeta llamada solo `Temporada 1` o `S01` toma el nombre de la serie de la carpeta superior. En una carpeta con varias temporadas (`Show.S01-S03`) la temporada sale del nombre de cada archivo (`S02E01`). Los vídeos que no están en una carpeta de temporada van a `target/<carpeta de origen>/video.mkv`, como con **Nombre de la carpeta de origen**.",
         "- **Ruta de origen completa**: `target/Completed/Show.S01/episode.mkv`, toda la ruta por debajo de la carpeta de origen.",
         "- **Todo en la carpeta de destino**: `target/episode.mkv`.",
         "Si el archivo ya existe, el nuevo recibe un sufijo (`episode (1).mkv`). La disposición se aplica a los archivos añadidos tras el cambio; los trabajos en cola conservan su ruta de salida."

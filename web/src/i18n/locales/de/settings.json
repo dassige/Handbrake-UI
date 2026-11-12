@@ -62,6 +62,7 @@
     "title": "Struktur des Ausgabeordners",
     "layout": {
       "parent": "Name des Quellordners",
+      "season": "Serien- und Staffelordner",
       "mirror": "Vollständiger Quellpfad",
       "flat": "Alles direkt im Zielordner"
     },

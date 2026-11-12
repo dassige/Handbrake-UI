@@ -358,7 +358,7 @@
         "- **Schützen** bei einem Quellordner: verhindert, dass seine Dateien und Ordner aus der App gelöscht oder umbenannt werden, z. B. den Ordner, aus dem ein Download-Client noch seedet. Im Bereich „Quellen“ zeigt ein solcher Ordner **Geschützt** statt der Schaltfläche „Löschen“, und auch der Server lehnt dort Löschen und Umbenennen ab.",
         "- **Zielordner**: wohin konvertierte Dateien geschrieben werden. Die Ansichten „Umbenennen“ und „Zusammenführen“ arbeiten nur hier.",
         "Alle müssen existieren. Das Ziel darf nicht in einem Quellordner liegen, und ein Quellordner nicht in einem anderen. In Docker müssen sie im Ordner liegen, der in den Container eingebunden ist (`MEDIA_DIR`, meist `/mnt`).",
-        "Die Ausgabestrukturen **Name des Quellordners** und **Vollständiger Quellpfad** werden aus dem Quellordner berechnet, in dem die jeweilige Datei liegt."
+        "Die Ausgabestrukturen **Name des Quellordners**, **Serien- und Staffelordner** und **Vollständiger Quellpfad** werden aus dem Quellordner berechnet, in dem die jeweilige Datei liegt."
       ],
       "see": [
         "settings.layout",
@@ -373,6 +373,7 @@
       "body": [
         "Wohin unter dem Zielordner jede konvertierte Datei kommt:",
         "- **Name des Quellordners**: `target/Show.S01/episode.mkv`, nur mit dem Namen des Ordners, in dem die Quelle liegt. Gut für Staffelordner.",
+        "- **Serien- und Staffelordner** (TV-Serien): `target/Show/S01/episode.mkv`. Serie und Staffel stammen aus dem Ordner, in dem die Quelle liegt: `Show.S01.1080p`, `Show - Staffel 1` oder der eigene Ordner einer Folge wie `Show.S01E05.1080p`; ein Ordner, der nur `Staffel 1` oder `S01` heißt, nimmt den Seriennamen vom Ordner darüber. In einem Ordner mit mehreren Staffeln (`Show.S01-S03`) kommt die Staffel aus dem Namen jeder Datei (`S02E01`). Videos, die nicht in einem Staffelordner liegen, kommen nach `target/<Quellordner>/video.mkv`, wie bei **Name des Quellordners**.",
         "- **Vollständiger Quellpfad**: `target/Completed/Show.S01/episode.mkv`, der ganze Pfad unterhalb des Quellordners.",
         "- **Alles direkt im Zielordner**: `target/episode.mkv`.",
         "Existiert die Datei schon, erhält die neue ein Suffix (`episode (1).mkv`). Die Struktur gilt für Dateien, die nach der Änderung hinzugefügt werden; wartende Aufträge behalten ihren Ausgabepfad."

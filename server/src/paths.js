@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { badRequest } from './errors.js';
+import { parseName, sanitizeFileName, tokenize } from './rename/parse.js';
 
 /** True when child is root itself or somewhere below it (lexical check). */
 export function isInside(root, child) {
@@ -105,16 +106,68 @@ export function extensionForFormat(format) {
   return FORMAT_EXT[format] ?? '.mkv';
 }
 
+const SEASON_WORD = '(?:seasons?|stagion[ei]|staffel[n]?|saisons?|temporadas?)';
+// "S01", "Season 1", "Stagione 1"... as a word of the (tokenized) folder name.
+const FOLDER_SEASON = [
+  /(?:^| )S(\d{1,2})(?= |$)/i,
+  new RegExp(`(?:^| )${SEASON_WORD} ?(\\d{1,2})(?= |$)`, 'i'),
+];
+// An episode's own folder ("Show.S01E05.1080p") also names its season.
+const FOLDER_EPISODE = /(?:^| )S(\d{1,2}) ?E\d{1,3}/i;
+// Several seasons in one folder: "S01-S03", "S01-03", "Seasons 1-3".
+const FOLDER_SEASONS = new RegExp(`(?:^| )(?:S\\d{1,2} ?- ?S?\\d{1,2}|${SEASON_WORD} ?\\d{1,2} ?- ?\\d{1,2})(?= |$)`, 'i');
+
+/** "Show 2019" / "Show (2019)" -> "Show (2019)"; trims separators. */
+function cleanShowName(s) {
+  const show = s.replace(/^[\s\-–—:,.]+|[\s\-–—:,.(]+$/g, '').trim();
+  const y = /^(.+?)\s+\(?((?:19|20)\d\d)\)?$/.exec(show);
+  return sanitizeFileName(y ? `${y[1]} (${y[2]})` : show);
+}
+
+/**
+ * For the 'season' layout: the show and season folders ("Show", "S01") of a source in
+ * relDir (relative to its sources folder), or null when its folder isn't a season folder.
+ * The show is the folder text before the season ("Show.S01.1080p" -> "Show"), or the
+ * folder above for a bare "Season 1" / "S01" folder.
+ */
+export function seasonFolders(relDir, fileBase) {
+  const parts = relDir.split(/[\\/]+/).filter(Boolean);
+  if (!parts.length) return null;
+  const folder = tokenize(parts[parts.length - 1]);
+  let m = null;
+  let season = null;
+  if (FOLDER_SEASONS.test(folder)) {
+    // A multi-season folder: the file's own S01E02 marker says which season.
+    m = FOLDER_SEASONS.exec(folder);
+    const ep = parseName(fileBase, { mode: 'tv' });
+    if (ep.season == null) return null;
+    season = ep.season;
+  } else {
+    m = FOLDER_EPISODE.exec(folder);
+    for (const re of FOLDER_SEASON) m ??= re.exec(folder);
+    if (!m) return null;
+    season = Number(m[1]);
+  }
+  let show = cleanShowName(folder.slice(0, m.index));
+  if (!show && parts.length > 1) show = sanitizeFileName(parts[parts.length - 2]);
+  if (!show) return null;
+  return [show, `S${String(season).padStart(2, '0')}`];
+}
+
 /** Where a source file should be written, before collision handling. */
 export function plannedOutputPath(source, settings, format) {
   const sourceRoot = rootOf(settings.get('sourceRoots'), source);
   const targetRoot = settings.get('targetRoot');
-  const name = path.parse(source).name + extensionForFormat(format);
+  const { name: base } = path.parse(source);
+  const name = base + extensionForFormat(format);
   const relDir = sourceRoot ? path.relative(sourceRoot, path.dirname(source)) : '';
+  const layout = settings.get('outputLayout');
   let dir = targetRoot;
   if (sourceRoot && relDir) {
-    if (settings.get('outputLayout') === 'mirror') dir = path.join(targetRoot, relDir);
-    else if (settings.get('outputLayout') === 'parent') dir = path.join(targetRoot, path.basename(relDir));
+    const season = layout === 'season' ? seasonFolders(relDir, base) : null;
+    if (season) dir = path.join(targetRoot, ...season);
+    else if (layout === 'mirror') dir = path.join(targetRoot, relDir);
+    else if (layout === 'parent' || layout === 'season') dir = path.join(targetRoot, path.basename(relDir));
   }
   return path.join(dir, name);
 }

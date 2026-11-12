@@ -5,6 +5,7 @@ import { rich, t } from '../i18n/index.js';
 
 const LAYOUTS = [
   { value: 'parent', labelKey: 'settings.output.layout.parent', example: 'target/Show.S01/episode.mkv' },
+  { value: 'season', labelKey: 'settings.output.layout.season', example: 'target/Show/S01/episode.mkv' },
   { value: 'mirror', labelKey: 'settings.output.layout.mirror', example: 'target/Completed/Show.S01/episode.mkv' },
   { value: 'flat', labelKey: 'settings.output.layout.flat', example: 'target/episode.mkv' },
 ];

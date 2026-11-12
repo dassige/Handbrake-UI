@@ -358,7 +358,7 @@
         "- **Protéger** sur un dossier de sources : empêche la suppression et le renommage de ses fichiers et dossiers depuis l'application, par exemple le dossier dont un client de téléchargement assure encore le partage. Dans le panneau Sources, un tel dossier affiche **Protégé** à la place du bouton Supprimer, et le serveur refuse aussi les suppressions et les renommages à cet endroit.",
         "- **Dossier cible** : l'emplacement où les fichiers convertis sont écrits. Les vues Renommer et Fusionner ne travaillent qu'ici.",
         "Tous doivent exister. La cible ne peut pas se trouver dans un dossier de sources, et un dossier de sources ne peut pas se trouver dans un autre. Dans Docker, ils doivent se trouver dans le dossier monté dans le conteneur (`MEDIA_DIR`, généralement `/mnt`).",
-        "Les organisations de sortie **Nom du dossier source** et **Chemin source complet** sont calculées à partir du dossier de sources où se trouve chaque fichier."
+        "Les organisations de sortie **Nom du dossier source**, **Dossiers série et saison** et **Chemin source complet** sont calculées à partir du dossier de sources où se trouve chaque fichier."
       ],
       "see": [
         "settings.layout",
@@ -373,6 +373,7 @@
       "body": [
         "L'emplacement, sous le dossier cible, où va chaque fichier converti :",
         "- **Nom du dossier source** : `target/Show.S01/episode.mkv`, en utilisant uniquement le nom du dossier où se trouve la source. Pratique pour les dossiers de saisons.",
+        "- **Dossiers série et saison** (séries TV) : `target/Show/S01/episode.mkv`. La série et la saison viennent du dossier où se trouve la source : `Show.S01.1080p`, `Show - Saison 1` ou le dossier propre à un épisode comme `Show.S01E05.1080p` ; un dossier nommé simplement `Saison 1` ou `S01` prend le nom de la série dans le dossier au-dessus. Dans un dossier de plusieurs saisons (`Show.S01-S03`), la saison vient du nom de chaque fichier (`S02E01`). Les vidéos qui ne sont pas dans un dossier de saison vont dans `target/<dossier source>/video.mkv`, comme avec **Nom du dossier source**.",
         "- **Chemin source complet** : `target/Completed/Show.S01/episode.mkv`, le chemin complet sous le dossier de sources.",
         "- **Tout dans le dossier cible** : `target/episode.mkv`.",
         "Si le fichier existe déjà, le nouveau reçoit un suffixe (`episode (1).mkv`). L'organisation s'applique aux fichiers ajoutés après le changement ; les tâches en attente gardent leur chemin de sortie."

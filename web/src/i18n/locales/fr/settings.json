@@ -62,6 +62,7 @@
     "title": "Organisation du dossier de sortie",
     "layout": {
       "parent": "Nom du dossier source",
+      "season": "Dossiers série et saison",
       "mirror": "Chemin source complet",
       "flat": "Tout dans le dossier cible"
     },

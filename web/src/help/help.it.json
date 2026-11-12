@@ -358,7 +358,7 @@
         "- **Proteggi** su una cartella sorgenti: impedisce che i suoi file e le sue cartelle vengano eliminati o rinominati dall’app, per esempio la cartella da cui un client di download sta ancora facendo il seeding. Nel pannello Sorgenti una cartella così mostra **Protetta** al posto del pulsante Elimina, e anche il server rifiuta lì eliminazioni e rinomine.",
         "- **Cartella di destinazione**: dove vengono scritti i file convertiti. Le viste Rinomina e Unisci funzionano solo qui.",
         "Tutte devono esistere. La destinazione non può trovarsi dentro una cartella sorgenti, e una cartella sorgenti non può trovarsi dentro un’altra. In Docker devono trovarsi dentro la cartella montata nel container (`MEDIA_DIR`, di solito `/mnt`).",
-        "Le strutture di output **Nome della cartella sorgente** e **Percorso completo della sorgente** vengono calcolate a partire dalla cartella sorgenti in cui si trova ciascun file."
+        "Le strutture di output **Nome della cartella sorgente**, **Cartelle serie e stagione** e **Percorso completo della sorgente** vengono calcolate a partire dalla cartella sorgenti in cui si trova ciascun file."
       ],
       "see": [
         "settings.layout",
@@ -373,6 +373,7 @@
       "body": [
         "Dove, sotto la cartella di destinazione, finisce ogni file convertito:",
         "- **Nome della cartella sorgente**: `target/Show.S01/episode.mkv`, usando solo il nome della cartella in cui si trova la sorgente. Ideale per le cartelle delle stagioni.",
+        "- **Cartelle serie e stagione** (serie TV): `target/Show/S01/episode.mkv`. La serie e la stagione vengono dalla cartella in cui si trova la sorgente: `Show.S01.1080p`, `Show - Stagione 1` o la cartella di un singolo episodio come `Show.S01E05.1080p`; una cartella che si chiama solo `Stagione 1` o `S01` prende il nome della serie dalla cartella che la contiene. In una cartella con più stagioni (`Show.S01-S03`) la stagione viene dal nome di ciascun file (`S02E01`). I video che non sono in una cartella di stagione finiscono in `target/<cartella sorgente>/video.mkv`, come con **Nome della cartella sorgente**.",
         "- **Percorso completo della sorgente**: `target/Completed/Show.S01/episode.mkv`, l’intero percorso sotto la cartella sorgenti.",
         "- **Tutto nella cartella di destinazione**: `target/episode.mkv`.",
         "Se il file esiste già, quello nuovo riceve un suffisso (`episode (1).mkv`). La struttura vale per i file aggiunti dopo la modifica; i processi in coda mantengono il proprio percorso di output."

@@ -119,8 +119,10 @@ the desktop app.
   interrupted upload continues where it stopped.
 - **Download to your computer:** single files with resume support, or folders
   and several files as one ZIP built on the fly (ZIP64 for files over 4 GB).
-- **Output layout:** `target/<source folder>/file`, the full source path
-  mirrored, or everything flat in the target folder.
+- **Output layout:** `target/<source folder>/file`, show and season folders
+  for TV shows (`target/Show/S01/episode`, worked out from season folders such
+  as `Show.S01` or `Show/Season 1`), the full source path mirrored, or
+  everything flat in the target folder.
 - **Delete sources** only when you ask: **Delete** shows exactly what will go
   and asks first. Files in the queue, the target folder and folders marked
   **Protect** (e.g. one a download client seeds from) are refused.

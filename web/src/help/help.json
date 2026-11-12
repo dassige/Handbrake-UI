@@ -358,7 +358,7 @@
         "- **Protect** on a sources folder: stops its files and folders being deleted or renamed from the app, for example the folder a download client is still seeding from. In the Sources panel such a folder shows **Protected** instead of the Delete button, and the server refuses deletes and renames there too.",
         "- **Target folder**: where converted files are written. The Rename and Merge views work only here.",
         "All must exist. The target cannot be inside a sources folder, and a sources folder cannot be inside another one. In Docker they must be inside the folder mounted into the container (`MEDIA_DIR`, usually `/mnt`).",
-        "The output layouts **Source folder name** and **Full source path** are worked out from the sources folder each file is in."
+        "The output layouts **Source folder name**, **Show and season folders** and **Full source path** are worked out from the sources folder each file is in."
       ],
       "see": [
         "settings.layout",
@@ -373,6 +373,7 @@
       "body": [
         "Where under the target folder each converted file goes:",
         "- **Source folder name**: `target/Show.S01/episode.mkv`, using only the name of the folder the source is in. Good for season folders.",
+        "- **Show and season folders** (TV shows): `target/Show/S01/episode.mkv`. The show and the season come from the folder the source is in: `Show.S01.1080p`, `Show - Season 1` or an episode's own folder such as `Show.S01E05.1080p`; a bare `Season 1` or `S01` folder takes the show name from the folder above it. In a folder with several seasons (`Show.S01-S03`) the season comes from each file's name (`S02E01`). Videos that are not in a season folder go to `target/<source folder>/video.mkv`, as with **Source folder name**.",
         "- **Full source path**: `target/Completed/Show.S01/episode.mkv`, the whole path below the sources folder.",
         "- **All in the target folder**: `target/episode.mkv`.",
         "If the file already exists, the new one gets a suffix (`episode (1).mkv`). The layout applies to files added after the change; queued jobs keep their output path."

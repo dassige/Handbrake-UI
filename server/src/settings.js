@@ -14,7 +14,7 @@ import { validCodeset } from './subtitles/text.js';
 
 export const MAX_SOURCE_ROOTS = 20;
 
-export const OUTPUT_LAYOUTS = ['parent', 'mirror', 'flat'];
+export const OUTPUT_LAYOUTS = ['parent', 'season', 'mirror', 'flat'];
 
 // Web app language; 'auto' follows each browser's language. Notifications stay in English.
 export const LANGUAGES = ['auto', 'en', 'it', 'de', 'fr', 'es'];

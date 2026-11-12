@@ -62,6 +62,7 @@
     "title": "Output folder layout",
     "layout": {
       "parent": "Source folder name",
+      "season": "Show and season folders",
       "mirror": "Full source path",
       "flat": "All in the target folder"
     },

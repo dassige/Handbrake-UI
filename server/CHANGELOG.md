@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.1.5] - 2026/11/13
+
+- feat: Output layout with show and season folders for TV shows
+
+A new output layout, "Show and season folders", writes converted
+episodes to target/Show/S01/episode.mkv. The show and season come
+from the folder the source is in: "Show.S01.1080p", "Show - Season 1"
+or an episode's own folder such as "Show.S01E05.1080p". A bare
+"Season 1" or "S01" folder takes the show name from the folder above
+it. In a folder with several seasons ("Show.S01-S03"), each file's
+own S02E01 marker gives the season. Show names are cleaned up (dots
+become spaces, release tags are dropped, a year becomes "(2019)"),
+and season words are recognised in the five app languages.
+
+Videos that are not in a season folder go to
+target/<source folder>/video.mkv, as with "Source folder name". The
+settings page, the help and the README describe the new layout in
+every language.
+
 ## [4.1.4] - 2026/11/13
 
 - feat: Quality check can re-check the selected files

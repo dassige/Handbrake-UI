@@ -62,6 +62,7 @@
     "title": "Estructura de la carpeta de salida",
     "layout": {
       "parent": "Nombre de la carpeta de origen",
+      "season": "Carpetas de serie y temporada",
       "mirror": "Ruta de origen completa",
       "flat": "Todo en la carpeta de destino"
     },
