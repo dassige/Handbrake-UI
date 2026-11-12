@@ -160,6 +160,9 @@ the desktop app.
 - **Login and API keys** (both optional): a password for the web app, and API
   keys for other programs (scripts, n8n, Home Assistant…), each limited to
   read only, queue control or full access.
+- **Documented API:** everything the web app does is an HTTP API, described
+  at `/api/docs` (browsable, with "Try it out") and `/api/openapi.json`
+  (OpenAPI 3.1, for client generators).
 - **Backup and restore:** a ZIP with the database (settings, presets, rename
   rules, jobs, histories) and optionally the logs; never video files.
   Downloadable, saved on the server, or scheduled. Restore runs live.
@@ -659,6 +662,11 @@ Keys never manage login or other keys; that needs a signed-in browser. A key is
 shown once when created; only its hash is stored. While login is off, keys are
 optional, but a key that is sent is still checked, so an integration can be
 tested first. `GET /api/health` always answers, for health checks.
+
+Every request, with its parameters, answers and the access it needs, is
+described at `http://<server>:8095/api/docs` (Swagger UI; **Authorize** takes an
+API key) and, for client generators, at `/api/openapi.json` (OpenAPI 3.1).
+Both are public, also while login is on.
 
 **Forgot the password?** Start the app with `DISABLE_LOGIN=true` (Docker: add it
 to `.env` and run `docker compose up -d`). Login is then off, and a new

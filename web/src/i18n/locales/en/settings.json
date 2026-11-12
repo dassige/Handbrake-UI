@@ -399,6 +399,8 @@
     "signedOutOthers_other": "{count} browsers signed out",
     "keysTitle": "API keys",
     "keysHint": "Let other programs (scripts, n8n, Home Assistant…) use EncForge’s API. They send the key with every request: <code>Authorization: Bearer ef_…</code>",
+    "docs": "API documentation",
+    "docsHint": "every request, what it needs and what it answers; it can try them out too.",
     "keysOptional": "While login is off, keys are not needed. A key that is sent is still checked, so an integration can be tried before turning login on.",
     "noKeys": "No API keys yet.",
     "newKey": "New API key",

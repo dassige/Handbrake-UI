@@ -1007,7 +1007,7 @@
     "settings.apiKeys": {
       "title": "API keys",
       "body": [
-        "API keys let other programs (scripts, n8n, Home Assistant…) use EncForge’s API: the same requests the web app makes, under `/api/`.",
+        "API keys let other programs (scripts, n8n, Home Assistant…) use EncForge’s API: the same requests the web app makes, under `/api/`. Every request, with what it needs and returns, is listed at `/api/docs` (the description itself: `/api/openapi.json`).",
         "The program sends the key with every request, in either header:",
         "- `Authorization: Bearer ef_…`",
         "- `X-API-Key: ef_…`",

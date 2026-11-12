@@ -399,6 +399,8 @@
     "signedOutOthers_other": "{count} browser disconnessi",
     "keysTitle": "Chiavi API",
     "keysHint": "Permettono ad altri programmi (script, n8n, Home Assistant…) di usare l’API di EncForge. La chiave va inviata con ogni richiesta: <code>Authorization: Bearer ef_…</code>",
+    "docs": "Documentazione dell’API",
+    "docsHint": "tutte le richieste, cosa serve a ognuna e cosa risponde; permette anche di provarle.",
     "keysOptional": "Finché l’accesso è disattivato le chiavi non servono. Una chiave inviata viene comunque verificata, così un’integrazione si può provare prima di attivare l’accesso.",
     "noKeys": "Nessuna chiave API.",
     "newKey": "Nuova chiave API",

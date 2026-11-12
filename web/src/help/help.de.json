@@ -1007,7 +1007,7 @@
     "settings.apiKeys": {
       "title": "API-Schlüssel",
       "body": [
-        "Mit API-Schlüsseln können andere Programme (Skripte, n8n, Home Assistant…) die API von EncForge benutzen: dieselben Anfragen, die die Web-App stellt, unter `/api/`.",
+        "Mit API-Schlüsseln können andere Programme (Skripte, n8n, Home Assistant…) die API von EncForge benutzen: dieselben Anfragen, die die Web-App stellt, unter `/api/`. Alle Anfragen, mit dem, was sie brauchen und zurückgeben, stehen unter `/api/docs` (die Beschreibung selbst: `/api/openapi.json`).",
         "Das Programm sendet den Schlüssel bei jeder Anfrage in einem dieser Header mit:",
         "- `Authorization: Bearer ef_…`",
         "- `X-API-Key: ef_…`",

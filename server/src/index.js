@@ -34,6 +34,7 @@ import { Subtitles } from './subtitles/service.js';
 import { Auth } from './auth.js';
 import { registerAuthRoutes } from './authRoutes.js';
 import { HttpError } from './errors.js';
+import { registerOpenApi } from './openapi/index.js';
 
 /** version, date and commit from a package.json (managed by DGS AutoVersion); null when missing. */
 function readVersion(file) {
@@ -93,12 +94,16 @@ backups.scheduler = backupScheduler;
 app.setErrorHandler((err, req, reply) => {
   const status = err.statusCode ?? (err.code === 'ENOENT' ? 404 : 500);
   if (status >= 500) req.log.error(err);
-  // code: a machine-readable reason, for errors that have one (auth.js).
-  reply.status(status).send(err instanceof HttpError && err.errorCode ? { error: err.message, code: err.errorCode } : { error: err.message });
+  // code: a machine-readable reason, for errors that have one (auth.js; invalidRequest: the docs' schema refused it).
+  const code = err instanceof HttpError ? err.errorCode : err.validation ? 'invalidRequest' : null;
+  reply.status(status).send(code ? { error: err.message, code } : { error: err.message });
 });
 
 // Login and API keys: checked before every /api route (auth.js).
 app.addHook('onRequest', auth.hook());
+
+// API docs (/api/docs, /api/openapi.json): attaches each route's docs as it is registered below.
+await registerOpenApi(app, { version: version.app?.version ?? version.server?.version ?? '0.0.0', webDir: config.webDir });
 
 // Per-request access logs are noise here (the UI polls); keep warnings and errors.
 await app.register(

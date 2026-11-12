@@ -1,6 +1,6 @@
 {
   "name": "encforge-server",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "private": true,
   "license": "GPL-2.0-only",
   "type": "module",
@@ -15,9 +15,11 @@
   },
   "dependencies": {
     "@fastify/static": "^10.1.10",
+    "@fastify/swagger": "^9.9.3",
+    "@fastify/swagger-ui": "^6.1.3",
     "fastify": "^5.12.8",
     "nodemailer": "^10.4.0"
   },
-  "versionDate": "2026/11/13 10:04",
-  "git-parentCommit-ID": "e644500c5467d5271a44ecfb3ef466737972a35d"
+  "versionDate": "2026/11/13 10:24",
+  "git-parentCommit-ID": "40ad16581f3d018f65d2ad51987d264432632605"
 }

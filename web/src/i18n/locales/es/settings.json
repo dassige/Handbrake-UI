@@ -399,6 +399,8 @@
     "signedOutOthers_other": "Sesión cerrada en {count} navegadores",
     "keysTitle": "Claves API",
     "keysHint": "Permiten que otros programas (scripts, n8n, Home Assistant…) usen la API de EncForge. Envían la clave con cada petición: <code>Authorization: Bearer ef_…</code>",
+    "docs": "Documentación de la API",
+    "docsHint": "todas las peticiones, qué necesita cada una y qué responde; también se pueden probar.",
     "keysOptional": "Mientras el inicio de sesión esté desactivado, las claves no hacen falta. Una clave enviada se comprueba igualmente, así que una integración se puede probar antes de activarlo.",
     "noKeys": "Todavía no hay claves API.",
     "newKey": "Nueva clave API",

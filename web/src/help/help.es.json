@@ -1007,7 +1007,7 @@
     "settings.apiKeys": {
       "title": "Claves API",
       "body": [
-        "Las claves API permiten que otros programas (scripts, n8n, Home Assistant…) usen la API de EncForge: las mismas peticiones que hace la aplicación web, bajo `/api/`.",
+        "Las claves API permiten que otros programas (scripts, n8n, Home Assistant…) usen la API de EncForge: las mismas peticiones que hace la aplicación web, bajo `/api/`. Todas las peticiones, con lo que necesita cada una y lo que devuelve, están en `/api/docs` (la descripción en sí: `/api/openapi.json`).",
         "El programa envía la clave con cada petición, en una de estas cabeceras:",
         "- `Authorization: Bearer ef_…`",
         "- `X-API-Key: ef_…`",

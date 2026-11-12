@@ -254,6 +254,8 @@ test('auth: every admin route exists, and routes get the expected access', async
   assert.equal(routeAccess('GET', '/api/backup'), 'admin');
   assert.equal(routeAccess('GET', '/api/auth/keys'), 'session');
   assert.equal(routeAccess('GET', '/api/health'), 'public');
+  assert.equal(routeAccess('GET', '/api/docs/static/*'), 'public', 'the API docs are public');
+  assert.equal(routeAccess('GET', '/api/openapi.json'), 'public');
   assert.equal(routeAccess('GET', undefined), 'read', 'unknown routes are not public');
   await app.close();
 });

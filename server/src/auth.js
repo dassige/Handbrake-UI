@@ -89,6 +89,8 @@ export function routeAccess(method, url) {
   const m = method === 'HEAD' ? 'GET' : method;
   const key = `${m} ${url}`;
   if (PUBLIC.has(key)) return 'public';
+  // The API docs (openapi/): the page, its files and the description itself.
+  if (url === '/api/openapi.json' || url === '/api/docs' || url?.startsWith('/api/docs/')) return 'public';
   if (url === '/api/auth' || url?.startsWith('/api/auth/')) return 'session';
   if (ADMIN.has(key)) return 'admin';
   return m === 'GET' ? 'read' : 'queue';

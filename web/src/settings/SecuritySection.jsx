@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Copy, KeyRound, LogOut, Monitor, Plus, ShieldAlert, Trash2 } from 'lucide-react';
+import { BookOpen, Copy, KeyRound, LogOut, Monitor, Plus, ShieldAlert, Trash2 } from 'lucide-react';
 import { api } from '../api.js';
 import { ago, dateTime } from '../format.js';
 import { rich, t } from '../i18n/index.js';
@@ -195,6 +195,10 @@ export function SecuritySection({ auth, onAuthChange, run, onError }) {
 
       <Card title={t('settings.security.keysTitle')} help="settings.apiKeys">
         <p className="set-hint">{rich('settings.security.keysHint')}</p>
+        <p className="set-hint">
+          <a href="/api/docs" target="_blank" rel="noopener noreferrer"><BookOpen size={13} /> {t('settings.security.docs')}</a>
+          {' · '}{t('settings.security.docsHint')}
+        </p>
         {!auth?.enabled && <p className="set-hint">{t('settings.security.keysOptional')}</p>}
 
         {created && (

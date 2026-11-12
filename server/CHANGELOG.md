@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.2.1] - 2026/11/13
+
+- feat: API documentation at /api/docs, with request validation
+
+Every API route is now described in OpenAPI 3.1: /api/docs shows it
+as a browsable page where requests can be tried with an API key, and
+/api/openapi.json serves the description for client generators. Both
+are public, also while login is on. The description explains login
+and the API key access levels, the error format, paths and the event
+stream; each operation shows the access it needs, taken from the same
+table the login check uses.
+
+The docs of each route live in server/src/openapi/paths/, by area, and
+are attached when the route is registered. Request parameters and
+bodies are now validated against them (400, code invalidRequest),
+never more strictly than the handlers already were; response schemas
+only document, so answers are sent exactly as before. Tests fail when
+a route has no docs or docs have no route, and replay the requests the
+web app makes to prove validation accepts them.
+
+Settings → Security links to the documentation; the help and the
+README mention it in every language.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
 ## [4.2.0] - 2026/11/13
 
 - feat: Optional login for the web app and API keys for other programs

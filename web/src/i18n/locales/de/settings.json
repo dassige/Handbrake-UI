@@ -399,6 +399,8 @@
     "signedOutOthers_other": "{count} Browser abgemeldet",
     "keysTitle": "API-Schlüssel",
     "keysHint": "Damit können andere Programme (Skripte, n8n, Home Assistant…) die API von EncForge benutzen. Sie senden den Schlüssel bei jeder Anfrage mit: <code>Authorization: Bearer ef_…</code>",
+    "docs": "API-Dokumentation",
+    "docsHint": "alle Anfragen, was sie brauchen und was sie antworten; dort lassen sie sich auch ausprobieren.",
     "keysOptional": "Solange die Anmeldung aus ist, sind keine Schlüssel nötig. Ein mitgesendeter Schlüssel wird trotzdem geprüft, so lässt sich eine Integration vor dem Einschalten testen.",
     "noKeys": "Noch keine API-Schlüssel.",
     "newKey": "Neuer API-Schlüssel",
