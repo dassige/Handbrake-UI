@@ -694,6 +694,7 @@
         "Was als Problem gilt, legen Sie in den [Einstellungen → Qualitätsprüfung](#settings.quality) fest. Das Ändern eines Kriteriums aktualisiert die Ergebnisse sofort, ohne erneut zu prüfen.",
         "- **Zur Warteschlange hinzufügen** konvertiert die ausgewählten Dateien mit der gewählten Voreinstellung (nur Dateien in einem Quellordner).",
         "- **CSV exportieren** lädt die ausgewählten Dateien (oder alle aufgelisteten) als Tabelle herunter.",
+        "- **Erneut prüfen** liest die ausgewählten Dateien noch einmal, nachdem Sie sie korrigiert oder ersetzt haben, und aktualisiert ihre Ergebnisse. Dateien, die es nicht mehr gibt, verschwinden aus der Liste. Neue Dateien findet nur eine neue Prüfung.",
         "Die letzten 20 Ergebnisse werden aufbewahrt; wählen Sie eines unter **Ergebnis**. Eine Prüfung kann laufen, während Dateien konvertiert werden."
       ],
       "see": [

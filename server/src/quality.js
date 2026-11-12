@@ -230,7 +230,7 @@ export class QualityScanner {
     this.events = events;
     this.queue = queue;
     this.log = log;
-    this.active = null; // { id, cancelled, child, results, scan }
+    this.active = null; // { id, recheck, cancelled, child, results, total, scanned, current }
     this.lastEmit = 0;
   }
 
@@ -247,20 +247,24 @@ export class QualityScanner {
   }
 
   list() {
-    return this.db.prepare(`SELECT ${META_COLUMNS} FROM quality_scans ORDER BY id DESC`).all().map((r) => {
-      const scan = rowToScan(r);
-      if (this.active?.id === scan.id) Object.assign(scan, this.progress());
-      return scan;
-    });
+    return this.db.prepare(`SELECT ${META_COLUMNS} FROM quality_scans ORDER BY id DESC`).all().map((r) => this.withProgress(rowToScan(r)));
+  }
+
+  /**
+   * The live state of the running scan. A re-check leaves the stored row as it was until
+   * it ends (a restart then keeps the old results), so its status is only set here.
+   */
+  withProgress(scan) {
+    if (this.active?.id !== scan.id) return scan;
+    return Object.assign(scan, { status: 'running' }, this.progress());
   }
 
   /** One scan with its results, checked against the current criteria. */
   get(id) {
     const r = this.db.prepare(`SELECT ${META_COLUMNS}, results FROM quality_scans WHERE id = ?`).get(id);
     if (!r) throw notFound(`Quality check ${id} not found`);
-    const scan = rowToScan(r);
+    const scan = this.withProgress(rowToScan(r));
     const results = this.active?.id === id ? this.active.results : JSON.parse(r.results ?? '[]');
-    if (this.active?.id === id) Object.assign(scan, this.progress());
     const criteria = this.settings.get('quality');
     const sourceRoots = this.settings.get('sourceRoots');
     const inSource = results.filter((f) => rootOf(sourceRoots, f.path)).map((f) => f.path);
@@ -278,7 +282,7 @@ export class QualityScanner {
 
   progress() {
     const a = this.active;
-    return { scanned: a.results.length, total: a.total, current: a.current ?? null };
+    return { scanned: a.scanned, total: a.total, current: a.current ?? null, recheck: a.recheck };
   }
 
   async start({ paths }) {
@@ -293,10 +297,11 @@ export class QualityScanner {
       .prepare(`INSERT INTO quality_scans (status, paths, created_at, total, scanned) VALUES ('running', ?, ?, 0, 0)`)
       .run(JSON.stringify(targets), Date.now());
     const id = Number(r.lastInsertRowid);
-    this.active = { id, cancelled: false, child: null, results: [], total: null, current: 'Listing files…' };
+    this.active = { id, recheck: false, cancelled: false, child: null, results: [], total: null, scanned: 0, current: 'Listing files…' };
     this.prune();
     this.events.emit('qualityScans');
-    this.run(id, targets, matcher).catch((err) => this.log.error(err));
+    // Settles when the check ends (tests wait on it).
+    this.done = this.run(id, targets, matcher).catch((err) => this.log.error(err));
     return { id };
   }
 
@@ -321,6 +326,7 @@ export class QualityScanner {
         a.current = file;
         this.emitProgress();
         a.results.push(await this.inspect(file, a));
+        a.scanned++;
       }
       if (a.cancelled) status = 'cancelled';
     } catch (err) {
@@ -333,6 +339,70 @@ export class QualityScanner {
     this.active = null;
     this.events.emit('qualityScans');
     this.events.emit('qualityScan', { id, status });
+  }
+
+  /**
+   * Reads some files of a finished check again, after they were fixed, and updates their
+   * results in place. Files that are gone (deleted, renamed or replaced) leave the results.
+   */
+  async recheck(id, { paths } = {}) {
+    if (this.active) throw conflict('A quality check is already running');
+    if (!Array.isArray(paths) || !paths.length) throw badRequest('Choose at least one file');
+    const r = this.db.prepare('SELECT status, results FROM quality_scans WHERE id = ?').get(id);
+    if (!r) throw notFound(`Quality check ${id} not found`);
+    if (r.status === 'running') throw conflict('This quality check is still running');
+    const results = JSON.parse(r.results ?? '[]');
+    const index = new Map(results.map((f, i) => [f.path, i]));
+    // Only files of this check, so a path from the request never reaches ffprobe unchecked.
+    const files = [...new Set(paths)].filter((p) => index.has(p) && rootOf(this.roots(), p));
+    if (!files.length) throw badRequest('None of these files are in this quality check');
+
+    this.active = { id, recheck: true, cancelled: false, child: null, results, total: files.length, scanned: 0, current: null };
+    this.events.emit('qualityScans');
+    this.done = this.runRecheck(id, files, index).catch((err) => this.log.error(err));
+    return { id, count: files.length };
+  }
+
+  async runRecheck(id, files, index) {
+    const a = this.active;
+    const gone = new Set();
+    let failed = null;
+    try {
+      for (const file of files) {
+        if (a.cancelled) break;
+        a.current = file;
+        this.emitProgress();
+        if (await this.isGone(file)) gone.add(file);
+        else a.results[index.get(file)] = await this.inspect(file, a);
+        a.scanned++;
+      }
+    } catch (err) {
+      failed = err.message;
+    }
+    const results = a.results.filter((f) => !gone.has(f.path));
+    const row = this.db.prepare('SELECT total, scanned FROM quality_scans WHERE id = ?').get(id);
+    if (row) {
+      this.db
+        .prepare('UPDATE quality_scans SET results = ?, total = ?, scanned = ? WHERE id = ?')
+        .run(JSON.stringify(results), Math.max(0, (row.total ?? 0) - gone.size), results.length, id);
+    }
+    this.active = null;
+    this.events.emit('qualityScans');
+    this.events.emit('qualityScan', { id, status: failed ? 'failed' : a.cancelled ? 'cancelled' : 'done', recheck: true, error: failed });
+  }
+
+  /** True when a file no longer exists while its folder is reachable (an unmounted share is not "gone"). */
+  async isGone(file) {
+    try {
+      await fs.stat(file);
+      return false;
+    } catch (err) {
+      if (err.code !== 'ENOENT') return false;
+      const root = rootOf(this.roots(), file);
+      const reachable = root && (await fs.stat(root).then(() => true, () => false));
+      if (!reachable) throw new Error(`Folder not reachable: ${root ?? path.dirname(file)}`);
+      return true;
+    }
   }
 
   async inspect(file, a) {

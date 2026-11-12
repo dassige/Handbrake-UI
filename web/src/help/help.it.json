@@ -694,6 +694,7 @@
         "Cosa conta come problema si imposta in [Impostazioni → Controllo qualità](#settings.quality). Cambiando un criterio i risultati si aggiornano subito, senza ricontrollare.",
         "- **Aggiungi alla coda** converte i file selezionati con la preimpostazione scelta (solo i file in una cartella sorgenti).",
         "- **Esporta CSV** scarica i file selezionati (o tutti quelli elencati) come foglio di calcolo.",
+        "- **Ricontrolla** legge di nuovo i file selezionati, dopo che li hai sistemati o sostituiti, e ne aggiorna i risultati. I file che non esistono più escono dall’elenco. I file nuovi si trovano solo con un nuovo controllo.",
         "Gli ultimi 20 risultati vengono conservati; scegline uno in **Risultato**. Un controllo può girare mentre i file vengono convertiti."
       ],
       "see": [

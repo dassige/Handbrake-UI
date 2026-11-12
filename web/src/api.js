@@ -102,6 +102,7 @@ export const api = {
   qualityScans: () => get('/api/quality/scans'),
   qualityScan: (id) => get(`/api/quality/scans/${id}`),
   startQualityScan: (paths) => post('/api/quality/scans', { paths }),
+  recheckQuality: (id, paths) => post(`/api/quality/scans/${id}/recheck`, { paths }),
   cancelQualityScan: (id) => post(`/api/quality/scans/${id}/cancel`),
   removeQualityScan: (id) => request('DELETE', `/api/quality/scans/${id}`),
 

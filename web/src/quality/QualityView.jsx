@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { usePaneSwitch } from '../components/PaneSwitch.jsx';
-import { ArrowDown, ArrowUp, Download, Gauge, ListPlus, Square, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Download, Gauge, ListPlus, RefreshCw, Square, Trash2 } from 'lucide-react';
 import { api } from '../api.js';
 import { SourceBrowser, browserRoots } from '../components/SourceBrowser.jsx';
 import { StatusBadge } from '../components/StatusBadge.jsx';
@@ -79,6 +79,8 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
   const effectiveId = scanId ?? scans[0]?.id ?? null;
   const meta = scans.find((s) => s.id === effectiveId) ?? null;
   const running = meta?.status === 'running';
+  // Only one check (or re-check) runs at a time on the server.
+  const anyRunning = scans.some((s) => s.status === 'running');
   const criteriaKey = JSON.stringify(settings?.quality ?? null);
 
   const load = useCallback(async () => {
@@ -114,6 +116,11 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
       setScanId(r.id);
       setFilter('flagged');
     }
+  }
+
+  /** Reads the selected files again, after they were fixed, keeping the selection. */
+  async function recheck(paths) {
+    if (meta && paths.length) await run(() => api.recheckQuality(meta.id, paths));
   }
 
   async function remove() {
@@ -245,7 +252,11 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
                 <>
                   <div className="progress big">
                     <div className="bar" style={{ width: `${meta.total ? (meta.scanned / meta.total) * 100 : 0}%` }} />
-                    <span>{meta.total == null ? t('quality.listing') : t('quality.progress', { scanned: meta.scanned, count: meta.total })}</span>
+                    <span>
+                      {meta.total == null
+                        ? t('quality.listing')
+                        : t(meta.recheck ? 'quality.rechecking' : 'quality.progress', { scanned: meta.scanned, count: meta.total })}
+                    </span>
                   </div>
                   <div className="quality-current small muted">
                     {/* While listing, the server's "current" is its own English "Listing files…": the bar says it already. */}
@@ -367,6 +378,14 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
             <div className="rename-foot">
               <span className="muted small">{selected.size ? t('quality.selected', { count: selectedRows.length }) : t('common.files.count', { count: rows.length })}</span>
               <span className="spacer" />
+              <button
+                className="btn small"
+                disabled={!selectedRows.length || anyRunning}
+                onClick={() => recheck(selectedRows.map((f) => f.path))}
+                title={selectedRows.length ? t('quality.recheckTitle') : t('quality.recheckNone')}
+              >
+                <RefreshCw size={14} /> {selectedRows.length ? t('quality.recheckCount', { count: selectedRows.length }) : t('quality.recheck')}
+              </button>
               <button className="btn small" disabled={!rows.length} onClick={exportCsv} title={t('quality.exportTitle')}>
                 <Download size={14} /> {t('quality.exportCsv')}
               </button>

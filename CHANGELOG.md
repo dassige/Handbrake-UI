@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.1.5] - 2026/11/13
+
+- feat: Quality check can re-check the selected files
+
+After fixing some files, select them in the results and press
+Re-check: only those files are read again, and their results are
+updated in the same result, with no new full check. The other files
+keep their results. Files that no longer exist (deleted, renamed or
+replaced) leave the list; new files are only found by a new check.
+If a whole folder can't be reached, the re-check stops with an error
+instead of dropping its files.
+
+A re-check shows its progress and can be stopped like a check. The
+result keeps its status and date, and a restart during a re-check
+keeps the earlier results. Only files of that result can be
+re-checked. The help explains the button in every language.
+
 ## [4.1.4] - 2026/11/12
 
 - feat: the target folder stands out in folder dropdowns

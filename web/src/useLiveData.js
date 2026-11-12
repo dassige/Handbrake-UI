@@ -138,7 +138,12 @@ export function useLiveData(onError, onNotice, onEvent) {
       const p = JSON.parse(e.data);
       setQualityScans((list) => list.map((s) => (s.id === p.id ? { ...s, ...p } : s)));
     });
-    es.addEventListener('qualityScan', () => setQualityTick((t) => t + 1));
+    es.addEventListener('qualityScan', (e) => {
+      setQualityTick((t) => t + 1);
+      // A re-check keeps its result's status, so its error is only reported here.
+      const p = JSON.parse(e.data || '{}');
+      if (p.recheck && p.error) errRef.current?.(new Error(p.error));
+    });
     es.addEventListener('namingChecks', () => loadNamingChecks());
     es.addEventListener('namingProgress', (e) => {
       const p = JSON.parse(e.data);
