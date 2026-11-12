@@ -96,7 +96,7 @@ test('normalizeQuality cleans lists and rejects bad numbers', () => {
   assert.throws(() => normalizeQuality({ badVideoCodecs: 'mpeg4' }), /list/);
 });
 
-test('re-check reads the chosen files again, keeps the others and drops the gone ones', async () => {
+test('re-check reads the chosen files again, follows a changed extension and drops the gone ones', async () => {
   const { default: fs } = await import('node:fs/promises');
   const { default: os } = await import('node:os');
   const { default: path } = await import('node:path');
@@ -111,7 +111,7 @@ test('re-check reads the chosen files again, keeps the others and drops the gone
     await fs.mkdir(src);
     await fs.mkdir(path.join(dir, 'out'));
     const settings = new Settings(db, { initialSourceRoot: src, initialTargetRoot: path.join(dir, 'out') });
-    const files = ['a.mkv', 'b.mkv', 'c.mkv'].map((f) => path.join(src, f));
+    const files = ['a.mkv', 'b.mkv', 'c.mkv', 'd.avi'].map((f) => path.join(src, f));
     for (const f of files) await fs.writeFile(f, 'x');
 
     // Every file starts at a low bitrate; "fixing" one raises it.
@@ -123,26 +123,31 @@ test('re-check reads the chosen files again, keeps the others and drops the gone
 
     const { id } = await quality.start({ paths: [src] });
     await quality.done;
-    assert.equal(quality.get(id).flagged, 3);
+    assert.equal(quality.get(id).flagged, 4);
 
     kbps.set(files[0], '8000000');
     await fs.rm(files[1]);
+    // d.avi was converted to d.mkv and deleted.
+    const converted = path.join(src, 'd.mkv');
+    await fs.rename(files[3], converted);
+    kbps.set(converted, '8000000');
     probed.length = 0;
     await assert.rejects(quality.recheck(id, { paths: [path.join(dir, 'elsewhere.mkv')] }), /None of these files/);
-    const r = await quality.recheck(id, { paths: [files[0], files[1]] });
-    assert.equal(r.count, 2);
+    const r = await quality.recheck(id, { paths: [files[0], files[1], files[3]] });
+    assert.equal(r.count, 3);
     assert.equal(quality.list()[0].status, 'running', 'a re-check shows as running');
     await assert.rejects(quality.start({ paths: [src] }), /already running/);
     await quality.done;
 
-    assert.deepEqual(probed, [files[0]], 'only the chosen file that still exists is read again');
+    assert.deepEqual(probed, [files[0], converted], 'the chosen files that exist, or their replacement, are read again');
     const scan = quality.get(id);
     assert.equal(scan.status, 'done', 'the result keeps its status');
-    assert.deepEqual(scan.results.map((f) => path.basename(f.path)), ['a.mkv', 'c.mkv']);
+    assert.deepEqual(scan.results.map((f) => path.basename(f.path)), ['a.mkv', 'c.mkv', 'd.mkv']);
     assert.equal(scan.results[0].issues.length, 0);
     assert.equal(scan.results[1].issues[0].kind, 'bitrate', 'files not chosen keep their result');
-    assert.equal(scan.total, 2);
-    assert.equal(scan.scanned, 2);
+    assert.equal(scan.results[2].issues.length, 0, 'the converted file replaces the old one');
+    assert.equal(scan.total, 3);
+    assert.equal(scan.scanned, 3);
   } finally {
     db.close();
     await fs.rm(dir, { recursive: true, force: true });

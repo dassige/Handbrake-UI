@@ -695,7 +695,7 @@
         "What counts as a problem is set in [Settings → Quality check](#settings.quality). Changing a criterion updates the results straight away, without checking again.",
         "- **Add to queue** converts the selected files with the chosen preset (only files in a sources folder).",
         "- **Export CSV** downloads the selected files (or all those listed) as a spreadsheet.",
-        "- **Re-check** reads the selected files again, after you fixed or replaced them, and updates their results. Files that no longer exist leave the list. New files are only found by a new check.",
+        "- **Re-check** reads the selected files again, after you fixed or replaced them, and updates their results. A file converted to another format in the same folder (film.avi now film.mkv) takes the old one's place; other files that no longer exist leave the list. New files are only found by a new check.",
         "The last 20 results are kept; pick one in **Result**. A check can run while files are converting."
       ],
       "see": [

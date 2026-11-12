@@ -695,7 +695,7 @@
         "Ce qui compte comme un problème se règle dans [Paramètres → Contrôle de qualité](#settings.quality). Changer un critère met les résultats à jour immédiatement, sans nouveau contrôle.",
         "- **Ajouter à la file** convertit les fichiers sélectionnés avec le préréglage choisi (uniquement les fichiers d'un dossier de sources).",
         "- **Exporter en CSV** télécharge les fichiers sélectionnés (ou tous ceux listés) sous forme de tableur.",
-        "- **Revérifier** relit les fichiers sélectionnés, après que vous les avez corrigés ou remplacés, et met à jour leurs résultats. Les fichiers qui n'existent plus sortent de la liste. Les nouveaux fichiers ne sont trouvés que par une nouvelle vérification.",
+        "- **Revérifier** relit les fichiers sélectionnés, après que vous les avez corrigés ou remplacés, et met à jour leurs résultats. Un fichier converti dans un autre format dans le même dossier (film.avi devenu film.mkv) prend la place de l'ancien ; les autres fichiers qui n'existent plus sortent de la liste. Les nouveaux fichiers ne sont trouvés que par une nouvelle vérification.",
         "Les 20 derniers résultats sont conservés ; choisissez-en un dans **Résultat**. Un contrôle peut s'exécuter pendant que des fichiers sont en cours de conversion."
       ],
       "see": [

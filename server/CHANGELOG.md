@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.1.6] - 2026/11/13
+
+- feat: Quality re-check follows a file converted to another format
+
+When a re-checked file no longer exists but its folder has a video
+with the same name and another extension (film.avi converted to
+film.mkv and deleted), the new file is read and takes the old one's
+place in the results. If it was already listed, it moves there
+instead of showing twice. Files with no such replacement leave the
+list as before.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
 ## [4.1.5] - 2026/11/13
 
 - feat: Output layout with show and season folders for TV shows

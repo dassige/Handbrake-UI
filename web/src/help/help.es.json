@@ -695,7 +695,7 @@
         "Lo que cuenta como problema se define en [Ajustes → Control de calidad](#settings.quality). Al cambiar un criterio, los resultados se actualizan al instante, sin volver a comprobar.",
         "- **Añadir a la cola** convierte los archivos seleccionados con el preajuste elegido (solo los archivos de una carpeta de origen).",
         "- **Exportar CSV** descarga los archivos seleccionados (o todos los de la lista) como una hoja de cálculo.",
-        "- **Volver a comprobar** lee de nuevo los archivos seleccionados, después de corregirlos o sustituirlos, y actualiza sus resultados. Los archivos que ya no existen salen de la lista. Los archivos nuevos solo los encuentra una nueva comprobación.",
+        "- **Volver a comprobar** lee de nuevo los archivos seleccionados, después de corregirlos o sustituirlos, y actualiza sus resultados. Un archivo convertido a otro formato en la misma carpeta (film.avi ahora film.mkv) ocupa el lugar del antiguo; los demás archivos que ya no existen salen de la lista. Los archivos nuevos solo los encuentra una nueva comprobación.",
         "Se conservan los últimos 20 resultados; elija uno en **Resultado**. Una comprobación puede ejecutarse mientras se convierten archivos."
       ],
       "see": [

@@ -5,7 +5,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { badRequest, conflict, notFound } from './errors.js';
-import { collectVideos, makeFileMatcher, rootOf, resolveUnderAny } from './paths.js';
+import { collectVideos, makeFileMatcher, naturalCompare, rootOf, resolveUnderAny } from './paths.js';
 
 export const DEFAULT_QUALITY = {
   // ffprobe codec names (codec_name).
@@ -343,7 +343,9 @@ export class QualityScanner {
 
   /**
    * Reads some files of a finished check again, after they were fixed, and updates their
-   * results in place. Files that are gone (deleted, renamed or replaced) leave the results.
+   * results in place. A file that is gone but has a video of the same name with another
+   * extension next to it (film.avi converted to film.mkv) is replaced by that video;
+   * other gone files leave the results.
    */
   async recheck(id, { paths } = {}) {
     if (this.active) throw conflict('A quality check is already running');
@@ -359,36 +361,70 @@ export class QualityScanner {
 
     this.active = { id, recheck: true, cancelled: false, child: null, results, total: files.length, scanned: 0, current: null };
     this.events.emit('qualityScans');
-    this.done = this.runRecheck(id, files, index).catch((err) => this.log.error(err));
+    this.done = this.runRecheck(id, files, index, makeFileMatcher(this.settings)).catch((err) => this.log.error(err));
     return { id, count: files.length };
   }
 
-  async runRecheck(id, files, index) {
+  async runRecheck(id, files, index, matcher) {
     const a = this.active;
-    const gone = new Set();
+    const before = a.results.length;
+    const fresh = new Map(); // result index -> its new entries ([] when the file is gone)
     let failed = null;
     try {
       for (const file of files) {
         if (a.cancelled) break;
+        const i = index.get(file);
         a.current = file;
         this.emitProgress();
-        if (await this.isGone(file)) gone.add(file);
-        else a.results[index.get(file)] = await this.inspect(file, a);
+        if (await this.isGone(file)) {
+          const entries = [];
+          for (const other of await this.replacementsOf(file, matcher)) entries.push(await this.inspect(other, a));
+          fresh.set(i, entries);
+          if (entries.length) a.results[i] = entries[0];
+        } else {
+          a.results[i] = await this.inspect(file, a);
+          fresh.set(i, [a.results[i]]);
+        }
         a.scanned++;
       }
     } catch (err) {
       failed = err.message;
     }
-    const results = a.results.filter((f) => !gone.has(f.path));
-    const row = this.db.prepare('SELECT total, scanned FROM quality_scans WHERE id = ?').get(id);
+    // A replacement that was already in the results moves to where the old file was.
+    const newPaths = new Set([...fresh.values()].flat().map((f) => f.path));
+    const results = [];
+    const seen = new Set();
+    a.results.forEach((f, i) => {
+      const entries = fresh.get(i) ?? (newPaths.has(f.path) ? [] : [f]);
+      for (const e of entries) {
+        if (seen.has(e.path)) continue;
+        seen.add(e.path);
+        results.push(e);
+      }
+    });
+    const row = this.db.prepare('SELECT total FROM quality_scans WHERE id = ?').get(id);
     if (row) {
       this.db
         .prepare('UPDATE quality_scans SET results = ?, total = ?, scanned = ? WHERE id = ?')
-        .run(JSON.stringify(results), Math.max(0, (row.total ?? 0) - gone.size), results.length, id);
+        .run(JSON.stringify(results), Math.max(0, (row.total ?? 0) + results.length - before), results.length, id);
     }
     this.active = null;
     this.events.emit('qualityScans');
     this.events.emit('qualityScan', { id, status: failed ? 'failed' : a.cancelled ? 'cancelled' : 'done', recheck: true, error: failed });
+  }
+
+  /** Videos next to a file with its name and another extension: film.avi -> film.mkv. */
+  async replacementsOf(file, matcher) {
+    const dir = path.dirname(file);
+    const base = path.basename(file);
+    const stem = path.basename(base, path.extname(base)).toLowerCase();
+    const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => []);
+    return entries
+      .filter((e) => e.isFile() && e.name !== base && matcher.isVideo(e.name) && !matcher.excluded(e.name)
+        && path.basename(e.name, path.extname(e.name)).toLowerCase() === stem)
+      .map((e) => e.name)
+      .sort(naturalCompare)
+      .map((n) => path.join(dir, n));
   }
 
   /** True when a file no longer exists while its folder is reachable (an unmounted share is not "gone"). */
