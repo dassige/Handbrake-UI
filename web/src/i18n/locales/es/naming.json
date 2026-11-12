@@ -42,5 +42,20 @@
   "deleteResult": "Eliminar este resultado",
   "rulesChanged": "las reglas cambiaron desde entonces: pulse Volver a comprobar",
   "goneText": "Ya no está aquí: renombrado, movido o eliminado después del control",
-  "allFixed": "Todos los archivos de este control se han renombrado o movido."
+  "allFixed": "Todos los archivos de este control se han renombrado o movido.",
+  "progressListing_one": "Listando archivos… {count} video encontrado",
+  "progressListing_other": "Listando archivos… {count} videos encontrados",
+  "progressChecking_one": "{checked} de {count} nombre comprobado",
+  "progressChecking_other": "{checked} de {count} nombres comprobados",
+  "stopped": "Detenido; se muestran los archivos comprobados hasta ahora.",
+  "stoppedWhy": "Detenido ({reason}).",
+  "interrupted": "Interrumpido por un reinicio",
+  "failed": "Error: {error}.",
+  "status": {
+    "running": "en curso",
+    "cancelled": "detenido",
+    "failed": "error"
+  },
+  "morePaths_one": "+ {count} carpeta más",
+  "morePaths_other": "+ {count} carpetas más"
 }

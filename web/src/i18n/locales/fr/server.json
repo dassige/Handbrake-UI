@@ -152,6 +152,7 @@
       "conversion": "une conversion est en cours",
       "merge": "une fusion est en cours",
       "quality": "un contrôle de qualité est en cours",
+      "naming": "un contrôle des noms est en cours",
       "upload": "un téléversement est en cours"
     },
     "missingFolder": "Le dossier {folder} n'existe pas sur ce serveur ; corrigez-le dans les Paramètres après la restauration."

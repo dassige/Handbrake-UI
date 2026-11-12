@@ -152,6 +152,7 @@
       "conversion": "eine Konvertierung läuft",
       "merge": "eine Zusammenführung läuft",
       "quality": "eine Qualitätsprüfung läuft",
+      "naming": "eine Namensprüfung läuft",
       "upload": "ein Upload läuft"
     },
     "missingFolder": "Der Ordner {folder} existiert auf diesem Server nicht; korrigieren Sie ihn nach der Wiederherstellung in den Einstellungen."

@@ -152,6 +152,7 @@
       "conversion": "hay una conversión en curso",
       "merge": "hay una unión en curso",
       "quality": "hay un control de calidad en curso",
+      "naming": "hay un control de nombres en curso",
       "upload": "hay una subida en curso"
     },
     "missingFolder": "La carpeta {folder} no existe en este servidor; corríjala en Ajustes después de restaurar."

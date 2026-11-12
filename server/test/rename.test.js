@@ -167,6 +167,83 @@ test('naming check lists wrong names and warnings, not names that are already ri
   }
 });
 
+/** Starts a naming check, waits for it to finish and returns its result. */
+async function runCheck(naming, body) {
+  const { id } = await naming.start(body);
+  await naming.done;
+  return naming.get(id);
+}
+
+test('naming checks run in the background with progress, can be stopped and survive a restart', async () => {
+  const { dir, db, renamer, cleanup } = await setup();
+  try {
+    for (let i = 0; i < 3; i++) {
+      await fs.mkdir(path.join(dir, `Show ${i}`));
+      for (let e = 1; e <= 300; e++) await fs.writeFile(path.join(dir, `Show ${i}`, `Show.${i}.S01E${String(e).padStart(3, '0')}.1080p.mkv`), '');
+    }
+    const progress = [];
+    const naming = new NamingChecks({ db, renamer, events: { emit: (e, d) => e === 'namingProgress' && progress.push(d) } });
+    const auto = renamer.listRules()[0];
+
+    const { id } = await naming.start({ paths: [dir], ruleId: auto.id });
+    assert.equal(naming.list()[0].status, 'running');
+    await assert.rejects(naming.start({ paths: [dir], ruleId: auto.id }), /already running/);
+    assert.throws(() => naming.remove(id), /Stop the naming check first/);
+    assert.deepEqual((await naming.get(id)).rows, []);
+    await naming.done;
+    const r = await naming.get(id);
+    assert.equal(r.status, 'done');
+    assert.equal(r.total, 900);
+    assert.equal(r.flagged, 900);
+    assert.ok(progress.some((p) => p.phase === 'listing' && p.found >= 0));
+    assert.ok(progress.some((p) => p.phase === 'checking' && p.total === 900));
+
+    // Stopped while comparing names: keeps what it checked.
+    const second = await naming.start({ paths: [dir], ruleId: auto.id });
+    const stopWhenChecking = setInterval(() => {
+      if (naming.active?.phase === 'checking') naming.cancel(second.id);
+    }, 0);
+    await naming.done;
+    clearInterval(stopWhenChecking);
+    const stopped = await naming.get(second.id);
+    assert.equal(stopped.status, 'cancelled');
+    assert.ok(stopped.total < 900, `stopped after ${stopped.total} files`);
+    assert.equal(stopped.flagged, stopped.rows.length);
+    assert.throws(() => naming.cancel(second.id), /not running/);
+
+    await assert.rejects(naming.start({ paths: [os.tmpdir()], ruleId: auto.id }), /outside/);
+    await assert.rejects(naming.start({ paths: [dir], ruleId: 9999 }), /not found/);
+
+    // A check left running by a restart.
+    db.prepare(`UPDATE naming_checks SET status = 'running' WHERE id = ?`).run(id);
+    naming.recover();
+    const after = naming.list().find((c) => c.id === id);
+    assert.equal(after.status, 'cancelled');
+    assert.equal(after.error, 'Interrupted by a restart');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('naming checks saved before they ran in the background read as done', async () => {
+  const base = await fs.mkdtemp(path.join(os.tmpdir(), 'hbui-naming-db-'));
+  try {
+    const file = path.join(base, 'old.db');
+    const { DatabaseSync } = await import('node:sqlite');
+    const old = new DatabaseSync(file);
+    old.exec(`CREATE TABLE naming_checks (id INTEGER PRIMARY KEY AUTOINCREMENT, created_at INTEGER NOT NULL, rule_id INTEGER,
+      rule_name TEXT NOT NULL, paths TEXT NOT NULL, total INTEGER NOT NULL, flagged INTEGER NOT NULL, rows TEXT NOT NULL);
+      INSERT INTO naming_checks (created_at, rule_id, rule_name, paths, total, flagged, rows) VALUES (1, 1, 'Auto', '["/x"]', 5, 0, '[]');`);
+    old.close();
+    const db = openDb(file);
+    const naming = new NamingChecks({ db, renamer: null, events: { emit() {} } });
+    assert.equal(naming.list()[0].status, 'done');
+    db.close();
+  } finally {
+    await fs.rm(base, { recursive: true, force: true });
+  }
+});
+
 test('naming checks are saved, mark renamed files as gone and keep the newest 20', async () => {
   const { dir, renamer, settings, cleanup } = await setup();
   try {
@@ -178,8 +255,10 @@ test('naming checks are saved, mark renamed files as gone and keep the newest 20
     await fs.writeFile(path.join(dir, 'Movie (2020).mkv'), '');
     const auto = renamer.listRules()[0];
 
-    const r = await naming.run({ paths: [dir], ruleId: auto.id });
-    assert.deepEqual(emitted, ['namingChecks']);
+    const r = await runCheck(naming, { paths: [dir], ruleId: auto.id });
+    assert.deepEqual(emitted.filter((e) => e !== 'namingProgress'), ['namingChecks', 'namingChecks', 'namingCheck']);
+    assert.ok(emitted.includes('namingProgress'));
+    assert.equal(r.status, 'done');
     assert.equal(r.total, 2);
     assert.equal(r.flagged, 1);
     assert.equal(r.ruleName, auto.name);
@@ -196,7 +275,7 @@ test('naming checks are saved, mark renamed files as gone and keep the newest 20
     assert.equal(again.rows[0].gone, true);
     assert.equal(again.rows[0].size, null);
 
-    for (let i = 0; i < 21; i++) await naming.run({ paths: [dir], ruleId: auto.id });
+    for (let i = 0; i < 21; i++) await runCheck(naming, { paths: [dir], ruleId: auto.id });
     const ids = naming.list().map((c) => c.id);
     assert.equal(ids.length, 20);
     assert.ok(!ids.includes(r.id), 'the oldest result was dropped');
@@ -261,7 +340,7 @@ test('sources folders can be renamed too, except protected folders and queued fi
 
     // The naming check reads sources folders and marks blocked files.
     const naming = new NamingChecks({ db, renamer, events: { emit() {} } });
-    const c = await naming.run({ paths: [src], ruleId: auto.id });
+    const c = await runCheck(naming, { paths: [src], ruleId: auto.id });
     assert.deepEqual(c.rows.map((x) => x.oldName), ['Silo.S03E08.Flood.1080p.mkv']);
     assert.match(c.rows[0].blocked, /protected folder/);
   } finally {

@@ -152,6 +152,7 @@
       "conversion": "a conversion is running",
       "merge": "a merge is running",
       "quality": "a quality check is running",
+      "naming": "a naming check is running",
       "upload": "an upload is in progress"
     },
     "missingFolder": "The folder {folder} does not exist on this server; fix it in Settings after restoring."

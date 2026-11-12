@@ -70,7 +70,7 @@ const subtitles = new Subtitles({ settings, tmpDir: path.join(config.dataDir, 't
 queue.subs = subtitles;
 const renamer = new Renamer({ db, settings, events, log: app.log, subtitles });
 queue.renamer = renamer;
-const naming = new NamingChecks({ db, renamer, events });
+const naming = new NamingChecks({ db, renamer, events, log: app.log });
 const merger = new Merger({
   db, settings, events, verifier, log: app.log, tmpDir: path.join(config.dataDir, 'tmp'),
   mkvmerge: config.mkvmerge, ffprobe: config.ffprobe,
@@ -80,7 +80,7 @@ const sourceFiles = new SourceFiles({ settings, queue, events, log: app.log, sub
 const downloads = new Downloads({ settings, log: app.log, subtitles });
 const quality = new QualityScanner({ db, settings, verifier, events, queue, log: app.log });
 const backups = new Backups({
-  db, dataDir: config.dataDir, settings, queue, merger, quality, uploads, renamer, watcher, events, log: app.log, versions: version,
+  db, dataDir: config.dataDir, settings, queue, merger, quality, naming, uploads, renamer, watcher, events, log: app.log, versions: version,
 });
 const backupScheduler = new BackupScheduler({ settings, backups, notifier, events, log: app.log });
 backups.scheduler = backupScheduler;
@@ -137,6 +137,7 @@ process.on('SIGINT', () => stop('SIGINT'));
 await app.listen({ port: config.port, host: config.host });
 app.log.info(`Data: ${config.dataDir}  HandBrakeCLI: ${config.handbrakeCli}`);
 quality.recover();
+naming.recover();
 await uploads.cleanup();
 setInterval(() => uploads.cleanup().catch((err) => app.log.warn(err.message)), 6 * 3600 * 1000).unref();
 await merger.recover();

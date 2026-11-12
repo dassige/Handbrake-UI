@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { usePaneSwitch } from '../components/PaneSwitch.jsx';
-import { AlertTriangle, ArrowRight, RefreshCw, SpellCheck, Trash2, Wand2 } from 'lucide-react';
+import { AlertTriangle, ArrowRight, RefreshCw, SpellCheck, Square, Trash2, Wand2 } from 'lucide-react';
 import { api } from '../api.js';
 import { SourceBrowser } from '../components/SourceBrowser.jsx';
 import { useDialogs } from '../components/Dialogs.jsx';
@@ -21,14 +21,32 @@ const FILTERS = [
   { id: 'gone', labelKey: 'naming.filters.gone', test: (r) => r.gone },
 ];
 const PAGE = 500;
+const SHOWN_PATHS = 3;
+
+/** The folders a check read: the first few, then "+ 57 more" (all of them in its tooltip). */
+function CheckedPaths({ paths, folder }) {
+  const rest = paths.length > SHOWN_PATHS + 1 ? paths.slice(SHOWN_PATHS) : [];
+  const list = rest.length ? paths.slice(0, SHOWN_PATHS) : paths;
+  return (
+    <>
+      {list.map((p, i) => (
+        <span key={p}>{i > 0 && ', '}<code className="naming-path" title={p}>{folder(p)}</code></span>
+      ))}
+      {rest.length > 0 && (
+        <span className="muted" title={rest.map(folder).join('\n')}>{' '}{t('naming.morePaths', { count: rest.length })}</span>
+      )}
+    </>
+  );
+}
 // The Rename view previews at most this many files at once (server/src/rename/renamer.js).
 const RENAME_MAX = 5000;
 
 /**
  * Finds the videos whose name is not the one a rename rule set gives them. Every check is
- * saved on the server (the newest 20); `checks` is their list, without the rows.
+ * saved on the server (the newest 20); `checks` is their list, without the rows, with live
+ * progress for the one running. `tick` increases when a check finishes.
  */
-export function NamingView({ settings, rules, ruleId, setRuleId, checks, changeTick, run, onError, onFixInRename }) {
+export function NamingView({ settings, rules, ruleId, setRuleId, checks, tick, changeTick, run, onError, onFixInRename }) {
   const dialogs = useDialogs();
   const [checkId, setCheckId] = useState(null);
   const [result, setResult] = useState(null);
@@ -37,10 +55,14 @@ export function NamingView({ settings, rules, ruleId, setRuleId, checks, changeT
   const [sort, setSort] = useRememberedSort('namingResults', SORT_KEYS);
   const [selected, setSelected] = useState(() => new Set());
   const [shown, setShown] = useState(PAGE);
-  const [checking, setChecking] = useState(false);
+  const [starting, setStarting] = useState(false);
 
   const effectiveRuleId = rules.some((r) => r.id === ruleId) ? ruleId : rules[0]?.id ?? null;
   const effectiveId = checks.some((c) => c.id === checkId) ? checkId : checks[0]?.id ?? null;
+  const meta = checks.find((c) => c.id === effectiveId) ?? null;
+  const running = meta?.status === 'running';
+  // One check at a time on the server.
+  const busy = starting || checks.some((c) => c.status === 'running');
 
   // The chosen result, again whenever files change (renamed ones show as gone).
   const load = useCallback(async () => {
@@ -57,7 +79,7 @@ export function NamingView({ settings, rules, ruleId, setRuleId, checks, changeT
   }, [effectiveId, onError]);
   useEffect(() => {
     load();
-  }, [load, changeTick]);
+  }, [load, changeTick, tick]);
 
   // Showing a result picks its rule set, so "Check again" and "Fix in Rename" use it.
   const resultId = result?.id;
@@ -73,16 +95,15 @@ export function NamingView({ settings, rules, ruleId, setRuleId, checks, changeT
 
   async function check(paths, id = effectiveRuleId) {
     if (!paths?.length || id == null) return;
-    setChecking(true);
+    setStarting(true);
     try {
       const r = await run(() => api.runNamingCheck(paths, id));
       if (r) {
-        setResult(r);
         setCheckId(r.id);
         setFilter('all');
       }
     } finally {
-      setChecking(false);
+      setStarting(false);
     }
   }
 
@@ -139,7 +160,9 @@ export function NamingView({ settings, rules, ruleId, setRuleId, checks, changeT
   const folder = (p) => displayPath(settings, p);
   const resultRule = rules.find((r) => r.id === result?.ruleId);
   const rulesChanged = !!result && !!resultRule && resultRule.updatedAt > result.createdAt;
-  const shownResult = result?.id === effectiveId ? result : null;
+  const shownResult = !running && result?.id === effectiveId && result.status !== 'running' ? result : null;
+  // The server's own English text for a restart is shown translated.
+  const errorText = (e) => (e === 'Interrupted by a restart' ? t('naming.interrupted') : e);
 
   const [paneClass, paneSwitch, showPane] = usePaneSwitch([t('naming.folders'), t('naming.results')]);
 
@@ -168,7 +191,7 @@ export function NamingView({ settings, rules, ruleId, setRuleId, checks, changeT
           <div className="pane-tools">
             <label className="field-inline">
               {t('naming.rules')}
-              <select value={effectiveRuleId ?? ''} disabled={checking} onChange={(e) => pickRule(Number(e.target.value))}>
+              <select value={effectiveRuleId ?? ''} disabled={busy} onChange={(e) => pickRule(Number(e.target.value))}>
                 {rules.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
               </select>
             </label>
@@ -179,6 +202,7 @@ export function NamingView({ settings, rules, ruleId, setRuleId, checks, changeT
                   {checks.map((c) => (
                     <option key={c.id} value={c.id} title={c.paths.map((p) => fileName(p) || p).join(', ')}>
                       {dateTime(c.createdAt)} · {c.ruleName}
+                      {c.status !== 'done' ? ` (${t(`naming.status.${c.status}`)})` : ''}
                     </option>
                   ))}
                 </select>
@@ -186,7 +210,7 @@ export function NamingView({ settings, rules, ruleId, setRuleId, checks, changeT
             )}
             {shownResult && (
               <>
-                <button className="btn ghost small" disabled={checking} onClick={() => check(shownResult.paths)} title={t('naming.checkAgainTitle')}>
+                <button className="btn ghost small" disabled={busy} onClick={() => check(shownResult.paths)} title={t('naming.checkAgainTitle')}>
                   <RefreshCw size={14} /> {t('naming.checkAgain')}
                 </button>
                 <button className="icon-btn danger" title={t('naming.deleteResult')} onClick={remove}>
@@ -197,11 +221,35 @@ export function NamingView({ settings, rules, ruleId, setRuleId, checks, changeT
           </div>
         </div>
 
-        {!shownResult && (
+        {running && (
+          <div className="quality-summary">
+            <div className="small">
+              <span className="muted">{t('naming.checked')} </span>
+              <CheckedPaths paths={meta.paths} folder={folder} />
+            </div>
+            {/* While the folders are read the total is unknown: a moving bar and the count found so far. */}
+            <div className={`progress big ${meta.phase === 'checking' ? '' : 'indeterminate'}`}>
+              <div key={meta.phase} className="bar" style={meta.phase === 'checking' ? { width: `${meta.total ? (meta.checked / meta.total) * 100 : 0}%` } : undefined} />
+              <span>
+                {meta.phase === 'checking'
+                  ? t('naming.progressChecking', { checked: meta.checked ?? 0, count: meta.total ?? 0 })
+                  : t('naming.progressListing', { count: meta.found ?? 0 })}
+              </span>
+            </div>
+            <div className="quality-current small muted">
+              <span className="file-name">{meta.phase === 'checking' || !meta.current ? '' : folder(meta.current)}</span>
+              <button className="btn small danger" onClick={() => run(() => api.cancelNamingCheck(meta.id))}>
+                <Square size={13} className="stop-icon" /> {t('common.stop')}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!shownResult && !running && (
           <div className="drop-hint">
             <SpellCheck size={28} />
-            <p>{checking ? t('naming.checking') : effectiveId != null ? t('common.loading') : rich('naming.emptyHint')}</p>
-            {effectiveId == null && <p className="small">{t('naming.emptyDetail')}</p>}
+            <p>{starting ? t('naming.checking') : effectiveId != null ? t('common.loading') : rich('naming.emptyHint')}</p>
+            {effectiveId == null && !starting && <p className="small">{t('naming.emptyDetail')}</p>}
           </div>
         )}
 
@@ -210,13 +258,20 @@ export function NamingView({ settings, rules, ruleId, setRuleId, checks, changeT
             <div className="quality-summary">
               <div className="small">
                 <span className="muted">{t('naming.checked')} </span>
-                {shownResult.paths.map((p, i) => (
-                  <span key={p}>{i > 0 && ', '}<code className="naming-path" title={p}>{folder(p)}</code></span>
-                ))}
+                <CheckedPaths paths={shownResult.paths} folder={folder} />
               </div>
               <p className="small">
-                {checking ? t('naming.checking') : rich('naming.summary', { flagged: shownResult.flagged, count: shownResult.total, rule: shownResult.ruleName, date: dateTime(shownResult.createdAt) })}
-                {rulesChanged && !checking && <span className="warn-text"> · {t('naming.rulesChanged')}</span>}
+                {/* The space goes outside: .warn-text is inline-flex, which drops a trailing space. */}
+                {shownResult.status === 'failed' && <><span className="text-bad">{t('naming.failed', { error: errorText(shownResult.error) })}</span>{' '}</>}
+                {shownResult.status === 'cancelled' && (
+                  <>
+                    <span className="warn-text">
+                      {shownResult.error ? t('naming.stoppedWhy', { reason: errorText(shownResult.error) }) : t('naming.stopped')}
+                    </span>{' '}
+                  </>
+                )}
+                {rich('naming.summary', { flagged: shownResult.flagged, count: shownResult.total, rule: shownResult.ruleName, date: dateTime(shownResult.createdAt) })}
+                {rulesChanged && <span className="warn-text"> · {t('naming.rulesChanged')}</span>}
               </p>
             </div>
 

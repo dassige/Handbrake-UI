@@ -175,8 +175,11 @@ export class Renamer {
     return busy ? 'queued or converting: remove it from the queue first' : null;
   }
 
-  /** Expands files and folders (in the sources folders or the target folder) into a list of files. */
-  async expand(paths, max = MAX_FILES) {
+  /**
+   * Expands files and folders (in the sources folders or the target folder) into a list of files.
+   * onDir(found, dir) and signal: see collectVideos.
+   */
+  async expand(paths, max = MAX_FILES, { onDir = null, signal = null } = {}) {
     if (!Array.isArray(paths) || !paths.length) return [];
     const roots = this.roots();
     const matcher = makeFileMatcher(this.settings);
@@ -184,8 +187,13 @@ export class Renamer {
     for (const p of paths) {
       const { path: abs } = await resolveUnderAny(roots, p);
       const stat = await fs.stat(abs);
-      if (stat.isDirectory()) out.push(...(await collectVideos(abs, { recursive: true, matcher: { ...matcher, excluded: () => false } })));
-      else if (stat.isFile()) out.push(abs);
+      const before = out.length;
+      const progress = onDir && ((n, dir) => onDir(before + n, dir));
+      if (stat.isDirectory()) {
+        out.push(...(await collectVideos(abs, { recursive: true, matcher: { ...matcher, excluded: () => false }, onDir: progress, signal })));
+      } else if (stat.isFile()) {
+        out.push(abs);
+      }
       if (out.length > max) throw badRequest(`Too many files (more than ${max})`);
     }
     return [...new Set(out)];
@@ -196,14 +204,26 @@ export class Renamer {
    * them, or that the rule set cannot fully recognise (a warning). Only names are read, so
    * whole libraries are fine; files whose name is already right are only counted.
    * Rows: { path, dir, oldName, expected (null when only a warning), info, warnings }.
-   * Saved by naming.js.
+   * Run in the background by naming.js: onProgress({ phase: 'listing', found, current }) while the
+   * folders are read, then ({ phase: 'checking', checked, total }). When signal.aborted turns true
+   * it stops: while listing with an 'ABORTED' error, while checking with the rows found so far
+   * (checked < total).
    */
-  async check({ paths, ruleId }) {
+  async check({ paths, ruleId }, { onProgress = null, signal = null } = {}) {
     if (!Array.isArray(paths) || !paths.length) throw badRequest('Choose at least one folder or file');
     const rule = this.getRule(Number(ruleId));
-    const files = await this.expand(paths, MAX_CHECK_FILES);
+    const onDir = onProgress && ((found, current) => onProgress({ phase: 'listing', found, current }));
+    const files = await this.expand(paths, MAX_CHECK_FILES, { onDir, signal });
     const rows = [];
+    let checked = 0;
     for (const file of files) {
+      // Now and then: report, let other requests in, and stop when asked.
+      if (checked % 250 === 0) {
+        if (signal?.aborted) break;
+        onProgress?.({ phase: 'checking', checked, total: files.length });
+        await new Promise((resolve) => setImmediate(resolve));
+      }
+      checked++;
       const oldName = path.basename(file);
       const [base, ext] = splitName(oldName);
       const r = runSteps(base, ext, rule.steps, {});
@@ -218,7 +238,7 @@ export class Renamer {
         warnings: r.warnings,
       });
     }
-    return { ruleId: rule.id, ruleName: rule.name, paths, total: files.length, checkedAt: Date.now(), rows };
+    return { ruleId: rule.id, ruleName: rule.name, paths, total: files.length, checked, checkedAt: Date.now(), rows };
   }
 
   stepsFor({ ruleId, steps }) {

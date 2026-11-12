@@ -152,6 +152,7 @@
       "conversion": "è in corso una conversione",
       "merge": "è in corso un’unione",
       "quality": "è in corso un controllo qualità",
+      "naming": "è in corso un controllo nomi",
       "upload": "è in corso un caricamento"
     },
     "missingFolder": "La cartella {folder} non esiste su questo server; correggila nelle Impostazioni dopo il ripristino."

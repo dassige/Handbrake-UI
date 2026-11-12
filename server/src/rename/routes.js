@@ -8,8 +8,12 @@ const id = (req) => {
 
 export function registerRenameRoutes(app, { renamer, naming }) {
   app.get('/api/naming/checks', async () => naming.list());
-  app.post('/api/naming/checks', async (req) => naming.run(req.body ?? {}));
+  app.post('/api/naming/checks', async (req) => naming.start(req.body ?? {}));
   app.get('/api/naming/checks/:id', async (req) => naming.get(id(req)));
+  app.post('/api/naming/checks/:id/cancel', async (req) => {
+    naming.cancel(id(req));
+    return { ok: true };
+  });
   app.delete('/api/naming/checks/:id', async (req) => {
     naming.remove(id(req));
     return { ok: true };

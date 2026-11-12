@@ -381,6 +381,7 @@ export default function App() {
           ruleId={namingRuleId}
           setRuleId={setNamingRuleId}
           checks={data.namingChecks}
+          tick={data.namingTick}
           changeTick={data.changeTick}
           run={run}
           onError={onError}

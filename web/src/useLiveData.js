@@ -17,6 +17,8 @@ export function useLiveData(onError, onNotice, onEvent) {
   // Increases when a quality check finishes, so an open result reloads.
   const [qualityTick, setQualityTick] = useState(0);
   const [namingChecks, setNamingChecks] = useState([]);
+  // Increases when a naming check finishes, so an open result reloads.
+  const [namingTick, setNamingTick] = useState(0);
   const [settings, setSettings] = useState(null);
   const [info, setInfo] = useState(null);
   const [connected, setConnected] = useState(false);
@@ -138,6 +140,11 @@ export function useLiveData(onError, onNotice, onEvent) {
     });
     es.addEventListener('qualityScan', () => setQualityTick((t) => t + 1));
     es.addEventListener('namingChecks', () => loadNamingChecks());
+    es.addEventListener('namingProgress', (e) => {
+      const p = JSON.parse(e.data);
+      setNamingChecks((list) => list.map((c) => (c.id === p.id ? { ...c, ...p } : c)));
+    });
+    es.addEventListener('namingCheck', () => setNamingTick((t) => t + 1));
     // Files were renamed (or a rename undone): folder lists and naming results show it.
     es.addEventListener('renameHistory', () => bump());
     es.addEventListener('watch', (e) => setWatch(JSON.parse(e.data)));
@@ -153,7 +160,7 @@ export function useLiveData(onError, onNotice, onEvent) {
   }, [loadJobs, loadPresets, loadRenameRules, loadMerges, loadQualityScans, loadNamingChecks, loadSettings, loadInfo]);
 
   return {
-    jobs, queue, presets, renameRules, merges, qualityScans, qualityTick, namingChecks, settings, info, connected, changeTick, watch, backupSchedule,
+    jobs, queue, presets, renameRules, merges, qualityScans, qualityTick, namingChecks, namingTick, settings, info, connected, changeTick, watch, backupSchedule,
     reloadJobs: loadJobs, reloadPresets: loadPresets, setSettings,
   };
 }

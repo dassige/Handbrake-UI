@@ -226,6 +226,10 @@ select, textarea, input[type='text'], input:not([type]), input[type='number'], i
 .progress.big { height: 22px; border-radius: 6px; margin: 0 0 10px; }
 .progress.big .bar { border-radius: 6px; }
 .progress.big span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+/* Work of unknown size (e.g. folders still being read): a block sliding across. */
+.progress.indeterminate .bar { width: 30%; transition: none; animation: progress-slide 1.4s ease-in-out infinite; }
+@keyframes progress-slide { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
+@media (prefers-reduced-motion: reduce) { .progress.indeterminate .bar { animation: none; width: 100%; opacity: 0.35; } }
 
 /* ------------------------------------------------------------------ drawer */
 .drawer {

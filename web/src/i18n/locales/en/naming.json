@@ -41,5 +41,20 @@
   "deleteResult": "Delete this result",
   "rulesChanged": "the rules changed since: press Check again",
   "goneText": "No longer here: renamed, moved or deleted since the check",
-  "allFixed": "Every file listed by this check has been renamed or moved."
+  "allFixed": "Every file listed by this check has been renamed or moved.",
+  "progressListing_one": "Listing files… {count} video found",
+  "progressListing_other": "Listing files… {count} videos found",
+  "progressChecking_one": "{checked} of {count} name checked",
+  "progressChecking_other": "{checked} of {count} names checked",
+  "stopped": "Stopped; showing the files checked so far.",
+  "stoppedWhy": "Stopped ({reason}).",
+  "interrupted": "Interrupted by a restart",
+  "failed": "Failed: {error}.",
+  "status": {
+    "running": "running",
+    "cancelled": "stopped",
+    "failed": "failed"
+  },
+  "morePaths_one": "+ {count} more folder",
+  "morePaths_other": "+ {count} more folders"
 }

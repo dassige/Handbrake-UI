@@ -734,7 +734,7 @@
         "1. Choose folders or files in the **Folders** panel and press **Check names**.",
         "1. The [results](#naming.results) list only the files that need a look. Tick the ones to fix and press **Fix in Rename**.",
         "Rename opens with those files and the same rules: check the [preview](#rename.preview), fix names by hand if needed, and press **Rename**. Then press **Check again** here to see what is left.",
-        "Only names are read, never the files themselves, so even a whole library takes seconds. Choosing other rules checks the same folders again. Every check is saved: the last 20 are kept, pick one in **Result**."
+        "Only names are read, never the files themselves, so even a whole library takes seconds. Choosing other rules checks the same folders again. Every check is saved: the last 20 are kept, pick one in **Result**. While it runs a bar shows how far it is: first the folders are read, then the names are compared. **Stop** keeps the files checked so far."
       ],
       "see": [
         "naming.results",

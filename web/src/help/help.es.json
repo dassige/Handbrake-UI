@@ -734,7 +734,7 @@
         "1. Elija carpetas o archivos en el panel **Carpetas** y pulse **Comprobar nombres**.",
         "1. Los [resultados](#naming.results) muestran solo los archivos que requieren revisión. Marque los que quiera corregir y pulse **Corregir en Renombrar**.",
         "Renombrar se abre con esos archivos y las mismas reglas: revise la [vista previa](#rename.preview), corrija nombres a mano si hace falta y pulse **Renombrar**. Después pulse aquí **Volver a comprobar** para ver lo que queda.",
-        "Solo se leen los nombres, nunca los archivos, así que incluso una biblioteca entera tarda segundos. Elegir otras reglas vuelve a comprobar las mismas carpetas. Cada control se guarda: se conservan los últimos 20, elija uno en **Resultado**."
+        "Solo se leen los nombres, nunca los archivos, así que incluso una biblioteca entera tarda segundos. Elegir otras reglas vuelve a comprobar las mismas carpetas. Cada control se guarda: se conservan los últimos 20, elija uno en **Resultado**. Mientras se ejecuta, una barra muestra cuánto falta: primero se leen las carpetas y luego se comparan los nombres. **Detener** conserva los archivos comprobados hasta ese momento."
       ],
       "see": [
         "naming.results",

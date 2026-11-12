@@ -59,8 +59,8 @@ export function countRows(db, schema = 'main') {
 const columns = (db, schema, table) => db.prepare(`PRAGMA ${schema}.table_info(${table})`).all().map((c) => c.name);
 
 export class Backups {
-  constructor({ db, dataDir, settings, queue, merger, quality, uploads, renamer, watcher, events, log, versions }) {
-    Object.assign(this, { db, settings, queue, merger, quality, uploads, renamer, watcher, events, log, versions });
+  constructor({ db, dataDir, settings, queue, merger, quality, naming = null, uploads, renamer, watcher, events, log, versions }) {
+    Object.assign(this, { db, settings, queue, merger, quality, naming, uploads, renamer, watcher, events, log, versions });
     this.dir = path.join(dataDir, 'backups');
     this.logDir = path.join(dataDir, 'logs');
     this.tmpDir = path.join(dataDir, 'tmp');
@@ -344,11 +344,12 @@ export class Backups {
     }
   }
 
-  /** Why a full restore cannot run now, or null: 'conversion' | 'merge' | 'quality' | 'upload'. */
+  /** Why a full restore cannot run now, or null: 'conversion' | 'merge' | 'quality' | 'naming' | 'upload'. */
   busyCode() {
     if (this.queue.active) return 'conversion';
     if (this.merger.active) return 'merge';
     if (this.quality.active) return 'quality';
+    if (this.naming?.active) return 'naming';
     if (this.uploads.writing.size) return 'upload';
     return null;
   }
@@ -358,6 +359,7 @@ export class Backups {
     if (this.queue.active) return 'a conversion is running';
     if (this.merger.active) return 'a merge is running';
     if (this.quality.active) return 'a quality check is running';
+    if (this.naming?.active) return 'a naming check is running';
     if (this.uploads.writing.size) return 'an upload is in progress';
     return null;
   }
@@ -410,6 +412,7 @@ export class Backups {
         for (const f of u.logs) await fs.copyFile(f, path.join(this.logDir, path.basename(f)));
         await this.merger.recover();
         this.quality.recover();
+        this.naming?.recover();
         await this.queue.recover();
       }
 

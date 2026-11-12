@@ -67,11 +67,17 @@ function escapeRegExp(s) {
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 export const naturalCompare = (a, b) => collator.compare(a, b);
 
-/** Lists video files under dir (recursively when asked), in natural order. */
-export async function collectVideos(dir, { recursive, matcher }) {
+/**
+ * Lists video files under dir (recursively when asked), in natural order.
+ * onDir(found, dir) is called after each folder is read (for progress); when signal.aborted
+ * turns true the walk stops with an error whose code is 'ABORTED'.
+ */
+export async function collectVideos(dir, { recursive, matcher, onDir = null, signal = null }) {
   const out = [];
   async function walk(current) {
+    if (signal?.aborted) throw Object.assign(new Error('Stopped'), { code: 'ABORTED' });
     const entries = await fs.readdir(current, { withFileTypes: true });
+    onDir?.(out.length, current);
     entries.sort((a, b) => naturalCompare(a.name, b.name));
     for (const e of entries) {
       if (isHiddenName(e.name) || matcher.excluded(e.name)) continue;

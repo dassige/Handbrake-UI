@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.1.2] - 2026/11/12
+
+- feat: Naming check shows its progress and can be stopped
+
+A naming check now runs in the background on the server. While the
+folders are read, a bar shows how many videos have been found so far
+and which folder is being read; then it counts the names checked out
+of the total. Stop keeps the files checked so far. A check interrupted
+by a restart is kept and marked as such, and a full restore waits
+while a check runs. When many folders are checked, the list shows the
+first three and how many more.
+
 ## [4.1.1] - 2026/11/12
 
 - feat: Rename and Naming check also work in the sources folders

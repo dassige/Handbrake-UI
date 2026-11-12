@@ -42,5 +42,20 @@
   "deleteResult": "Elimina questo risultato",
   "rulesChanged": "le regole sono cambiate da allora: premi Ricontrolla",
   "goneText": "Non è più qui: rinominato, spostato o eliminato dopo il controllo",
-  "allFixed": "Tutti i file elencati da questo controllo sono stati rinominati o spostati."
+  "allFixed": "Tutti i file elencati da questo controllo sono stati rinominati o spostati.",
+  "progressListing_one": "Elenco dei file… {count} video trovato",
+  "progressListing_other": "Elenco dei file… {count} video trovati",
+  "progressChecking_one": "{checked} di {count} nome controllato",
+  "progressChecking_other": "{checked} di {count} nomi controllati",
+  "stopped": "Interrotto; vengono mostrati i file controllati fin qui.",
+  "stoppedWhy": "Interrotto ({reason}).",
+  "interrupted": "Interrotto da un riavvio",
+  "failed": "Non riuscito: {error}.",
+  "status": {
+    "running": "in corso",
+    "cancelled": "interrotto",
+    "failed": "non riuscito"
+  },
+  "morePaths_one": "+ altra {count} cartella",
+  "morePaths_other": "+ altre {count} cartelle"
 }

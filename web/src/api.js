@@ -117,6 +117,7 @@ export const api = {
   namingCheck: (id) => get(`/api/naming/checks/${id}`),
   runNamingCheck: (paths, ruleId) => post('/api/naming/checks', { paths, ruleId }),
   removeNamingCheck: (id) => request('DELETE', `/api/naming/checks/${id}`),
+  cancelNamingCheck: (id) => post(`/api/naming/checks/${id}/cancel`),
   applyRename: (items, ruleName) => post('/api/rename/apply', { items, ruleName }),
   renameHistory: () => get('/api/rename/history'),
   undoRename: (id) => post(`/api/rename/history/${id}/undo`),

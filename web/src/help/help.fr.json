@@ -734,7 +734,7 @@
         "1. Choisissez des dossiers ou des fichiers dans le panneau **Dossiers** et appuyez sur **Contrôler les noms**.",
         "1. Les [résultats](#naming.results) ne listent que les fichiers à revoir. Cochez ceux à corriger et appuyez sur **Corriger dans Renommer**.",
         "Renommer s’ouvre avec ces fichiers et les mêmes règles : vérifiez l’[aperçu](#rename.preview), corrigez les noms à la main si besoin et appuyez sur **Renommer**. Appuyez ensuite ici sur **Contrôler à nouveau** pour voir ce qui reste.",
-        "Seuls les noms sont lus, jamais les fichiers eux-mêmes : même une bibliothèque entière prend quelques secondes. Choisir d’autres règles contrôle à nouveau les mêmes dossiers. Chaque contrôle est enregistré : les 20 derniers sont conservés, choisissez-en un dans **Résultat**."
+        "Seuls les noms sont lus, jamais les fichiers eux-mêmes : même une bibliothèque entière prend quelques secondes. Choisir d’autres règles contrôle à nouveau les mêmes dossiers. Chaque contrôle est enregistré : les 20 derniers sont conservés, choisissez-en un dans **Résultat**. Pendant le contrôle, une barre montre où il en est : d’abord la lecture des dossiers, puis la comparaison des noms. **Arrêter** garde les fichiers contrôlés jusque-là."
       ],
       "see": [
         "naming.results",

@@ -734,7 +734,7 @@
         "1. Wählen Sie Ordner oder Dateien im Bereich **Ordner** und klicken Sie auf **Namen prüfen**.",
         "1. Die [Ergebnisse](#naming.results) listen nur die auffälligen Dateien. Setzen Sie Häkchen bei denen, die korrigiert werden sollen, und klicken Sie auf **In Umbenennen korrigieren**.",
         "Umbenennen öffnet sich mit diesen Dateien und denselben Regeln: Prüfen Sie die [Vorschau](#rename.preview), korrigieren Sie Namen bei Bedarf von Hand und klicken Sie auf **Umbenennen**. Klicken Sie danach hier auf **Erneut prüfen**, um zu sehen, was noch übrig ist.",
-        "Es werden nur Namen gelesen, nie die Dateien selbst, daher dauert auch eine ganze Bibliothek nur Sekunden. Andere Regeln zu wählen prüft dieselben Ordner erneut. Jede Prüfung wird gespeichert: Die letzten 20 bleiben erhalten, wählen Sie eine unter **Ergebnis**."
+        "Es werden nur Namen gelesen, nie die Dateien selbst, daher dauert auch eine ganze Bibliothek nur Sekunden. Andere Regeln zu wählen prüft dieselben Ordner erneut. Jede Prüfung wird gespeichert: Die letzten 20 bleiben erhalten, wählen Sie eine unter **Ergebnis**. Während sie läuft, zeigt ein Balken den Fortschritt: zuerst werden die Ordner gelesen, dann die Namen verglichen. **Stoppen** behält die bis dahin geprüften Dateien."
       ],
       "see": [
         "naming.results",

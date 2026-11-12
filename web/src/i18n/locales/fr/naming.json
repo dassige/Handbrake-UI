@@ -42,5 +42,20 @@
   "deleteResult": "Supprimer ce résultat",
   "rulesChanged": "les règles ont changé depuis : appuyez sur Contrôler à nouveau",
   "goneText": "N’est plus ici : renommé, déplacé ou supprimé depuis le contrôle",
-  "allFixed": "Tous les fichiers listés par ce contrôle ont été renommés ou déplacés."
+  "allFixed": "Tous les fichiers listés par ce contrôle ont été renommés ou déplacés.",
+  "progressListing_one": "Liste des fichiers… {count} vidéo trouvée",
+  "progressListing_other": "Liste des fichiers… {count} vidéos trouvées",
+  "progressChecking_one": "{checked} nom contrôlé sur {count}",
+  "progressChecking_other": "{checked} noms contrôlés sur {count}",
+  "stopped": "Arrêté ; affichage des fichiers contrôlés jusqu’ici.",
+  "stoppedWhy": "Arrêté ({reason}).",
+  "interrupted": "Interrompu par un redémarrage",
+  "failed": "Échec : {error}.",
+  "status": {
+    "running": "en cours",
+    "cancelled": "arrêté",
+    "failed": "échec"
+  },
+  "morePaths_one": "+ {count} autre dossier",
+  "morePaths_other": "+ {count} autres dossiers"
 }

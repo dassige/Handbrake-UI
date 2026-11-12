@@ -124,7 +124,10 @@ CREATE TABLE IF NOT EXISTS naming_checks (
   paths       TEXT NOT NULL,     -- JSON list of the folders/files checked
   total       INTEGER NOT NULL,  -- videos checked
   flagged     INTEGER NOT NULL,  -- rows stored
-  rows        TEXT NOT NULL      -- JSON list: { path, dir, oldName, expected, info, warnings }
+  rows        TEXT NOT NULL,     -- JSON list: { path, dir, oldName, expected, info, warnings }
+  status      TEXT NOT NULL DEFAULT 'done', -- running | done | cancelled | failed
+  finished_at INTEGER,
+  error       TEXT
 );
 
 -- One row per finished conversion attempt; kept when jobs are cleared (history.js).
@@ -174,6 +177,9 @@ const MIGRATIONS = [
   ['jobs', 'sub_embed', 'TEXT'], // this job's embed mode (NULL: the queue's or Settings')
   ['jobs', 'sub_copy', 'TEXT'], // this job's copy mode (NULL: the queue's or Settings')
   ['jobs', 'subtitle_result', 'TEXT'], // JSON: what was embedded and copied
+  ['naming_checks', 'status', "TEXT NOT NULL DEFAULT 'done'"], // naming checks run in the background since 4.0
+  ['naming_checks', 'finished_at', 'INTEGER'],
+  ['naming_checks', 'error', 'TEXT'],
 ];
 
 /**

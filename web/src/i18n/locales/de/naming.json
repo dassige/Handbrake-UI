@@ -41,5 +41,20 @@
   "deleteResult": "Dieses Ergebnis löschen",
   "rulesChanged": "die Regeln wurden seitdem geändert: klicken Sie auf „Erneut prüfen“",
   "goneText": "Nicht mehr hier: seit der Prüfung umbenannt, verschoben oder gelöscht",
-  "allFixed": "Alle Dateien aus dieser Prüfung wurden umbenannt oder verschoben."
+  "allFixed": "Alle Dateien aus dieser Prüfung wurden umbenannt oder verschoben.",
+  "progressListing_one": "Dateien werden aufgelistet… {count} Video gefunden",
+  "progressListing_other": "Dateien werden aufgelistet… {count} Videos gefunden",
+  "progressChecking_one": "{checked} von {count} Namen geprüft",
+  "progressChecking_other": "{checked} von {count} Namen geprüft",
+  "stopped": "Gestoppt; die bisher geprüften Dateien werden angezeigt.",
+  "stoppedWhy": "Gestoppt ({reason}).",
+  "interrupted": "Durch einen Neustart unterbrochen",
+  "failed": "Fehlgeschlagen: {error}.",
+  "status": {
+    "running": "läuft",
+    "cancelled": "gestoppt",
+    "failed": "fehlgeschlagen"
+  },
+  "morePaths_one": "+ {count} weiterer Ordner",
+  "morePaths_other": "+ {count} weitere Ordner"
 }
