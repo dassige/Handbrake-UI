@@ -65,7 +65,7 @@ export function FolderPicker({ settings, title = t('components.folderPicker.titl
             <button
               key={r}
               type="button"
-              className={`chip ${r === root ? 'active' : ''}`}
+              className={`chip ${r === root ? 'active' : ''} ${r === settings.targetRoot ? 'chip-target' : ''}`}
               onClick={() => {
                 setRoot(r);
                 load(r);

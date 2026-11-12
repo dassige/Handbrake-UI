@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowUp, Captions, ChevronRight, Download, Eye, FileVideo, Folder, FolderOpen, ListPlus, Lock, RefreshCw, Trash2, Upload } from 'lucide-react';
-import { rootLabel, watchedFolder } from '../roots.js';
+import { watchedFolder } from '../roots.js';
 import { api } from '../api.js';
 import { bytes, dateTime } from '../format.js';
 import { FolderBadges, StatusBadge } from './StatusBadge.jsx';
@@ -10,6 +10,7 @@ import { useDeleteFiles } from './useDeleteFiles.jsx';
 import { t } from '../i18n/index.js';
 import { sortList, useRememberedSort } from '../sort.js';
 import { SortControl } from './SortControl.jsx';
+import { RootSelect } from './RootSelect.jsx';
 import { langName, langShort } from '../subtitles/languages.js';
 
 export const DRAG_PATHS = 'application/x-hbui-paths';
@@ -199,21 +200,14 @@ export function SourceBrowser({
         <h2>{title}{help && <Help id={help} />}</h2>
         <div className="pane-tools">
           {roots.length > 1 && (
-            <select
-              className="root-select"
+            <RootSelect
+              settings={settings}
+              roots={roots}
               value={sourceRoot}
-              onChange={(e) => chooseRoot(e.target.value)}
+              onChange={chooseRoot}
+              label={t('sources.rootLabel')}
               title={t('sources.rootTitle')}
-              aria-label={t('sources.rootLabel')}
-            >
-              {roots.map((r) => (
-                <option key={r} value={r} title={r}>
-                  {root !== 'target' && settings.protectedRoots?.includes(r)
-                    ? t('sources.rootProtected', { name: rootLabel(settings, r) })
-                    : rootLabel(settings, r)}
-                </option>
-              ))}
-            </select>
+            />
           )}
           {onUpload && (
             <button

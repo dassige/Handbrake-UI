@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.1.4] - 2026/11/12
+
+- feat: the target folder stands out in folder dropdowns
+
+In the folder dropdown of Rename, Naming and Quality, the target
+folder is shown in a light blue badge, in the list and when chosen;
+the folder chips in Settings pickers match. The dropdown is now the
+app's own (a native one can't show a badge) and keeps full keyboard
+use: arrows, Home/End, Enter, Escape and type-ahead.
+
 ## [4.1.3] - 2026/11/12
 
 - perf: Rename previews big folders in seconds
