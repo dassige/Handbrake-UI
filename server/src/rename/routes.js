@@ -6,7 +6,15 @@ const id = (req) => {
   return n;
 };
 
-export function registerRenameRoutes(app, { renamer }) {
+export function registerRenameRoutes(app, { renamer, naming }) {
+  app.get('/api/naming/checks', async () => naming.list());
+  app.post('/api/naming/checks', async (req) => naming.run(req.body ?? {}));
+  app.get('/api/naming/checks/:id', async (req) => naming.get(id(req)));
+  app.delete('/api/naming/checks/:id', async (req) => {
+    naming.remove(id(req));
+    return { ok: true };
+  });
+
   app.get('/api/rename/rules', async () => renamer.listRules());
   app.get('/api/rename/rules/:id', async (req) => renamer.getRule(id(req)));
   app.post('/api/rename/rules', async (req) => renamer.createRule(req.body ?? {}));

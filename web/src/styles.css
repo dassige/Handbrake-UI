@@ -523,6 +523,12 @@ h2 .help-btn, h3 .help-btn, legend .help-btn { vertical-align: 2px; }
 .quality-table tr.ticked td { background: var(--sel); }
 .quality-table .q-name { display: flex; align-items: center; gap: 6px; font-weight: 550; word-break: break-all; }
 .q-issues { display: flex; flex-wrap: wrap; gap: 4px; }
+.naming-current, .naming-path { word-break: break-all; }
+.naming-expected { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; font-size: 12.5px; color: var(--good); word-break: break-all; margin-top: 2px; }
+.naming-expected svg { vertical-align: -1px; color: var(--muted); }
+.pane.naming .pane-tools select { max-width: 210px; }
+.naming-table tbody tr.gone { cursor: default; }
+.naming-table tbody tr.gone .naming-current { color: var(--muted); text-decoration: line-through; }
 .badge.q-format { background: var(--warn-soft); color: var(--warn); }
 .badge.q-resolution { background: var(--info-soft); color: var(--info); }
 .badge.q-bitrate { background: var(--accent-soft); color: var(--accent); }

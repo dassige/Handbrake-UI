@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.1.0] - 2026/11/12
+
+- feat: Naming check, find files whose names don't follow a rename rule set
+
+A new Naming tab checks every video in chosen folders of the target
+folder against a rename rule set (Auto, TV series, Movies or your
+own) and lists the files that need a look:
+- Wrong name: the rule set would rename the file; the expected name
+  is shown under the current one.
+- Not recognised: the rule set found something missing, such as no
+  episode number or no year.
+Files that already have the right name are counted, not listed. Only
+names are read, so even a whole library takes seconds.
+
+Fix in Rename opens the selected files in Rename with the same rule
+set, to check the preview and apply. Choosing other rules or pressing
+Check again checks the same folders again.
+
+Every check is saved; the newest 20 are kept and can be reopened from
+Result. Files renamed, moved or deleted since a check are shown under
+Renamed or moved and can't be selected again. Naming results are part
+of backups (restore "Everything").
+
+Also:
+- Rename keeps its chosen rule set while you use other views.
+- Folder lists refresh after a rename or an undo.
+- Help and texts for the Naming view in all five languages.
+
 ## [4.0.0] - 2026/11/12
 
 - feat: rename the project to EncForge

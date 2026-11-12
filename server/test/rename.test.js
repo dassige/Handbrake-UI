@@ -8,6 +8,7 @@ import { importAren, normalizeSteps, runSteps } from '../src/rename/steps.js';
 import { openDb } from '../src/db.js';
 import { Settings } from '../src/settings.js';
 import { Renamer } from '../src/rename/renamer.js';
+import { NamingChecks } from '../src/rename/naming.js';
 
 const smart = normalizeSteps([{ type: 'smart' }]);
 const rename = (name, ctx) => {
@@ -114,6 +115,86 @@ test('preview, collisions with _1, apply and undo on disk', async () => {
     assert.equal(undo.restored, 2);
     assert.ok((await fs.readdir(dir)).includes('Silo.S03E07.Radio.1080p.WEBRip.x265.mkv'));
     await assert.rejects(renamer.undo(h.id), /already undone/);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('naming check lists wrong names and warnings, not names that are already right', async () => {
+  const { dir, renamer, cleanup } = await setup();
+  try {
+    const show = path.join(dir, 'Silo');
+    await fs.mkdir(show);
+    await fs.writeFile(path.join(show, 'Silo S03e06 - The Book.mkv'), '');
+    await fs.writeFile(path.join(show, 'Silo.S03E07.Radio.1080p.WEBRip.x265.mkv'), 'abc');
+    await fs.writeFile(path.join(dir, 'Movie (2020).mkv'), '');
+    await fs.writeFile(path.join(dir, 'Excalibur.mkv'), '');
+    await fs.writeFile(path.join(dir, 'notes.txt'), '');
+    const auto = renamer.listRules()[0];
+    const r = await renamer.check({ paths: [dir], ruleId: auto.id });
+    assert.equal(r.total, 4);
+    assert.equal(r.ruleName, auto.name);
+    const byOld = Object.fromEntries(r.rows.map((x) => [x.oldName, x]));
+    assert.deepEqual(Object.keys(byOld).sort(), ['Excalibur.mkv', 'Silo.S03E07.Radio.1080p.WEBRip.x265.mkv']);
+    const wrong = byOld['Silo.S03E07.Radio.1080p.WEBRip.x265.mkv'];
+    assert.equal(wrong.expected, 'Silo S03e07 - Radio.mkv');
+    assert.equal(wrong.dir, show);
+    assert.deepEqual(wrong.warnings, []);
+    // Already as the rule set would name it, but not recognised: listed with its warning only.
+    assert.equal(byOld['Excalibur.mkv'].expected, null);
+    assert.deepEqual(byOld['Excalibur.mkv'].warnings, ['no year found']);
+
+    // A TV rule set reads the movie as a missing episode number.
+    const tv = renamer.listRules().find((x) => x.name === 'TV series');
+    const t = await renamer.check({ paths: [path.join(dir, 'Movie (2020).mkv')], ruleId: tv.id });
+    assert.equal(t.total, 1);
+    assert.match(t.rows[0].warnings[0], /no episode number/);
+
+    await assert.rejects(renamer.check({ paths: [], ruleId: auto.id }), /Choose at least one/);
+    await assert.rejects(renamer.check({ paths: [dir], ruleId: 9999 }), /not found/);
+    await assert.rejects(renamer.check({ paths: [os.tmpdir()], ruleId: auto.id }), /outside/);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('naming checks are saved, mark renamed files as gone and keep the newest 20', async () => {
+  const { dir, renamer, settings, cleanup } = await setup();
+  try {
+    const db = settings.db;
+    const emitted = [];
+    const naming = new NamingChecks({ db, renamer, events: { emit: (e) => emitted.push(e) } });
+    const bad = path.join(dir, 'Silo.S03E07.Radio.1080p.WEBRip.x265.mkv');
+    await fs.writeFile(bad, 'abc');
+    await fs.writeFile(path.join(dir, 'Movie (2020).mkv'), '');
+    const auto = renamer.listRules()[0];
+
+    const r = await naming.run({ paths: [dir], ruleId: auto.id });
+    assert.deepEqual(emitted, ['namingChecks']);
+    assert.equal(r.total, 2);
+    assert.equal(r.flagged, 1);
+    assert.equal(r.ruleName, auto.name);
+    assert.deepEqual(r.paths, [dir]);
+    assert.equal(r.rows[0].expected, 'Silo S03e07 - Radio.mkv');
+    assert.equal(r.rows[0].size, 3);
+    assert.equal(r.rows[0].gone, false);
+    assert.deepEqual(naming.list().map((c) => c.id), [r.id]);
+    assert.equal(naming.list()[0].rows, undefined, 'the list has no rows');
+
+    // Renamed after the check: the saved row is marked, not dropped.
+    await renamer.apply({ items: [{ path: bad, newName: r.rows[0].expected }] });
+    const again = await naming.get(r.id);
+    assert.equal(again.rows[0].gone, true);
+    assert.equal(again.rows[0].size, null);
+
+    for (let i = 0; i < 21; i++) await naming.run({ paths: [dir], ruleId: auto.id });
+    const ids = naming.list().map((c) => c.id);
+    assert.equal(ids.length, 20);
+    assert.ok(!ids.includes(r.id), 'the oldest result was dropped');
+
+    naming.remove(ids[0]);
+    assert.equal(naming.list().length, 19);
+    await assert.rejects(naming.get(ids[0]), /not found/);
   } finally {
     await cleanup();
   }

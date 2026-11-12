@@ -298,12 +298,13 @@
       "jobs": "Jobs (queue and history)",
       "renameHistory": "Rename history",
       "merges": "Merges",
-      "qualityScans": "Quality check results"
+      "qualityScans": "Quality check results",
+      "namingChecks": "Naming check results"
     },
     "configOnly": "Configuration only",
     "configOnlyHint": "Settings, presets and rename rules. Jobs and history stay as they are.",
     "everything": "Everything",
-    "everythingHint": "Also jobs, their logs, rename history, merges and quality results. The queue stays stopped.",
+    "everythingHint": "Also jobs, their logs, rename history, merges, quality and naming results. The queue stays stopped.",
     "notPossible": "Not possible while {reason}.",
     "restoreButton": "Restore…",
     "onServerTitle": "Backups on the server",

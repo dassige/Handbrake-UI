@@ -25,7 +25,7 @@ import { ZipError, extractEntry, readZipEntries } from './zipReader.js';
 
 export const FORMAT = 1;
 export const CONFIG_TABLES = ['settings', 'presets', 'rename_rules'];
-export const ALL_TABLES = [...CONFIG_TABLES, 'jobs', 'rename_history', 'merges', 'quality_scans', 'job_history', 'watch_seen', 'watch_folders'];
+export const ALL_TABLES = [...CONFIG_TABLES, 'jobs', 'rename_history', 'merges', 'quality_scans', 'naming_checks', 'job_history', 'watch_seen', 'watch_folders'];
 const KEEP_SNAPSHOTS = 10;
 const MAX_UPLOAD = 1024 * 1024 * 1024;
 const SNAPSHOT_NAME = /^[\w.-]+\.zip$/;
@@ -52,6 +52,7 @@ export function countRows(db, schema = 'main') {
     renameHistory: n(`SELECT COUNT(*) AS n FROM ${schema}.rename_history`, 'rename_history'),
     merges: n(`SELECT COUNT(*) AS n FROM ${schema}.merges`, 'merges'),
     qualityScans: n(`SELECT COUNT(*) AS n FROM ${schema}.quality_scans`, 'quality_scans'),
+    namingChecks: n(`SELECT COUNT(*) AS n FROM ${schema}.naming_checks`, 'naming_checks'),
   };
 }
 
@@ -412,7 +413,7 @@ export class Backups {
         await this.queue.recover();
       }
 
-      for (const e of ['jobs', 'presets', 'renameRules', 'merges', 'qualityScans']) this.events.emit(e);
+      for (const e of ['jobs', 'presets', 'renameRules', 'merges', 'qualityScans', 'namingChecks']) this.events.emit(e);
       this.events.emit('settings', this.settings.public());
       this.events.emit('queue', this.queue.state());
       this.log.info(`Restored ${scope === 'all' ? 'everything' : 'the configuration'} from ${source}; previous data saved as ${saved.name}`);

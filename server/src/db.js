@@ -115,6 +115,18 @@ CREATE TABLE IF NOT EXISTS quality_scans (
   results     TEXT               -- JSON list of file descriptions (quality.js describeMedia)
 );
 
+-- Naming check results (rename/naming.js); only the files that needed a look are stored.
+CREATE TABLE IF NOT EXISTS naming_checks (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  created_at  INTEGER NOT NULL,
+  rule_id     INTEGER,
+  rule_name   TEXT NOT NULL,
+  paths       TEXT NOT NULL,     -- JSON list of the folders/files checked
+  total       INTEGER NOT NULL,  -- videos checked
+  flagged     INTEGER NOT NULL,  -- rows stored
+  rows        TEXT NOT NULL      -- JSON list: { path, dir, oldName, expected, info, warnings }
+);
+
 -- One row per finished conversion attempt; kept when jobs are cleared (history.js).
 CREATE TABLE IF NOT EXISTS job_history (
   id             INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -298,12 +298,13 @@
       "jobs": "Tâches (file d'attente et historique)",
       "renameHistory": "Historique des renommages",
       "merges": "Fusions",
-      "qualityScans": "Résultats du contrôle de qualité"
+      "qualityScans": "Résultats du contrôle de qualité",
+      "namingChecks": "Résultats du contrôle des noms"
     },
     "configOnly": "Configuration uniquement",
     "configOnlyHint": "Paramètres, préréglages et règles de renommage. Les tâches et l'historique restent tels quels.",
     "everything": "Tout",
-    "everythingHint": "Aussi les tâches, leurs journaux, l'historique des renommages, les fusions et les résultats de qualité. La file d'attente reste arrêtée.",
+    "everythingHint": "Aussi les tâches, leurs journaux, l'historique des renommages, les fusions et les résultats des contrôles de qualité et des noms. La file d'attente reste arrêtée.",
     "notPossible": "Impossible : {reason}.",
     "restoreButton": "Restaurer…",
     "onServerTitle": "Sauvegardes sur le serveur",

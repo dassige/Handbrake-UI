@@ -49,9 +49,8 @@ function NameInput({ row, onCommit }) {
   );
 }
 
-export function RenameView({ settings, rules, paths, setPaths, changeTick, run, onError }) {
+export function RenameView({ settings, rules, ruleId, setRuleId, paths, setPaths, changeTick, run, onError }) {
   const dialogs = useDialogs();
-  const [ruleId, setRuleId] = useState(null);
   const [showName, setShowName] = useState('');
   const [edits, setEdits] = useState({});
   const [rows, setRows] = useState([]);

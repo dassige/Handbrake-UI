@@ -298,12 +298,13 @@
       "jobs": "Trabajos (cola e historial)",
       "renameHistory": "Historial de renombrado",
       "merges": "Uniones",
-      "qualityScans": "Resultados del control de calidad"
+      "qualityScans": "Resultados del control de calidad",
+      "namingChecks": "Resultados del control de nombres"
     },
     "configOnly": "Solo la configuración",
     "configOnlyHint": "Ajustes, preajustes y reglas de renombrado. Los trabajos y el historial se quedan como están.",
     "everything": "Todo",
-    "everythingHint": "También los trabajos, sus registros, el historial de renombrado, las uniones y los resultados del control de calidad. La cola sigue detenida.",
+    "everythingHint": "También los trabajos, sus registros, el historial de renombrado, las uniones y los resultados de los controles de calidad y de nombres. La cola sigue detenida.",
     "notPossible": "No es posible mientras {reason}.",
     "restoreButton": "Restaurar…",
     "onServerTitle": "Copias de seguridad en el servidor",

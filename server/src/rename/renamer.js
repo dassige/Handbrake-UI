@@ -6,6 +6,8 @@ import { sanitizeFileName } from './parse.js';
 import { importAren, normalizeSteps, runSteps } from './steps.js';
 
 const MAX_FILES = 5000;
+// The naming check only reads names, so it takes far more files than a rename preview.
+const MAX_CHECK_FILES = 100000;
 
 const BUILTINS = [
   {
@@ -158,7 +160,7 @@ export class Renamer {
   // ---------------------------------------------------------------- preview / apply
 
   /** Expands files and folders (under the target root) into a list of files. */
-  async expand(paths) {
+  async expand(paths, max = MAX_FILES) {
     if (!Array.isArray(paths) || !paths.length) return [];
     const root = this.settings.get('targetRoot');
     const matcher = makeFileMatcher(this.settings);
@@ -168,9 +170,39 @@ export class Renamer {
       const stat = await fs.stat(abs);
       if (stat.isDirectory()) out.push(...(await collectVideos(abs, { recursive: true, matcher: { ...matcher, excluded: () => false } })));
       else if (stat.isFile()) out.push(abs);
-      if (out.length > MAX_FILES) throw badRequest(`Too many files (more than ${MAX_FILES})`);
+      if (out.length > max) throw badRequest(`Too many files (more than ${max})`);
     }
     return [...new Set(out)];
+  }
+
+  /**
+   * Naming check: the videos in these folders whose name is not the one the rule set gives
+   * them, or that the rule set cannot fully recognise (a warning). Only names are read, so
+   * whole libraries are fine; files whose name is already right are only counted.
+   * Rows: { path, dir, oldName, expected (null when only a warning), info, warnings }.
+   * Saved by naming.js.
+   */
+  async check({ paths, ruleId }) {
+    if (!Array.isArray(paths) || !paths.length) throw badRequest('Choose at least one folder or file');
+    const rule = this.getRule(Number(ruleId));
+    const files = await this.expand(paths, MAX_CHECK_FILES);
+    const rows = [];
+    for (const file of files) {
+      const oldName = path.basename(file);
+      const [base, ext] = splitName(oldName);
+      const r = runSteps(base, ext, rule.steps, {});
+      const expected = joinName(sanitizeFileName(r.name) || base, r.ext);
+      if (expected === oldName && !r.warnings.length) continue;
+      rows.push({
+        path: file,
+        dir: path.dirname(file),
+        oldName,
+        expected: expected === oldName ? null : expected,
+        info: r.info,
+        warnings: r.warnings,
+      });
+    }
+    return { ruleId: rule.id, ruleName: rule.name, paths, total: files.length, checkedAt: Date.now(), rows };
   }
 
   stepsFor({ ruleId, steps }) {

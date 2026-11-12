@@ -15,6 +15,7 @@ const COUNTS = [
   { key: 'renameHistory', labelKey: 'settings.backup.counts.renameHistory' },
   { key: 'merges', labelKey: 'settings.backup.counts.merges' },
   { key: 'qualityScans', labelKey: 'settings.backup.counts.qualityScans' },
+  { key: 'namingChecks', labelKey: 'settings.backup.counts.namingChecks' },
 ];
 
 /** Downloads or keeps backups of the settings and database, and restores them (Settings → Backup and restore). */

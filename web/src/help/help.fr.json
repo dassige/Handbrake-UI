@@ -22,6 +22,7 @@
         "1. Dans **Renommer**, donnez des noms propres aux fichiers convertis : voir [Renommer des fichiers](#rename.overview).",
         "Si vous le souhaitez, réunissez plusieurs fichiers convertis en un seul (p. ex. un film coupé en deux parties) dans **Fusionner** : voir [Fusionner des fichiers](#merge.overview).",
         "Pour retrouver les fichiers anciens ou de mauvaise qualité dans vos dossiers, utilisez **Qualité** : voir [Contrôle de qualité](#quality.overview).",
+        "Pour retrouver les fichiers dont le nom ne suit pas vos règles de renommage, utilisez **Noms** : voir [Contrôle des noms](#naming.overview).",
         "Pour convertir sans être présent : une [plage de conversion](#settings.schedule) lance la file d'attente la nuit, les [dossiers surveillés](#settings.watch) ajoutent tout seuls les nouveaux téléchargements, et les [notifications](#settings.notifications) vous disent comment cela s'est passé. **Statistiques** montre ce qui a été converti : voir [Statistiques](#stats.overview).",
         "Les fichiers sources ne sont jamais modifiés : vos téléchargements peuvent donc continuer à être partagés. Ils ne sont supprimés que sur demande : voir [Supprimer des fichiers sources](#delete.overview).",
         "Sur un téléphone, l'application fonctionne de la même façon : les vues à deux panneaux (Sources et file d'attente, fichiers et liste à renommer…) n'en montrent qu'un à la fois, avec un sélecteur au-dessus ; l'ajout de fichiers passe au second panneau. Le glisser-déposer demande une souris : sur un écran tactile, utilisez les cases à cocher et **Ajouter à la file**, ainsi que les boutons **Monter**, **Descendre**, **Placer en tête** et **Placer en dernier** dans les détails d'une tâche pour réordonner la file.",
@@ -36,7 +37,8 @@
         "presets",
         "merge.overview",
         "upload.overview",
-        "quality.overview"
+        "quality.overview",
+        "naming.overview"
       ]
     },
     "convert.sources": {
@@ -724,6 +726,47 @@
         "settings.quality"
       ]
     },
+    "naming.overview": {
+      "title": "Contrôle des noms",
+      "body": [
+        "Trouve les vidéos du dossier cible dont le nom n’est pas celui que leur donneraient vos règles de renommage : vous pouvez ainsi ranger toute une bibliothèque sans ouvrir chaque dossier.",
+        "1. Dans **Noms**, choisissez les **Règles** à utiliser : **Auto**, **TV series**, **Movies** ou l’un de vos [jeux de règles](#rename.rules).",
+        "1. Choisissez des dossiers ou des fichiers dans le panneau **Dossiers** et appuyez sur **Contrôler les noms**.",
+        "1. Les [résultats](#naming.results) ne listent que les fichiers à revoir. Cochez ceux à corriger et appuyez sur **Corriger dans Renommer**.",
+        "Renommer s’ouvre avec ces fichiers et les mêmes règles : vérifiez l’[aperçu](#rename.preview), corrigez les noms à la main si besoin et appuyez sur **Renommer**. Appuyez ensuite ici sur **Contrôler à nouveau** pour voir ce qui reste.",
+        "Seuls les noms sont lus, jamais les fichiers eux-mêmes : même une bibliothèque entière prend quelques secondes. Choisir d’autres règles contrôle à nouveau les mêmes dossiers. Chaque contrôle est enregistré : les 20 derniers sont conservés, choisissez-en un dans **Résultat**."
+      ],
+      "see": [
+        "naming.results",
+        "naming.folders",
+        "rename.overview",
+        "rename.rules"
+      ]
+    },
+    "naming.folders": {
+      "title": "Choisir ce qu’il faut contrôler",
+      "body": [
+        "Le panneau Dossiers montre le dossier cible, celui sur lequel travaille Renommer.",
+        "Cochez des dossiers et des fichiers (Ctrl-clic et Maj-clic en sélectionnent plusieurs) et appuyez sur **Contrôler les noms**. Un dossier inclut tout ce qu’il contient, sous-dossiers compris."
+      ],
+      "see": [
+        "naming.overview"
+      ]
+    },
+    "naming.results": {
+      "title": "Résultats du contrôle des noms",
+      "body": [
+        "Chaque fichier affiche son nom actuel et, en dessous, le nom que lui donneraient les règles. Les fichiers sont regroupés par dossier.",
+        "- **Nom incorrect** : les règles renommeraient le fichier.",
+        "- **Non reconnu** : il manque quelque chose aux règles, par exemple un numéro d’épisode avec **TV series** ou une année avec **Movies**. Le fichier peut quand même avoir le bon nom ; vérifiez-le dans Renommer et tapez le nom à la main si besoin.",
+        "- **Renommés ou déplacés** : fichiers qui n’existent plus sous ce nom, par exemple parce que vous les avez corrigés dans Renommer. Ils restent dans le résultat mais ne peuvent pas être sélectionnés.",
+        "Les fichiers qui ont déjà le bon nom sont comptés mais pas listés. **Corriger dans Renommer** accepte jusqu’à 5000 fichiers à la fois."
+      ],
+      "see": [
+        "naming.overview",
+        "rename.preview"
+      ]
+    },
     "settings.quality": {
       "title": "Critères du contrôle de qualité",
       "body": [
@@ -742,7 +785,7 @@
     "download.overview": {
       "title": "Télécharger des fichiers",
       "body": [
-        "Copie des fichiers du serveur vers votre ordinateur : depuis n'importe quel dossier de sources ou le dossier cible, dans chaque panneau qui liste des dossiers (Sources, Renommer, Fusionner et Qualité).",
+        "Copie des fichiers du serveur vers votre ordinateur : depuis n'importe quel dossier de sources ou le dossier cible, dans chaque panneau qui liste des dossiers (Sources, Renommer, Fusionner, Qualité et Noms).",
         "- Pointez un fichier ou un dossier et appuyez sur sa flèche de téléchargement, ou cochez-en plusieurs et appuyez sur **Télécharger**.",
         "- **Un fichier** se télécharge tout de suite. La liste de téléchargements du navigateur affiche la progression, et un téléchargement interrompu peut y être repris.",
         "- **Un dossier** (sous-dossiers compris) arrive sous la forme d'**un seul fichier ZIP** qui conserve les dossiers. Les fichiers y sont stockés tels quels, sans compression : le téléchargement démarre donc aussitôt et le navigateur connaît la taille. Un téléchargement ZIP interrompu doit recommencer.",
@@ -778,14 +821,14 @@
     "backup.overview": {
       "title": "Sauvegarde et restauration",
       "body": [
-        "Une sauvegarde contient les données propres à l'application : paramètres (dossiers, critères de qualité…), préréglages, jeux de règles de renommage, liste et historique des tâches, historique des renommages, fusions et résultats des contrôles de qualité. Elle peut aussi contenir le journal HandBrake de chaque tâche. Les fichiers vidéo n'en font jamais partie.",
+        "Une sauvegarde contient les données propres à l'application : paramètres (dossiers, critères de qualité…), préréglages, jeux de règles de renommage, liste et historique des tâches, historique des renommages, fusions et résultats des contrôles de qualité et des noms. Elle peut aussi contenir le journal HandBrake de chaque tâche. Les fichiers vidéo n'en font jamais partie.",
         "Elle se trouve dans les [Paramètres](#settings.folders) → **Sauvegarde et restauration**.",
         "- **Télécharger la sauvegarde** enregistre un fichier ZIP sur votre ordinateur.",
         "- **Enregistrer sur le serveur** en conserve une dans le dossier de données de l'application (`data/backups`). Les 10 plus récentes sont gardées.",
         "### Restaurer",
         "1. **Choisir un fichier de sauvegarde…** sur votre ordinateur, ou choisissez-en une sous **Sauvegardes sur le serveur**.",
         "1. Vérifiez ce qu'elle contient : le tableau compare la sauvegarde aux données actuelles, et les dossiers qui n'existent pas sur ce serveur sont signalés.",
-        "1. Choisissez **Configuration uniquement** (paramètres, préréglages et règles de renommage ; les tâches et l'historique restent) ou **Tout** (aussi les tâches et leurs journaux, les historiques, les fusions et les résultats de qualité).",
+        "1. Choisissez **Configuration uniquement** (paramètres, préréglages et règles de renommage ; les tâches et l'historique restent) ou **Tout** (aussi les tâches et leurs journaux, les historiques, les fusions et les résultats des contrôles de qualité et des noms).",
         "1. Appuyez sur **Restaurer…** et confirmez. La page se recharge ensuite.",
         "Avant chaque restauration, les données actuelles sont enregistrées sur le serveur sous le nom **Avant une restauration** : une restauration peut donc être annulée en restaurant celle-là.",
         "Une restauration ne démarre jamais la file d'attente. **Tout** ne peut pas être restauré pendant qu'une conversion, une fusion, un contrôle de qualité ou un téléversement est en cours.",

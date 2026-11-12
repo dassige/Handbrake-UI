@@ -22,6 +22,7 @@
         "1. In **Rename**, give the converted files clean names: see [Renaming files](#rename.overview).",
         "Optionally, join several converted files into one (e.g. a film split in two parts) in **Merge**: see [Merging files](#merge.overview).",
         "To find old or low-quality files anywhere in your folders, use **Quality**: see [Quality check](#quality.overview).",
+        "To find files whose names don’t follow your rename rules, use **Naming**: see [Naming check](#naming.overview).",
         "To convert without being there: a [conversion window](#settings.schedule) runs the queue at night, [watch folders](#settings.watch) add new downloads by themselves, and [notifications](#settings.notifications) tell you how it went. **Stats** shows what has been converted: see [Stats](#stats.overview).",
         "Source files are never changed, so downloads can keep seeding. They are deleted only when you ask: see [Deleting source files](#delete.overview).",
         "On a phone the app works the same way: views with two panels (Sources and Queue, files and the rename list…) show one panel at a time, with a switch above them; adding files jumps to the second panel. Drag and drop needs a mouse, so on a touch screen use the check boxes and **Add to queue**, and the **Up**, **Down**, **Move to top** and **Move to bottom** buttons in a job's details to reorder the queue.",
@@ -36,7 +37,8 @@
         "presets",
         "merge.overview",
         "upload.overview",
-        "quality.overview"
+        "quality.overview",
+        "naming.overview"
       ]
     },
     "convert.sources": {
@@ -724,6 +726,47 @@
         "settings.quality"
       ]
     },
+    "naming.overview": {
+      "title": "Naming check",
+      "body": [
+        "Finds the videos in the target folder whose name is not the one your rename rules would give them, so a whole library can be tidied up without opening every folder.",
+        "1. In **Naming**, pick the **Rules** to check against: **Auto**, **TV series**, **Movies** or one of your own [rule sets](#rename.rules).",
+        "1. Choose folders or files in the **Folders** panel and press **Check names**.",
+        "1. The [results](#naming.results) list only the files that need a look. Tick the ones to fix and press **Fix in Rename**.",
+        "Rename opens with those files and the same rules: check the [preview](#rename.preview), fix names by hand if needed, and press **Rename**. Then press **Check again** here to see what is left.",
+        "Only names are read, never the files themselves, so even a whole library takes seconds. Choosing other rules checks the same folders again. Every check is saved: the last 20 are kept, pick one in **Result**."
+      ],
+      "see": [
+        "naming.results",
+        "naming.folders",
+        "rename.overview",
+        "rename.rules"
+      ]
+    },
+    "naming.folders": {
+      "title": "Choosing what to check",
+      "body": [
+        "The Folders panel shows the target folder, the same one Rename works on.",
+        "Tick folders and files (Ctrl-click and Shift-click select several) and press **Check names**. A folder includes everything inside it, sub-folders too."
+      ],
+      "see": [
+        "naming.overview"
+      ]
+    },
+    "naming.results": {
+      "title": "Naming check results",
+      "body": [
+        "Each file shows its current name and, below it, the name the rules would give it. Files are grouped by folder.",
+        "- **Wrong name**: the rules would rename the file.",
+        "- **Not recognised**: the rules found something missing, such as no episode number with **TV series** or no year with **Movies**. The file may still have the right name; check it in Rename and type the name by hand if needed.",
+        "- **Renamed or moved**: files that are no longer there under that name, for example because you fixed them in Rename. They stay in the result but can’t be selected.",
+        "Files that already have the right name are counted but not listed. **Fix in Rename** takes up to 5000 files at once."
+      ],
+      "see": [
+        "naming.overview",
+        "rename.preview"
+      ]
+    },
     "settings.quality": {
       "title": "Quality check criteria",
       "body": [
@@ -742,7 +785,7 @@
     "download.overview": {
       "title": "Downloading files",
       "body": [
-        "Copies files from the server to your computer: from any sources folder or the target folder, in every panel that lists folders (Sources, Rename, Merge and Quality).",
+        "Copies files from the server to your computer: from any sources folder or the target folder, in every panel that lists folders (Sources, Rename, Merge, Quality and Naming).",
         "- Point at a file or folder and press its download arrow, or tick several and press **Download**.",
         "- **One file** downloads straight away. The browser's own download list shows the progress, and an interrupted download can be resumed there.",
         "- **A folder** (sub-folders included) comes as **one ZIP file** that keeps the folders inside. The files are stored as they are, not compressed, so it starts at once and the browser knows the size. A ZIP download that is interrupted must start again.",
@@ -778,14 +821,14 @@
     "backup.overview": {
       "title": "Backup and restore",
       "body": [
-        "A backup holds the app's own data: settings (folders, quality criteria…), presets, rename rule sets, the job list and history, rename history, merges and quality check results. Optionally it also holds the HandBrake log of each job. Video files are never part of it.",
+        "A backup holds the app's own data: settings (folders, quality criteria…), presets, rename rule sets, the job list and history, rename history, merges, quality check and naming check results. Optionally it also holds the HandBrake log of each job. Video files are never part of it.",
         "It is in [Settings](#settings.folders) → **Backup and restore**.",
         "- **Download backup** saves a ZIP file on your computer.",
         "- **Save on the server** keeps one in the app's data folder (`data/backups`). The newest 10 are kept.",
         "### Restoring",
         "1. **Choose a backup file…** from your computer, or pick one under **Backups on the server**.",
         "1. Check what it holds: the table compares the backup with the current data, and folders that don't exist on this server are pointed out.",
-        "1. Choose **Configuration only** (settings, presets and rename rules; jobs and history stay) or **Everything** (also jobs and their logs, histories, merges and quality results).",
+        "1. Choose **Configuration only** (settings, presets and rename rules; jobs and history stay) or **Everything** (also jobs and their logs, histories, merges, quality and naming results).",
         "1. Press **Restore…** and confirm. The page reloads afterwards.",
         "Before every restore the current data is saved on the server as **Before a restore**, so a restore can be undone by restoring that one.",
         "A restore never starts the queue. **Everything** can't be restored while a conversion, merge, quality check or upload is running.",

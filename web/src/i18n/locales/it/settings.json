@@ -298,12 +298,13 @@
       "jobs": "Processi (coda e cronologia)",
       "renameHistory": "Cronologia delle rinomine",
       "merges": "Unioni",
-      "qualityScans": "Risultati del controllo qualità"
+      "qualityScans": "Risultati del controllo qualità",
+      "namingChecks": "Risultati del controllo nomi"
     },
     "configOnly": "Solo configurazione",
     "configOnlyHint": "Impostazioni, preimpostazioni e regole di rinomina. Processi e cronologia restano come sono.",
     "everything": "Tutto",
-    "everythingHint": "Anche i processi, i loro registri, la cronologia delle rinomine, le unioni e i risultati del controllo qualità. La coda resta ferma.",
+    "everythingHint": "Anche i processi, i loro registri, la cronologia delle rinomine, le unioni e i risultati dei controlli qualità e nomi. La coda resta ferma.",
     "notPossible": "Non possibile mentre {reason}.",
     "restoreButton": "Ripristina…",
     "onServerTitle": "Backup sul server",

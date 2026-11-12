@@ -22,6 +22,7 @@
         "1. Geben Sie den konvertierten Dateien unter **Umbenennen** saubere Namen: siehe [Dateien umbenennen](#rename.overview).",
         "Optional können Sie mehrere konvertierte Dateien (z. B. einen in zwei Teile geteilten Film) unter **Zusammenführen** zu einer verbinden: siehe [Dateien zusammenführen](#merge.overview).",
         "Um alte oder qualitativ schwache Dateien irgendwo in Ihren Ordnern zu finden, verwenden Sie **Qualität**: siehe [Qualitätsprüfung](#quality.overview).",
+        "Um Dateien zu finden, deren Namen nicht Ihren Umbenennungsregeln folgen, verwenden Sie **Namen**: siehe [Namensprüfung](#naming.overview).",
         "Um zu konvertieren, ohne dabei zu sein: Ein [Zeitfenster](#settings.schedule) lässt die Warteschlange nachts laufen, [überwachte Ordner](#settings.watch) fügen neue Downloads von selbst hinzu, und [Benachrichtigungen](#settings.notifications) sagen Ihnen, wie es gelaufen ist. **Statistik** zeigt, was konvertiert wurde: siehe [Statistik](#stats.overview).",
         "Quelldateien werden nie verändert, Downloads können also weiter geseedet werden. Sie werden nur gelöscht, wenn Sie es verlangen: siehe [Quelldateien löschen](#delete.overview).",
         "Auf dem Smartphone funktioniert die App genauso: Ansichten mit zwei Bereichen (Quellen und Warteschlange, Dateien und Umbenennungsliste …) zeigen jeweils einen Bereich, mit einem Umschalter darüber; beim Hinzufügen von Dateien springt die Ansicht zum zweiten Bereich. Drag-and-drop braucht eine Maus, nutzen Sie auf einem Touchscreen also die Kontrollkästchen und **Zur Warteschlange hinzufügen** sowie die Schaltflächen **Hoch**, **Runter**, **An den Anfang** und **Ans Ende** in den Details eines Auftrags, um die Warteschlange umzusortieren.",
@@ -36,7 +37,8 @@
         "presets",
         "merge.overview",
         "upload.overview",
-        "quality.overview"
+        "quality.overview",
+        "naming.overview"
       ]
     },
     "convert.sources": {
@@ -724,6 +726,47 @@
         "settings.quality"
       ]
     },
+    "naming.overview": {
+      "title": "Namensprüfung",
+      "body": [
+        "Findet die Videos im Zielordner, deren Name nicht dem entspricht, den Ihre Umbenennungsregeln ihnen geben würden. So lässt sich eine ganze Bibliothek aufräumen, ohne jeden Ordner zu öffnen.",
+        "1. Wählen Sie unter **Namen** die **Regeln** für die Prüfung: **Auto**, **TV series**, **Movies** oder eine Ihrer eigenen [Regelsätze](#rename.rules).",
+        "1. Wählen Sie Ordner oder Dateien im Bereich **Ordner** und klicken Sie auf **Namen prüfen**.",
+        "1. Die [Ergebnisse](#naming.results) listen nur die auffälligen Dateien. Setzen Sie Häkchen bei denen, die korrigiert werden sollen, und klicken Sie auf **In Umbenennen korrigieren**.",
+        "Umbenennen öffnet sich mit diesen Dateien und denselben Regeln: Prüfen Sie die [Vorschau](#rename.preview), korrigieren Sie Namen bei Bedarf von Hand und klicken Sie auf **Umbenennen**. Klicken Sie danach hier auf **Erneut prüfen**, um zu sehen, was noch übrig ist.",
+        "Es werden nur Namen gelesen, nie die Dateien selbst, daher dauert auch eine ganze Bibliothek nur Sekunden. Andere Regeln zu wählen prüft dieselben Ordner erneut. Jede Prüfung wird gespeichert: Die letzten 20 bleiben erhalten, wählen Sie eine unter **Ergebnis**."
+      ],
+      "see": [
+        "naming.results",
+        "naming.folders",
+        "rename.overview",
+        "rename.rules"
+      ]
+    },
+    "naming.folders": {
+      "title": "Was geprüft wird",
+      "body": [
+        "Der Bereich Ordner zeigt den Zielordner, denselben, mit dem Umbenennen arbeitet.",
+        "Setzen Sie Häkchen bei Ordnern und Dateien (Strg-Klick und Umschalt-Klick wählen mehrere aus) und klicken Sie auf **Namen prüfen**. Ein Ordner umfasst alles darin, auch Unterordner."
+      ],
+      "see": [
+        "naming.overview"
+      ]
+    },
+    "naming.results": {
+      "title": "Ergebnisse der Namensprüfung",
+      "body": [
+        "Jede Datei zeigt ihren aktuellen Namen und darunter den Namen, den die Regeln ihr geben würden. Die Dateien sind nach Ordnern gruppiert.",
+        "- **Falscher Name**: Die Regeln würden die Datei umbenennen.",
+        "- **Nicht erkannt**: Den Regeln fehlt etwas, z. B. eine Episodennummer bei **TV series** oder ein Jahr bei **Movies**. Die Datei kann trotzdem richtig benannt sein; prüfen Sie sie in Umbenennen und geben Sie den Namen bei Bedarf von Hand ein.",
+        "- **Umbenannt oder verschoben**: Dateien, die es unter diesem Namen nicht mehr gibt, z. B. weil Sie sie in Umbenennen korrigiert haben. Sie bleiben im Ergebnis, können aber nicht ausgewählt werden.",
+        "Dateien, die bereits richtig benannt sind, werden gezählt, aber nicht aufgeführt. **In Umbenennen korrigieren** nimmt bis zu 5000 Dateien auf einmal."
+      ],
+      "see": [
+        "naming.overview",
+        "rename.preview"
+      ]
+    },
     "settings.quality": {
       "title": "Kriterien der Qualitätsprüfung",
       "body": [
@@ -742,7 +785,7 @@
     "download.overview": {
       "title": "Dateien herunterladen",
       "body": [
-        "Kopiert Dateien vom Server auf Ihren Computer: aus jedem Quellordner oder dem Zielordner, in jedem Bereich, der Ordner auflistet (Quellen, Umbenennen, Zusammenführen und Qualität).",
+        "Kopiert Dateien vom Server auf Ihren Computer: aus jedem Quellordner oder dem Zielordner, in jedem Bereich, der Ordner auflistet (Quellen, Umbenennen, Zusammenführen, Qualität und Namen).",
         "- Zeigen Sie auf eine Datei oder einen Ordner und klicken Sie auf den Download-Pfeil, oder setzen Sie bei mehreren ein Häkchen und klicken Sie auf **Herunterladen**.",
         "- **Eine Datei** wird sofort heruntergeladen. Die eigene Download-Liste des Browsers zeigt den Fortschritt, und ein unterbrochener Download kann dort fortgesetzt werden.",
         "- **Ein Ordner** (Unterordner eingeschlossen) kommt als **eine ZIP-Datei**, die die Ordner darin beibehält. Die Dateien werden unverändert abgelegt, nicht komprimiert, sodass der Download sofort beginnt und der Browser die Größe kennt. Ein unterbrochener ZIP-Download muss von vorn beginnen.",
@@ -778,14 +821,14 @@
     "backup.overview": {
       "title": "Sicherung und Wiederherstellung",
       "body": [
-        "Eine Sicherung enthält die eigenen Daten der App: Einstellungen (Ordner, Qualitätskriterien …), Voreinstellungen, Umbenennungsregelsätze, die Auftragsliste und den Verlauf, den Umbenennungsverlauf, Zusammenführungen und Ergebnisse der Qualitätsprüfung. Optional enthält sie auch das HandBrake-Protokoll jedes Auftrags. Videodateien sind nie Teil davon.",
+        "Eine Sicherung enthält die eigenen Daten der App: Einstellungen (Ordner, Qualitätskriterien …), Voreinstellungen, Umbenennungsregelsätze, die Auftragsliste und den Verlauf, den Umbenennungsverlauf, Zusammenführungen sowie Ergebnisse der Qualitäts- und Namensprüfung. Optional enthält sie auch das HandBrake-Protokoll jedes Auftrags. Videodateien sind nie Teil davon.",
         "Sie finden sie in den [Einstellungen](#settings.folders) → **Sicherung und Wiederherstellung**.",
         "- **Sicherung herunterladen** speichert eine ZIP-Datei auf Ihrem Computer.",
         "- **Auf dem Server speichern** legt eine im Datenordner der App ab (`data/backups`). Die neuesten 10 werden aufbewahrt.",
         "### Wiederherstellen",
         "1. **Sicherungsdatei wählen…** von Ihrem Computer, oder wählen Sie eine unter **Sicherungen auf dem Server**.",
         "1. Prüfen Sie, was sie enthält: Die Tabelle vergleicht die Sicherung mit den aktuellen Daten, und Ordner, die auf diesem Server nicht existieren, werden angezeigt.",
-        "1. Wählen Sie **Nur Konfiguration** (Einstellungen, Voreinstellungen und Umbenennungsregeln; Aufträge und Verlauf bleiben) oder **Alles** (auch Aufträge und ihre Protokolle, Verläufe, Zusammenführungen und Qualitätsergebnisse).",
+        "1. Wählen Sie **Nur Konfiguration** (Einstellungen, Voreinstellungen und Umbenennungsregeln; Aufträge und Verlauf bleiben) oder **Alles** (auch Aufträge und ihre Protokolle, Verläufe, Zusammenführungen sowie Ergebnisse der Qualitäts- und Namensprüfung).",
         "1. Klicken Sie auf **Wiederherstellen…** und bestätigen Sie. Danach wird die Seite neu geladen.",
         "Vor jeder Wiederherstellung werden die aktuellen Daten als **Vor einer Wiederherstellung** auf dem Server gespeichert, sodass sich eine Wiederherstellung durch Wiederherstellen dieser Sicherung rückgängig machen lässt.",
         "Eine Wiederherstellung startet nie die Warteschlange. **Alles** lässt sich nicht wiederherstellen, solange eine Konvertierung, Zusammenführung, Qualitätsprüfung oder ein Upload läuft.",

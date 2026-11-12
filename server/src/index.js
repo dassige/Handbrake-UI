@@ -11,6 +11,7 @@ import { Queue } from './queue.js';
 import { Events } from './events.js';
 import { registerRoutes } from './routes.js';
 import { Renamer } from './rename/renamer.js';
+import { NamingChecks } from './rename/naming.js';
 import { Verifier } from './verify.js';
 import { Merger } from './merge.js';
 import { registerMergeRoutes } from './mergeRoutes.js';
@@ -69,6 +70,7 @@ const subtitles = new Subtitles({ settings, tmpDir: path.join(config.dataDir, 't
 queue.subs = subtitles;
 const renamer = new Renamer({ db, settings, events, log: app.log, subtitles });
 queue.renamer = renamer;
+const naming = new NamingChecks({ db, renamer, events });
 const merger = new Merger({
   db, settings, events, verifier, log: app.log, tmpDir: path.join(config.dataDir, 'tmp'),
   mkvmerge: config.mkvmerge, ffprobe: config.ffprobe,
@@ -94,7 +96,7 @@ await app.register(
   async (api) => {
     registerRoutes(api, { settings, presets, queue, events, handbrake, renamer, watcher, backupScheduler, subtitles, version, dataDir: config.dataDir });
     registerAutomationRoutes(api, { history, watcher, notifier });
-    registerRenameRoutes(api, { renamer });
+    registerRenameRoutes(api, { renamer, naming });
     registerMergeRoutes(api, { merger });
     registerUploadRoutes(api, { uploads, sourceFiles });
     registerQualityRoutes(api, { quality });

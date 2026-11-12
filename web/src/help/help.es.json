@@ -22,6 +22,7 @@
         "1. En **Renombrar**, dé nombres limpios a los archivos convertidos: consulte [Renombrar archivos](#rename.overview).",
         "Si lo desea, una varios archivos convertidos en uno (p. ej., una película dividida en dos partes) en **Unir**: consulte [Unir archivos](#merge.overview).",
         "Para encontrar archivos antiguos o de baja calidad en cualquier lugar de sus carpetas, use **Calidad**: consulte [Control de calidad](#quality.overview).",
+        "Para encontrar archivos cuyos nombres no siguen sus reglas de renombrado, use **Nombres**: consulte [Control de nombres](#naming.overview).",
         "Para convertir sin estar presente: una [franja de conversión](#settings.schedule) ejecuta la cola por la noche, las [carpetas vigiladas](#settings.watch) añaden por sí solas las descargas nuevas y las [notificaciones](#settings.notifications) le avisan de cómo fue todo. **Estadísticas** muestra lo que se ha convertido: consulte [Estadísticas](#stats.overview).",
         "Los archivos de origen nunca se modifican, así que las descargas pueden seguir compartiéndose. Solo se eliminan cuando usted lo pide: consulte [Eliminar archivos de origen](#delete.overview).",
         "En un teléfono la aplicación funciona igual: las vistas con dos paneles (Orígenes y cola, archivos y lista de renombrado…) muestran un panel cada vez, con un selector encima; al añadir archivos se pasa al segundo panel. Arrastrar y soltar requiere un ratón, así que en una pantalla táctil use las casillas y **Añadir a la cola**, y los botones **Subir**, **Bajar**, **Mover al principio** y **Mover al final** en los detalles de un trabajo para reordenar la cola.",
@@ -36,7 +37,8 @@
         "presets",
         "merge.overview",
         "upload.overview",
-        "quality.overview"
+        "quality.overview",
+        "naming.overview"
       ]
     },
     "convert.sources": {
@@ -724,6 +726,47 @@
         "settings.quality"
       ]
     },
+    "naming.overview": {
+      "title": "Control de nombres",
+      "body": [
+        "Encuentra los videos de la carpeta de destino cuyo nombre no es el que les darían sus reglas de renombrado, para poner en orden una biblioteca entera sin abrir cada carpeta.",
+        "1. En **Nombres**, elija las **Reglas** con las que comprobar: **Auto**, **TV series**, **Movies** o uno de sus [conjuntos de reglas](#rename.rules).",
+        "1. Elija carpetas o archivos en el panel **Carpetas** y pulse **Comprobar nombres**.",
+        "1. Los [resultados](#naming.results) muestran solo los archivos que requieren revisión. Marque los que quiera corregir y pulse **Corregir en Renombrar**.",
+        "Renombrar se abre con esos archivos y las mismas reglas: revise la [vista previa](#rename.preview), corrija nombres a mano si hace falta y pulse **Renombrar**. Después pulse aquí **Volver a comprobar** para ver lo que queda.",
+        "Solo se leen los nombres, nunca los archivos, así que incluso una biblioteca entera tarda segundos. Elegir otras reglas vuelve a comprobar las mismas carpetas. Cada control se guarda: se conservan los últimos 20, elija uno en **Resultado**."
+      ],
+      "see": [
+        "naming.results",
+        "naming.folders",
+        "rename.overview",
+        "rename.rules"
+      ]
+    },
+    "naming.folders": {
+      "title": "Elegir qué comprobar",
+      "body": [
+        "El panel Carpetas muestra la carpeta de destino, la misma con la que trabaja Renombrar.",
+        "Marque carpetas y archivos (Ctrl+clic y Mayús+clic seleccionan varios) y pulse **Comprobar nombres**. Una carpeta incluye todo lo que contiene, también las subcarpetas."
+      ],
+      "see": [
+        "naming.overview"
+      ]
+    },
+    "naming.results": {
+      "title": "Resultados del control de nombres",
+      "body": [
+        "Cada archivo muestra su nombre actual y, debajo, el nombre que le darían las reglas. Los archivos se agrupan por carpeta.",
+        "- **Nombre incorrecto**: las reglas renombrarían el archivo.",
+        "- **No reconocido**: a las reglas les falta algo, por ejemplo un número de episodio con **TV series** o un año con **Movies**. El archivo puede tener igualmente el nombre correcto; revíselo en Renombrar y escriba el nombre a mano si hace falta.",
+        "- **Renombrados o movidos**: archivos que ya no existen con ese nombre, por ejemplo porque los corrigió en Renombrar. Siguen en el resultado pero no se pueden seleccionar.",
+        "Los archivos que ya tienen el nombre correcto se cuentan pero no se muestran. **Corregir en Renombrar** admite hasta 5000 archivos a la vez."
+      ],
+      "see": [
+        "naming.overview",
+        "rename.preview"
+      ]
+    },
     "settings.quality": {
       "title": "Criterios del control de calidad",
       "body": [
@@ -742,7 +785,7 @@
     "download.overview": {
       "title": "Descargar archivos",
       "body": [
-        "Copia archivos del servidor a su equipo: desde cualquier carpeta de origen o desde la carpeta de destino, en todos los paneles que listan carpetas (Orígenes, Renombrar, Unir y Calidad).",
+        "Copia archivos del servidor a su equipo: desde cualquier carpeta de origen o desde la carpeta de destino, en todos los paneles que listan carpetas (Orígenes, Renombrar, Unir, Calidad y Nombres).",
         "- Señale un archivo o una carpeta y pulse su flecha de descarga, o marque varios y pulse **Descargar**.",
         "- **Un archivo** se descarga de inmediato. La lista de descargas del propio navegador muestra el progreso, y una descarga interrumpida puede reanudarse allí.",
         "- **Una carpeta** (subcarpetas incluidas) llega como **un archivo ZIP** que conserva las carpetas del interior. Los archivos se guardan tal cual, sin comprimir, así que empieza al instante y el navegador conoce el tamaño. Una descarga ZIP interrumpida debe empezar de nuevo.",
@@ -778,14 +821,14 @@
     "backup.overview": {
       "title": "Copia de seguridad y restauración",
       "body": [
-        "Una copia de seguridad contiene los datos propios de la aplicación: los ajustes (carpetas, criterios de calidad…), los preajustes, los conjuntos de reglas de renombrado, la lista y el historial de trabajos, el historial de renombrado, las uniones y los resultados del control de calidad. Opcionalmente contiene también el registro de HandBrake de cada trabajo. Los archivos de video nunca forman parte de ella.",
+        "Una copia de seguridad contiene los datos propios de la aplicación: los ajustes (carpetas, criterios de calidad…), los preajustes, los conjuntos de reglas de renombrado, la lista y el historial de trabajos, el historial de renombrado, las uniones y los resultados de los controles de calidad y de nombres. Opcionalmente contiene también el registro de HandBrake de cada trabajo. Los archivos de video nunca forman parte de ella.",
         "Está en [Ajustes](#settings.folders) → **Copia de seguridad y restauración**.",
         "- **Descargar copia de seguridad** guarda un archivo ZIP en su equipo.",
         "- **Guardar en el servidor** conserva una en la carpeta de datos de la aplicación (`data/backups`). Se conservan las 10 más recientes.",
         "### Restaurar",
         "1. **Elija un archivo de copia de seguridad…** de su equipo, o seleccione una en **Copias de seguridad en el servidor**.",
         "1. Compruebe lo que contiene: la tabla compara la copia con los datos actuales y señala las carpetas que no existen en este servidor.",
-        "1. Elija **Solo la configuración** (ajustes, preajustes y reglas de renombrado; los trabajos y el historial se conservan) o **Todo** (también los trabajos y sus registros, los historiales, las uniones y los resultados de calidad).",
+        "1. Elija **Solo la configuración** (ajustes, preajustes y reglas de renombrado; los trabajos y el historial se conservan) o **Todo** (también los trabajos y sus registros, los historiales, las uniones y los resultados de los controles de calidad y de nombres).",
         "1. Pulse **Restaurar…** y confirme. Después la página se vuelve a cargar.",
         "Antes de cada restauración, los datos actuales se guardan en el servidor como **Antes de una restauración**, así que una restauración puede deshacerse restaurando esa copia.",
         "Una restauración nunca inicia la cola. **Todo** no puede restaurarse mientras se ejecuta una conversión, una unión, un control de calidad o una subida.",

@@ -298,12 +298,13 @@
       "jobs": "Aufträge (Warteschlange und Verlauf)",
       "renameHistory": "Umbenennungsverlauf",
       "merges": "Zusammenführungen",
-      "qualityScans": "Ergebnisse der Qualitätsprüfung"
+      "qualityScans": "Ergebnisse der Qualitätsprüfung",
+      "namingChecks": "Ergebnisse der Namensprüfung"
     },
     "configOnly": "Nur Konfiguration",
     "configOnlyHint": "Einstellungen, Voreinstellungen und Umbenennungsregeln. Aufträge und Verlauf bleiben, wie sie sind.",
     "everything": "Alles",
-    "everythingHint": "Auch Aufträge, ihre Protokolle, Umbenennungsverlauf, Zusammenführungen und Qualitätsergebnisse. Die Warteschlange bleibt gestoppt.",
+    "everythingHint": "Auch Aufträge, ihre Protokolle, Umbenennungsverlauf, Zusammenführungen sowie Ergebnisse der Qualitäts- und Namensprüfung. Die Warteschlange bleibt gestoppt.",
     "notPossible": "Nicht möglich, solange {reason}.",
     "restoreButton": "Wiederherstellen…",
     "onServerTitle": "Sicherungen auf dem Server",

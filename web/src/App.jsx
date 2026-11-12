@@ -3,6 +3,7 @@ import { CalendarClock, Pause, Play, Settings as SettingsIcon, SlidersHorizontal
 import { RenameView } from './rename/RenameView.jsx';
 import { MergeView } from './merge/MergeView.jsx';
 import { QualityView } from './quality/QualityView.jsx';
+import { NamingView } from './naming/NamingView.jsx';
 import { StatsView } from './stats/StatsView.jsx';
 import { SettingsPage, SECTION_IDS } from './settings/SettingsPage.jsx';
 import { PresetsPage } from './presets/PresetsPage.jsx';
@@ -25,7 +26,7 @@ import { displayPath } from './roots.js';
 import { rich, setLanguage, t } from './i18n/index.js';
 import { skipReason } from './i18n/serverText.js';
 
-const VIEWS = ['convert', 'rename', 'merge', 'quality', 'stats', 'presets', 'settings'];
+const VIEWS = ['convert', 'rename', 'merge', 'quality', 'naming', 'stats', 'presets', 'settings'];
 
 /** "#settings/watch" → { view: 'settings', sub: 'watch' } */
 function parseHash(hash) {
@@ -66,6 +67,10 @@ export default function App() {
   const [route, setRoute] = useState(() => parseHash(location.hash));
   const view = route.view;
   const [renamePaths, setRenamePaths] = useState([]);
+  // The rule set chosen in Rename (also picked by Naming's "Fix in Rename").
+  const [renameRuleId, setRenameRuleId] = useState(null);
+  // Naming: the rule set for the next check.
+  const [namingRuleId, setNamingRuleId] = useState(null);
   const [mergePaths, setMergePaths] = useState([]);
   const settingsDirty = useRef(false);
   const onSettingsDirty = useCallback((d) => (settingsDirty.current = d), []);
@@ -111,10 +116,11 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
-  /** Opens the rename view with these files added. */
+  /** Opens the rename view with these files added (and this rule set chosen, when given). */
   const openRename = useCallback(
-    (paths) => {
+    (paths, ruleId = null) => {
       setRenamePaths((p) => [...new Set([...p, ...paths])]);
+      if (ruleId != null) setRenameRuleId(ruleId);
       setSelectedJobId(null);
       switchView('rename');
     },
@@ -264,6 +270,7 @@ export default function App() {
             {t('app.views.merge')}{mergePaths.length ? <span className="chip-count"> {mergePaths.length}</span> : null}
           </button>
           <button className={view === 'quality' ? 'active' : ''} onClick={() => switchView('quality')}>{t('app.views.quality')}</button>
+          <button className={view === 'naming' ? 'active' : ''} onClick={() => switchView('naming')}>{t('app.views.naming')}</button>
           <button className={view === 'stats' ? 'active' : ''} onClick={() => switchView('stats')}>{t('app.views.stats')}</button>
         </nav>
         <div className="queue-state">
@@ -367,6 +374,18 @@ export default function App() {
           onAddToQueue={addPaths}
           onOpenSettings={() => switchView('settings', 'quality')}
         />
+      ) : view === 'naming' ? (
+        <NamingView
+          settings={settings}
+          rules={data.renameRules}
+          ruleId={namingRuleId}
+          setRuleId={setNamingRuleId}
+          checks={data.namingChecks}
+          changeTick={data.changeTick}
+          run={run}
+          onError={onError}
+          onFixInRename={openRename}
+        />
       ) : view === 'merge' ? (
         <MergeView
           settings={settings}
@@ -381,6 +400,8 @@ export default function App() {
         <RenameView
           settings={settings}
           rules={data.renameRules}
+          ruleId={renameRuleId}
+          setRuleId={setRenameRuleId}
           paths={renamePaths}
           setPaths={setRenamePaths}
           changeTick={data.changeTick}

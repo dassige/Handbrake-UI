@@ -22,6 +22,7 @@
         "1. In **Rinomina**, dai ai file convertiti nomi puliti: vedi [Rinominare i file](#rename.overview).",
         "Se vuoi, unisci più file convertiti in uno solo (per esempio un film diviso in due parti) in **Unisci**: vedi [Unire i file](#merge.overview).",
         "Per trovare file vecchi o di bassa qualità in qualsiasi punto delle tue cartelle, usa **Qualità**: vedi [Controllo qualità](#quality.overview).",
+        "Per trovare i file con nomi che non seguono le tue regole di rinomina, usa **Nomi**: vedi [Controllo nomi](#naming.overview).",
         "Per convertire senza essere presenti: una [fascia oraria di conversione](#settings.schedule) esegue la coda di notte, le [cartelle monitorate](#settings.watch) aggiungono da sole i nuovi download e le [notifiche](#settings.notifications) ti dicono com’è andata. **Statistiche** mostra cosa è stato convertito: vedi [Statistiche](#stats.overview).",
         "I file sorgente non vengono mai modificati, quindi i download possono continuare il seeding. Vengono eliminati solo se lo chiedi tu: vedi [Eliminare i file sorgente](#delete.overview).",
         "Sul telefono l’app funziona allo stesso modo: le viste con due pannelli (Sorgenti e Coda, i file e l’elenco di rinomina…) mostrano un pannello alla volta, con un selettore sopra; aggiungendo file si passa al secondo pannello. Il trascinamento richiede un mouse, quindi su un touch screen usa le caselle di selezione e **Aggiungi alla coda**, e i pulsanti **Su**, **Giù**, **Sposta in cima** e **Sposta in fondo** nei dettagli di un processo per riordinare la coda.",
@@ -36,7 +37,8 @@
         "presets",
         "merge.overview",
         "upload.overview",
-        "quality.overview"
+        "quality.overview",
+        "naming.overview"
       ]
     },
     "convert.sources": {
@@ -724,6 +726,47 @@
         "settings.quality"
       ]
     },
+    "naming.overview": {
+      "title": "Controllo nomi",
+      "body": [
+        "Trova i video nella cartella di destinazione il cui nome non è quello che darebbero le tue regole di rinomina, così puoi riordinare un’intera libreria senza aprire ogni cartella.",
+        "1. In **Nomi**, scegli le **Regole** da usare per il controllo: **Auto**, **TV series**, **Movies** o una delle tue [regole](#rename.rules).",
+        "1. Scegli cartelle o file nel pannello **Cartelle** e premi **Controlla i nomi**.",
+        "1. I [risultati](#naming.results) elencano solo i file da controllare. Spunta quelli da correggere e premi **Correggi in Rinomina**.",
+        "Rinomina si apre con quei file e le stesse regole: controlla l’[anteprima](#rename.preview), correggi a mano i nomi se serve e premi **Rinomina**. Poi premi **Ricontrolla** qui per vedere cosa resta.",
+        "Vengono letti solo i nomi, mai i file, quindi anche un’intera libreria richiede pochi secondi. Scegliere altre regole ricontrolla le stesse cartelle. Ogni controllo viene salvato: si conservano gli ultimi 20, scegline uno in **Risultato**."
+      ],
+      "see": [
+        "naming.results",
+        "naming.folders",
+        "rename.overview",
+        "rename.rules"
+      ]
+    },
+    "naming.folders": {
+      "title": "Scegliere cosa controllare",
+      "body": [
+        "Il pannello Cartelle mostra la cartella di destinazione, la stessa su cui lavora Rinomina.",
+        "Spunta cartelle e file (Ctrl-clic e Maiusc-clic ne selezionano più di uno) e premi **Controlla i nomi**. Una cartella include tutto ciò che contiene, sottocartelle comprese."
+      ],
+      "see": [
+        "naming.overview"
+      ]
+    },
+    "naming.results": {
+      "title": "Risultati del controllo nomi",
+      "body": [
+        "Ogni file mostra il nome attuale e, sotto, il nome che gli darebbero le regole. I file sono raggruppati per cartella.",
+        "- **Nome sbagliato**: le regole rinominerebbero il file.",
+        "- **Non riconosciuto**: le regole non hanno trovato qualcosa, ad esempio il numero dell’episodio con **TV series** o l’anno con **Movies**. Il file può comunque avere il nome giusto; controllalo in Rinomina e scrivi il nome a mano se serve.",
+        "- **Rinominati o spostati**: file che non ci sono più con quel nome, ad esempio perché li hai corretti in Rinomina. Restano nel risultato ma non si possono selezionare.",
+        "I file che hanno già il nome giusto vengono contati ma non elencati. **Correggi in Rinomina** accetta fino a 5000 file alla volta."
+      ],
+      "see": [
+        "naming.overview",
+        "rename.preview"
+      ]
+    },
     "settings.quality": {
       "title": "Criteri del controllo qualità",
       "body": [
@@ -742,7 +785,7 @@
     "download.overview": {
       "title": "Scaricare i file",
       "body": [
-        "Copia i file dal server al tuo computer: da qualsiasi cartella sorgenti o dalla cartella di destinazione, in ogni pannello che elenca cartelle (Sorgenti, Rinomina, Unisci e Qualità).",
+        "Copia i file dal server al tuo computer: da qualsiasi cartella sorgenti o dalla cartella di destinazione, in ogni pannello che elenca cartelle (Sorgenti, Rinomina, Unisci, Qualità e Nomi).",
         "- Punta su un file o una cartella e premi la sua freccia di download, oppure spunta più elementi e premi **Scarica**.",
         "- **Un file** si scarica subito. L’elenco dei download del browser mostra l’avanzamento, e un download interrotto può essere ripreso da lì.",
         "- **Una cartella** (sottocartelle comprese) arriva come **un unico file ZIP** che mantiene le cartelle al suo interno. I file vengono archiviati così come sono, senza compressione, quindi parte subito e il browser conosce la dimensione. Un download ZIP interrotto deve ripartire da capo.",
@@ -778,14 +821,14 @@
     "backup.overview": {
       "title": "Backup e ripristino",
       "body": [
-        "Un backup contiene i dati propri dell’app: impostazioni (cartelle, criteri di qualità…), preimpostazioni, set di regole di rinomina, l’elenco dei processi e la cronologia, la cronologia delle rinomine, le unioni e i risultati dei controlli qualità. Facoltativamente contiene anche il log di HandBrake di ogni processo. I file video non ne fanno mai parte.",
+        "Un backup contiene i dati propri dell’app: impostazioni (cartelle, criteri di qualità…), preimpostazioni, set di regole di rinomina, l’elenco dei processi e la cronologia, la cronologia delle rinomine, le unioni e i risultati dei controlli qualità e nomi. Facoltativamente contiene anche il log di HandBrake di ogni processo. I file video non ne fanno mai parte.",
         "Si trova in [Impostazioni](#settings.folders) → **Backup e ripristino**.",
         "- **Scarica il backup** salva un file ZIP sul tuo computer.",
         "- **Salva sul server** ne conserva uno nella cartella dati dell’app (`data/backups`). Vengono conservati gli ultimi 10.",
         "### Ripristinare",
         "1. **Scegli un file di backup…** dal tuo computer, oppure sceglilo sotto **Backup sul server**.",
         "1. Controlla cosa contiene: la tabella confronta il backup con i dati attuali, e le cartelle che non esistono su questo server vengono segnalate.",
-        "1. Scegli **Solo configurazione** (impostazioni, preimpostazioni e regole di rinomina; processi e cronologia restano) oppure **Tutto** (anche processi e relativi log, cronologie, unioni e risultati qualità).",
+        "1. Scegli **Solo configurazione** (impostazioni, preimpostazioni e regole di rinomina; processi e cronologia restano) oppure **Tutto** (anche processi e relativi log, cronologie, unioni e risultati dei controlli qualità e nomi).",
         "1. Premi **Ripristina…** e conferma. Poi la pagina si ricarica.",
         "Prima di ogni ripristino i dati attuali vengono salvati sul server come **Prima di un ripristino**, quindi un ripristino si può annullare ripristinando quel backup.",
         "Un ripristino non avvia mai la coda. **Tutto** non si può ripristinare mentre è in corso una conversione, un’unione, un controllo qualità o un caricamento.",

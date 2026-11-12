@@ -65,6 +65,7 @@ test('backup: snapshot, inspect and restore the configuration only', async () =>
   assert.equal(info.manifest.versions.app.version, '9.9.9');
   assert.equal(info.counts.presets, 1);
   assert.equal(info.current.presets, 2);
+  assert.equal(info.counts.namingChecks, 0);
   assert.equal(info.logs, 1);
   assert.deepEqual(info.warnings, []);
 
