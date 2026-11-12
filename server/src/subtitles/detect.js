@@ -103,16 +103,26 @@ export async function findSidecars(videoPath, opts) {
  * [{ path, suffix }] where suffix is what follows the video's base name (".en.forced.srt").
  * names: the file names in the video's folder.
  */
-export function companionsOf(videoPath, names, { extensions = DEFAULT_SUBTITLE_EXTENSIONS, isVideo }) {
-  const dir = path.dirname(videoPath);
+export function companionsOf(videoPath, names, options) {
+  return companionsByVideo(path.dirname(videoPath), names, options).get(baseOf(path.basename(videoPath))) ?? [];
+}
+
+/**
+ * The companions of every video in one folder, from the folder's names, in one pass:
+ * Map(video base name → [{ path, suffix }]). Renaming many videos of a folder asks this once.
+ */
+export function companionsByVideo(dir, names, { extensions = DEFAULT_SUBTITLE_EXTENSIONS, isVideo }) {
   const exts = new Set([...extensions, ...(extensions.includes('idx') ? ['sub'] : [])]);
   const vbases = [...new Set(names.filter((n) => isVideo(n)).map(baseOf))];
-  const mine = baseOf(path.basename(videoPath));
-  const out = [];
+  const idxBases = new Set(names.filter((n) => extOf(n) === 'idx').map(baseOf));
+  const out = new Map();
   for (const n of names) {
     if (hidden(n) || isVideo(n) || !exts.has(extOf(n))) continue;
-    if (extOf(n) === 'sub' && !names.some((x) => extOf(x) === 'idx' && baseOf(x) === baseOf(n))) continue;
-    if (ownerOf(baseOf(n), vbases) === mine) out.push({ path: path.join(dir, n), suffix: n.slice(mine.length) });
+    if (extOf(n) === 'sub' && !idxBases.has(baseOf(n))) continue;
+    const owner = ownerOf(baseOf(n), vbases);
+    if (owner == null) continue;
+    if (!out.has(owner)) out.set(owner, []);
+    out.get(owner).push({ path: path.join(dir, n), suffix: n.slice(owner.length) });
   }
   return out;
 }

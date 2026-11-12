@@ -8,7 +8,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { badRequest } from '../errors.js';
 import { makeFileMatcher } from '../paths.js';
-import { companionsOf, findSidecars, scanFolder } from './detect.js';
+import { companionsByVideo, companionsOf, findSidecars, scanFolder } from './detect.js';
 import { langFromWord } from './languages.js';
 import { effectiveModes, handbrakeArgs, planSubtitles, targetName } from './plan.js';
 import {
@@ -80,6 +80,16 @@ export class Subtitles {
     if (!this.enabled()) return [];
     const names = await fs.readdir(path.dirname(videoPath)).catch(() => []);
     return companionsOf(videoPath, names, this.options());
+  }
+
+  /**
+   * The companions of every video in a folder: Map(video base name → [{ path, suffix }]).
+   * The folder is read once, however many of its videos are renamed.
+   */
+  async companionsInFolder(dir) {
+    if (!this.enabled()) return new Map();
+    const names = await fs.readdir(dir).catch(() => []);
+    return companionsByVideo(dir, names, this.options());
   }
 
   /** Every sidecar of a source video (for deleting it), with the .sub data of .idx files. */

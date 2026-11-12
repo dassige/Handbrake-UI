@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileTag, langFromWord, normLang, readTags } from '../src/subtitles/languages.js';
-import { companionsOf, findSidecars, ownerOf } from '../src/subtitles/detect.js';
+import { companionsByVideo, companionsOf, findSidecars, ownerOf } from '../src/subtitles/detect.js';
 import { applyEdits, decode, normalizeEdits, parse, serialize, toSrt } from '../src/subtitles/text.js';
 import {
   effectiveModes, handbrakeArgs, outputSubtitleLangs, planSubtitles, targetName,
@@ -96,6 +96,12 @@ test('subtitles: owners and companions', () => {
   const names = ['A.mkv', 'A.en.srt', 'A.en.idx', 'A.en.sub', 'A.sub', 'AB.mkv', 'AB.srt', 'A.nfo'];
   const list = companionsOf(path.join('/t', 'A.mkv'), names, { isVideo });
   assert.deepEqual(list.map((c) => c.suffix), ['.en.srt', '.en.idx', '.en.sub']);
+  // The whole folder at once (renaming many videos): the same answer for every video.
+  const all = companionsByVideo('/t', names, { isVideo });
+  assert.deepEqual([...all.keys()].sort(), ['A', 'AB']);
+  assert.deepEqual(all.get('A'), list);
+  assert.deepEqual(all.get('AB'), companionsOf(path.join('/t', 'AB.mkv'), names, { isVideo }));
+  assert.deepEqual(all.get('AB').map((c) => c.suffix), ['.srt']);
 });
 
 // ------------------------------------------------------------------ text

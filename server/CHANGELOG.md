@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.1.3] - 2026/11/12
+
+- perf: Rename previews big folders in seconds
+
+Previewing or renaming many videos of one folder read the folder once
+per video and compared every subtitle file with every video each time.
+Each folder is now read once and its subtitle files matched in one
+pass: 2000 episodes with subtitles went from over 10 minutes to under
+a second.
+
 ## [4.1.2] - 2026/11/12
 
 - feat: Naming check shows its progress and can be stopped

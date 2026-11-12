@@ -38,6 +38,11 @@ function splitName(fileName) {
 
 const joinName = (base, ext) => (ext ? `${base}.${ext}` : base);
 
+/** Runs fn on every item, a few at a time: folders are often on a network share. */
+async function eachLimited(items, fn, size = 32) {
+  for (let i = 0; i < items.length; i += size) await Promise.all(items.slice(i, i + size).map(fn));
+}
+
 function rowToRule(r) {
   return {
     id: r.id,
@@ -281,18 +286,19 @@ export class Renamer {
       r.warnings = [r.blocked, ...r.warnings];
     }
     await this.resolveCollisions(rows.filter((r) => !r.blocked));
-    // Subtitle files that will follow each renamed video.
+    // Subtitle files that will follow each renamed video (each folder is read once).
     const listed = new Set(rows.map((r) => r.path));
-    await Promise.all(rows.map(async (row) => {
-      const list = row.status === 'rename' ? await this.companionPairs(row, listed) : [];
+    const folders = new Map();
+    await eachLimited(rows, async (row) => {
+      const list = row.status === 'rename' ? await this.companionPairs(row, listed, folders) : [];
       row.companions = list.map((c) => ({ oldName: path.basename(c.from), newName: path.basename(c.to), error: c.error ?? null }));
-    }));
+    });
     // Date and size, for sorting the list in the web app.
-    await Promise.all(rows.map(async (row) => {
+    await eachLimited(rows, async (row) => {
       const st = await fs.stat(row.path).catch(() => null);
       row.mtime = st?.mtimeMs ?? null;
       row.size = st?.size ?? null;
-    }));
+    });
     return rows;
   }
 
@@ -353,9 +359,10 @@ export class Renamer {
     await this.resolveCollisions(rows);
     const pairs = rows.filter((r) => r.status === 'rename').map((r) => ({ from: r.path, to: path.join(r.dir, r.newName) }));
     const listed = new Set(rows.map((r) => r.path));
+    const folders = new Map();
     const skipped = [];
     for (const r of rows.filter((x) => x.status === 'rename')) {
-      for (const c of await this.companionPairs(r, listed)) {
+      for (const c of await this.companionPairs(r, listed, folders)) {
         if (c.error) skipped.push({ path: c.from, error: c.error });
         else pairs.push(c);
       }
@@ -417,11 +424,14 @@ export class Renamer {
   /**
    * The subtitle files named after a renamed video ("Old.en.srt" → "New.en.srt"), unless they are
    * in the batch themselves. A pair whose new name is taken by another file gets an error instead.
+   * folders caches each folder's companions for one preview or rename (Map: dir → Promise).
    */
-  async companionPairs(row, listed) {
+  async companionPairs(row, listed, folders = new Map()) {
     if (!this.subtitles) return [];
     const newBase = splitName(row.newName)[0];
-    const list = (await this.subtitles.companions(row.path)).filter((c) => !listed.has(c.path));
+    if (!folders.has(row.dir)) folders.set(row.dir, this.subtitles.companionsInFolder(row.dir));
+    const oldBase = row.oldName.slice(0, row.oldName.length - path.extname(row.oldName).length);
+    const list = ((await folders.get(row.dir)).get(oldBase) ?? []).filter((c) => !listed.has(c.path));
     const moving = new Set(list.map((c) => c.path.toLowerCase()));
     const out = [];
     for (const c of list) {
