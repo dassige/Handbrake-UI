@@ -900,6 +900,7 @@
         "Un `POST` JSON per ogni messaggio verso un URL: un nodo **Webhook** di n8n, un trigger webhook di Home Assistant, ntfy, Gotify… Aggiungine quanti ne servono (fino a 10) con **Aggiungi un webhook**; ognuno ha un nome, un interruttore on/off, il suo URL ed eventuali header aggiuntivi, per esempio `Authorization: Bearer …`, uno per riga.",
         "- Ogni webhook riceve **gli eventi scelti sopra**, oppure **solo questi eventi**: per esempio tutto a n8n, ma solo “la coda è terminata” a Home Assistant.",
         "- Il corpo contiene `event`, `title`, `message` (testo semplice), `url` (l’indirizzo dell’app, se impostato), `at` e `data` (i dettagli del processo o dell’esecuzione).",
+        "- **Segreto di firma** (facoltativo): ogni richiesta porta allora `X-EncForge-Signature: sha256=…`, l’HMAC-SHA256 del contenuto esatto con il segreto; chi la riceve calcola lo stesso valore per verificare che il messaggio arrivi da qui. Come la password della posta, non viene mai rimandato al browser. I messaggi dei lavori riportano `id` e `tag` del lavoro in `data`.",
         "### E-mail",
         "Inviata tramite il tuo server SMTP. Impostazioni tipiche: **STARTTLS** sulla porta 587, **TLS** sulla 465. Per Gmail e Outlook usa una **password per le app**, non quella normale.",
         "- La password è salvata sul server e non viene mai rimandata al browser; lascia vuota la casella per mantenerla.",

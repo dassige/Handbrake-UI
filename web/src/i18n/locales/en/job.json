@@ -85,6 +85,7 @@
     "title": "Files",
     "source": "Source",
     "output": "Output",
+    "tag": "Tag",
     "edit": "edit",
     "suffixNote": "(a suffix is added if the file exists when it starts)",
     "outputUpdated": "Output path updated",

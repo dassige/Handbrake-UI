@@ -97,6 +97,7 @@ export const schemas = [
       verifyStatus: { type: ['string', 'null'], description: 'State of the check of the converted file: running, or its result (e.g. ok, warning, error, skipped). null: not checked.' },
       verify: { type: ['object', 'null'], description: 'Result of the check: `status`, a list of `checks`, and for some results a `note`.' },
       origin: { type: ['string', 'null'], description: 'What added the job when not the user (e.g. a watch folder); null otherwise.' },
+      tag: { type: ['string', 'null'], description: 'The tag given when the job was added (e.g. an integration’s own reference); null when none. Kept by “convert again” and sent in notifications.' },
       subtitles: { type: ['array', 'null'], items: { $ref: 'JobSubtitleFile#' }, description: 'Subtitle files found next to the source; null until they have been looked for.' },
       subEmbed: { type: ['string', 'null'], enum: [...EMBED_MODES, null], description: 'This job’s own embed mode; null: follow the queue or Settings.' },
       subCopy: { type: ['string', 'null'], enum: [...COPY_MODES, null], description: 'This job’s own copy mode; null: follow the queue or Settings.' },
@@ -169,8 +170,17 @@ export const paths = {
   'GET /api/jobs': {
     operationId: 'listJobs',
     tags: ['Jobs'],
-    summary: 'All jobs and the queue state',
-    description: 'Running and paused jobs first, then queued ones in queue order, then finished ones, newest first.',
+    summary: 'Jobs and the queue state',
+    description: 'Running and paused jobs first, then queued ones in queue order, then finished ones, newest first. Without filters: every job still listed (cleared jobs are gone). Filters combine: e.g. `?tag=sonarr:1234&status=done,failed` tells whether an integration’s files are finished.',
+    querystring: {
+      type: 'object',
+      properties: {
+        status: { type: 'string', description: 'Comma-separated statuses: queued, running, paused, done, failed, cancelled.' },
+        tag: { type: 'string', description: 'Only jobs with exactly this tag.' },
+        since: { type: 'string', description: 'Milliseconds since 1970: only jobs added or finished at or after it (for polling).' },
+        limit: { type: 'string', description: 'At most this many jobs (1–10000), the first ones in the order above.' },
+      },
+    },
     response: {
       200: {
         type: 'object',
@@ -200,13 +210,16 @@ export const paths = {
     operationId: 'addJobs',
     tags: ['Jobs'],
     summary: 'Add files or folders to the queue',
-    description: 'Adds one job per video file. A folder adds the videos in it (and below it, when “recursive” is on in Settings). Paths must be inside the sources folders. Adding never starts the queue: use `POST /api/queue/start`. Files that were not added are listed in `skipped` with a `code`: `noVideoInFolder`, `notVideo`, `alreadyQueued` (queued or converting), `alreadyConverted` (done, when “skip converted” is on). A preset that is not given (or null) uses the default preset.',
+    description: 'Adds one job per video file. A folder adds the videos in it (and below it, when “recursive” is on in Settings). Paths must be inside the sources folders. Adding does not start the queue, unless `start` (waits for the conversion window, if one is set) or `startNow` (starts at once) is true. `tag` is kept with every job added, to find them later (`GET /api/jobs?tag=`) and to recognise them in notifications. Files that were not added are listed in `skipped` with a `code`: `noVideoInFolder`, `notVideo`, `alreadyQueued` (queued or converting), `alreadyConverted` (done, when “skip converted” is on). A preset that is not given (or null) uses the default preset.',
     body: {
       type: 'object',
       properties: {
         paths: { type: 'array', items: { type: 'string' }, description: 'Absolute paths of video files or folders.' },
         presetId: { type: ['integer', 'null'], description: 'Preset to convert with; null or missing: the default preset.' },
         position: positionProp,
+        tag: { type: ['string', 'null'], description: 'Free text up to 100 characters kept with each new job, e.g. `sonarr:1234`.' },
+        start: { type: ['boolean', 'null'], description: 'Also start the queue, as `POST /api/queue/start` does.' },
+        startNow: { type: ['boolean', 'null'], description: 'Also start the queue, even outside the conversion window.' },
       },
       required: ['paths'],
     },
@@ -215,6 +228,7 @@ export const paths = {
         type: 'object',
         properties: {
           added: { type: 'array', items: { type: 'integer' }, description: 'Ids of the new jobs.' },
+          queue: { $ref: 'QueueState#' },
           skipped: {
             type: 'array',
             items: {
@@ -471,10 +485,12 @@ schemas.push({
 
 export const examples = [
   { method: 'GET', url: '/api/jobs' },
+  { method: 'GET', url: '/api/jobs?status=done,failed&tag=sonarr:1234&since=1700000000000&limit=50' },
   { method: 'GET', url: '/api/jobs/1' },
   { method: 'GET', url: '/api/jobs/1/log' },
   { method: 'POST', url: '/api/jobs', body: { paths: ['/mnt/downloads/Film.mkv', '/mnt/downloads/Series'], presetId: 1, position: 'end' } },
   { method: 'POST', url: '/api/jobs', body: { paths: ['/mnt/downloads/Film.mkv'], presetId: null, position: 'next' } },
+  { method: 'POST', url: '/api/jobs', body: { paths: ['/mnt/downloads/Film.mkv'], tag: 'sonarr:1234', start: true } },
   { method: 'PATCH', url: '/api/jobs/1', body: { outputPath: '/mnt/converted/Film.mkv' } },
   { method: 'PATCH', url: '/api/jobs/1', body: { presetId: 2 } },
   { method: 'POST', url: '/api/jobs/reorder', body: { ids: [3, 1, 2] } },

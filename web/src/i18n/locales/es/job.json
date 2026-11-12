@@ -85,6 +85,7 @@
     "title": "Archivos",
     "source": "Origen",
     "output": "Salida",
+    "tag": "Etiqueta",
     "edit": "editar",
     "suffixNote": "(se añade un sufijo si el archivo ya existe cuando empieza)",
     "outputUpdated": "Ruta de salida actualizada",

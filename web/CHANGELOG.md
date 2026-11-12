@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.2.2] - 2026/11/13
+
+- feat: Job tags, job list filters, start on add and signed webhooks
+
+POST /api/jobs takes a tag, free text up to 100 characters such as an
+integration's own reference (radarr:1234). It is kept with every job
+added, copied by "Convert again", shown in the job details and sent in
+job notifications. start: true also starts the queue, as Start does
+(waiting for the conversion window, if any); startNow: true starts it
+even outside the window. The answer now includes the queue state.
+
+GET /api/jobs can be filtered by status (a comma-separated list), tag,
+since (added or finished at or after a time) and limit, so a client
+can poll for its own jobs.
+
+A webhook can have a signing secret: each request then carries
+X-EncForge-Signature: sha256=<HMAC-SHA256 of the body>, and every
+webhook request says its event in X-EncForge-Event. Like the e-mail
+password, the secret is never sent back to the browser. The API docs,
+the help and the README describe all of it in every language.
+
 ## [4.2.1] - 2026/11/13
 
 - feat: API documentation at /api/docs, with request validation

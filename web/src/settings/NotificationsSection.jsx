@@ -31,7 +31,7 @@ const EXAMPLE = `{
   "message": "…",
   "url": "http://…:8095",
   "at": "2026-11-10T21:04:11.000Z",
-  "data": { "source": "…", "output": "…", "error": "…" }
+  "data": { "id": 42, "tag": null, "source": "…", "output": "…", "error": "…" }
 }`;
 
 /** For a test: the unsaved settings, with the password only when one was typed. */
@@ -144,6 +144,29 @@ export function NotificationsSection({ draft, set, run }) {
               </Field>
               <Field label={t('settings.notifications.headers')} hint={t('settings.notifications.headersHint')}>
                 <textarea rows={2} value={h.headers} onChange={(e) => setHook(i, { headers: e.target.value })} spellCheck={false} className="mono" />
+              </Field>
+              <Field
+                label={t('settings.notifications.secret')}
+                hint={
+                  h.hasSecret && typeof h.secret !== 'string'
+                    ? rich('settings.notifications.secretSaved', {
+                      remove: (
+                        <button type="button" className="link" onClick={() => setHook(i, { secret: '', hasSecret: false })}>
+                          {t('settings.notifications.passwordRemove')}
+                        </button>
+                      ),
+                    })
+                    : rich('settings.notifications.secretHint')
+                }
+              >
+                <input
+                  type="password"
+                  value={h.secret ?? ''}
+                  placeholder={h.hasSecret ? '••••••••' : ''}
+                  autoComplete="new-password"
+                  maxLength={200}
+                  onChange={(e) => setHook(i, { secret: e.target.value })}
+                />
               </Field>
               <div className="set-radios hook-events">
                 <label className="radio">

@@ -239,6 +239,7 @@ export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSe
               </>
             )}
           </Row>
+          {job.tag && <Row label={t('job.files.tag')}><code className="path">{job.tag}</code></Row>}
           <Row label={t('job.files.sizes')}>
             {bytes(job.sourceSize)}
             {job.outputSize != null && <> → {bytes(job.outputSize)}{saved != null && ` ${saved >= 0 ? t('job.files.smaller', { percent: saved }) : t('job.files.larger', { percent: -saved })}`}</>}

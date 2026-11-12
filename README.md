@@ -153,7 +153,7 @@ the desktop app.
 
 **Everything else**
 
-- **Notifications:** a webhook (JSON POST, e.g. n8n or Home Assistant) and/or
+- **Notifications:** webhooks (JSON POST, e.g. n8n or Home Assistant; optionally signed) and/or
   e-mail over SMTP when the queue finishes, a conversion or check fails, a file
   is converted or a watch folder adds files. In the browser, the tab title
   shows progress and desktop notifications can be turned on.
@@ -667,6 +667,21 @@ Every request, with its parameters, answers and the access it needs, is
 described at `http://<server>:8095/api/docs` (Swagger UI; **Authorize** takes an
 API key) and, for client generators, at `/api/openapi.json` (OpenAPI 3.1).
 Both are public, also while login is on.
+
+For example, a download client's post-processing script can queue a file with
+its own reference as a tag, and start the queue:
+
+```bash
+curl -H "Authorization: Bearer ef_…" -H "Content-Type: application/json" \
+  -d '{"paths":["/mnt/downloads/Film.mkv"],"tag":"radarr:1234","start":true}' \
+  http://<server>:8095/api/jobs
+```
+
+`GET /api/jobs?tag=radarr:1234` then shows how it went (also `status`, `since`
+and `limit` filters). Or let EncForge tell you: notification webhooks carry the
+job's `id` and `tag`, and with a **signing secret** set on the webhook each
+request has `X-EncForge-Signature: sha256=…`, the HMAC-SHA256 of the body, to
+check that it came from EncForge.
 
 **Forgot the password?** Start the app with `DISABLE_LOGIN=true` (Docker: add it
 to `.env` and run `docker compose up -d`). Login is then off, and a new

@@ -85,6 +85,7 @@
     "title": "Dateien",
     "source": "Quelle",
     "output": "Ausgabe",
+    "tag": "Tag",
     "edit": "bearbeiten",
     "suffixNote": "(ein Suffix wird angehängt, wenn die Datei beim Start bereits existiert)",
     "outputUpdated": "Ausgabepfad aktualisiert",

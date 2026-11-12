@@ -117,6 +117,11 @@ export const schemas = [
                 headers: { type: 'string', description: 'One "Name: value" per line.' },
                 hasHeaders: { type: 'boolean', description: 'Only in answers.' },
                 events: { type: ['object', 'null'], description: 'null: use the general events.' },
+                secret: {
+                  type: 'string',
+                  description: 'Write only. Signs every request: header `X-EncForge-Signature: sha256=<hex>`, the HMAC-SHA256 of the exact request body with this secret. Not sent: the saved one is kept; "": removed.',
+                },
+                hasSecret: { type: 'boolean', description: 'Only in answers: a signing secret is set.' },
               },
             },
           },

@@ -184,7 +184,7 @@ test('notifications: the single webhook of older versions becomes the first in t
   const old = { events: { jobFailed: true }, webhook: { enabled: true, url: 'http://old/hook', headers: 'A: b' } };
   const v = normalizeNotifications(old);
   assert.deepEqual(v.webhooks, [
-    { id: 'webhook-1', name: 'Webhook', enabled: true, url: 'http://old/hook', headers: 'A: b', events: null },
+    { id: 'webhook-1', name: 'Webhook', enabled: true, url: 'http://old/hook', headers: 'A: b', events: null, secret: '' },
   ]);
   assert.equal('webhook' in v, false);
   // Empty old settings give an empty list.
@@ -430,4 +430,70 @@ test('about: the changelog is split into releases', async () => {
     { version: '1.3.1', date: '2026/11/10', notes: [] },
     { version: '1.3.0', date: '2026/11/10', notes: ['feat: backup and restore', 'tests'] },
   ]);
+});
+
+// ------------------------------------------------------------------ API clients: tags, filters, signed webhooks
+
+test('queue: a tag is kept with the jobs, copied by "convert again", and filters the list', async () => {
+  const t = await setup();
+  try {
+    for (const f of ['a.mkv', 'b.mkv', 'c.mkv']) await fs.writeFile(path.join(t.src, f), 'x');
+    const tagged = await t.queue.add({ paths: [path.join(t.src, 'a.mkv'), path.join(t.src, 'b.mkv')], tag: '  sonarr:42 ' });
+    const plain = await t.queue.add({ paths: [path.join(t.src, 'c.mkv')] });
+    assert.equal(t.queue.get(tagged.added[0]).tag, 'sonarr:42');
+    assert.equal(t.queue.get(plain.added[0]).tag, null);
+
+    assert.deepEqual(t.queue.list({ tag: 'sonarr:42' }).map((j) => j.id), tagged.added);
+    assert.equal(t.queue.list().length, 3);
+    assert.equal(t.queue.list({ statuses: ['done'] }).length, 0);
+    assert.equal(t.queue.list({ statuses: ['queued', 'done'] }).length, 3);
+    assert.deepEqual(t.queue.list({ limit: 1 }).map((j) => j.id), [tagged.added[0]], 'queue order, first only');
+    assert.equal(t.queue.list({ since: Date.now() + 60_000 }).length, 0);
+
+    t.queue.setRunning(true);
+    await until(() => t.settings.get('queueRunning') === false);
+    const again = await t.queue.convertAgain(tagged.added[0], {});
+    assert.equal(t.queue.get(again).tag, 'sonarr:42');
+    assert.equal(t.notes.find((n) => n.event === 'jobDone').data.tag, 'sonarr:42');
+    assert.equal(buildMessage('jobDone', t.queue.get(tagged.added[0])).data.tag, 'sonarr:42');
+
+    await assert.rejects(t.queue.add({ paths: [path.join(t.src, 'c.mkv')], tag: 'x'.repeat(101) }), /at most 100/);
+    await assert.rejects(t.queue.add({ paths: [path.join(t.src, 'c.mkv')], tag: 5 }), /tag must be text/);
+  } finally {
+    await t.done();
+  }
+});
+
+test('notifications: a webhook secret is kept like a password, never shown, and signs each request', async () => {
+  const saved = normalizeNotifications({ webhooks: [{ id: 'n8n', name: 'n8n', enabled: true, url: 'http://hook.local/n8n', secret: ' s3cret ' }] });
+  assert.equal(saved.webhooks[0].secret, 's3cret');
+  const view = publicNotifications(saved);
+  assert.equal(view.webhooks[0].secret, undefined);
+  assert.equal(view.webhooks[0].hasSecret, true);
+  // Sent back without a secret: kept. An empty string removes it.
+  assert.equal(normalizeNotifications(view, saved).webhooks[0].secret, 's3cret');
+  const cleared = normalizeNotifications({ ...view, webhooks: [{ ...view.webhooks[0], secret: '' }] }, saved);
+  assert.equal(cleared.webhooks[0].secret, '');
+
+  const calls = [];
+  const n = new Notifier({
+    settings: { get: () => ({ ...saved, events: { ...saved.events, jobDone: true } }) },
+    log: quiet,
+    fetch: async (url, opts) => {
+      calls.push(opts);
+      return { ok: true };
+    },
+  });
+  await n.notify('jobDone', { id: 7, tag: 'radarr:9', sourcePath: '/s/a.mkv', outputPath: '/o/a.mkv', status: 'done' });
+  const { headers, body } = calls[0];
+  const { createHmac } = await import('node:crypto');
+  assert.equal(headers['X-EncForge-Signature'], `sha256=${createHmac('sha256', 's3cret').update(body).digest('hex')}`);
+  assert.equal(headers['X-EncForge-Event'], 'jobDone');
+  assert.equal(JSON.parse(body).data.tag, 'radarr:9');
+
+  // Without a secret there is no signature.
+  calls.length = 0;
+  n.settings = { get: () => ({ ...cleared, events: { ...cleared.events, jobDone: true } }) };
+  await n.notify('jobDone', { id: 7, sourcePath: '/s/a.mkv', status: 'done' });
+  assert.equal(calls[0].headers['X-EncForge-Signature'], undefined);
 });

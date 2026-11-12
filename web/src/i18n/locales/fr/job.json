@@ -85,6 +85,7 @@
     "title": "Fichiers",
     "source": "Source",
     "output": "Sortie",
+    "tag": "Étiquette",
     "edit": "modifier",
     "suffixNote": "(un suffixe est ajouté si le fichier existe au démarrage)",
     "outputUpdated": "Chemin de sortie mis à jour",

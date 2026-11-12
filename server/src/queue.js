@@ -11,10 +11,21 @@ import { inWindow, nextWindowStart, windowEnd } from './schedule.js';
 
 const ACTIVE = ['running', 'paused'];
 const FINISHED = ['done', 'failed', 'cancelled'];
+export const JOB_STATUSES = ['queued', ...ACTIVE, ...FINISHED];
+export const MAX_TAG = 100;
+
+/** A job's tag: trimmed text up to MAX_TAG characters, or null. */
+export function cleanTag(tag) {
+  if (tag == null) return null;
+  if (typeof tag !== 'string') throw badRequest('tag must be text');
+  const t = tag.trim();
+  if (t.length > MAX_TAG) throw badRequest(`A tag can be at most ${MAX_TAG} characters`);
+  return t || null;
+}
 const LIST_COLUMNS = `id, status, phase, position, source_path, output_path, preset_id, preset_name,
   format, created_at, started_at, finished_at, paused_ms, progress, fps, avg_fps, eta, pass,
   pass_count, source_size, output_size, source_info, scan_error, exit_code, error, attempts, rename_note, verify, verify_status, origin,
-  subtitles, sub_embed, sub_copy, subtitle_result`;
+  subtitles, sub_embed, sub_copy, subtitle_result, tag`;
 
 // Pause/resume send SIGSTOP/SIGCONT. Windows has no such signals: Node would
 // terminate HandBrakeCLI instead, so pausing is turned off there.
@@ -57,6 +68,7 @@ function rowToJob(r) {
     subEmbed: r.sub_embed ?? null,
     subCopy: r.sub_copy ?? null,
     subtitleResult: r.subtitle_result ? JSON.parse(r.subtitle_result) : null,
+    tag: r.tag ?? null,
   };
 }
 
@@ -124,13 +136,34 @@ export class Queue {
 
   // ---------------------------------------------------------------- reads
 
-  list() {
+  /**
+   * Jobs: running first, then queued in queue order, then finished, newest first.
+   * Filters (all optional): statuses (list), tag (exact), since (ms: added or finished at or after it),
+   * limit (the first n in that order).
+   */
+  list({ statuses = null, tag = null, since = null, limit = null } = {}) {
+    const where = [];
+    const args = [];
+    if (statuses?.length) {
+      where.push(`status IN (${statuses.map(() => '?').join(', ')})`);
+      args.push(...statuses);
+    }
+    if (tag != null) {
+      where.push('tag = ?');
+      args.push(tag);
+    }
+    if (since != null) {
+      where.push('(created_at >= ? OR finished_at >= ?)');
+      args.push(since, since);
+    }
+    if (limit != null) args.push(limit);
     return this.db
-      .prepare(`SELECT ${LIST_COLUMNS} FROM jobs ORDER BY
+      .prepare(`SELECT ${LIST_COLUMNS} FROM jobs ${where.length ? `WHERE ${where.join(' AND ')}` : ''} ORDER BY
         CASE WHEN status IN ('running','paused') THEN 0 WHEN status = 'queued' THEN 1 ELSE 2 END,
         CASE WHEN status = 'queued' THEN position END,
-        COALESCE(finished_at, created_at) DESC`)
-      .all()
+        COALESCE(finished_at, created_at) DESC
+        ${limit != null ? 'LIMIT ?' : ''}`)
+      .all(...args)
       .map(rowToJob);
   }
 
@@ -251,8 +284,10 @@ export class Queue {
    * Adds files and folders (absolute paths under a source root).
    * Returns { added: [ids], skipped: [{ path, code, reason }] } (reason: English, code: for the web app).
    */
-  async add({ paths, presetId, position = 'end', origin = null }) {
+  /** tag: free text kept with every job added (cleanTag). */
+  async add({ paths, presetId, position = 'end', origin = null, tag = null }) {
     if (!Array.isArray(paths) || !paths.length) throw badRequest('Nothing to add');
+    tag = cleanTag(tag);
     const sourceRoots = this.settings.get('sourceRoots');
     const preset = this.presets.resolve(presetId);
     const format = preset.summary.format;
@@ -289,12 +324,12 @@ export class Queue {
       let pos = this.nextPosition(position, toAdd.length);
       const insert = this.db.prepare(
         `INSERT INTO jobs (status, position, source_path, output_path, preset_id, preset_name, preset_json,
-          format, created_at, source_size, origin) VALUES ('queued', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          format, created_at, source_size, origin, tag) VALUES ('queued', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       );
       return toAdd.map((f, i) => {
         const r = insert.run(
           pos++, f, plannedOutputPath(f, this.settings, format), preset.id, preset.name, preset.json,
-          format, Date.now(), sizes[i], origin,
+          format, Date.now(), sizes[i], origin, tag,
         );
         return Number(r.lastInsertRowid);
       });
@@ -407,7 +442,7 @@ export class Queue {
     this.tick();
   }
 
-  /** Creates a new job for the same source, optionally with another preset. */
+  /** Creates a new job for the same source (and tag), optionally with another preset. */
   async convertAgain(id, { presetId, position } = {}) {
     const job = this.get(id);
     const preset = presetId != null ? this.presets.get(presetId) : null;
@@ -416,11 +451,11 @@ export class Queue {
     const size = await fs.stat(job.sourcePath).then((s) => s.size, () => null);
     const r = this.db
       .prepare(`INSERT INTO jobs (status, position, source_path, output_path, preset_id, preset_name, preset_json,
-        format, created_at, source_size, source_info) VALUES ('queued', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        format, created_at, source_size, source_info, tag) VALUES ('queued', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
       .run(
         this.nextPosition(position, 1), job.sourcePath, plannedOutputPath(job.sourcePath, this.settings, format),
         preset ? preset.id : job.presetId, preset ? preset.name : job.presetName, presetJson, format, Date.now(),
-        size, job.sourceInfo ? JSON.stringify(job.sourceInfo) : null,
+        size, job.sourceInfo ? JSON.stringify(job.sourceInfo) : null, job.tag,
       );
     const newId = Number(r.lastInsertRowid);
     this.db

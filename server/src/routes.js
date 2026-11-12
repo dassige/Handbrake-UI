@@ -5,12 +5,31 @@ import { isHiddenName, makeFileMatcher, naturalCompare, resolveUnderAny } from '
 import { aboutInfo } from './about.js';
 import { hasScope } from './auth.js';
 import { redactNotifications } from './notify.js';
+import { JOB_STATUSES } from './queue.js';
 
 const id = (req) => {
   const n = Number(req.params.id);
   if (!Number.isInteger(n)) throw badRequest('Invalid id');
   return n;
 };
+
+/** GET /api/jobs filters from the query string. */
+function jobFilter(q) {
+  const statuses = q.status ? String(q.status).split(',').map((s) => s.trim()).filter(Boolean) : null;
+  for (const s of statuses ?? []) if (!JOB_STATUSES.includes(s)) throw badRequest(`status must be some of ${JOB_STATUSES.join(', ')}`);
+  const num = (v, name, min, max) => {
+    if (v == null || v === '') return null;
+    const n = Number(v);
+    if (!Number.isInteger(n) || n < min || n > max) throw badRequest(`${name} must be a whole number from ${min} to ${max}`);
+    return n;
+  };
+  return {
+    statuses,
+    tag: q.tag != null && q.tag !== '' ? String(q.tag) : null,
+    since: num(q.since, 'since', 0, Number.MAX_SAFE_INTEGER),
+    limit: num(q.limit, 'limit', 1, 10_000),
+  };
+}
 
 /** The browser and admin keys see all settings; other API keys get them without secrets. */
 const isAdmin = (req) => !req.auth || hasScope(req.auth.scope, 'admin');
@@ -180,7 +199,8 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
   });
 
   // ------------------------------------------------------------- jobs
-  app.get('/api/jobs', async () => ({ jobs: queue.list(), queue: queue.state() }));
+  // Query (all optional): status=queued,running · tag=<exact> · since=<ms> · limit=<n>.
+  app.get('/api/jobs', async (req) => ({ jobs: queue.list(jobFilter(req.query ?? {})), queue: queue.state() }));
   app.get('/api/jobs/:id', async (req) => queue.get(id(req)));
   app.get('/api/jobs/:id/log', async (req, reply) => {
     const jobId = id(req);
@@ -191,9 +211,13 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
     return text.length > max ? `… (first ${text.length - max} characters omitted)\n` + text.slice(-max) : text;
   });
 
+  // body: { paths, presetId?, position?, tag?, start?, startNow? }. start: also start the queue
+  // (waiting for the conversion window, if any); startNow: start it even outside the window.
   app.post('/api/jobs', async (req) => {
-    const { paths, presetId, position } = req.body ?? {};
-    return queue.add({ paths, presetId, position });
+    const { paths, presetId, position, tag, start, startNow } = req.body ?? {};
+    const result = await queue.add({ paths, presetId, position, tag });
+    if (start === true || startNow === true) queue.setRunning(true, { now: startNow === true });
+    return { ...result, queue: queue.state() };
   });
   app.patch('/api/jobs/:id', async (req) => queue.update(id(req), req.body ?? {}));
   app.post('/api/jobs/reorder', async (req) => {

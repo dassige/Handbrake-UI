@@ -206,6 +206,7 @@ const MIGRATIONS = [
   ['naming_checks', 'status', "TEXT NOT NULL DEFAULT 'done'"], // naming checks run in the background since 4.0
   ['naming_checks', 'finished_at', 'INTEGER'],
   ['naming_checks', 'error', 'TEXT'],
+  ['jobs', 'tag', 'TEXT'], // free text set by whoever added the job (an API client's reference), for filtering
 ];
 
 /**
@@ -232,6 +233,7 @@ export function openDb(file) {
     const cols = db.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
     if (!cols.includes(column)) db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
   }
+  db.exec('CREATE INDEX IF NOT EXISTS jobs_tag ON jobs(tag)');
   // Before 1.4 there was no history: start it from the finished jobs still listed.
   if (!hadHistory) backfillHistory(db);
   return db;

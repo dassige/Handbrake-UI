@@ -1,5 +1,6 @@
 // Notifications by webhook (n8n, Home Assistant…) and e-mail (SMTP).
 // notify() never throws: a delivery problem is logged and kept in recent().
+import { createHmac } from 'node:crypto';
 import path from 'node:path';
 import nodemailer from 'nodemailer';
 import { badRequest } from './errors.js';
@@ -11,7 +12,8 @@ export const DEFAULT_NOTIFICATIONS = {
   events: { queueFinished: true, jobFailed: true, checkFailed: true, jobDone: false, watchAdded: false, backupFailed: true },
   // Shown as a link in messages, e.g. http://my-server:8095
   appUrl: '',
-  // [{ id, name, enabled, url, headers, events }]; events null = the general list above.
+  // [{ id, name, enabled, url, headers, events, secret }]; events null = the general list above;
+  // secret: signs each request (X-EncForge-Signature), never sent back to the browser.
   webhooks: [],
   email: { enabled: false, host: '', port: 587, security: 'starttls', user: '', password: '', from: '', to: '' },
 };
@@ -20,6 +22,11 @@ const RECENT = 30;
 const TIMEOUT = 15_000;
 export const MAX_WEBHOOKS = 10;
 const WEBHOOK_ID = /^[\w-]{1,40}$/;
+const MAX_SECRET = 200;
+export const SIGNATURE_HEADER = 'X-EncForge-Signature';
+
+/** "sha256=<hex>": HMAC-SHA256 of the exact request body with the webhook's secret. */
+export const signBody = (secret, body) => `sha256=${createHmac('sha256', secret).update(body).digest('hex')}`;
 
 /** Fills missing keys with defaults (settings saved by older versions). */
 export function mergeNotifications(n) {
@@ -58,6 +65,7 @@ export function normalizeNotifications(n, previous) {
 
   if (v.webhooks.length > MAX_WEBHOOKS) throw badRequest(`At most ${MAX_WEBHOOKS} webhooks`);
   const ids = new Set();
+  const prevSecret = (id) => prev.webhooks.find((h) => h.id === id)?.secret ?? '';
   const webhooks = v.webhooks.map((w, i) => {
     let id = typeof w?.id === 'string' && WEBHOOK_ID.test(w.id) ? w.id : null;
     if (!id || ids.has(id)) for (let k = i + 1; !id || ids.has(id); k++) id = `webhook-${k}`;
@@ -69,7 +77,10 @@ export function normalizeNotifications(n, previous) {
       url: String(w?.url ?? '').trim(),
       headers: String(w?.headers ?? '').trim(),
       events: w?.events ? cleanEvents(w.events) : null,
+      // Like the e-mail password: not sent = keep the saved one ('' removes it).
+      secret: typeof w?.secret === 'string' ? w.secret.trim() : prevSecret(id),
     };
+    if (hook.secret.length > MAX_SECRET) throw badRequest(`${hook.name}: the signing secret can be at most ${MAX_SECRET} characters`);
     if (hook.url && !/^https?:\/\/\S+$/i.test(hook.url)) throw badRequest(`${hook.name}: the URL must start with http:// or https://`);
     if (hook.enabled && !hook.url) throw badRequest(`${hook.name}: enter the URL, or turn it off`);
     parseHeaders(hook.headers);
@@ -101,7 +112,8 @@ export function normalizeNotifications(n, previous) {
 /** The settings as the browser sees them: no password, only whether one is saved. */
 export function publicNotifications(n) {
   const { password, ...email } = n.email;
-  return { ...n, email: { ...email, hasPassword: !!password } };
+  const webhooks = n.webhooks.map(({ secret, ...w }) => ({ ...w, hasSecret: !!secret }));
+  return { ...n, webhooks, email: { ...email, hasPassword: !!password } };
 }
 
 /** For API keys below admin: webhook headers often hold tokens, so only whether there are any. */
@@ -149,7 +161,7 @@ export function buildMessage(event, data = {}) {
   const lines = [];
   let title;
   const job = (j) => ({
-    id: j.id, source: j.sourcePath, output: j.outputPath, preset: j.presetName, status: j.status,
+    id: j.id, tag: j.tag ?? null, source: j.sourcePath, output: j.outputPath, preset: j.presetName, status: j.status,
     sourceSize: j.sourceSize, outputSize: j.outputSize, encodeSeconds: encodeTime(j), verifyStatus: j.verifyStatus,
     error: j.error ?? null,
   });
@@ -296,10 +308,13 @@ export class Notifier {
       at: new Date().toISOString(),
       data: message.data,
     };
+    const raw = JSON.stringify(body);
+    const headers = { 'Content-Type': 'application/json', 'X-EncForge-Event': message.event, ...parseHeaders(w.headers) };
+    if (w.secret) headers[SIGNATURE_HEADER] = signBody(w.secret, raw);
     const res = await this.fetch(w.url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...parseHeaders(w.headers) },
-      body: JSON.stringify(body),
+      headers,
+      body: raw,
       signal: AbortSignal.timeout(TIMEOUT),
     });
     if (!res.ok) {

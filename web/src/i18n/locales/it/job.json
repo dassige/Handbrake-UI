@@ -85,6 +85,7 @@
     "title": "File",
     "source": "Sorgente",
     "output": "Destinazione",
+    "tag": "Etichetta",
     "edit": "modifica",
     "suffixNote": "(se il file esiste quando inizia, viene aggiunto un suffisso)",
     "outputUpdated": "Percorso di destinazione aggiornato",
