@@ -50,6 +50,7 @@
   "selected_one": "{count} sélectionnée",
   "selected_other": "{count} sélectionnées",
   "selectJob": "Sélectionner {name}",
+  "clearSelection": "Tout désélectionner",
   "removeSelected": "Retirer ({count})",
   "removeSelectedTitle": "Retirer les tâches sélectionnées de la liste (les fichiers ne sont pas touchés)",
   "removeDialog": {

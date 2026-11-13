@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.2.6] - 2026/11/13
+
+- feat: Clear selection button in the queue
+
+While jobs are selected, the bar above the queue has a "Clear
+selection" button that unchecks them all.
+
 ## [4.2.5] - 2026/11/13
 
 - feat: Select several jobs in the queue to replace or remove them

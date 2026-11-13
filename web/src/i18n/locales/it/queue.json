@@ -50,6 +50,7 @@
   "selected_one": "{count} selezionato",
   "selected_other": "{count} selezionati",
   "selectJob": "Seleziona {name}",
+  "clearSelection": "Annulla selezione",
   "removeSelected": "Togli ({count})",
   "removeSelectedTitle": "Togli i lavori selezionati dall’elenco (i file non vengono toccati)",
   "removeDialog": {

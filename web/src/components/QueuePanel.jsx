@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { CalendarClock, Clock, Combine, Replace, ShieldCheck, Trash2, Upload, Wand2 } from 'lucide-react';
+import { CalendarClock, Clock, Combine, Replace, ShieldCheck, Trash2, Upload, Wand2, X } from 'lucide-react';
 import { clockTime, humanDuration } from '../format.js';
 import { api } from '../api.js';
 import { DRAG_PATHS } from './SourceBrowser.jsx';
@@ -228,6 +228,11 @@ export function QueuePanel({
             />
             {chosen.length ? t('queue.selected', { count: chosen.length }) : t('common.selectAll')}
           </label>
+          {checked.size > 0 && (
+            <button className="btn ghost small" onClick={() => setChecked(new Set())}>
+              <X size={14} /> {t('queue.clearSelection')}
+            </button>
+          )}
           <div className="select-actions">
             {replaceable.length > 0 && (
               <button className="btn ghost small" title={t('queue.replaceAllTitle')} onClick={replaceChecked}>
