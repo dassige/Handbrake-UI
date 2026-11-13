@@ -132,6 +132,9 @@ the desktop app.
 - **Quality check:** reads every video in chosen folders with ffprobe and lists
   files with an old container or codec (AVI, DivX/Xvid, MPEG-2, WMV…), a low
   resolution or a low bitrate. Flagged files can be queued or exported as CSV.
+  Files queued from here can then **replace their originals**: the converted
+  file takes the original's name and folder, and the original is kept in a
+  folder chosen in Settings (or deleted).
 - **Merge:** joins converted files into one MKV with mkvmerge, without
   re-encoding. Chapters of each part are kept and moved to where the part
   starts. The merged file is checked like a conversion.

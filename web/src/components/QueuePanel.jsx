@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { CalendarClock, Clock, Combine, ShieldCheck, Trash2, Upload, Wand2 } from 'lucide-react';
+import { CalendarClock, Clock, Combine, Replace, ShieldCheck, Trash2, Upload, Wand2 } from 'lucide-react';
 import { clockTime, humanDuration } from '../format.js';
 import { api } from '../api.js';
 import { DRAG_PATHS } from './SourceBrowser.jsx';
@@ -8,6 +8,7 @@ import { Help } from '../help/Help.jsx';
 import { useDialogs } from './Dialogs.jsx';
 import { t } from '../i18n/index.js';
 import { QueueSubtitlesButton } from '../subtitles/QueueSubtitles.jsx';
+import { canReplace, isQualityJob, useReplaceOriginal } from './replaceOriginal.jsx';
 
 const FILTERS = [
   { key: 'all', labelKey: 'queue.filters.all', match: () => true },
@@ -16,6 +17,8 @@ const FILTERS = [
   { key: 'failed', labelKey: 'queue.filters.failed', match: (j) => ['failed', 'cancelled'].includes(j.status) },
   // Converted, but the check after conversion found problems (shown in red when there are any).
   { key: 'checkFailed', labelKey: 'queue.filters.checkFailed', match: (j) => j.status === 'done' && j.verifyStatus === 'error', alert: true },
+  // Added from the quality check, to replace their originals once converted.
+  { key: 'quality', labelKey: 'queue.filters.quality', match: isQualityJob, titleKey: 'queue.filters.qualityTitle' },
 ];
 
 export function QueuePanel({
@@ -23,6 +26,7 @@ export function QueuePanel({
   onDropPaths, onSelect, selectedId, run, onRename, onMerge, estimate, queueState,
 }) {
   const dialogs = useDialogs();
+  const replaceOriginals = useReplaceOriginal({ settings, run });
   const [filter, setFilter] = useState('all');
   const [dropActive, setDropActive] = useState(false);
   const [dragJob, setDragJob] = useState(null);
@@ -102,7 +106,7 @@ export function QueuePanel({
             key={f.key}
             className={`chip ${filter === f.key ? 'active' : ''} ${f.alert && counts[f.key] ? 'alert' : ''}`}
             onClick={() => setFilter(f.key)}
-            title={f.key === 'checkFailed' ? t('queue.filters.checkFailedTitle') : undefined}
+            title={f.key === 'checkFailed' ? t('queue.filters.checkFailedTitle') : f.titleKey ? t(f.titleKey) : undefined}
           >
             {t(f.labelKey)} <span className="chip-count">{counts[f.key]}</span>
           </button>
@@ -119,6 +123,11 @@ export function QueuePanel({
             disabled={visible.some((j) => j.verifyStatus === 'running')}
           >
             <ShieldCheck size={14} /> {t('queue.checkAllAgain')}
+          </button>
+        )}
+        {filter === 'quality' && visible.some(canReplace) && (
+          <button className="btn ghost small" title={t('queue.replaceAllTitle')} onClick={() => replaceOriginals(visible)}>
+            <Replace size={14} /> {t('queue.replaceAll', { count: visible.filter(canReplace).length })}
           </button>
         )}
         {filter === 'done' && counts.done > 0 && (

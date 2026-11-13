@@ -163,15 +163,16 @@ export default function App({ auth, onAuthChange }) {
     [onError, toasts],
   );
 
+  /** origin 'quality': from the quality check, to replace the originals once converted. */
   const addPaths = useCallback(
-    async (paths) => {
+    async (paths, { origin } = {}) => {
       if (!paths.length) return;
       if (!effectivePresetId) {
         toasts.error(t('app.add.noPreset'));
         switchView('presets');
         return;
       }
-      const r = await run(() => api.addJobs(paths, effectivePresetId, position));
+      const r = await run(() => api.addJobs(paths, effectivePresetId, position, origin));
       if (!r) return;
       // Skipped files grouped by their (translated) reason: "2 already converted, 1 not a video".
       const reasons = {};
@@ -392,7 +393,7 @@ export default function App({ auth, onAuthChange }) {
           changeTick={data.changeTick}
           run={run}
           onError={onError}
-          onAddToQueue={addPaths}
+          onAddToQueue={(paths) => addPaths(paths, { origin: 'quality' })}
           onOpenSettings={() => switchView('settings', 'quality')}
         />
       ) : view === 'naming' ? (

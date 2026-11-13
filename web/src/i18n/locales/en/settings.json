@@ -106,7 +106,13 @@
     "badAudioCodecs": "Old audio codecs",
     "badContainers": "Old containers (file extensions)",
     "flagInterlaced": "Flag interlaced video",
-    "applyHint": "Changes apply to existing results straight away; no new check is needed."
+    "applyHint": "Changes apply to existing results straight away; no new check is needed.",
+    "replaceTitle": "Replacing originals",
+    "replaceHint": "Files added to the queue from the quality check can replace their originals once converted: in the queue, use the Quality filter or a job’s details.",
+    "originalsFolder": "Folder for replaced originals",
+    "originalsFolderHint": "Empty: originals can only be deleted. A folder outside the sources folders, e.g. on the NAS; with Docker it must be inside the mounted media folder. Originals keep their path from the sources folder, e.g. <code>Films/Film.avi</code>.",
+    "originalsFolderPlaceholder": "e.g. /mnt/media/originals",
+    "originalsPickTitle": "Folder for replaced originals"
   },
   "renaming": {
     "title": "Renaming",

@@ -106,7 +106,13 @@
     "badAudioCodecs": "Códecs de audio antiguos",
     "badContainers": "Contenedores antiguos (extensiones de archivo)",
     "flagInterlaced": "Marcar el video entrelazado",
-    "applyHint": "Los cambios se aplican de inmediato a los resultados existentes; no hace falta una nueva comprobación."
+    "applyHint": "Los cambios se aplican de inmediato a los resultados existentes; no hace falta una nueva comprobación.",
+    "replaceTitle": "Reemplazo de originales",
+    "replaceHint": "Los archivos añadidos a la cola desde la comprobación de calidad pueden reemplazar sus originales una vez convertidos: en la cola, use el filtro Calidad o los detalles de un trabajo.",
+    "originalsFolder": "Carpeta para los originales reemplazados",
+    "originalsFolderHint": "Vacía: los originales solo se pueden eliminar. Una carpeta fuera de las carpetas de origen, p. ej., en el NAS; con Docker debe estar dentro de la carpeta multimedia montada. Los originales conservan su ruta desde la carpeta de origen, p. ej., <code>Peliculas/Pelicula.avi</code>.",
+    "originalsFolderPlaceholder": "p. ej., /mnt/media/originales",
+    "originalsPickTitle": "Carpeta para los originales reemplazados"
   },
   "renaming": {
     "title": "Renombrado",

@@ -167,6 +167,17 @@
     "tooManyAttempts": "Zu viele Fehlversuche: Warten Sie einige Minuten und versuchen Sie es erneut",
     "passwordTooShort": "Das Passwort muss mindestens 8 Zeichen haben",
     "passwordTooLong": "Das Passwort ist zu lang",
-    "noPassword": "Legen Sie zuerst ein Passwort fest"
+    "noPassword": "Legen Sie zuerst ein Passwort fest",
+    "notQuality": "Nur aus der Qualitätsprüfung hinzugefügte Aufträge ersetzen ihr Original",
+    "alreadyReplaced": "Das Original wurde bereits ersetzt",
+    "notDone": "Der Auftrag ist noch nicht konvertiert",
+    "checking": "Die konvertierte Datei wird geprüft: Warten Sie auf die Prüfung",
+    "checkFailed": "Die Prüfung nach der Konvertierung ist fehlgeschlagen: Das Original wird nicht ersetzt",
+    "noOutput": "Die konvertierte Datei ist nicht mehr da",
+    "outsideSources": "Das Original ist nicht mehr in einem Quellordner",
+    "protected": "Das Original liegt in einem geschützten Quellordner (Einstellungen → Ordner)",
+    "pending": "Das Original ist wieder in der Warteschlange oder wird konvertiert: Entfernen Sie es zuerst aus der Warteschlange",
+    "nameTaken": "Neben dem Original hat bereits eine andere Datei den neuen Namen",
+    "noBackupFolder": "Wählen Sie zuerst einen Ordner für Originale (Einstellungen → Qualitätsprüfung)"
   }
 }

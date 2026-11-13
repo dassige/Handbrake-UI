@@ -129,6 +129,7 @@ export const schemas = [
         },
       },
       backupSchedule: { type: 'object', description: 'Scheduled backups.' },
+      replaceBackupFolder: { type: 'string', description: 'Where “Replace original” keeps originals (quality check); "" = none, originals can only be deleted. Must exist, be writable and not be inside a sources folder.' },
       language: { type: 'string', enum: ['auto', 'en', 'it', 'de', 'fr', 'es'], description: 'Language of the web app; auto follows the browser.' },
     },
   },

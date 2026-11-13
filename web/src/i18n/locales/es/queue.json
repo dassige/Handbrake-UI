@@ -6,7 +6,9 @@
     "done": "Convertidos",
     "failed": "Con error / cancelados",
     "checkFailed": "Comprobación fallida",
-    "checkFailedTitle": "Archivos convertidos cuya comprobación tras la conversión ha fallado"
+    "checkFailedTitle": "Archivos convertidos cuya comprobación tras la conversión ha fallado",
+    "quality": "Calidad",
+    "qualityTitle": "Añadidos desde la comprobación de calidad, para reemplazar sus originales"
   },
   "preset": "Preajuste",
   "presetTitle": "Preajuste que se usa para los archivos que añade",
@@ -42,5 +44,7 @@
     "windowClosed": "Franja cerrada: el trabajo actual termina y el resto espera hasta {time}",
     "windowOpenUntil": "Franja abierta hasta {time}",
     "guessed": "(algunas duraciones son estimadas)"
-  }
+  },
+  "replaceAll": "Reemplazar originales ({count})",
+  "replaceAllTitle": "Reemplazar los originales de los archivos convertidos que aparecen aquí"
 }

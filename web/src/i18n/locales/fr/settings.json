@@ -106,7 +106,13 @@
     "badAudioCodecs": "Codecs audio anciens",
     "badContainers": "Conteneurs anciens (extensions de fichier)",
     "flagInterlaced": "Signaler les vidéos entrelacées",
-    "applyHint": "Les modifications s'appliquent immédiatement aux résultats existants ; aucun nouveau contrôle n'est nécessaire."
+    "applyHint": "Les modifications s'appliquent immédiatement aux résultats existants ; aucun nouveau contrôle n'est nécessaire.",
+    "replaceTitle": "Remplacement des originaux",
+    "replaceHint": "Les fichiers ajoutés à la file depuis le contrôle qualité peuvent remplacer leurs originaux une fois convertis : dans la file, utilisez le filtre Qualité ou les détails d’une tâche.",
+    "originalsFolder": "Dossier des originaux remplacés",
+    "originalsFolderHint": "Vide : les originaux ne peuvent qu’être supprimés. Un dossier hors des dossiers sources, p. ex. sur le NAS ; avec Docker, il doit se trouver dans le dossier multimédia monté. Les originaux gardent leur chemin depuis le dossier source, p. ex. <code>Films/Film.avi</code>.",
+    "originalsFolderPlaceholder": "p. ex. /mnt/media/originaux",
+    "originalsPickTitle": "Dossier des originaux remplacés"
   },
   "renaming": {
     "title": "Renommage",

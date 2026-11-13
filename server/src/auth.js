@@ -68,6 +68,8 @@ export const ADMIN_ROUTES = [
   'POST /api/rename/apply',
   'POST /api/rename/history/:id/undo',
   'POST /api/files/delete',
+  // Deletes or moves the original.
+  'POST /api/jobs/:id/replace-original',
   // A merge can remove its parts afterwards.
   'POST /api/merge',
   'GET /api/backup',

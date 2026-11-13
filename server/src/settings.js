@@ -11,6 +11,7 @@ import { DEFAULT_NOTIFICATIONS, mergeNotifications, normalizeNotifications, publ
 import { DEFAULT_SUBTITLE_EXTENSIONS, KNOWN_SUBTITLE_EXTENSIONS } from './subtitles/detect.js';
 import { COPY_MODES, DEFAULT_COPY, DEFAULT_EMBED, EMBED_MODES } from './subtitles/plan.js';
 import { validCodeset } from './subtitles/text.js';
+import { normalizeOriginalsFolder } from './replace.js';
 
 export const MAX_SOURCE_ROOTS = 20;
 
@@ -59,6 +60,8 @@ function defaults(config) {
     notifications: DEFAULT_NOTIFICATIONS,
     backupSchedule: DEFAULT_BACKUP_SCHEDULE,
     language: 'auto',
+    // Quality check → "Replace original": where originals are kept ('' = none, they can only be deleted).
+    replaceBackupFolder: '',
   };
 }
 
@@ -154,6 +157,7 @@ export class Settings {
     next.watch = await normalizeWatch(next.watch, next.sourceRoots);
     next.notifications = normalizeNotifications(next.notifications, this.values.notifications);
     next.backupSchedule = await normalizeBackupSchedule(next.backupSchedule);
+    next.replaceBackupFolder = await normalizeOriginalsFolder(next.replaceBackupFolder, next.sourceRoots);
     if (!OUTPUT_LAYOUTS.includes(next.outputLayout)) {
       throw badRequest(`outputLayout must be one of ${OUTPUT_LAYOUTS.join(', ')}`);
     }

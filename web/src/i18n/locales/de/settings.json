@@ -106,7 +106,13 @@
     "badAudioCodecs": "Alte Audiocodecs",
     "badContainers": "Alte Container (Dateiendungen)",
     "flagInterlaced": "Interlaced-Video markieren",
-    "applyHint": "Änderungen gelten sofort für vorhandene Ergebnisse; eine neue Prüfung ist nicht nötig."
+    "applyHint": "Änderungen gelten sofort für vorhandene Ergebnisse; eine neue Prüfung ist nicht nötig.",
+    "replaceTitle": "Originale ersetzen",
+    "replaceHint": "Aus der Qualitätsprüfung hinzugefügte Dateien können nach der Konvertierung ihre Originale ersetzen: in der Warteschlange über den Filter Qualität oder die Details eines Auftrags.",
+    "originalsFolder": "Ordner für ersetzte Originale",
+    "originalsFolderHint": "Leer: Originale können nur gelöscht werden. Ein Ordner außerhalb der Quellordner, z. B. auf dem NAS; mit Docker muss er im eingebundenen Medienordner liegen. Originale behalten ihren Pfad aus dem Quellordner, z. B. <code>Filme/Film.avi</code>.",
+    "originalsFolderPlaceholder": "z. B. /mnt/media/originale",
+    "originalsPickTitle": "Ordner für ersetzte Originale"
   },
   "renaming": {
     "title": "Umbenennen",

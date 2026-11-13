@@ -207,6 +207,7 @@ const MIGRATIONS = [
   ['naming_checks', 'finished_at', 'INTEGER'],
   ['naming_checks', 'error', 'TEXT'],
   ['jobs', 'tag', 'TEXT'], // free text set by whoever added the job (an API client's reference), for filtering
+  ['jobs', 'replaced', 'TEXT'], // JSON: the original was replaced by the converted file (replace.js)
 ];
 
 /**

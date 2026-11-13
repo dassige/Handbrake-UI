@@ -167,6 +167,17 @@
     "tooManyAttempts": "Troppi tentativi falliti: attendi qualche minuto e riprova",
     "passwordTooShort": "La password deve avere almeno 8 caratteri",
     "passwordTooLong": "La password è troppo lunga",
-    "noPassword": "Imposta prima una password"
+    "noPassword": "Imposta prima una password",
+    "notQuality": "Solo i lavori aggiunti dal controllo qualità sostituiscono il loro originale",
+    "alreadyReplaced": "L’originale è già stato sostituito",
+    "notDone": "Il lavoro non è ancora convertito",
+    "checking": "Il file convertito è in fase di controllo: attendi la fine del controllo",
+    "checkFailed": "Il controllo dopo la conversione è fallito: l’originale non viene sostituito",
+    "noOutput": "Il file convertito non c’è più",
+    "outsideSources": "L’originale non è più in una cartella sorgente",
+    "protected": "L’originale è in una cartella sorgente protetta (Impostazioni → Cartelle)",
+    "pending": "L’originale è di nuovo in coda o in conversione: toglilo prima dalla coda",
+    "nameTaken": "Un altro file ha già il nuovo nome accanto all’originale",
+    "noBackupFolder": "Scegli prima una cartella per gli originali (Impostazioni → Controllo qualità)"
   }
 }

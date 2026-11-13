@@ -167,6 +167,17 @@
     "tooManyAttempts": "Demasiados intentos fallidos: espere unos minutos y vuelva a intentarlo",
     "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
     "passwordTooLong": "La contraseña es demasiado larga",
-    "noPassword": "Establezca primero una contraseña"
+    "noPassword": "Establezca primero una contraseña",
+    "notQuality": "Solo los trabajos añadidos desde la comprobación de calidad reemplazan su original",
+    "alreadyReplaced": "El original ya se reemplazó",
+    "notDone": "El trabajo aún no está convertido",
+    "checking": "Se está comprobando el archivo convertido: espere a que termine la comprobación",
+    "checkFailed": "La comprobación tras la conversión falló: el original no se reemplaza",
+    "noOutput": "El archivo convertido ya no existe",
+    "outsideSources": "El original ya no está en una carpeta de origen",
+    "protected": "El original está en una carpeta de origen protegida (Ajustes → Carpetas)",
+    "pending": "El original vuelve a estar en la cola o convirtiéndose: quítelo primero de la cola",
+    "nameTaken": "Otro archivo ya tiene el nuevo nombre junto al original",
+    "noBackupFolder": "Elija primero una carpeta para los originales (Ajustes → Comprobación de calidad)"
   }
 }

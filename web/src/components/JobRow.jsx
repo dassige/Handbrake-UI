@@ -3,6 +3,7 @@ import { AlertTriangle, ArrowDown, ArrowDownToLine, ArrowUp, ArrowUpToLine, Capt
 import { api } from '../api.js';
 import { bytes, dirName, duration, elapsed, fileName, humanDuration, percent, ratio, relTo, ago } from '../format.js';
 import { StatusBadge, VerifyBadge } from './StatusBadge.jsx';
+import { ReplaceBadge } from './replaceOriginal.jsx';
 import { useDialogs } from './Dialogs.jsx';
 import { t } from '../i18n/index.js';
 import { renameNote } from '../i18n/serverText.js';
@@ -79,7 +80,8 @@ export function JobActions({ job, run, queueIndex = -1, labels = false, onRename
       {s === 'queued' && labels && btn({ icon: ArrowDown, label: t('job.actions.down'), title: t('job.actions.downTitle'), onClick: () => act('move', { where: 'down' }) })}
       {s === 'queued' && labels && btn({ icon: ArrowDownToLine, label: t('job.actions.moveBottom'), onClick: () => act('move', { where: 'bottom' }) })}
       {s === 'done' && onRename && btn({ icon: Wand2, label: t('common.rename'), title: t('job.actions.renameTitle'), onClick: () => onRename([job.outputPath]) })}
-      {s === 'done' && (
+      {/* Once its original was replaced, converting "again" would convert the converted file. */}
+      {s === 'done' && !job.replaced && (
         btn({ icon: RotateCcw, label: t('job.actions.again'), title: t('job.actions.againTitle'), onClick: () => act('again', { position: 'end' }) })
       )}
       {(s === 'failed' || s === 'cancelled') && (
@@ -170,6 +172,7 @@ export function JobRow({
         <div className="job-title">
           <StatusBadge status={job.status} phase={job.phase} />
           {job.status === 'done' && <VerifyBadge status={job.verifyStatus} />}
+          <ReplaceBadge job={job} />
           <span className="job-name" title={job.sourcePath}>{fileName(job.sourcePath)}</span>
           <SubtitleBadge job={job} settings={settings} />
         </div>

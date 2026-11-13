@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { CircleAlert, CircleCheck, CircleX, Copy, Download, FileText, Info, RotateCcw, ShieldCheck, X } from 'lucide-react';
+import { CircleAlert, CircleCheck, CircleX, Copy, Download, FileText, Info, Replace, RotateCcw, ShieldCheck, X } from 'lucide-react';
 import { api } from '../api.js';
 import { bytes, dateTime, duration, elapsed, fileName, percent, ratio } from '../format.js';
 import { Help } from '../help/Help.jsx';
 import { useEscape } from './Modal.jsx';
 import { StatusBadge, VerifyBadge } from './StatusBadge.jsx';
+import { ReplaceBadge, canReplace, isQualityJob, useReplaceOriginal } from './replaceOriginal.jsx';
 import { JobActions } from './JobRow.jsx';
 import { has, t } from '../i18n/index.js';
 import { checkDetail, checkLabel, checkNote, renameNote } from '../i18n/serverText.js';
@@ -81,6 +82,42 @@ function phaseText(job) {
   return has(`job.phases.${phase}`) ? t(`job.phases.${phase}`) : phase;
 }
 
+/** Jobs from the quality check: replacing the original with the converted file (replaceOriginal.jsx). */
+function ReplaceSection({ job, settings, run }) {
+  const replace = useReplaceOriginal({ settings, run });
+  const r = job.replaced;
+  return (
+    <section>
+      <SectionTitle help="quality.replace">{t('job.replace.section')}</SectionTitle>
+      {r ? (
+        <>
+          <Row label={t('job.replace.replacedAt')}>{dateTime(r.at)}</Row>
+          <Row label={t('job.replace.nowAt')}><code className="path">{r.path}</code></Row>
+          <Row label={t('job.replace.originalLabel')}>
+            {r.backup ? <code className="path">{r.backup}</code> : <span className="muted">{t('job.replace.deleted')}</span>}
+          </Row>
+          {r.warnings?.map((w) => <p key={w} className="warn-text">{w}</p>)}
+        </>
+      ) : job.status !== 'done' ? (
+        <p className="muted small">{t('job.replace.later')}</p>
+      ) : job.verifyStatus === 'error' ? (
+        <p className="warn-text">{t('job.replace.checkFailed')}</p>
+      ) : job.verifyStatus === 'running' ? (
+        <p className="muted small">{t('job.replace.checking')}</p>
+      ) : (
+        <>
+          <p className="muted small">{t('job.replace.ready')}</p>
+          <span>
+            <button className="btn small" onClick={() => replace([job])} disabled={!canReplace(job)}>
+              <Replace size={14} /> {t('job.replace.button')}
+            </button>
+          </span>
+        </>
+      )}
+    </section>
+  );
+}
+
 function CheckSection({ job, run }) {
   const v = job.verify;
   const checking = job.verifyStatus === 'running' || (job.status !== 'done' && job.phase === 'verifying');
@@ -155,6 +192,7 @@ export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSe
           <span className="badges">
             <StatusBadge status={job.status} phase={job.phase} />
             {job.status === 'done' && <VerifyBadge status={job.verifyStatus} />}
+            <ReplaceBadge job={job} />
           </span>
           <h2 title={job.sourcePath}>{fileName(job.sourcePath)}</h2>
         </div>
@@ -170,7 +208,7 @@ export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSe
             <JobActions job={job} run={run} queueIndex={queued ? 1 : -1} labels onRename={onRename} canPause={canPause} canConvertNow={canConvertNow} />
             <Help id="job.actions" />
           </span>
-          {!queued && !active && presets.length > 0 && (
+          {!queued && !active && !job.replaced && presets.length > 0 && (
             <label className="field-inline">
               <RotateCcw size={14} /> {t('job.drawer.convertAgainWith')}
               <select value="" onChange={(e) => e.target.value && convertAgain(Number(e.target.value))}>
@@ -195,6 +233,8 @@ export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSe
             <Row label={t('job.progress.pass')}>{job.passCount > 1 ? t('job.progress.passValue', { pass: job.pass, total: job.passCount }) : null}</Row>
           </section>
         )}
+
+        {isQualityJob(job) && <ReplaceSection job={job} settings={settings} run={run} />}
 
         {(job.status === 'done' || job.phase === 'verifying') && <CheckSection job={job} run={run} />}
 

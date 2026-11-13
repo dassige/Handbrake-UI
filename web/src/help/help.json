@@ -701,7 +701,8 @@
       "see": [
         "quality.issues",
         "settings.quality",
-        "quality.folders"
+        "quality.folders",
+        "quality.replace"
       ]
     },
     "quality.folders": {
@@ -1025,6 +1026,23 @@
       ],
       "see": [
         "settings.security"
+      ]
+    },
+    "quality.replace": {
+      "title": "Replacing originals",
+      "body": [
+        "Files added to the queue from the **Quality** check are marked **Replaces original** in the queue, and the **Quality** filter lists them. Once converted, the converted file can take the original’s place.",
+        "**Replace original…** in a job’s details does one; with the Quality filter, **Replace originals** does every converted one at once.",
+        "- The converted file goes into the original’s folder, with the original’s name and its own extension: `Film.avi` becomes `Film.mkv`.",
+        "- **Keep the original**: it is moved to the folder for replaced originals chosen in [Settings → Quality check](#settings.quality), under the same path as in its sources folder. **Delete the original**: it is gone for good. Without that folder, originals can only be deleted.",
+        "- Subtitle files copied next to the converted file go with it, named after the original. An original subtitle file with the same name goes with the original; the other ones stay.",
+        "Replacing is refused when the [check after conversion](#verify.overview) failed, the original is in a protected sources folder or queued again, or another file already has the new name. If a step fails, the steps before it are undone.",
+        "The folder for originals must be outside the sources folders, so watch folders and checks don’t pick the originals up. With Docker it must be inside the mounted media folder."
+      ],
+      "see": [
+        "quality.overview",
+        "settings.quality",
+        "verify.overview"
       ]
     }
   }

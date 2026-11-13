@@ -6,7 +6,9 @@
     "done": "Converties",
     "failed": "Échouées / annulées",
     "checkFailed": "Vérification échouée",
-    "checkFailedTitle": "Fichiers convertis dont la vérification après conversion a échoué"
+    "checkFailedTitle": "Fichiers convertis dont la vérification après conversion a échoué",
+    "quality": "Qualité",
+    "qualityTitle": "Ajoutés depuis le contrôle qualité, pour remplacer leurs originaux"
   },
   "preset": "Préréglage",
   "presetTitle": "Préréglage utilisé pour les fichiers que vous ajoutez",
@@ -42,5 +44,7 @@
     "windowClosed": "Plage fermée : la tâche en cours se termine, le reste attend jusqu'à {time}",
     "windowOpenUntil": "Plage ouverte jusqu'à {time}",
     "guessed": "(certaines durées estimées)"
-  }
+  },
+  "replaceAll": "Remplacer les originaux ({count})",
+  "replaceAllTitle": "Remplacer les originaux des fichiers convertis listés ici"
 }

@@ -31,6 +31,7 @@ import { Watcher } from './watch.js';
 import { registerAutomationRoutes } from './automationRoutes.js';
 import { BackupScheduler } from './backupSchedule.js';
 import { Subtitles } from './subtitles/service.js';
+import { Replacer } from './replace.js';
 import { Auth } from './auth.js';
 import { registerAuthRoutes } from './authRoutes.js';
 import { HttpError } from './errors.js';
@@ -82,6 +83,7 @@ const merger = new Merger({
   mkvmerge: config.mkvmerge, ffprobe: config.ffprobe,
 });
 const uploads = new Uploads({ db, settings, events, log: app.log });
+const replacer = new Replacer({ db, settings, queue, subtitles, events, log: app.log });
 const sourceFiles = new SourceFiles({ settings, queue, events, log: app.log, subtitles });
 const downloads = new Downloads({ settings, log: app.log, subtitles });
 const quality = new QualityScanner({ db, settings, verifier, events, queue, log: app.log });
@@ -108,7 +110,7 @@ await registerOpenApi(app, { version: version.app?.version ?? version.server?.ve
 // Per-request access logs are noise here (the UI polls); keep warnings and errors.
 await app.register(
   async (api) => {
-    registerRoutes(api, { settings, presets, queue, events, handbrake, renamer, watcher, backupScheduler, subtitles, version, dataDir: config.dataDir });
+    registerRoutes(api, { settings, presets, queue, events, handbrake, renamer, watcher, backupScheduler, subtitles, replacer, version, dataDir: config.dataDir });
     registerAuthRoutes(api, { auth, events });
     registerAutomationRoutes(api, { history, watcher, notifier });
     registerRenameRoutes(api, { renamer, naming });

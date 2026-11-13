@@ -6,6 +6,7 @@ import { aboutInfo } from './about.js';
 import { hasScope } from './auth.js';
 import { redactNotifications } from './notify.js';
 import { JOB_STATUSES } from './queue.js';
+import { REPLACE_ORIGIN } from './replace.js';
 
 const id = (req) => {
   const n = Number(req.params.id);
@@ -35,7 +36,7 @@ function jobFilter(q) {
 const isAdmin = (req) => !req.auth || hasScope(req.auth.scope, 'admin');
 const forViewer = (s) => ({ ...s, notifications: redactNotifications(s.notifications) });
 
-export function registerRoutes(app, { settings, presets, queue, events, handbrake, renamer, watcher, backupScheduler, subtitles, version, dataDir }) {
+export function registerRoutes(app, { settings, presets, queue, events, handbrake, renamer, watcher, backupScheduler, subtitles, replacer, version, dataDir }) {
   // ------------------------------------------------------------- status
   let hbInfo = null;
   app.get('/api/info', async () => {
@@ -211,11 +212,13 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
     return text.length > max ? `… (first ${text.length - max} characters omitted)\n` + text.slice(-max) : text;
   });
 
-  // body: { paths, presetId?, position?, tag?, start?, startNow? }. start: also start the queue
+  // body: { paths, presetId?, position?, tag?, origin?, start?, startNow? }. start: also start the queue
   // (waiting for the conversion window, if any); startNow: start it even outside the window.
+  // origin "quality": added from the quality check, to replace the original afterwards (replace.js).
   app.post('/api/jobs', async (req) => {
-    const { paths, presetId, position, tag, start, startNow } = req.body ?? {};
-    const result = await queue.add({ paths, presetId, position, tag });
+    const { paths, presetId, position, tag, origin, start, startNow } = req.body ?? {};
+    if (origin != null && origin !== REPLACE_ORIGIN) throw badRequest(`origin can only be ${REPLACE_ORIGIN}`);
+    const result = await queue.add({ paths, presetId, position, tag, origin: origin ?? null });
     if (start === true || startNow === true) queue.setRunning(true, { now: startNow === true });
     return { ...result, queue: queue.state() };
   });
@@ -246,6 +249,8 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
   action('verify', (jobId) => queue.verifyJob(jobId));
   // Converts this queued job alone while the queue is stopped.
   action('convert-now', (jobId) => queue.convertNow(jobId));
+  // A quality-check job: the converted file takes the original's place. body: { backup }.
+  action('replace-original', (jobId, body) => replacer.replace(jobId, { backup: body.backup === true }));
 
   // ------------------------------------------------------------- sidecar subtitles
   app.get('/api/jobs/:id/subtitles', async (req) => queue.subtitleInfo(id(req)));

@@ -6,7 +6,9 @@
     "done": "Converted",
     "failed": "Failed / cancelled",
     "checkFailed": "Check failed",
-    "checkFailedTitle": "Converted files whose check after conversion failed"
+    "checkFailedTitle": "Converted files whose check after conversion failed",
+    "quality": "Quality",
+    "qualityTitle": "Added from the quality check, to replace their originals"
   },
   "preset": "Preset",
   "presetTitle": "Preset used for files you add",
@@ -42,5 +44,7 @@
     "windowClosed": "Window closed: the current job finishes, the rest waits until {time}",
     "windowOpenUntil": "Window open until {time}",
     "guessed": "(some lengths guessed)"
-  }
+  },
+  "replaceAll": "Replace originals ({count})",
+  "replaceAllTitle": "Replace the originals of the converted files listed here"
 }

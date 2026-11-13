@@ -6,7 +6,9 @@
     "done": "Convertiti",
     "failed": "Non riusciti / annullati",
     "checkFailed": "Verifica non riuscita",
-    "checkFailedTitle": "File convertiti la cui verifica dopo la conversione non è riuscita"
+    "checkFailedTitle": "File convertiti la cui verifica dopo la conversione non è riuscita",
+    "quality": "Qualità",
+    "qualityTitle": "Aggiunti dal controllo qualità, per sostituire i loro originali"
   },
   "preset": "Preimpostazione",
   "presetTitle": "Preimpostazione usata per i file che aggiungi",
@@ -42,5 +44,7 @@
     "windowClosed": "Fascia oraria chiusa: il processo in corso termina, il resto attende fino a: {time}",
     "windowOpenUntil": "Fascia oraria aperta fino a: {time}",
     "guessed": "(alcune durate stimate)"
-  }
+  },
+  "replaceAll": "Sostituisci gli originali ({count})",
+  "replaceAllTitle": "Sostituisci gli originali dei file convertiti elencati qui"
 }

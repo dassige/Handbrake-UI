@@ -701,7 +701,8 @@
       "see": [
         "quality.issues",
         "settings.quality",
-        "quality.folders"
+        "quality.folders",
+        "quality.replace"
       ]
     },
     "quality.folders": {
@@ -1025,6 +1026,23 @@
       ],
       "see": [
         "settings.security"
+      ]
+    },
+    "quality.replace": {
+      "title": "Originale ersetzen",
+      "body": [
+        "Aus der **Qualitätsprüfung** in die Warteschlange gestellte Dateien sind dort als **Ersetzt Original** markiert, und der Filter **Qualität** listet sie auf. Nach der Konvertierung kann die konvertierte Datei den Platz des Originals einnehmen.",
+        "**Original ersetzen…** in den Details eines Auftrags ersetzt eines; mit dem Filter Qualität ersetzt **Originale ersetzen** alle konvertierten auf einmal.",
+        "- Die konvertierte Datei kommt in den Ordner des Originals, mit dem Namen des Originals und ihrer eigenen Endung: aus `Film.avi` wird `Film.mkv`.",
+        "- **Original behalten**: Es wird in den Ordner für ersetzte Originale verschoben, der unter [Einstellungen → Qualitätsprüfung](#settings.quality) gewählt ist, unter demselben Pfad wie im Quellordner. **Original löschen**: Es ist endgültig weg. Ohne diesen Ordner können Originale nur gelöscht werden.",
+        "- Neben die konvertierte Datei kopierte Untertiteldateien gehen mit ihr, benannt nach dem Original. Eine Original-Untertiteldatei mit demselben Namen geht mit dem Original; die anderen bleiben.",
+        "Das Ersetzen wird abgelehnt, wenn die [Prüfung nach der Konvertierung](#verify.overview) fehlgeschlagen ist, das Original in einem geschützten Quellordner liegt oder wieder in der Warteschlange ist, oder eine andere Datei schon den neuen Namen hat. Schlägt ein Schritt fehl, werden die vorherigen rückgängig gemacht.",
+        "Der Ordner für Originale muss außerhalb der Quellordner liegen, damit überwachte Ordner und Prüfungen die Originale nicht aufgreifen. Mit Docker muss er im eingebundenen Medienordner liegen."
+      ],
+      "see": [
+        "quality.overview",
+        "settings.quality",
+        "verify.overview"
       ]
     }
   }

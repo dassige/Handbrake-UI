@@ -6,7 +6,9 @@
     "done": "Konvertiert",
     "failed": "Fehlgeschlagen / abgebrochen",
     "checkFailed": "Prüfung fehlgeschlagen",
-    "checkFailedTitle": "Konvertierte Dateien, deren Prüfung nach der Konvertierung fehlgeschlagen ist"
+    "checkFailedTitle": "Konvertierte Dateien, deren Prüfung nach der Konvertierung fehlgeschlagen ist",
+    "quality": "Qualität",
+    "qualityTitle": "Aus der Qualitätsprüfung hinzugefügt, um ihre Originale zu ersetzen"
   },
   "preset": "Voreinstellung",
   "presetTitle": "Voreinstellung für Dateien, die Sie hinzufügen",
@@ -42,5 +44,7 @@
     "windowClosed": "Zeitfenster geschlossen: Der aktuelle Auftrag wird beendet, der Rest wartet bis {time}",
     "windowOpenUntil": "Zeitfenster offen bis {time}",
     "guessed": "(einige Längen geschätzt)"
-  }
+  },
+  "replaceAll": "Originale ersetzen ({count})",
+  "replaceAllTitle": "Die Originale der hier gelisteten konvertierten Dateien ersetzen"
 }

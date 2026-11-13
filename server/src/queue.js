@@ -25,7 +25,7 @@ export function cleanTag(tag) {
 const LIST_COLUMNS = `id, status, phase, position, source_path, output_path, preset_id, preset_name,
   format, created_at, started_at, finished_at, paused_ms, progress, fps, avg_fps, eta, pass,
   pass_count, source_size, output_size, source_info, scan_error, exit_code, error, attempts, rename_note, verify, verify_status, origin,
-  subtitles, sub_embed, sub_copy, subtitle_result, tag`;
+  subtitles, sub_embed, sub_copy, subtitle_result, tag, replaced`;
 
 // Pause/resume send SIGSTOP/SIGCONT. Windows has no such signals: Node would
 // terminate HandBrakeCLI instead, so pausing is turned off there.
@@ -69,6 +69,7 @@ function rowToJob(r) {
     subCopy: r.sub_copy ?? null,
     subtitleResult: r.subtitle_result ? JSON.parse(r.subtitle_result) : null,
     tag: r.tag ?? null,
+    replaced: r.replaced ? JSON.parse(r.replaced) : null,
   };
 }
 
@@ -432,6 +433,7 @@ export class Queue {
   retry(id) {
     const job = this.get(id);
     if (!FINISHED.includes(job.status)) throw conflict('Only finished jobs can be retried');
+    if (job.replaced) throw conflict('The original was replaced by the converted file');
     this.db
       .prepare(`UPDATE jobs SET status = 'queued', phase = NULL, position = ?, progress = 0, fps = NULL,
         avg_fps = NULL, eta = NULL, pass = NULL, pass_count = NULL, started_at = NULL, finished_at = NULL,
@@ -445,6 +447,7 @@ export class Queue {
   /** Creates a new job for the same source (and tag), optionally with another preset. */
   async convertAgain(id, { presetId, position } = {}) {
     const job = this.get(id);
+    if (job.replaced) throw conflict('The original was replaced by the converted file');
     const preset = presetId != null ? this.presets.get(presetId) : null;
     const presetJson = preset ? preset.json : this.db.prepare('SELECT preset_json FROM jobs WHERE id = ?').get(id).preset_json;
     const format = preset ? preset.summary.format : job.format;

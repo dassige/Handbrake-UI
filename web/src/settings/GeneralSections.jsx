@@ -1,5 +1,7 @@
-import { Lock, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { FolderSearch, Lock, Plus, Trash2 } from 'lucide-react';
 import { Card, Check, Field, ListInput, NumberInput } from './fields.jsx';
+import { FolderPicker } from '../components/FolderPicker.jsx';
 import { rootLabel } from '../roots.js';
 import { rich, t } from '../i18n/index.js';
 
@@ -171,8 +173,9 @@ const KBPS_CLASSES = [
   { id: 'uhd', label: '4K' },
 ];
 
-export function QualitySection({ draft, set }) {
+export function QualitySection({ draft, set, onError }) {
   const q = draft.quality;
+  const [picking, setPicking] = useState(false);
   const setQ = (k, v) => set('quality', { ...q, [k]: v });
   return (
     <>
@@ -217,6 +220,36 @@ export function QualitySection({ draft, set }) {
         </Field>
         <Check checked={q.flagInterlaced} onChange={(v) => setQ('flagInterlaced', v)}>{t('settings.quality.flagInterlaced')}</Check>
         <p className="set-hint">{t('settings.quality.applyHint')}</p>
+      </Card>
+      <Card title={t('settings.quality.replaceTitle')} help="quality.replace">
+        <p className="set-hint">{t('settings.quality.replaceHint')}</p>
+        <Field label={t('settings.quality.originalsFolder')} hint={rich('settings.quality.originalsFolderHint')}>
+          <div className="inline-form">
+            <input
+              value={draft.replaceBackupFolder ?? ''}
+              onChange={(e) => set('replaceBackupFolder', e.target.value)}
+              placeholder={t('settings.quality.originalsFolderPlaceholder')}
+              spellCheck={false}
+            />
+            <button type="button" className="btn small" onClick={() => setPicking(true)}>
+              <FolderSearch size={14} /> {t('settings.browse')}
+            </button>
+          </div>
+        </Field>
+        {picking && (
+          <FolderPicker
+            settings={draft}
+            title={t('settings.quality.originalsPickTitle')}
+            kind="any"
+            initial={draft.replaceBackupFolder || undefined}
+            onError={onError}
+            onClose={() => setPicking(false)}
+            onPick={(p) => {
+              set('replaceBackupFolder', p);
+              setPicking(false);
+            }}
+          />
+        )}
       </Card>
     </>
   );

@@ -41,7 +41,7 @@ export const SECTIONS = [
   {
     group: 'tools',
     items: [
-      { id: 'quality', icon: Gauge, keys: ['quality'], Component: QualitySection },
+      { id: 'quality', icon: Gauge, keys: ['quality', 'replaceBackupFolder'], Component: QualitySection },
       { id: 'renaming', icon: Wand2, keys: ['autoRename', 'autoRenameRuleId', 'renameSeparator'], Component: RenamingSection },
     ],
   },
@@ -69,6 +69,7 @@ function clean(key, value) {
     case 'protectedRoots':
       return value.map((p) => p.trim()).filter(Boolean);
     case 'targetRoot':
+    case 'replaceBackupFolder':
       return value.trim();
     case 'sourceNames':
       return Object.fromEntries(Object.entries(value ?? {}).map(([k, v]) => [k.trim(), v.trim()]).filter(([k, v]) => k && v));

@@ -106,7 +106,13 @@
     "badAudioCodecs": "Codec audio vecchi",
     "badContainers": "Contenitori vecchi (estensioni dei file)",
     "flagInterlaced": "Segnala i video interlacciati",
-    "applyHint": "Le modifiche valgono subito per i risultati esistenti; non serve un nuovo controllo."
+    "applyHint": "Le modifiche valgono subito per i risultati esistenti; non serve un nuovo controllo.",
+    "replaceTitle": "Sostituzione degli originali",
+    "replaceHint": "I file aggiunti alla coda dal controllo qualità possono sostituire i loro originali una volta convertiti: nella coda, usa il filtro Qualità o i dettagli di un lavoro.",
+    "originalsFolder": "Cartella per gli originali sostituiti",
+    "originalsFolderHint": "Vuota: gli originali possono solo essere eliminati. Una cartella fuori dalle cartelle sorgente, es. sul NAS; con Docker deve stare dentro la cartella multimediale montata. Gli originali mantengono il loro percorso dalla cartella sorgente, es. <code>Films/Film.avi</code>.",
+    "originalsFolderPlaceholder": "es. /mnt/media/originali",
+    "originalsPickTitle": "Cartella per gli originali sostituiti"
   },
   "renaming": {
     "title": "Rinomina",

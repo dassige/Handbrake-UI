@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.2.3] - 2026/11/13
+
+- feat: Replace originals with their conversions from the quality check
+
+Files added to the queue from the quality check are marked "Replaces
+original" in the queue, which gets a Quality filter. Once converted,
+"Replace original" (in a job's details, or for all of them with the
+filter) puts the converted file in the original's place: same folder
+and name, with the converted file's extension. The original is kept in
+the folder for replaced originals chosen in Settings → Quality check,
+under its path from the sources folder, or deleted. Subtitle copies
+next to the converted file go with it, named after the original; an
+original subtitle of the same name is kept with the original.
+
+Replacing is refused when the check after conversion failed, the
+original is protected or queued again, or another file already has the
+new name. The converted file is placed under a hidden name first and a
+failing step undoes the ones before it; moves between disks copy and
+remove the source last. Replaced jobs cannot be converted again. The
+help, the API docs and the README describe it in every language.
+
 ## [4.2.2] - 2026/11/13
 
 - feat: Job tags, job list filters, start on add and signed webhooks

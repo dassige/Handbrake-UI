@@ -68,7 +68,8 @@ export const api = {
   updatePreset: (id, body) => request('PUT', `/api/presets/${id}`, body),
 
   jobs: () => get('/api/jobs'),
-  addJobs: (paths, presetId, position) => post('/api/jobs', { paths, presetId, position }),
+  // origin 'quality': added from the quality check, to replace the original once converted.
+  addJobs: (paths, presetId, position, origin) => post('/api/jobs', { paths, presetId, position, origin }),
   updateJob: (id, patch) => request('PATCH', `/api/jobs/${id}`, patch),
   jobLog: (id) => get(`/api/jobs/${id}/log`),
   jobAction: (id, action, body) => post(`/api/jobs/${id}/${action}`, body),

@@ -167,6 +167,17 @@
     "tooManyAttempts": "Too many failed attempts: wait a few minutes and try again",
     "passwordTooShort": "The password must be at least 8 characters",
     "passwordTooLong": "The password is too long",
-    "noPassword": "Set a password first"
+    "noPassword": "Set a password first",
+    "notQuality": "Only jobs added from the quality check replace their original",
+    "alreadyReplaced": "The original was already replaced",
+    "notDone": "The job is not converted yet",
+    "checking": "The converted file is being checked: wait for the check",
+    "checkFailed": "The check after conversion failed: the original is not replaced",
+    "noOutput": "The converted file is gone",
+    "outsideSources": "The original is no longer in a sources folder",
+    "protected": "The original is in a protected sources folder (Settings → Folders)",
+    "pending": "The original is queued or converting again: remove it from the queue first",
+    "nameTaken": "Another file already has the new name next to the original",
+    "noBackupFolder": "Choose a folder for originals first (Settings → Quality check)"
   }
 }
