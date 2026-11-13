@@ -252,6 +252,16 @@ export function registerRoutes(app, { settings, presets, queue, events, handbrak
   // A quality-check job: the converted file takes the original's place. body: { backup }.
   action('replace-original', (jobId, body) => replacer.replace(jobId, { backup: body.backup === true }));
 
+  // ------------------------------------------------------------- replacing originals in the background
+  app.get('/api/replace', async () => replacer.state());
+  // body: { ids, backup }: adds the jobs to the list being worked through.
+  app.post('/api/replace', async (req) => replacer.add(req.body?.ids, { backup: req.body?.backup === true }));
+  app.post('/api/replace/stop', async () => replacer.stop());
+  app.delete('/api/replace', async () => {
+    replacer.clear();
+    return { ok: true };
+  });
+
   // ------------------------------------------------------------- sidecar subtitles
   app.get('/api/jobs/:id/subtitles', async (req) => queue.subtitleInfo(id(req)));
   // body: { embed?, copy? (null: follow the queue/Settings), files?: [{ path, include?, lang?, forced?, sdh?, edits? }] }

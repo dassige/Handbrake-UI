@@ -1033,7 +1033,7 @@
       "title": "Originale ersetzen",
       "body": [
         "Aus der **Qualitätsprüfung** in die Warteschlange gestellte Dateien sind dort als **Ersetzt Original** markiert, und der Filter **Qualität** listet sie auf. Nach der Konvertierung kann die konvertierte Datei den Platz des Originals einnehmen.",
-        "**Original ersetzen…** in den Details eines Auftrags ersetzt eines; mit dem Filter Qualität ersetzt **Originale ersetzen** alle konvertierten auf einmal.",
+        "**Original ersetzen…** in den Details eines Auftrags ersetzt eines; mit dem Filter Qualität ersetzt **Originale ersetzen** alle konvertierten auf einmal. Der Server arbeitet sie nacheinander ab, auch bei geschlossener Seite: Eine Leiste über der Warteschlange zeigt den Fortschritt, und **Nach diesem anhalten** stellt die Datei, die gerade kopiert wird, fertig und überspringt den Rest.",
         "- Die konvertierte Datei kommt in den Ordner des Originals, mit dem Namen des Originals und ihrer eigenen Endung: aus `Film.avi` wird `Film.mkv`.",
         "- **Original behalten**: Es wird in den Ordner für ersetzte Originale verschoben, der unter [Einstellungen → Qualitätsprüfung](#settings.quality) gewählt ist, unter demselben Pfad wie im Quellordner. **Original löschen**: Es ist endgültig weg. Ohne diesen Ordner können Originale nur gelöscht werden.",
         "- Neben die konvertierte Datei kopierte Untertiteldateien gehen mit ihr, benannt nach dem Original. Eine Original-Untertiteldatei mit demselben Namen geht mit dem Original; die anderen bleiben.",

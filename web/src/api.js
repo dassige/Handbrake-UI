@@ -100,6 +100,11 @@ export const api = {
   deleteFiles: (paths) => post('/api/files/delete', { paths }),
 
   downloadUrl: (path) => `/api/download?path=${encodeURIComponent(path)}`,
+  // Replacing originals in the background (server/src/replace.js)
+  replaceState: () => get('/api/replace'),
+  startReplace: (ids, backup) => post('/api/replace', { ids, backup }),
+  stopReplace: () => post('/api/replace/stop'),
+  clearReplace: () => request('DELETE', '/api/replace'),
   // The player (server/src/media.js)
   mediaInfo: (path) => get(`/api/media/info?path=${encodeURIComponent(path)}`),
   mediaFileUrl: (path) => `/api/media/file?path=${encodeURIComponent(path)}`,

@@ -162,6 +162,7 @@ naming.recover();
 await uploads.cleanup();
 setInterval(() => uploads.cleanup().catch((err) => app.log.warn(err.message)), 6 * 3600 * 1000).unref();
 await merger.recover();
+await replacer.recover().catch((err) => app.log.warn(`Replacing originals: ${err.message}`));
 await queue.recover();
 // Conversion window: checked every 30 s.
 queue.scheduleTick();

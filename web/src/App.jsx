@@ -449,6 +449,7 @@ export default function App({ auth, onAuthChange }) {
           onWatch={watchFolder}
         />
         <QueuePanel
+          replace={data.replace}
           jobs={jobs}
           presets={presets}
           presetId={effectivePresetId}
@@ -470,6 +471,7 @@ export default function App({ auth, onAuthChange }) {
 
       {selectedJob && (
         <JobDrawer
+          replace={data.replace}
           job={selectedJob}
           presets={presets}
           settings={settings}

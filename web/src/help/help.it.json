@@ -1033,7 +1033,7 @@
       "title": "Sostituire gli originali",
       "body": [
         "I file aggiunti alla coda dal controllo **Qualità** sono segnati **Sostituisce l’originale** nella coda, e il filtro **Qualità** li elenca. Una volta convertito, il file convertito può prendere il posto dell’originale.",
-        "**Sostituisci l’originale…** nei dettagli di un lavoro ne sostituisce uno; con il filtro Qualità, **Sostituisci gli originali** li sostituisce tutti quelli convertiti in una volta.",
+        "**Sostituisci l’originale…** nei dettagli di un lavoro ne sostituisce uno; con il filtro Qualità, **Sostituisci gli originali** li sostituisce tutti quelli convertiti in una volta. Il server li elabora uno alla volta, anche con la pagina chiusa: una barra sopra la coda mostra a che punto è, e **Ferma dopo questo** completa il file in copia e salta gli altri.",
         "- Il file convertito va nella cartella dell’originale, con il nome dell’originale e la propria estensione: `Film.avi` diventa `Film.mkv`.",
         "- **Mantieni l’originale**: viene spostato nella cartella per gli originali sostituiti scelta in [Impostazioni → Controllo qualità](#settings.quality), con lo stesso percorso che aveva nella cartella sorgente. **Elimina l’originale**: va perso definitivamente. Senza quella cartella, gli originali possono solo essere eliminati.",
         "- I file di sottotitoli copiati accanto al file convertito lo seguono, con il nome dell’originale. Un file di sottotitoli originale con lo stesso nome segue l’originale; gli altri restano.",

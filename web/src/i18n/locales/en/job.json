@@ -153,6 +153,17 @@
     "checkFailed": "The check after conversion failed, so the original cannot be replaced. Check the file again, or convert it again.",
     "checking": "Wait for the check after conversion to finish.",
     "ready": "The converted file can take the original’s place: same folder and name, with the converted file’s extension.",
-    "button": "Replace original…"
+    "button": "Replace original…",
+    "starting": "Starting…",
+    "step": {
+      "converted": "Copying the converted file…",
+      "original": "Keeping the original…"
+    },
+    "badgeWaiting": "Waiting to replace",
+    "badgeReplacing": "Replacing…",
+    "badgeReplacingPercent": "Replacing… {percent}",
+    "badgeFailed": "Replace failed",
+    "waiting": "Waiting its turn: the originals are replaced one at a time.",
+    "background": "The server replaces them one at a time, also with this page closed; the bar above the queue shows how far it is."
   }
 }

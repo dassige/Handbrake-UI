@@ -60,5 +60,20 @@
     "message_other": "The {count} jobs are taken off the list. Their files are not touched.",
     "skipped_one": "{count} converting job stays.",
     "skipped_other": "{count} converting jobs stay."
+  },
+  "replacing": {
+    "title": "Replacing originals: {done} of {total}",
+    "stop": "Stop after this one",
+    "stopping": "Stopping…",
+    "stopTitle": "Finish the file being replaced (a copy cannot be cut safely) and skip the rest",
+    "failedSoFar_one": "{count} failed so far",
+    "failedSoFar_other": "{count} failed so far",
+    "doneCount_one": "{count} original replaced",
+    "doneCount_other": "{count} originals replaced",
+    "failedCount_one": "{count} failed",
+    "failedCount_other": "{count} failed",
+    "skippedCount_one": "{count} skipped",
+    "skippedCount_other": "{count} skipped",
+    "dismiss": "Dismiss"
   }
 }

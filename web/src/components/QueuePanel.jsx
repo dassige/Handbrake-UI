@@ -8,7 +8,7 @@ import { Help } from '../help/Help.jsx';
 import { useDialogs } from './Dialogs.jsx';
 import { t } from '../i18n/index.js';
 import { QueueSubtitlesButton } from '../subtitles/QueueSubtitles.jsx';
-import { canReplace, isQualityJob, useReplaceOriginal } from './replaceOriginal.jsx';
+import { ReplaceProgress, canReplace, isQualityJob, replaceItemOf, useReplaceOriginal } from './replaceOriginal.jsx';
 
 const FILTERS = [
   { key: 'all', labelKey: 'queue.filters.all', match: () => true },
@@ -23,10 +23,10 @@ const FILTERS = [
 
 export function QueuePanel({
   jobs, presets, presetId, onPresetChange, position, onPositionChange, settings,
-  onDropPaths, onSelect, selectedId, run, onRename, onMerge, estimate, queueState,
+  onDropPaths, onSelect, selectedId, run, onRename, onMerge, estimate, queueState, replace = null,
 }) {
   const dialogs = useDialogs();
-  const replaceOriginals = useReplaceOriginal({ settings, run });
+  const replaceOriginals = useReplaceOriginal({ settings, run, replace });
   const [filter, setFilter] = useState('all');
   // Jobs picked with their checkboxes (or Ctrl/Shift-click), for Remove and Replace originals.
   const [checked, setChecked] = useState(() => new Set());
@@ -50,7 +50,7 @@ export function QueuePanel({
   const allChecked = visible.length > 0 && visible.every((j) => checked.has(j.id));
   // A converting job cannot be removed: it is left out, and stays picked.
   const removable = chosen.filter((j) => !['running', 'paused'].includes(j.status));
-  const replaceable = chosen.filter(canReplace);
+  const replaceable = chosen.filter((j) => canReplace(j, replace));
 
   /** Checkbox: picks or unpicks one job. */
   function toggleCheck(job) {
@@ -247,6 +247,7 @@ export function QueuePanel({
       )}
 
       <EstimateBar estimate={estimate} queue={queueState} />
+      <ReplaceProgress replace={replace} run={run} />
 
       <div className="job-list" onDragOver={(e) => dragJob != null && e.preventDefault()} onDrop={() => dragJob != null && reorderDrop(null)}>
         {visible.length === 0 && (
@@ -264,6 +265,7 @@ export function QueuePanel({
             onSelect={(e) => onRowClick(e, job)}
             checked={checked.has(job.id)}
             onCheck={() => toggleCheck(job)}
+            replaceItem={replaceItemOf(replace, job.id)}
             run={run}
             onRename={onRename}
             queueIndex={queuedIds.indexOf(job.id)}

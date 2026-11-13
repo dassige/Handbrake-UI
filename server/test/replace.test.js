@@ -8,11 +8,12 @@ import { openDb } from '../src/db.js';
 import { Settings } from '../src/settings.js';
 import { Queue } from '../src/queue.js';
 import { Subtitles } from '../src/subtitles/service.js';
-import { Replacer, destinationOf } from '../src/replace.js';
+import { Replacer, destinationOf, partName } from '../src/replace.js';
 
 const quiet = { info() {}, warn() {}, error() {} };
 
 async function setup({ rename } = {}) {
+  const emitted = [];
   const dir = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), 'encforge-replace-')));
   const src = path.join(dir, 'src');
   const out = path.join(dir, 'out');
@@ -21,10 +22,10 @@ async function setup({ rename } = {}) {
   for (const x of [src, out, originals, path.join(data, 'tmp'), path.join(data, 'logs')]) await fs.mkdir(x, { recursive: true });
   const db = openDb(':memory:');
   const settings = new Settings(db, { initialSourceRoot: src, initialTargetRoot: out });
-  const events = { emit() {} };
+  const events = { emit: (type, data) => emitted.push([type, data]) };
   const queue = new Queue({ db, settings, presets: {}, handbrake: {}, verifier: null, events, dataDir: data, log: quiet });
   const subtitles = new Subtitles({ settings, tmpDir: path.join(data, 'tmp'), log: quiet });
-  const replacer = new Replacer({ db, settings, queue, subtitles, events, log: quiet, ...(rename ? { rename } : {}) });
+  const replacer = new Replacer({ db, settings, queue, subtitles, events, log: quiet, progressEvery: 0, ...(rename ? { rename } : {}) });
   /** A converted job: files written, row inserted. */
   const job = async ({ source, output, origin = 'quality', verify = 'ok', status = 'done', original = 'original', converted = 'converted' }) => {
     await fs.mkdir(path.dirname(source), { recursive: true });
@@ -41,7 +42,7 @@ async function setup({ rename } = {}) {
     db.close();
     await fs.rm(dir, { recursive: true, force: true });
   };
-  return { dir, src, out, originals, db, settings, queue, replacer, job, read, there, done };
+  return { dir, src, out, originals, db, settings, queue, replacer, job, read, there, done, emitted };
 }
 
 test('replace: the converted file takes the original’s place; the original and its overwritten subtitle are kept', async () => {
@@ -215,6 +216,101 @@ test('replace: copies between shares never need fs.copyFile (it sets the mode, w
     assert.deepEqual(job.replaced.warnings, []);
   } finally {
     fsp.copyFile = original;
+    await t.done();
+  }
+});
+
+const settled = async (t) => {
+  const until = Date.now() + 5000;
+  while (t.replacer.state()?.running && Date.now() < until) await new Promise((r) => setTimeout(r, 5));
+  return t.replacer.state();
+};
+
+test('replace in the background: one at a time, with progress, a failure does not stop the rest', async () => {
+  const rename = async (from, to) => {
+    if (path.dirname(from) !== path.dirname(to)) throw Object.assign(new Error('cross-device'), { code: 'EXDEV' });
+    return fs.rename(from, to);
+  };
+  const t = await setup({ rename });
+  try {
+    await t.settings.update({ replaceBackupFolder: t.originals });
+    const big = 'x'.repeat(3 << 20); // copied in 1 MB chunks: several progress reports
+    const a = await t.job({ source: path.join(t.src, 'A.avi'), output: path.join(t.out, 'A.mkv'), converted: big });
+    const b = await t.job({ source: path.join(t.src, 'B.avi'), output: path.join(t.out, 'B.mkv'), verify: 'error' });
+    const c = await t.job({ source: path.join(t.src, 'C.avi'), output: path.join(t.out, 'C.mkv') });
+
+    const first = t.replacer.add([a, b, c], { backup: true });
+    assert.equal(first.running, true);
+    assert.deepEqual(first.items.map((i) => i.status), ['replacing', 'waiting', 'waiting']);
+    // Asked again while it runs: not added twice.
+    assert.equal(t.replacer.add([a, c], { backup: true }).items.length, 3);
+    assert.throws(() => t.replacer.clear(), /stop first/);
+
+    const end = await settled(t);
+    assert.equal(end.running, false);
+    assert.deepEqual(end.items.map((i) => i.status), ['done', 'failed', 'done']);
+    assert.equal(end.items[1].code, 'checkFailed');
+    assert.equal(await t.read(path.join(t.src, 'A.mkv')), big);
+    assert.equal(await t.read(path.join(t.src, 'C.mkv')), 'converted');
+
+    const progress = t.emitted.filter(([type, s]) => type === 'replace' && s?.current?.id === a && s.current.step).map(([, s]) => s.current);
+    assert.ok(progress.some((p) => p.step === 'converted' && p.total === big.length && p.done > 0 && p.done < p.total), 'part-way progress of the converted file');
+    assert.ok(progress.some((p) => p.step === 'original'), 'then the original going to the originals folder');
+
+    t.replacer.clear();
+    assert.equal(t.replacer.state(), null);
+    assert.throws(() => t.replacer.add([], {}), /Choose the jobs/);
+  } finally {
+    await t.done();
+  }
+});
+
+test('replace in the background: stop finishes the file being replaced and skips the rest', async () => {
+  let release;
+  const held = new Promise((r) => (release = r));
+  let first = true;
+  const rename = async (from, to) => {
+    if (first && to.endsWith('.encforge-part')) {
+      first = false;
+      await held;
+    }
+    return fs.rename(from, to);
+  };
+  const t = await setup({ rename });
+  try {
+    const ids = [];
+    for (const n of ['A', 'B', 'C']) ids.push(await t.job({ source: path.join(t.src, `${n}.avi`), output: path.join(t.out, `${n}.mkv`) }));
+    t.replacer.add(ids);
+    await new Promise((r) => setTimeout(r, 20));
+    assert.equal(t.replacer.stop().stopping, true);
+    release();
+    const end = await settled(t);
+    assert.deepEqual(end.items.map((i) => i.status), ['done', 'skipped', 'skipped']);
+    assert.equal(await t.read(path.join(t.src, 'A.mkv')), 'converted');
+    assert.equal(await t.read(path.join(t.src, 'B.avi')), 'original');
+    assert.throws(() => t.replacer.stop(), /Nothing is being replaced/);
+  } finally {
+    await t.done();
+  }
+});
+
+test('replace: after a restart, an unfinished copy is removed, or finishes the replace when the original had gone', async () => {
+  const t = await setup();
+  try {
+    const a = await t.job({ source: path.join(t.src, 'A.avi'), output: path.join(t.out, 'A.mkv') });
+    const b = await t.job({ source: path.join(t.src, 'B.avi'), output: path.join(t.out, 'B.mkv'), original: null });
+    const partA = partName(path.join(t.src, 'A.mkv'));
+    const partB = partName(path.join(t.src, 'B.mkv'));
+    await fs.writeFile(partA, 'half');
+    await fs.writeFile(partB, 'converted');
+    await t.replacer.recover();
+    assert.equal(await t.there(partA), false);
+    assert.equal(await t.read(path.join(t.src, 'A.avi')), 'original');
+    assert.equal(await t.there(path.join(t.src, 'A.mkv')), false);
+    assert.equal(await t.read(path.join(t.src, 'B.mkv')), 'converted');
+    assert.equal(await t.there(partB), false);
+    assert.ok(a && b);
+  } finally {
     await t.done();
   }
 });

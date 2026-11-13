@@ -191,6 +191,11 @@ export async function uniquePath(p) {
  * mode (fchmod), which NFS shares that map users to another owner (Synology) refuse with
  * EPERM, so the copy failed although the file could be written.
  */
-export async function copyBytes(from, to) {
-  await pipeline(createReadStream(from, { highWaterMark: 1 << 20 }), createWriteStream(to));
+export async function copyBytes(from, to, onProgress = null) {
+  const read = createReadStream(from, { highWaterMark: 1 << 20 });
+  if (onProgress) {
+    let done = 0;
+    read.on('data', (chunk) => onProgress((done += chunk.length)));
+  }
+  await pipeline(read, createWriteStream(to));
 }

@@ -1033,7 +1033,7 @@
       "title": "Remplacer les originaux",
       "body": [
         "Les fichiers ajoutés à la file depuis le contrôle **Qualité** y sont marqués **Remplace l’original**, et le filtre **Qualité** les liste. Une fois converti, le fichier converti peut prendre la place de l’original.",
-        "**Remplacer l’original…** dans les détails d’une tâche en remplace un ; avec le filtre Qualité, **Remplacer les originaux** remplace d’un coup tous ceux qui sont convertis.",
+        "**Remplacer l’original…** dans les détails d’une tâche en remplace un ; avec le filtre Qualité, **Remplacer les originaux** remplace d’un coup tous ceux qui sont convertis. Le serveur les traite un par un, même avec la page fermée : une barre au-dessus de la file montre l’avancement, et **Arrêter après celui-ci** termine le fichier en cours de copie et passe les autres.",
         "- Le fichier converti va dans le dossier de l’original, avec le nom de l’original et sa propre extension : `Film.avi` devient `Film.mkv`.",
         "- **Conserver l’original** : il est déplacé dans le dossier des originaux remplacés choisi dans [Paramètres → Contrôle qualité](#settings.quality), sous le même chemin que dans son dossier source. **Supprimer l’original** : il disparaît définitivement. Sans ce dossier, les originaux ne peuvent qu’être supprimés.",
         "- Les fichiers de sous-titres copiés à côté du fichier converti le suivent, nommés d’après l’original. Un fichier de sous-titres original de même nom suit l’original ; les autres restent.",

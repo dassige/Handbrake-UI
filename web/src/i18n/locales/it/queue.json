@@ -60,5 +60,20 @@
     "message_other": "I {count} lavori vengono tolti dall’elenco. I loro file non vengono toccati.",
     "skipped_one": "{count} lavoro in conversione resta.",
     "skipped_other": "{count} lavori in conversione restano."
+  },
+  "replacing": {
+    "title": "Sostituzione degli originali: {done} di {total}",
+    "stop": "Ferma dopo questo",
+    "stopping": "Arresto…",
+    "stopTitle": "Completa il file in sostituzione (una copia non si può interrompere in sicurezza) e salta gli altri",
+    "failedSoFar_one": "{count} fallito finora",
+    "failedSoFar_other": "{count} falliti finora",
+    "doneCount_one": "{count} originale sostituito",
+    "doneCount_other": "{count} originali sostituiti",
+    "failedCount_one": "{count} fallito",
+    "failedCount_other": "{count} falliti",
+    "skippedCount_one": "{count} saltato",
+    "skippedCount_other": "{count} saltati",
+    "dismiss": "Chiudi"
   }
 }

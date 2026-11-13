@@ -5,10 +5,10 @@ import { bytes, dateTime, duration, elapsed, fileName, percent, ratio } from '..
 import { Help } from '../help/Help.jsx';
 import { useEscape } from './Modal.jsx';
 import { StatusBadge, VerifyBadge } from './StatusBadge.jsx';
-import { ReplaceBadge, canReplace, isQualityJob, useReplaceOriginal } from './replaceOriginal.jsx';
+import { ReplaceBadge, ReplaceRowProgress, canReplace, isQualityJob, replaceItemOf, stepText, useReplaceOriginal } from './replaceOriginal.jsx';
 import { JobActions } from './JobRow.jsx';
 import { has, t } from '../i18n/index.js';
-import { checkDetail, checkLabel, checkNote, renameNote } from '../i18n/serverText.js';
+import { checkDetail, checkLabel, checkNote, errorText, renameNote } from '../i18n/serverText.js';
 import { JobSubtitles } from '../subtitles/JobSubtitles.jsx';
 import { startDownload } from '../download/useDownload.jsx';
 
@@ -83,8 +83,9 @@ function phaseText(job) {
 }
 
 /** Jobs from the quality check: replacing the original with the converted file (replaceOriginal.jsx). */
-function ReplaceSection({ job, settings, run }) {
-  const replace = useReplaceOriginal({ settings, run });
+function ReplaceSection({ job, settings, run, replaceState }) {
+  const replace = useReplaceOriginal({ settings, run, replace: replaceState });
+  const item = replaceItemOf(replaceState, job.id);
   const r = job.replaced;
   return (
     <section>
@@ -98,6 +99,13 @@ function ReplaceSection({ job, settings, run }) {
           </Row>
           {r.warnings?.map((w) => <p key={w} className="warn-text">{w}</p>)}
         </>
+      ) : item?.status === 'waiting' ? (
+        <p className="muted small">{t('job.replace.waiting')}</p>
+      ) : item?.status === 'replacing' ? (
+        <>
+          <p className="small">{stepText(item.current)}</p>
+          <ReplaceRowProgress item={item} />
+        </>
       ) : job.status !== 'done' ? (
         <p className="muted small">{t('job.replace.later')}</p>
       ) : job.verifyStatus === 'error' ? (
@@ -106,9 +114,10 @@ function ReplaceSection({ job, settings, run }) {
         <p className="muted small">{t('job.replace.checking')}</p>
       ) : (
         <>
+          {item?.status === 'failed' && <p className="text-bad small">{errorText({ message: item.error, code: item.code })}</p>}
           <p className="muted small">{t('job.replace.ready')}</p>
           <span>
-            <button className="btn small" onClick={() => replace([job])} disabled={!canReplace(job)}>
+            <button className="btn small" onClick={() => replace([job])} disabled={!canReplace(job, replaceState)}>
               <Replace size={14} /> {t('job.replace.button')}
             </button>
           </span>
@@ -165,7 +174,7 @@ function CheckSection({ job, run }) {
   );
 }
 
-export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSelect, canPause = true, canConvertNow = false }) {
+export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSelect, canPause = true, canConvertNow = false, replace = null }) {
   const [showLog, setShowLog] = useState(job.status === 'failed');
   const [outputEdit, setOutputEdit] = useState(null);
   const info = job.sourceInfo;
@@ -192,7 +201,7 @@ export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSe
           <span className="badges">
             <StatusBadge status={job.status} phase={job.phase} />
             {job.status === 'done' && <VerifyBadge status={job.verifyStatus} />}
-            <ReplaceBadge job={job} />
+            <ReplaceBadge job={job} item={replaceItemOf(replace, job.id)} />
           </span>
           <h2 title={job.sourcePath}>{fileName(job.sourcePath)}</h2>
         </div>
@@ -234,7 +243,7 @@ export function JobDrawer({ job, presets, settings, run, onRename, onClose, onSe
           </section>
         )}
 
-        {isQualityJob(job) && <ReplaceSection job={job} settings={settings} run={run} />}
+        {isQualityJob(job) && <ReplaceSection job={job} settings={settings} run={run} replaceState={replace} />}
 
         {(job.status === 'done' || job.phase === 'verifying') && <CheckSection job={job} run={run} />}
 

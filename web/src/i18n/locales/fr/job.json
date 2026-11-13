@@ -153,6 +153,17 @@
     "checkFailed": "Le contrôle après conversion a échoué : l’original ne peut donc pas être remplacé. Contrôlez à nouveau le fichier, ou convertissez-le à nouveau.",
     "checking": "Attendez la fin du contrôle après conversion.",
     "ready": "Le fichier converti peut prendre la place de l’original : même dossier et même nom, avec l’extension du fichier converti.",
-    "button": "Remplacer l’original…"
+    "button": "Remplacer l’original…",
+    "starting": "Démarrage…",
+    "step": {
+      "converted": "Copie du fichier converti…",
+      "original": "Conservation de l’original…"
+    },
+    "badgeWaiting": "En attente de remplacement",
+    "badgeReplacing": "Remplacement…",
+    "badgeReplacingPercent": "Remplacement… {percent}",
+    "badgeFailed": "Échec du remplacement",
+    "waiting": "Attend son tour : les originaux sont remplacés un par un.",
+    "background": "Le serveur les remplace un par un, même avec cette page fermée ; la barre au-dessus de la file montre l’avancement."
   }
 }

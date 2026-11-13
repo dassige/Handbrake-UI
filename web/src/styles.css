@@ -424,6 +424,18 @@ h2 .help-btn, h3 .help-btn, legend .help-btn { vertical-align: 2px; }
 .badge.verify { font-weight: 500; }
 .badge.replace { background: var(--info-soft); color: var(--info); display: inline-flex; align-items: center; gap: 3px; }
 .badge.replace.done { background: var(--good-soft); color: var(--good); }
+.badge.replace.waiting { background: var(--neutral-soft); color: var(--muted); }
+.badge.replace.running { background: var(--accent-soft); color: var(--accent); }
+.badge.replace.failed { background: var(--bad-soft); color: var(--bad); }
+.progress.replacing .bar { background: var(--info); }
+.progress.indeterminate .bar { opacity: 0.35; }
+.replace-progress { margin: 0 12px 8px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel-2); display: flex; flex-direction: column; gap: 6px; }
+.replace-progress.ok { border-color: var(--good); background: var(--good-soft); }
+.replace-progress.bad { border-color: var(--bad); background: var(--bad-soft); }
+.replace-progress-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.replace-progress-file { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.replace-progress p, .replace-failures { margin: 0; }
+.replace-failures { padding-left: 18px; font-size: 12.5px; }
 .drawer-head-tools, .row-inline { display: inline-flex; align-items: center; gap: 4px; }
 .check-summary { display: flex; align-items: center; gap: 10px; margin: 0 0 6px !important; }
 .checks { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 6px; }

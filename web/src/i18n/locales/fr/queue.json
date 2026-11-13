@@ -60,5 +60,20 @@
     "message_other": "Les {count} tâches sont retirées de la liste. Leurs fichiers ne sont pas touchés.",
     "skipped_one": "{count} tâche en cours de conversion reste.",
     "skipped_other": "{count} tâches en cours de conversion restent."
+  },
+  "replacing": {
+    "title": "Remplacement des originaux : {done} sur {total}",
+    "stop": "Arrêter après celui-ci",
+    "stopping": "Arrêt…",
+    "stopTitle": "Terminer le fichier en cours de remplacement (une copie ne peut pas être interrompue sans risque) et passer les autres",
+    "failedSoFar_one": "{count} échec jusqu’ici",
+    "failedSoFar_other": "{count} échecs jusqu’ici",
+    "doneCount_one": "{count} original remplacé",
+    "doneCount_other": "{count} originaux remplacés",
+    "failedCount_one": "{count} échec",
+    "failedCount_other": "{count} échecs",
+    "skippedCount_one": "{count} ignoré",
+    "skippedCount_other": "{count} ignorés",
+    "dismiss": "Fermer"
   }
 }

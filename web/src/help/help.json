@@ -1033,7 +1033,7 @@
       "title": "Replacing originals",
       "body": [
         "Files added to the queue from the **Quality** check are marked **Replaces original** in the queue, and the **Quality** filter lists them. Once converted, the converted file can take the original’s place.",
-        "**Replace original…** in a job’s details does one; with the Quality filter, **Replace originals** does every converted one at once.",
+        "**Replace original…** in a job’s details does one; with the Quality filter, **Replace originals** does every converted one at once. The server works through them one at a time, also with the page closed: a bar above the queue shows how far it is, and **Stop after this one** finishes the file being copied and skips the rest.",
         "- The converted file goes into the original’s folder, with the original’s name and its own extension: `Film.avi` becomes `Film.mkv`.",
         "- **Keep the original**: it is moved to the folder for replaced originals chosen in [Settings → Quality check](#settings.quality), under the same path as in its sources folder. **Delete the original**: it is gone for good. Without that folder, originals can only be deleted.",
         "- Subtitle files copied next to the converted file go with it, named after the original. An original subtitle file with the same name goes with the original; the other ones stay.",

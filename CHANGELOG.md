@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.3.2] - 2026/11/14
+
+- feat: Replace originals in the background, with progress
+
+"Replace originals" now hands the jobs to the server, which replaces
+them one at a time in the background, also with the page closed or
+reloaded. A bar above the queue shows which file is being replaced,
+the step (copying the converted file, keeping the original) and how
+far the copy is, then a summary with any failures until dismissed.
+Jobs show "Waiting to replace", "Replacing… 42%" with a bar, or "Replace
+failed" with the reason. "Stop after this one" finishes the file being
+copied and skips the rest. At start-up, a copy left unfinished by a
+restart is removed, or completes the replace when the original had
+already gone. New endpoints: GET/POST/DELETE /api/replace and POST
+/api/replace/stop; progress also comes as "replace" events.
+
 ## [4.3.1] - 2026/11/14
 
 - fix: Replacing originals failed with EPERM between NFS shares

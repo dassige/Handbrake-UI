@@ -60,5 +60,20 @@
     "message_other": "Die {count} Aufträge werden aus der Liste genommen. Ihre Dateien bleiben unberührt.",
     "skipped_one": "{count} laufender Auftrag bleibt.",
     "skipped_other": "{count} laufende Aufträge bleiben."
+  },
+  "replacing": {
+    "title": "Originale werden ersetzt: {done} von {total}",
+    "stop": "Nach diesem anhalten",
+    "stopping": "Wird angehalten…",
+    "stopTitle": "Die Datei, die gerade ersetzt wird, fertigstellen (eine Kopie lässt sich nicht sicher abbrechen) und den Rest überspringen",
+    "failedSoFar_one": "{count} bisher fehlgeschlagen",
+    "failedSoFar_other": "{count} bisher fehlgeschlagen",
+    "doneCount_one": "{count} Original ersetzt",
+    "doneCount_other": "{count} Originale ersetzt",
+    "failedCount_one": "{count} fehlgeschlagen",
+    "failedCount_other": "{count} fehlgeschlagen",
+    "skippedCount_one": "{count} übersprungen",
+    "skippedCount_other": "{count} übersprungen",
+    "dismiss": "Schließen"
   }
 }

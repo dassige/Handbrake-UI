@@ -3,7 +3,7 @@ import { AlertTriangle, CirclePlay, ArrowDown, ArrowDownToLine, ArrowUp, ArrowUp
 import { api } from '../api.js';
 import { bytes, dirName, duration, elapsed, fileName, humanDuration, percent, ratio, relTo, ago } from '../format.js';
 import { StatusBadge, VerifyBadge } from './StatusBadge.jsx';
-import { ReplaceBadge } from './replaceOriginal.jsx';
+import { ReplaceBadge, ReplaceRowProgress } from './replaceOriginal.jsx';
 import { useDialogs } from './Dialogs.jsx';
 import { t } from '../i18n/index.js';
 import { renameNote } from '../i18n/serverText.js';
@@ -126,7 +126,7 @@ function SubtitleBadge({ job, settings }) {
  * jobs at once); onSelect gets the click event, so Ctrl/Shift-click can pick instead.
  */
 export function JobRow({
-  job, settings, selected, onSelect, checked = false, onCheck, run, onRename, queueIndex, dropBefore,
+  job, settings, selected, onSelect, checked = false, onCheck, replaceItem = null, run, onRename, queueIndex, dropBefore,
   onJobDragStart, onJobDragEnd, onJobDragOver, onJobDrop, estimate, canPause, canConvertNow,
 }) {
   const active = job.status === 'running' || job.status === 'paused';
@@ -196,7 +196,7 @@ export function JobRow({
         <div className="job-title">
           <StatusBadge status={job.status} phase={job.phase} />
           {job.status === 'done' && <VerifyBadge status={job.verifyStatus} />}
-          <ReplaceBadge job={job} />
+          <ReplaceBadge job={job} item={replaceItem} />
           <span className="job-name" title={job.sourcePath}>{fileName(job.sourcePath)}</span>
           <SubtitleBadge job={job} settings={settings} />
         </div>
@@ -209,6 +209,7 @@ export function JobRow({
             <div className="bar" style={{ width: `${(job.progress ?? 0) * 100}%` }} />
           </div>
         )}
+        <ReplaceRowProgress item={replaceItem} />
         <div className={`job-meta ${job.status === 'failed' ? 'text-bad' : ''} ${job.renameNote ? 'has-note' : ''}`}>
           {meta.filter(Boolean).join(' · ')}
         </div>

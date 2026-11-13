@@ -50,9 +50,9 @@ export const partName = (to) => path.join(path.dirname(to), `.${path.basename(to
  * Moves a file, also between disks or shares: rename, or a copy of its bytes (under a hidden
  * name, then renamed) when rename cannot cross. A `to` that is already a hidden part name is
  * copied to directly. keepSource: after a copy, leave the source for the caller to remove.
- * Returns { copied }.
+ * onProgress(bytes): during a copy. Returns { copied }.
  */
-export async function moveFile(from, to, { keepSource = false, rename = fs.rename } = {}) {
+export async function moveFile(from, to, { keepSource = false, rename = fs.rename, onProgress = null } = {}) {
   try {
     await rename(from, to);
     return { copied: false };
@@ -61,7 +61,7 @@ export async function moveFile(from, to, { keepSource = false, rename = fs.renam
   }
   const part = to.endsWith(PART) ? to : partName(to);
   try {
-    await copyBytes(from, part);
+    await copyBytes(from, part, onProgress);
     if (part !== to) await fs.rename(part, to);
   } catch (err) {
     await fs.rm(part, { force: true }).catch(() => {});
@@ -71,11 +71,135 @@ export async function moveFile(from, to, { keepSource = false, rename = fs.renam
   return { copied: true };
 }
 
+/** How often progress goes out to the browsers (ms). */
+const PROGRESS_EVERY = 500;
+
 export class Replacer {
   /** rename: replaceable for tests (to act as if folders were on different disks). */
-  constructor({ db, settings, queue, subtitles = null, events, log, rename = fs.rename }) {
-    Object.assign(this, { db, settings, queue, subtitles, events, log, rename });
+  constructor({ db, settings, queue, subtitles = null, events, log, rename = fs.rename, progressEvery = PROGRESS_EVERY }) {
+    Object.assign(this, { db, settings, queue, subtitles, events, log, rename, progressEvery });
     this.busy = new Set();
+    // The originals being replaced in the background (one at a time): see add().
+    this.batch = null;
+    this.lastProgress = 0;
+  }
+
+  // ---------------------------------------------------------------- in the background
+
+  /**
+   * The list: { running, stopping, startedAt, finishedAt, items: [{ id, name, backup, status, error, code }],
+   * current: { id, step, done, total } | null }. status: waiting | replacing | done | failed | skipped.
+   * null when there is none (never started, or cleared).
+   */
+  state() {
+    const b = this.batch;
+    if (!b) return null;
+    return { ...b, items: b.items.map((i) => ({ ...i })), current: b.current && { ...b.current } };
+  }
+
+  emit() {
+    this.lastProgress = Date.now();
+    this.events.emit('replace', this.state());
+  }
+
+  /**
+   * Adds jobs to the list and starts working through it, one at a time, in the background (it
+   * goes on with no browser open). A job already waiting or being replaced is not added twice.
+   * Jobs that turn out not to be replaceable fail one by one, with the reason.
+   */
+  add(ids, { backup = false } = {}) {
+    if (!Array.isArray(ids) || !ids.length) throw badRequest('Choose the jobs whose originals to replace');
+    if (backup === true && !this.settings.get('replaceBackupFolder')) {
+      throw badRequest('Choose a folder for the originals first (Settings → Quality check)', 'noBackupFolder');
+    }
+    const jobs = ids.map((id) => this.queue.get(Number(id)));
+    if (!this.batch?.running) {
+      this.batch = { running: true, stopping: false, startedAt: Date.now(), finishedAt: null, items: [], current: null };
+    }
+    const pending = new Set(this.batch.items.filter((i) => ['waiting', 'replacing'].includes(i.status)).map((i) => i.id));
+    for (const job of jobs) {
+      if (pending.has(job.id)) continue;
+      pending.add(job.id);
+      this.batch.items.push({ id: job.id, name: path.basename(job.sourcePath), backup: backup === true, status: 'waiting', error: null, code: null });
+    }
+    this.emit();
+    this.work();
+    return this.state();
+  }
+
+  /** Finishes the file being replaced, and skips the rest. */
+  stop() {
+    if (!this.batch?.running) throw conflict('Nothing is being replaced');
+    this.batch.stopping = true;
+    this.emit();
+    return this.state();
+  }
+
+  /** Forgets a finished list (its summary in the app). */
+  clear() {
+    if (this.batch?.running) throw conflict('Originals are being replaced; stop first');
+    this.batch = null;
+    this.emit();
+  }
+
+  async work() {
+    if (this.working) return;
+    this.working = true;
+    const b = this.batch;
+    try {
+      for (let item = b.items.find((i) => i.status === 'waiting'); item && !b.stopping; item = b.items.find((i) => i.status === 'waiting')) {
+        item.status = 'replacing';
+        b.current = { id: item.id, step: null, done: 0, total: null };
+        this.emit();
+        try {
+          await this.replace(item.id, {
+            backup: item.backup,
+            onProgress: (p) => {
+              b.current = { id: item.id, ...p };
+              if (p.done === 0 || Date.now() - this.lastProgress >= this.progressEvery) this.emit();
+            },
+          });
+          item.status = 'done';
+        } catch (err) {
+          item.status = 'failed';
+          item.error = err.message;
+          item.code = err.errorCode ?? null;
+          this.log?.warn(`Replacing the original of job ${item.id} failed: ${err.message}`);
+        }
+        b.current = null;
+        this.emit();
+      }
+    } finally {
+      for (const i of b.items) if (i.status === 'waiting') i.status = 'skipped';
+      b.running = false;
+      b.stopping = false;
+      b.current = null;
+      b.finishedAt = Date.now();
+      this.working = false;
+      this.emit();
+    }
+  }
+
+  /**
+   * At start-up: a replace cut short by a restart may have left the converted file's hidden copy
+   * next to its original. With the original still there it is removed (nothing was replaced);
+   * without it, the original had already gone to the originals folder, so the copy takes its place.
+   */
+  async recover() {
+    const rows = this.db.prepare(`SELECT id FROM jobs WHERE origin = ? AND status = 'done' AND replaced IS NULL`).all(REPLACE_ORIGIN);
+    for (const { id } of rows) {
+      const job = this.queue.get(id);
+      const dest = destinationOf(job);
+      const part = partName(dest);
+      if (!(await exists(part))) continue;
+      if (await exists(job.sourcePath)) {
+        await fs.rm(part, { force: true }).catch(() => {});
+        this.log?.info(`Job ${id}: removed an unfinished copy left by a restart: ${part}`);
+      } else {
+        await fs.rename(part, dest).catch((err) => this.log?.warn(`Job ${id}: could not finish a replace cut short: ${err.message}`));
+        this.log?.warn(`Job ${id}: finished a replace cut short by a restart: ${dest}`);
+      }
+    }
   }
 
   /** Why this job's original cannot be replaced now, or null. */
@@ -103,19 +227,28 @@ export class Replacer {
 
   /**
    * Replaces the original of job id. backup: keep it in the originals folder (which must be set).
+   * onProgress({ step, done, total }) while files are copied: step 'converted' (the converted file
+   * to the original's folder) or 'original' (the original to the originals folder), in bytes.
    * Returns the updated job; its `replaced` says what happened.
    */
-  async replace(id, { backup = false } = {}) {
+  async replace(id, { backup = false, onProgress = null } = {}) {
     if (this.busy.has(id)) throw conflict('This original is being replaced already');
     this.busy.add(id);
     try {
-      return await this.run(this.queue.get(id), backup === true);
+      return await this.run(this.queue.get(id), backup === true, onProgress);
     } finally {
       this.busy.delete(id);
     }
   }
 
-  async run(job, backup) {
+  async run(job, backup, onProgress = null) {
+    const sizeOf = (p) => fs.stat(p).then((s) => s.size, () => null);
+    const progress = async (step, file) => {
+      if (!onProgress) return null;
+      const total = await sizeOf(file);
+      onProgress({ step, done: 0, total });
+      return (done) => onProgress({ step, done, total });
+    };
     const problem = await this.problem(job);
     if (problem) throw new HttpError(409, problem.reason, problem.code);
     const folder = this.settings.get('replaceBackupFolder');
@@ -133,14 +266,14 @@ export class Replacer {
 
     // 1. The converted file next to the original, under a hidden name.
     const part = partName(dest);
-    const moved = await moveFile(converted, part, { keepSource: true, rename: this.rename });
+    const moved = await moveFile(converted, part, { keepSource: true, rename: this.rename, onProgress: await progress('converted', converted) });
     const undoPart = () => (moved.copied ? fs.rm(part, { force: true }) : fs.rename(part, converted));
 
     // 2. The original into the originals folder.
     try {
       if (backupPath) {
         await fs.mkdir(path.dirname(backupPath), { recursive: true });
-        await moveFile(original, backupPath, { rename: this.rename });
+        await moveFile(original, backupPath, { rename: this.rename, onProgress: await progress('original', original) });
       }
     } catch (err) {
       await undoPart().catch((e) => this.log?.warn(`Job ${job.id}: could not undo: ${e.message}`));

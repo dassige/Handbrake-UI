@@ -179,6 +179,36 @@ const jobErrors = {
 const conflict = (what) => ({ 409: { description: what, $ref: 'Error#' } });
 const positionProp = { type: ['string', 'null'], description: '`next`: before the first queued job; anything else or empty: after the last one.' };
 
+schemas.push({
+  $id: 'ReplaceBatch',
+  type: 'object',
+  properties: {
+    running: { type: 'boolean' },
+    stopping: { type: 'boolean', description: 'Stop was asked: the file being replaced is finished, the rest skipped.' },
+    startedAt: { type: 'integer' },
+    finishedAt: { type: ['integer', 'null'] },
+    items: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer', description: 'The job.' },
+          name: { type: 'string', description: 'The original’s file name.' },
+          backup: { type: 'boolean' },
+          status: { type: 'string', enum: ['waiting', 'replacing', 'done', 'failed', 'skipped'] },
+          error: { type: ['string', 'null'] },
+          code: { type: ['string', 'null'], description: 'Why it failed, when known (as for replace-original).' },
+        },
+      },
+    },
+    current: {
+      type: ['object', 'null'],
+      description: 'The job being replaced: step `converted` (copying the converted file next to the original) or `original` (copying the original to the originals folder), with bytes done and total. A move within one disk is instant and reports no bytes.',
+      properties: { id: { type: 'integer' }, step: { type: ['string', 'null'] }, done: { type: 'integer' }, total: { type: ['integer', 'null'] } },
+    },
+  },
+});
+
 export const paths = {
   'GET /api/jobs': {
     operationId: 'listJobs',
@@ -386,6 +416,42 @@ export const paths = {
       ...conflict('Cannot be replaced now; see `code`.'),
     },
   },
+  'GET /api/replace': {
+    operationId: 'getReplaceProgress',
+    tags: ['Jobs'],
+    summary: 'Originals being replaced in the background',
+    description: 'The list started with `POST /api/replace`: each job’s status and, for the one being replaced, how far the copy is. Also sent as `replace` events on `/api/events`. null when there is none.',
+    response: { 200: { oneOf: [{ $ref: 'ReplaceBatch#' }, { type: 'null' }] } },
+  },
+  'POST /api/replace': {
+    operationId: 'replaceOriginals',
+    tags: ['Jobs'],
+    summary: 'Replace originals in the background',
+    description: 'Adds converted quality-check jobs to the list of originals to replace (see `POST /api/jobs/{id}/replace-original` for what replacing does). The server works through the list one job at a time, also with no browser open; a job already in the list is not added twice. Jobs that cannot be replaced fail one by one, with the reason and `code`.',
+    body: {
+      type: 'object',
+      properties: {
+        ids: { type: 'array', items: { type: 'integer' }, description: 'The jobs.' },
+        backup: { type: ['boolean', 'null'], description: 'Keep the originals in the originals folder (which must be set).' },
+      },
+      required: ['ids'],
+    },
+    response: { 200: { $ref: 'ReplaceBatch#' }, 400: { description: 'No jobs, or backup without an originals folder (code noBackupFolder).', $ref: 'Error#' }, 404: { description: 'No such job.', $ref: 'Error#' } },
+  },
+  'POST /api/replace/stop': {
+    operationId: 'stopReplacingOriginals',
+    tags: ['Jobs'],
+    summary: 'Stop after the original being replaced',
+    description: 'The file being replaced is finished (a copy cannot be cut safely); the jobs still waiting are skipped.',
+    response: { 200: { $ref: 'ReplaceBatch#' }, ...conflict('Nothing is being replaced.') },
+  },
+  'DELETE /api/replace': {
+    operationId: 'clearReplaceProgress',
+    tags: ['Jobs'],
+    summary: 'Forget a finished list',
+    description: 'Removes the summary of the last list (the app’s bar above the queue).',
+    response: { ...ok, ...conflict('Originals are being replaced; stop first.') },
+  },
   'GET /api/jobs/:id/subtitles': {
     operationId: 'getJobSubtitles',
     tags: ['Subtitles'],
@@ -537,6 +603,10 @@ export const examples = [
   { method: 'POST', url: '/api/jobs/1/verify', body: {} },
   { method: 'POST', url: '/api/jobs/1/convert-now', body: {} },
   { method: 'POST', url: '/api/jobs/1/replace-original', body: { backup: true } },
+  { method: 'GET', url: '/api/replace' },
+  { method: 'POST', url: '/api/replace', body: { ids: [1, 2, 3], backup: true } },
+  { method: 'POST', url: '/api/replace/stop', body: {} },
+  { method: 'DELETE', url: '/api/replace' },
   { method: 'POST', url: '/api/jobs/1/replace-original', body: { backup: false } },
   { method: 'POST', url: '/api/jobs', body: { paths: ['/mnt/downloads/Old film.avi'], presetId: 1, position: 'end', origin: 'quality' } },
   { method: 'GET', url: '/api/jobs/1/subtitles' },

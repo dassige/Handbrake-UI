@@ -153,6 +153,17 @@
     "checkFailed": "Il controllo dopo la conversione è fallito, quindi l’originale non può essere sostituito. Controlla di nuovo il file, o convertilo di nuovo.",
     "checking": "Attendi la fine del controllo dopo la conversione.",
     "ready": "Il file convertito può prendere il posto dell’originale: stessa cartella e stesso nome, con l’estensione del file convertito.",
-    "button": "Sostituisci l’originale…"
+    "button": "Sostituisci l’originale…",
+    "starting": "Avvio…",
+    "step": {
+      "converted": "Copia del file convertito…",
+      "original": "Conservazione dell’originale…"
+    },
+    "badgeWaiting": "In attesa di sostituzione",
+    "badgeReplacing": "Sostituzione…",
+    "badgeReplacingPercent": "Sostituzione… {percent}",
+    "badgeFailed": "Sostituzione fallita",
+    "waiting": "In attesa del suo turno: gli originali vengono sostituiti uno alla volta.",
+    "background": "Il server li sostituisce uno alla volta, anche con questa pagina chiusa; la barra sopra la coda mostra a che punto è."
   }
 }

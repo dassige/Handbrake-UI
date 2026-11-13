@@ -153,6 +153,17 @@
     "checkFailed": "Die Prüfung nach der Konvertierung ist fehlgeschlagen, daher kann das Original nicht ersetzt werden. Prüfen Sie die Datei erneut oder konvertieren Sie sie erneut.",
     "checking": "Warten Sie, bis die Prüfung nach der Konvertierung fertig ist.",
     "ready": "Die konvertierte Datei kann den Platz des Originals einnehmen: gleicher Ordner und Name, mit der Endung der konvertierten Datei.",
-    "button": "Original ersetzen…"
+    "button": "Original ersetzen…",
+    "starting": "Start…",
+    "step": {
+      "converted": "Konvertierte Datei wird kopiert…",
+      "original": "Original wird aufbewahrt…"
+    },
+    "badgeWaiting": "Wartet auf Ersetzen",
+    "badgeReplacing": "Wird ersetzt…",
+    "badgeReplacingPercent": "Wird ersetzt… {percent}",
+    "badgeFailed": "Ersetzen fehlgeschlagen",
+    "waiting": "Wartet, bis es an der Reihe ist: Die Originale werden nacheinander ersetzt.",
+    "background": "Der Server ersetzt sie nacheinander, auch wenn diese Seite geschlossen ist; die Leiste über der Warteschlange zeigt den Fortschritt."
   }
 }
