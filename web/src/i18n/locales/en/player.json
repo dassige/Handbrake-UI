@@ -1,0 +1,17 @@
+{
+  "play": "Play",
+  "playTitle": "Play this video",
+  "playJobTitle": "Play the original, or the converted file",
+  "label": "Video player",
+  "original": "Original",
+  "converted": "Converted",
+  "loading": "Reading the file…",
+  "failed": "The video could not be played.",
+  "position": "Position",
+  "audio": "Audio",
+  "track": "Track {n}",
+  "compat": "Compatible mode",
+  "compatTitle": "Converted while it plays: for formats this browser cannot play, or to choose the audio track",
+  "compatHint": "Converted while it plays: it may take a few seconds to start, and jumping with the bar above starts it again from there.",
+  "fellBack": "This browser cannot play the file as it is, so it is converted while it plays. Jump with the bar above."
+}

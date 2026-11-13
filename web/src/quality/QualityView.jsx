@@ -9,6 +9,7 @@ import { bytes, dateTime, dirName, duration, fileName, relTo } from '../format.j
 import { Help } from '../help/Help.jsx';
 import { intlLocale, rich, t } from '../i18n/index.js';
 import { qualityIssue } from '../i18n/serverText.js';
+import { PlayButton, usePlayer } from '../player/Player.jsx';
 import { rootLabel } from '../roots.js';
 import { compareNames, fileType, useRememberedSort } from '../sort.js';
 import { SortControl } from '../components/SortControl.jsx';
@@ -66,6 +67,7 @@ const scanError = (e) => (e === 'Interrupted by a restart' ? t('quality.interrup
 
 /** Finds old formats, low resolutions and low bitrates in the chosen folders. */
 export function QualityView({ settings, scans, tick, changeTick, run, onError, onAddToQueue, onOpenSettings }) {
+  const player = usePlayer();
   const dialogs = useDialogs();
   const [scanId, setScanId] = useState(null);
   const [scan, setScan] = useState(null);
@@ -337,6 +339,7 @@ export function QualityView({ settings, scans, tick, changeTick, run, onError, o
                           </td>
                           <td className="names">
                             <div className="q-name" title={f.path}>
+                              {player && <PlayButton onClick={() => player({ sources: [{ path: f.path }] })} />}
                               {fileName(f.path)}
                               {f.job && <StatusBadge status={f.job} />}
                             </div>

@@ -12,6 +12,7 @@ import { registerUploadRoutes } from '../src/uploadRoutes.js';
 import { registerQualityRoutes } from '../src/qualityRoutes.js';
 import { registerDownloadRoutes } from '../src/downloadRoutes.js';
 import { registerBackupRoutes } from '../src/backupRoutes.js';
+import { registerMediaRoutes } from '../src/mediaRoutes.js';
 
 // Stand-in for every service: any property or call gives itself back; not a promise.
 const stub = new Proxy(function stub() {}, {
@@ -34,7 +35,7 @@ async function makeApp() {
   await app.register(async (api) => {
     for (const register of [
       registerRoutes, registerAuthRoutes, registerAutomationRoutes, registerRenameRoutes, registerMergeRoutes,
-      registerUploadRoutes, registerQualityRoutes, registerDownloadRoutes, registerBackupRoutes,
+      registerUploadRoutes, registerQualityRoutes, registerDownloadRoutes, registerBackupRoutes, registerMediaRoutes,
     ]) register(api, deps);
   });
   await app.ready();

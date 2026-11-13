@@ -11,6 +11,7 @@ import { UploadDialog } from './upload/UploadDialog.jsx';
 import { UploadsPanel } from './upload/UploadsPanel.jsx';
 import { useUploads } from './upload/useUploads.js';
 import { Help, HelpProvider, HelpSearchButton } from './help/Help.jsx';
+import { PlayerProvider } from './player/Player.jsx';
 import { api } from './api.js';
 import { useLiveData } from './useLiveData.js';
 import { useAttention } from './attention.js';
@@ -269,6 +270,7 @@ export default function App({ auth, onAuthChange }) {
 
   return (
     <HelpProvider>
+    <PlayerProvider>
     <div className="app">
       <header className="topbar">
         <div className="brand">
@@ -493,6 +495,7 @@ export default function App({ auth, onAuthChange }) {
       <UploadsPanel uploads={uploads} />
       <Toasts toasts={toasts} />
     </div>
+    </PlayerProvider>
     </HelpProvider>
   );
 }

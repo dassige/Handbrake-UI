@@ -4,8 +4,9 @@ import * as core from './core.js';
 import * as jobs from './jobs.js';
 import * as tools from './tools.js';
 import * as files from './files.js';
+import * as media from './media.js';
 
-const AREAS = [auth, core, jobs, tools, files];
+const AREAS = [auth, core, jobs, tools, files, media];
 
 /** "METHOD /url" → docs entry. */
 export const DOCS = Object.assign({}, ...AREAS.map((a) => a.paths));

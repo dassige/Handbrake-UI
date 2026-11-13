@@ -1,0 +1,17 @@
+{
+  "play": "Abspielen",
+  "playTitle": "Dieses Video abspielen",
+  "playJobTitle": "Das Original oder die konvertierte Datei abspielen",
+  "label": "Videoplayer",
+  "original": "Original",
+  "converted": "Konvertiert",
+  "loading": "Datei wird gelesen…",
+  "failed": "Das Video konnte nicht abgespielt werden.",
+  "position": "Position",
+  "audio": "Audio",
+  "track": "Spur {n}",
+  "compat": "Kompatibler Modus",
+  "compatTitle": "Beim Abspielen konvertiert: für Formate, die dieser Browser nicht abspielt, oder um die Tonspur zu wählen",
+  "compatHint": "Beim Abspielen konvertiert: Der Start kann einige Sekunden dauern, und ein Sprung mit der Leiste oben startet es von dort neu.",
+  "fellBack": "Dieser Browser kann die Datei nicht direkt abspielen, daher wird sie beim Abspielen konvertiert. Springen Sie mit der Leiste oben."
+}

@@ -117,6 +117,10 @@ the desktop app.
   friendly name ("Downloads") shown instead of the path.
 - **Upload from your computer** in 32 MB chunks with automatic retries. An
   interrupted upload continues where it stopped.
+- **Play videos in the browser:** a play button in the folder lists, the quality
+  check results and the queue (original or converted file). Formats the browser
+  can't play (AVI, DivX, MPEG-2, WMV, AC3/DTS audio…) are converted on the fly
+  with ffmpeg, with a position bar to jump and a choice of audio track.
 - **Download to your computer:** single files with resume support, or folders
   and several files as one ZIP built on the fly (ZIP64 for files over 4 GB).
 - **Output layout:** `target/<source folder>/file`, show and season folders

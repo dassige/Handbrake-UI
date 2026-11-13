@@ -4,6 +4,7 @@ import { watchedFolder } from '../roots.js';
 import { api } from '../api.js';
 import { bytes, dateTime } from '../format.js';
 import { FolderBadges, StatusBadge } from './StatusBadge.jsx';
+import { PlayButton, isVideoName, usePlayer } from '../player/Player.jsx';
 import { Help } from '../help/Help.jsx';
 import { downloadTitle, useDownload } from '../download/useDownload.jsx';
 import { useDeleteFiles } from './useDeleteFiles.jsx';
@@ -65,6 +66,7 @@ export function SourceBrowser({
   settings, changeTick, onAdd, onError, root = 'source', title = t('sources.title'), addLabel, addTitle,
   hint = t('sources.hint'), help, onUpload, allowDelete, onNotice, onWatch, sortId = root,
 }) {
+  const player = usePlayer();
   const addText = addLabel ?? t('sources.addLabel');
   // Without addTitle, a custom addLabel is fitted into the English-style sentence (callers should pass addTitle).
   const rowAddTitle = addTitle ?? (addLabel ? t('sources.addTitleAction', { action: addLabel.toLowerCase() }) : t('sources.addTitle'));
@@ -353,6 +355,9 @@ export function SourceBrowser({
               <Eye size={14} className="watched-icon" aria-label={t('sources.watch.watchFolder')} title={t('sources.watch.watchFolder')} />
             )}
             <span className="file-meta">
+              {player && item.type === 'file' && isVideoName(settings, item.name) && (
+                <PlayButton className="row-play" onClick={() => player({ sources: [{ path: item.path }] })} />
+              )}
               <button
                 className="icon-btn row-download"
                 title={downloadTitle(item)}

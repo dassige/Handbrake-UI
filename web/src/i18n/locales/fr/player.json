@@ -1,0 +1,17 @@
+{
+  "play": "Lire",
+  "playTitle": "Lire cette vidéo",
+  "playJobTitle": "Lire l’original, ou le fichier converti",
+  "label": "Lecteur vidéo",
+  "original": "Original",
+  "converted": "Converti",
+  "loading": "Lecture du fichier…",
+  "failed": "La vidéo n’a pas pu être lue.",
+  "position": "Position",
+  "audio": "Audio",
+  "track": "Piste {n}",
+  "compat": "Mode compatible",
+  "compatTitle": "Converti pendant la lecture : pour les formats que ce navigateur ne lit pas, ou pour choisir la piste audio",
+  "compatHint": "Converti pendant la lecture : le démarrage peut prendre quelques secondes, et un saut avec la barre ci-dessus le relance à partir de là.",
+  "fellBack": "Ce navigateur ne peut pas lire le fichier tel quel : il est donc converti pendant la lecture. Sautez avec la barre ci-dessus."
+}

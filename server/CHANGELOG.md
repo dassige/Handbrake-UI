@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.3.0] - 2026/11/14
+
+- feat: Play videos in the browser
+
+A play button in the folder lists (sources and target), the quality
+check results and the queue opens a video in a player; for a queued
+or converted job it offers the original and, once converted, the
+converted file. Files the browser plays (MP4/WebM/MKV with H.264, VP9,
+AV1 or supported HEVC, and AAC/MP3/Opus audio) are played as they are,
+with seeking. Anything else (AVI, DivX, MPEG-2, WMV, AC3/DTS audio) is
+converted on the fly by ffmpeg to H.264/AAC at up to 1280 pixels wide,
+with a position bar to jump and a choice of audio track; the player
+switches to this mode by itself when the browser cannot play a file.
+
+Each stream's ffmpeg stops when the player stops reading, runs at the
+conversions' CPU priority, and at most 3 run at once. New endpoints:
+/api/media/info, /api/media/file and /api/media/stream (read access).
+The help, the API docs and the README describe it in every language.
+
 ## [4.2.4] - 2026/11/13
 
 - chore: Stop tracking server/data

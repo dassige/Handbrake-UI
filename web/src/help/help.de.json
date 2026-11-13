@@ -1045,6 +1045,21 @@
         "settings.quality",
         "verify.overview"
       ]
+    },
+    "player": {
+      "title": "Videos abspielen",
+      "body": [
+        "Die runde **Abspielen**-Schaltfläche öffnet ein Video in einem Player: in den Ordnerlisten (Quellen und Ziel), in den Ergebnissen der **Qualitätsprüfung** und in der Warteschlange. Bei einem Auftrag in der Warteschlange können Sie nach der Konvertierung zwischen **Original** und **Konvertiert** wechseln.",
+        "Browser spielen manche Formate selbst ab (MP4 und WebM mit H.264-, VP9- oder AV1-Video und AAC-, MP3- oder Opus-Ton; MKV in den meisten Browsern): Dann wird die Datei direkt abgespielt, und die übliche Leiste des Players springt überallhin.",
+        "Alles andere (AVI, DivX/Xvid, MPEG-2, WMV, AC3- oder DTS-Ton…) läuft im **kompatiblen Modus**: Der Server konvertiert es beim Abspielen, mit höchstens 1280 Pixeln Breite. Der Start dauert einige Sekunden; springen Sie mit der Leiste unter dem Bild, die die Konvertierung von dort neu startet.",
+        "- Der Player wechselt von selbst in den kompatiblen Modus, wenn der Browser eine Datei nicht abspielen kann.",
+        "- **Audio**: Bei mehreren Tonspuren wählen Sie eine aus (im kompatiblen Modus).",
+        "- Die Konvertierung endet, sobald der Player geschlossen wird oder lange pausiert, und läuft mit derselben niedrigen CPU-Priorität wie Konvertierungen."
+      ],
+      "see": [
+        "convert.sources",
+        "quality.overview"
+      ]
     }
   }
 }

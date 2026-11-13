@@ -1045,6 +1045,21 @@
         "settings.quality",
         "verify.overview"
       ]
+    },
+    "player": {
+      "title": "Riprodurre i video",
+      "body": [
+        "Il pulsante tondo **riproduci** apre un video in un lettore: negli elenchi delle cartelle (sorgente e destinazione), nei risultati del controllo **Qualità** e nella coda. Per un lavoro in coda puoi passare dall’**Originale** al file **Convertito**, una volta convertito.",
+        "I browser riproducono da soli alcuni formati (MP4 e WebM con video H.264, VP9 o AV1 e audio AAC, MP3 o Opus; MKV nella maggior parte dei browser): allora il file viene riprodotto così com’è, e la solita barra del lettore salta ovunque.",
+        "Tutto il resto (AVI, DivX/Xvid, MPEG-2, WMV, audio AC3 o DTS…) viene riprodotto in **modalità compatibile**: il server lo converte durante la riproduzione, fino a 1280 pixel di larghezza. Per partire servono alcuni secondi; salta con la barra sotto l’immagine, che fa ripartire la conversione da lì.",
+        "- Il lettore passa da solo alla modalità compatibile quando il browser non riesce a riprodurre un file.",
+        "- **Audio**: con più tracce audio, scegline una (in modalità compatibile).",
+        "- La conversione si ferma appena il lettore viene chiuso o resta in pausa a lungo, e gira con la stessa bassa priorità di CPU delle conversioni."
+      ],
+      "see": [
+        "convert.sources",
+        "quality.overview"
+      ]
     }
   }
 }

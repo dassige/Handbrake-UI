@@ -37,6 +37,7 @@ export const TAGS = [
   { name: 'Quality', description: 'Quality checks of existing video files.' },
   { name: 'Uploads', description: 'Uploading files into a sources folder, in chunks.' },
   { name: 'Downloads', description: 'Downloading files and folders (as ZIP).' },
+  { name: 'Media', description: 'Playing video files: their details, the file itself, or a stream any browser can play.' },
   { name: 'Backup', description: 'Backups of settings and data, and restoring them.' },
   { name: 'Automation', description: 'Statistics, watch folders and notifications.' },
 ];

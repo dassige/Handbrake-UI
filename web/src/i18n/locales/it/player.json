@@ -1,0 +1,17 @@
+{
+  "play": "Riproduci",
+  "playTitle": "Riproduci questo video",
+  "playJobTitle": "Riproduci l’originale, o il file convertito",
+  "label": "Lettore video",
+  "original": "Originale",
+  "converted": "Convertito",
+  "loading": "Lettura del file…",
+  "failed": "Il video non può essere riprodotto.",
+  "position": "Posizione",
+  "audio": "Audio",
+  "track": "Traccia {n}",
+  "compat": "Modalità compatibile",
+  "compatTitle": "Convertito durante la riproduzione: per i formati che questo browser non riproduce, o per scegliere la traccia audio",
+  "compatHint": "Convertito durante la riproduzione: può servire qualche secondo per partire, e saltare con la barra sopra lo fa ripartire da lì.",
+  "fellBack": "Questo browser non riproduce il file così com’è, quindi viene convertito durante la riproduzione. Salta con la barra sopra."
+}

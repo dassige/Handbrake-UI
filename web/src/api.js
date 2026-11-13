@@ -100,6 +100,10 @@ export const api = {
   deleteFiles: (paths) => post('/api/files/delete', { paths }),
 
   downloadUrl: (path) => `/api/download?path=${encodeURIComponent(path)}`,
+  // The player (server/src/media.js)
+  mediaInfo: (path) => get(`/api/media/info?path=${encodeURIComponent(path)}`),
+  mediaFileUrl: (path) => `/api/media/file?path=${encodeURIComponent(path)}`,
+  mediaStreamUrl: (path, t = 0, audio = 0) => `/api/media/stream?path=${encodeURIComponent(path)}&t=${t}&audio=${audio}`,
   prepareZip: (paths, name, withSubtitles = false) => post('/api/download/zip', { paths, name, withSubtitles }),
   // { files: { video: [subtitle paths] }, count }
   downloadSubtitles: (paths) => post('/api/download/subtitles', { paths }),

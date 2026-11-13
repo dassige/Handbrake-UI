@@ -1045,6 +1045,21 @@
         "settings.quality",
         "verify.overview"
       ]
+    },
+    "player": {
+      "title": "Lire les vidéos",
+      "body": [
+        "Le bouton rond **lecture** ouvre une vidéo dans un lecteur : dans les listes des dossiers (sources et cible), les résultats du contrôle **Qualité** et la file. Pour une tâche de la file, vous pouvez passer de l’**Original** au fichier **Converti** une fois la conversion faite.",
+        "Les navigateurs lisent eux-mêmes certains formats (MP4 et WebM avec vidéo H.264, VP9 ou AV1 et audio AAC, MP3 ou Opus ; MKV dans la plupart des navigateurs) : le fichier est alors lu tel quel, et la barre habituelle du lecteur saute n’importe où.",
+        "Tout le reste (AVI, DivX/Xvid, MPEG-2, WMV, audio AC3 ou DTS…) est lu en **mode compatible** : le serveur le convertit pendant la lecture, jusqu’à 1280 pixels de large. Le démarrage prend quelques secondes ; sautez avec la barre sous l’image, qui relance la conversion à partir de là.",
+        "- Le lecteur passe de lui-même en mode compatible quand le navigateur ne peut pas lire un fichier.",
+        "- **Audio** : avec plusieurs pistes audio, choisissez-en une (en mode compatible).",
+        "- La conversion s’arrête dès que le lecteur est fermé ou reste longtemps en pause, et tourne avec la même faible priorité CPU que les conversions."
+      ],
+      "see": [
+        "convert.sources",
+        "quality.overview"
+      ]
     }
   }
 }

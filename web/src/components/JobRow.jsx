@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, ArrowDown, ArrowDownToLine, ArrowUp, ArrowUpToLine, Captions, GripVertical, Pause, Play, RotateCcw, SkipForward, Square, Trash2, Wand2 } from 'lucide-react';
+import { AlertTriangle, CirclePlay, ArrowDown, ArrowDownToLine, ArrowUp, ArrowUpToLine, Captions, GripVertical, Pause, Play, RotateCcw, SkipForward, Square, Trash2, Wand2 } from 'lucide-react';
 import { api } from '../api.js';
 import { bytes, dirName, duration, elapsed, fileName, humanDuration, percent, ratio, relTo, ago } from '../format.js';
 import { StatusBadge, VerifyBadge } from './StatusBadge.jsx';
@@ -7,6 +7,7 @@ import { ReplaceBadge } from './replaceOriginal.jsx';
 import { useDialogs } from './Dialogs.jsx';
 import { t } from '../i18n/index.js';
 import { renameNote } from '../i18n/serverText.js';
+import { usePlayer } from '../player/Player.jsx';
 import { containerProblem } from '../subtitles/modes.js';
 
 export const DRAG_JOB = 'application/x-hbui-job';
@@ -30,8 +31,16 @@ function useClock(active) {
  */
 export function JobActions({ job, run, queueIndex = -1, labels = false, onRename, canPause = true, canConvertNow = false }) {
   const dialogs = useDialogs();
+  const player = usePlayer();
   const act = (name, body) => run(() => api.jobAction(job.id, name, body));
   const s = job.status;
+  /** Original and converted file (once converted); after "Replace original" only the converted one is left. */
+  const play = () => {
+    const converted = { label: t('player.converted'), path: job.outputPath };
+    if (job.replaced) return player({ sources: [converted] });
+    const sources = [{ label: t('player.original'), path: job.sourcePath }, ...(s === 'done' ? [converted] : [])];
+    return player({ sources, initial: sources.length - 1 });
+  };
   const btn = ({ icon: Icon, label, title, danger, onClick }) => (
     <button
       key={label}
@@ -49,6 +58,7 @@ export function JobActions({ job, run, queueIndex = -1, labels = false, onRename
   );
   return (
     <div className="job-actions" onClick={(e) => e.stopPropagation()}>
+      {player && s !== 'running' && btn({ icon: CirclePlay, label: t('player.play'), title: t('player.playJobTitle'), onClick: play })}
       {s === 'running' && canPause && btn({ icon: Pause, label: t('job.actions.pause'), onClick: () => act('pause') })}
       {s === 'paused' && btn({ icon: Play, label: t('job.actions.resume'), onClick: () => act('resume') })}
       {['running', 'paused', 'queued'].includes(s) && job.phase === 'verifying' && (

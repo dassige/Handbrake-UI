@@ -32,6 +32,8 @@ import { registerAutomationRoutes } from './automationRoutes.js';
 import { BackupScheduler } from './backupSchedule.js';
 import { Subtitles } from './subtitles/service.js';
 import { Replacer } from './replace.js';
+import { Media } from './media.js';
+import { registerMediaRoutes } from './mediaRoutes.js';
 import { Auth } from './auth.js';
 import { registerAuthRoutes } from './authRoutes.js';
 import { HttpError } from './errors.js';
@@ -85,6 +87,7 @@ const merger = new Merger({
 const uploads = new Uploads({ db, settings, events, log: app.log });
 const replacer = new Replacer({ db, settings, queue, subtitles, events, log: app.log });
 const sourceFiles = new SourceFiles({ settings, queue, events, log: app.log, subtitles });
+const media = new Media({ settings, verifier, ffmpeg: config.ffmpeg, log: app.log });
 const downloads = new Downloads({ settings, log: app.log, subtitles });
 const quality = new QualityScanner({ db, settings, verifier, events, queue, log: app.log });
 const backups = new Backups({
@@ -118,6 +121,7 @@ await app.register(
     registerUploadRoutes(api, { uploads, sourceFiles });
     registerQualityRoutes(api, { quality });
     registerDownloadRoutes(api, { downloads });
+    registerMediaRoutes(api, { media });
     registerBackupRoutes(api, { backups, backupScheduler });
   },
   {

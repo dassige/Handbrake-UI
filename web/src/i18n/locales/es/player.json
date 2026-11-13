@@ -1,0 +1,17 @@
+{
+  "play": "Reproducir",
+  "playTitle": "Reproducir este vídeo",
+  "playJobTitle": "Reproducir el original, o el archivo convertido",
+  "label": "Reproductor de vídeo",
+  "original": "Original",
+  "converted": "Convertido",
+  "loading": "Leyendo el archivo…",
+  "failed": "No se pudo reproducir el vídeo.",
+  "position": "Posición",
+  "audio": "Audio",
+  "track": "Pista {n}",
+  "compat": "Modo compatible",
+  "compatTitle": "Convertido mientras se reproduce: para formatos que este navegador no reproduce, o para elegir la pista de audio",
+  "compatHint": "Convertido mientras se reproduce: puede tardar unos segundos en empezar, y saltar con la barra de arriba lo vuelve a empezar desde ahí.",
+  "fellBack": "Este navegador no puede reproducir el archivo tal cual, así que se convierte mientras se reproduce. Salte con la barra de arriba."
+}

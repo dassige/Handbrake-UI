@@ -1045,6 +1045,21 @@
         "settings.quality",
         "verify.overview"
       ]
+    },
+    "player": {
+      "title": "Playing videos",
+      "body": [
+        "The round **play** button opens a video in a player: in the folder lists (sources and target), the **Quality** check results and the queue. For a job in the queue you can switch between the **Original** and the **Converted** file once it is converted.",
+        "Browsers play some formats themselves (MP4 and WebM with H.264, VP9 or AV1 video and AAC, MP3 or Opus audio; MKV in most browsers): then the file is played as it is, and the usual player bar jumps anywhere.",
+        "Anything else (AVI, DivX/Xvid, MPEG-2, WMV, AC3 or DTS audio…) plays in **compatible mode**: the server converts it while it plays, at up to 1280 pixels wide. Starting takes a few seconds; jump with the bar under the picture, which starts the conversion again from there.",
+        "- The player switches to compatible mode by itself when the browser cannot play a file.",
+        "- **Audio**: with several audio tracks, choose one (in compatible mode).",
+        "- The conversion stops as soon as the player is closed or paused for long, and runs at the same low CPU priority as conversions."
+      ],
+      "see": [
+        "convert.sources",
+        "quality.overview"
+      ]
     }
   }
 }

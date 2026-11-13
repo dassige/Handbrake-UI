@@ -1045,6 +1045,21 @@
         "settings.quality",
         "verify.overview"
       ]
+    },
+    "player": {
+      "title": "Reproducir vídeos",
+      "body": [
+        "El botón redondo de **reproducir** abre un vídeo en un reproductor: en las listas de carpetas (origen y destino), en los resultados de la comprobación de **Calidad** y en la cola. Para un trabajo de la cola puede cambiar entre el **Original** y el archivo **Convertido** una vez convertido.",
+        "Los navegadores reproducen por sí mismos algunos formatos (MP4 y WebM con vídeo H.264, VP9 o AV1 y audio AAC, MP3 u Opus; MKV en la mayoría de navegadores): entonces el archivo se reproduce tal cual, y la barra habitual del reproductor salta a cualquier punto.",
+        "Todo lo demás (AVI, DivX/Xvid, MPEG-2, WMV, audio AC3 o DTS…) se reproduce en **modo compatible**: el servidor lo convierte mientras se reproduce, hasta 1280 píxeles de ancho. Empezar tarda unos segundos; salte con la barra bajo la imagen, que vuelve a empezar la conversión desde ahí.",
+        "- El reproductor pasa solo al modo compatible cuando el navegador no puede reproducir un archivo.",
+        "- **Audio**: con varias pistas de audio, elija una (en modo compatible).",
+        "- La conversión se detiene en cuanto se cierra el reproductor o se queda mucho tiempo en pausa, y funciona con la misma baja prioridad de CPU que las conversiones."
+      ],
+      "see": [
+        "convert.sources",
+        "quality.overview"
+      ]
     }
   }
 }
