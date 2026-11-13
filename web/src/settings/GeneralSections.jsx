@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FolderSearch, Lock, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, FolderSearch, Lock, Plus, Trash2 } from 'lucide-react';
 import { Card, Check, Field, ListInput, NumberInput } from './fields.jsx';
 import { FolderPicker } from '../components/FolderPicker.jsx';
 import { rootLabel } from '../roots.js';
@@ -31,6 +31,12 @@ export function FoldersSection({ draft, set }) {
   };
   const setLocked = (path, on) =>
     set('protectedRoots', on ? [...draft.protectedRoots, path] : draft.protectedRoots.filter((r) => r !== path));
+  // The order is the one of the folder pickers; the first folder is the one views open first.
+  const move = (i, by) => {
+    const next = roots.slice();
+    [next[i], next[i + by]] = [next[i + by], next[i]];
+    set('sourceRoots', next);
+  };
 
   return (
     <>
@@ -61,6 +67,26 @@ export function FoldersSection({ draft, set }) {
                 <input type="checkbox" checked={locked.has(r)} onChange={(e) => setLocked(r, e.target.checked)} aria-label={t('settings.folders.protectLabel', { number: i + 1 })} />
                 <Lock size={13} /> {t('settings.folders.protect')}
               </label>
+              <button
+                type="button"
+                className="icon-btn"
+                disabled={i === 0}
+                onClick={() => move(i, -1)}
+                title={t('settings.folders.moveUp')}
+                aria-label={t('settings.folders.moveUpLabel', { number: i + 1 })}
+              >
+                <ArrowUp size={15} />
+              </button>
+              <button
+                type="button"
+                className="icon-btn"
+                disabled={i === roots.length - 1}
+                onClick={() => move(i, 1)}
+                title={t('settings.folders.moveDown')}
+                aria-label={t('settings.folders.moveDownLabel', { number: i + 1 })}
+              >
+                <ArrowDown size={15} />
+              </button>
               <button
                 type="button"
                 className="icon-btn danger"

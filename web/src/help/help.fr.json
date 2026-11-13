@@ -354,7 +354,7 @@
       "title": "Dossiers de sources et dossier cible",
       "body": [
         "Des dossiers sur le serveur (pas sur votre ordinateur). Les partages NAS montés sur le serveur fonctionnent aussi.",
-        "- **Dossiers de sources** : l'emplacement des fichiers à convertir. Ajoutez-en autant que nécessaire avec **Ajouter un dossier de sources** ; le panneau Sources en affiche un à la fois et ne peut pas remonter au-dessus. Retirer un dossier de la liste ne supprime rien.",
+        "- **Dossiers de sources** : l'emplacement des fichiers à convertir. Ajoutez-en autant que nécessaire avec **Ajouter un dossier de sources** ; le panneau Sources en affiche un à la fois et ne peut pas remonter au-dessus. Retirer un dossier de la liste ne supprime rien. Leur ordre, modifié avec les flèches, est partout l’ordre des listes de dossiers ; le premier s’ouvre en premier.",
         "- **Nom** (facultatif) sur un dossier de sources : un nom convivial tel que « Téléchargements », affiché à la place du chemin dans le panneau Sources, les listes de dossiers et la vue Qualité. Chaque nom ne peut servir qu'une fois, 40 caractères au maximum ; un nom vide affiche le nom du dossier lui-même.",
         "- **Protéger** sur un dossier de sources : empêche la suppression et le renommage de ses fichiers et dossiers depuis l'application, par exemple le dossier dont un client de téléchargement assure encore le partage. Dans le panneau Sources, un tel dossier affiche **Protégé** à la place du bouton Supprimer, et le serveur refuse aussi les suppressions et les renommages à cet endroit.",
         "- **Dossier cible** : l'emplacement où les fichiers convertis sont écrits. Les vues Renommer et Fusionner ne travaillent qu'ici.",

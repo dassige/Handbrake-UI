@@ -48,7 +48,11 @@
     "add": "Add a sources folder",
     "targetTitle": "Target folder",
     "targetLabel": "Converted files are written here",
-    "targetHint": "All folders must already exist on the server. The target cannot be inside a sources folder, and a sources folder cannot be inside another one."
+    "targetHint": "All folders must already exist on the server. The target cannot be inside a sources folder, and a sources folder cannot be inside another one.",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "moveUpLabel": "Move sources folder {number} up",
+    "moveDownLabel": "Move sources folder {number} down"
   },
   "adding": {
     "title": "When you add a folder",

@@ -48,7 +48,11 @@
     "add": "Quellordner hinzufügen",
     "targetTitle": "Zielordner",
     "targetLabel": "Konvertierte Dateien werden hierhin geschrieben",
-    "targetHint": "Alle Ordner müssen auf dem Server bereits existieren. Das Ziel darf nicht in einem Quellordner liegen, und ein Quellordner nicht in einem anderen."
+    "targetHint": "Alle Ordner müssen auf dem Server bereits existieren. Das Ziel darf nicht in einem Quellordner liegen, und ein Quellordner nicht in einem anderen.",
+    "moveUp": "Nach oben",
+    "moveDown": "Nach unten",
+    "moveUpLabel": "Quellordner {number} nach oben verschieben",
+    "moveDownLabel": "Quellordner {number} nach unten verschieben"
   },
   "adding": {
     "title": "Beim Hinzufügen eines Ordners",

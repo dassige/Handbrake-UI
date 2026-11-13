@@ -48,7 +48,11 @@
     "add": "Aggiungi una cartella sorgenti",
     "targetTitle": "Cartella di destinazione",
     "targetLabel": "I file convertiti vengono scritti qui",
-    "targetHint": "Tutte le cartelle devono già esistere sul server. La destinazione non può trovarsi dentro una cartella sorgenti, e una cartella sorgenti non può trovarsi dentro un’altra."
+    "targetHint": "Tutte le cartelle devono già esistere sul server. La destinazione non può trovarsi dentro una cartella sorgenti, e una cartella sorgenti non può trovarsi dentro un’altra.",
+    "moveUp": "Sposta su",
+    "moveDown": "Sposta giù",
+    "moveUpLabel": "Sposta su la cartella sorgente {number}",
+    "moveDownLabel": "Sposta giù la cartella sorgente {number}"
   },
   "adding": {
     "title": "Quando aggiungi una cartella",

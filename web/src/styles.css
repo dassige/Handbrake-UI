@@ -837,6 +837,7 @@ textarea.mono { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
 /* ------------------------------------------------------------------ folder names, watch, picker, about */
 .root-row .root-name { flex: 0 0 160px; min-width: 0; }
 .root-row .root-path { flex: 1; min-width: 0; }
+.root-row .icon-btn:disabled { opacity: 0.3; cursor: default; }
 .watch-btn { margin-left: auto; }
 .watch-pill {
   margin-left: auto; display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--border); background: var(--panel-2);

@@ -354,7 +354,7 @@
       "title": "Quell- und Zielordner",
       "body": [
         "Ordner auf dem Server (nicht auf Ihrem Computer). Auf dem Server eingebundene NAS-Freigaben funktionieren ebenfalls.",
-        "- **Quellordner**: wo die zu konvertierenden Dateien liegen. Fügen Sie so viele hinzu, wie Sie brauchen, mit **Quellordner hinzufügen**; der Bereich „Quellen“ zeigt jeweils einen und kann nicht darüber hinaus navigieren. Das Entfernen eines Ordners aus der Liste löscht nichts.",
+        "- **Quellordner**: wo die zu konvertierenden Dateien liegen. Fügen Sie so viele hinzu, wie Sie brauchen, mit **Quellordner hinzufügen**; der Bereich „Quellen“ zeigt jeweils einen und kann nicht darüber hinaus navigieren. Das Entfernen eines Ordners aus der Liste löscht nichts. Ihre Reihenfolge, die Sie mit den Pfeilen ändern, ist überall die Reihenfolge der Ordnerlisten; der erste wird zuerst geöffnet.",
         "- **Name** (optional) bei einem Quellordner: ein Anzeigename wie „Downloads“, der im Bereich „Quellen“, in den Ordnerlisten und in der Ansicht „Qualität“ statt des Pfads angezeigt wird. Jeder Name kann nur einmal vergeben werden, höchstens 40 Zeichen; bei leerem Namen wird der eigene Name des Ordners angezeigt.",
         "- **Schützen** bei einem Quellordner: verhindert, dass seine Dateien und Ordner aus der App gelöscht oder umbenannt werden, z. B. den Ordner, aus dem ein Download-Client noch seedet. Im Bereich „Quellen“ zeigt ein solcher Ordner **Geschützt** statt der Schaltfläche „Löschen“, und auch der Server lehnt dort Löschen und Umbenennen ab.",
         "- **Zielordner**: wohin konvertierte Dateien geschrieben werden. Die Ansichten „Umbenennen“ und „Zusammenführen“ arbeiten nur hier.",

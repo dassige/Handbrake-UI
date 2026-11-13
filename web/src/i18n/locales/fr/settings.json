@@ -48,7 +48,11 @@
     "add": "Ajouter un dossier de sources",
     "targetTitle": "Dossier cible",
     "targetLabel": "Les fichiers convertis sont écrits ici",
-    "targetHint": "Tous les dossiers doivent déjà exister sur le serveur. La cible ne peut pas se trouver dans un dossier de sources, et un dossier de sources ne peut pas se trouver dans un autre."
+    "targetHint": "Tous les dossiers doivent déjà exister sur le serveur. La cible ne peut pas se trouver dans un dossier de sources, et un dossier de sources ne peut pas se trouver dans un autre.",
+    "moveUp": "Monter",
+    "moveDown": "Descendre",
+    "moveUpLabel": "Monter le dossier source {number}",
+    "moveDownLabel": "Descendre le dossier source {number}"
   },
   "adding": {
     "title": "Quand vous ajoutez un dossier",

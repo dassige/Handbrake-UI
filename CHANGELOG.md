@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.3.4] - 2026/11/14
+
+- feat: Reorder the sources folders in Settings
+
+Each sources folder in Settings → Folders has up and down arrows. The
+order is the one of the folder pickers in every view, and the first
+folder is the one a view opens first; names and protection move with
+their folder, and the new order is saved with the other settings. The
+help describes it in every language.
+
 ## [4.3.3] - 2026/11/14
 
 - feat: Replacing an original can keep the converted file in the target folder

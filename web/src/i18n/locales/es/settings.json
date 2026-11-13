@@ -48,7 +48,11 @@
     "add": "Añadir una carpeta de origen",
     "targetTitle": "Carpeta de destino",
     "targetLabel": "Los archivos convertidos se escriben aquí",
-    "targetHint": "Todas las carpetas deben existir ya en el servidor. El destino no puede estar dentro de una carpeta de origen, y una carpeta de origen no puede estar dentro de otra."
+    "targetHint": "Todas las carpetas deben existir ya en el servidor. El destino no puede estar dentro de una carpeta de origen, y una carpeta de origen no puede estar dentro de otra.",
+    "moveUp": "Subir",
+    "moveDown": "Bajar",
+    "moveUpLabel": "Subir la carpeta de origen {number}",
+    "moveDownLabel": "Bajar la carpeta de origen {number}"
   },
   "adding": {
     "title": "Al añadir una carpeta",

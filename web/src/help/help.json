@@ -354,7 +354,7 @@
       "title": "Sources and target folders",
       "body": [
         "Folders on the server (not on your computer). NAS shares mounted on the server work too.",
-        "- **Sources folders**: where the files to convert are. Add as many as you need with **Add a sources folder**; the Sources panel shows one at a time and can't go above it. Removing a folder from the list deletes nothing.",
+        "- **Sources folders**: where the files to convert are. Add as many as you need with **Add a sources folder**; the Sources panel shows one at a time and can't go above it. Removing a folder from the list deletes nothing. Their order, changed with the arrows, is the order of the folder lists everywhere; the first one opens first.",
         "- **Name** (optional) on a sources folder: a friendly name such as “Downloads”, shown instead of the path in the Sources panel, the folder lists and the Quality view. Each name can be used once, up to 40 characters; an empty name shows the folder’s own name.",
         "- **Protect** on a sources folder: stops its files and folders being deleted or renamed from the app, for example the folder a download client is still seeding from. In the Sources panel such a folder shows **Protected** instead of the Delete button, and the server refuses deletes and renames there too.",
         "- **Target folder**: where converted files are written. The Rename and Merge views work only here.",

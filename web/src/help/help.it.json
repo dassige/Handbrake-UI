@@ -354,7 +354,7 @@
       "title": "Cartelle sorgenti e di destinazione",
       "body": [
         "Cartelle sul server (non sul tuo computer). Funzionano anche le condivisioni NAS montate sul server.",
-        "- **Cartelle sorgenti**: dove si trovano i file da convertire. Aggiungine quante ti servono con **Aggiungi una cartella sorgenti**; il pannello Sorgenti ne mostra una alla volta e non può salire oltre di essa. Rimuovere una cartella dall’elenco non elimina niente.",
+        "- **Cartelle sorgenti**: dove si trovano i file da convertire. Aggiungine quante ti servono con **Aggiungi una cartella sorgenti**; il pannello Sorgenti ne mostra una alla volta e non può salire oltre di essa. Rimuovere una cartella dall’elenco non elimina niente. Il loro ordine, che si cambia con le frecce, è l’ordine degli elenchi di cartelle ovunque; la prima si apre per prima.",
         "- **Nome** (facoltativo) di una cartella sorgenti: un nome più semplice come “Downloads”, mostrato al posto del percorso nel pannello Sorgenti, negli elenchi di cartelle e nella vista Qualità. Ogni nome si può usare una sola volta, fino a 40 caratteri; con un nome vuoto viene mostrato il nome della cartella stessa.",
         "- **Proteggi** su una cartella sorgenti: impedisce che i suoi file e le sue cartelle vengano eliminati o rinominati dall’app, per esempio la cartella da cui un client di download sta ancora facendo il seeding. Nel pannello Sorgenti una cartella così mostra **Protetta** al posto del pulsante Elimina, e anche il server rifiuta lì eliminazioni e rinomine.",
         "- **Cartella di destinazione**: dove vengono scritti i file convertiti. Le viste Rinomina e Unisci funzionano solo qui.",

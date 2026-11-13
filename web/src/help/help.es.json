@@ -354,7 +354,7 @@
       "title": "Carpetas de origen y de destino",
       "body": [
         "Carpetas del servidor (no de su equipo). Los recursos compartidos de un NAS montados en el servidor también sirven.",
-        "- **Carpetas de origen**: dónde están los archivos que se van a convertir. Añada tantas como necesite con **Añadir una carpeta de origen**; el panel Orígenes muestra una cada vez y no puede subir por encima de ella. Quitar una carpeta de la lista no elimina nada.",
+        "- **Carpetas de origen**: dónde están los archivos que se van a convertir. Añada tantas como necesite con **Añadir una carpeta de origen**; el panel Orígenes muestra una cada vez y no puede subir por encima de ella. Quitar una carpeta de la lista no elimina nada. Su orden, que se cambia con las flechas, es el orden de las listas de carpetas en todas partes; la primera se abre primero.",
         "- **Nombre** (opcional) en una carpeta de origen: un nombre descriptivo como «Descargas», que se muestra en lugar de la ruta en el panel Orígenes, en las listas de carpetas y en la vista Calidad. Cada nombre puede usarse una vez, con un máximo de 40 caracteres; si se deja vacío se muestra el nombre propio de la carpeta.",
         "- **Proteger** en una carpeta de origen: impide que sus archivos y carpetas se eliminen o renombren desde la aplicación, por ejemplo, la carpeta desde la que un cliente de descargas sigue compartiendo. En el panel Orígenes, una carpeta así muestra **Protegida** en lugar del botón Eliminar, y el servidor también rechaza allí las eliminaciones y los renombrados.",
         "- **Carpeta de destino**: dónde se escriben los archivos convertidos. Las vistas Renombrar y Unir solo trabajan aquí.",
