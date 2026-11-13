@@ -74,6 +74,7 @@
         "- **Drag** a queued job by its handle (⋮⋮) to change the order, or use **Move to top**.",
         "- The filters show all jobs, the active ones, the converted ones or the failed and cancelled ones. **Rename these** (under Converted) opens their files in the Rename view, **Merge these** in the Merge view.",
         "- **Clear finished** removes converted, failed and cancelled jobs from the list. Files are not touched.",
+        "- **Select** jobs with their checkboxes, or with Ctrl-click and Shift-click (a range); **Select all** takes every job the filter shows. **Remove** then takes them off the list (not the ones converting; files are not touched), and **Replace originals** does it for the selected jobs from the [quality check](#quality.replace).",
         "Click a job to see its [details](#job.details)."
       ],
       "see": [

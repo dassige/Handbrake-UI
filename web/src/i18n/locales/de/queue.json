@@ -46,5 +46,18 @@
     "guessed": "(einige Längen geschätzt)"
   },
   "replaceAll": "Originale ersetzen ({count})",
-  "replaceAllTitle": "Die Originale der hier gelisteten konvertierten Dateien ersetzen"
+  "replaceAllTitle": "Die Originale der ausgewählten konvertierten Dateien ersetzen",
+  "selected_one": "{count} ausgewählt",
+  "selected_other": "{count} ausgewählt",
+  "selectJob": "{name} auswählen",
+  "removeSelected": "Entfernen ({count})",
+  "removeSelectedTitle": "Die ausgewählten Aufträge aus der Liste nehmen (Dateien bleiben unberührt)",
+  "removeDialog": {
+    "title_one": "{count} Auftrag entfernen?",
+    "title_other": "{count} Aufträge entfernen?",
+    "message_one": "Der Auftrag wird aus der Liste genommen. Seine Dateien bleiben unberührt.",
+    "message_other": "Die {count} Aufträge werden aus der Liste genommen. Ihre Dateien bleiben unberührt.",
+    "skipped_one": "{count} laufender Auftrag bleibt.",
+    "skipped_other": "{count} laufende Aufträge bleiben."
+  }
 }

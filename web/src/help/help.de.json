@@ -74,6 +74,7 @@
         "- **Ziehen** Sie einen wartenden Auftrag am Griff (⋮⋮), um die Reihenfolge zu ändern, oder verwenden Sie **An den Anfang**.",
         "- Die Filter zeigen alle Aufträge, die aktiven, die konvertierten oder die fehlgeschlagenen und abgebrochenen. **Diese umbenennen** (unter „Konvertiert“) öffnet deren Dateien in der Ansicht „Umbenennen“, **Diese zusammenführen** in der Ansicht „Zusammenführen“.",
         "- **Erledigte entfernen** entfernt konvertierte, fehlgeschlagene und abgebrochene Aufträge aus der Liste. Dateien bleiben unberührt.",
+        "- **Wählen** Sie Aufträge mit ihren Kästchen aus, oder mit Strg-Klick und Umschalt-Klick (ein Bereich); **Alle auswählen** nimmt alle Aufträge, die der Filter zeigt. **Entfernen** nimmt sie dann aus der Liste (nicht die laufenden; Dateien bleiben unberührt), und **Originale ersetzen** tut es für die ausgewählten Aufträge aus der [Qualitätsprüfung](#quality.replace).",
         "Klicken Sie auf einen Auftrag, um seine [Details](#job.details) zu sehen."
       ],
       "see": [

@@ -46,5 +46,18 @@
     "guessed": "(certaines durées estimées)"
   },
   "replaceAll": "Remplacer les originaux ({count})",
-  "replaceAllTitle": "Remplacer les originaux des fichiers convertis listés ici"
+  "replaceAllTitle": "Remplacer les originaux des fichiers convertis sélectionnés",
+  "selected_one": "{count} sélectionnée",
+  "selected_other": "{count} sélectionnées",
+  "selectJob": "Sélectionner {name}",
+  "removeSelected": "Retirer ({count})",
+  "removeSelectedTitle": "Retirer les tâches sélectionnées de la liste (les fichiers ne sont pas touchés)",
+  "removeDialog": {
+    "title_one": "Retirer {count} tâche ?",
+    "title_other": "Retirer {count} tâches ?",
+    "message_one": "La tâche est retirée de la liste. Ses fichiers ne sont pas touchés.",
+    "message_other": "Les {count} tâches sont retirées de la liste. Leurs fichiers ne sont pas touchés.",
+    "skipped_one": "{count} tâche en cours de conversion reste.",
+    "skipped_other": "{count} tâches en cours de conversion restent."
+  }
 }

@@ -74,6 +74,7 @@
         "- **Faites glisser** une tâche en attente par sa poignée (⋮⋮) pour changer l'ordre, ou utilisez **Placer en tête**.",
         "- Les filtres affichent toutes les tâches, les actives, les converties, ou les échouées et annulées. **Renommer ceux-ci** (sous Converties) ouvre leurs fichiers dans la vue Renommer, **Fusionner ceux-ci** dans la vue Fusionner.",
         "- **Effacer les terminées** retire de la liste les tâches converties, échouées et annulées. Les fichiers ne sont pas touchés.",
+        "- **Sélectionnez** des tâches avec leurs cases, ou avec Ctrl-clic et Maj-clic (une plage) ; **Tout sélectionner** prend toutes les tâches affichées par le filtre. **Retirer** les retire ensuite de la liste (pas celles en cours de conversion ; les fichiers ne sont pas touchés), et **Remplacer les originaux** le fait pour les tâches sélectionnées du [contrôle qualité](#quality.replace).",
         "Cliquez sur une tâche pour voir ses [détails](#job.details)."
       ],
       "see": [

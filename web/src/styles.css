@@ -206,6 +206,9 @@ select, textarea, input[type='text'], input:not([type]), input[type='number'], i
 .job-row + .job-row { margin-top: 2px; }
 .job-row:hover { background: var(--panel-2); }
 .job-row.selected { background: var(--sel); border-color: var(--sel-border); }
+.job-row.checked { box-shadow: inset 3px 0 0 var(--info); }
+.job-check { flex: none; margin: 3px 2px 0 0; }
+.queue-select { padding: 2px 12px 6px; }
 .job-row.running, .job-row.paused { background: var(--accent-soft); }
 .job-row.running.selected, .job-row.paused.selected { border-color: var(--accent); }
 .job-row.drop-before::before {

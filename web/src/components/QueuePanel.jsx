@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { CalendarClock, Clock, Combine, Replace, ShieldCheck, Trash2, Upload, Wand2 } from 'lucide-react';
 import { clockTime, humanDuration } from '../format.js';
 import { api } from '../api.js';
@@ -28,12 +28,73 @@ export function QueuePanel({
   const dialogs = useDialogs();
   const replaceOriginals = useReplaceOriginal({ settings, run });
   const [filter, setFilter] = useState('all');
+  // Jobs picked with their checkboxes (or Ctrl/Shift-click), for Remove and Replace originals.
+  const [checked, setChecked] = useState(() => new Set());
+  const lastChecked = useRef(null);
   const [dropActive, setDropActive] = useState(false);
   const [dragJob, setDragJob] = useState(null);
   const [dropTarget, setDropTarget] = useState(null);
 
   const visible = useMemo(() => jobs.filter(FILTERS.find((f) => f.key === filter).match), [jobs, filter]);
   const counts = useMemo(() => Object.fromEntries(FILTERS.map((f) => [f.key, jobs.filter(f.match).length])), [jobs]);
+  // Another filter starts a new selection; removed jobs leave it.
+  useEffect(() => setChecked(new Set()), [filter]);
+  useEffect(() => {
+    setChecked((c) => {
+      const ids = new Set(jobs.map((j) => j.id));
+      const kept = [...c].filter((id) => ids.has(id));
+      return kept.length === c.size ? c : new Set(kept);
+    });
+  }, [jobs]);
+  const chosen = visible.filter((j) => checked.has(j.id));
+  const allChecked = visible.length > 0 && visible.every((j) => checked.has(j.id));
+  // A converting job cannot be removed: it is left out, and stays picked.
+  const removable = chosen.filter((j) => !['running', 'paused'].includes(j.status));
+  const replaceable = chosen.filter(canReplace);
+
+  /** Checkbox: picks or unpicks one job. */
+  function toggleCheck(job) {
+    const next = new Set(checked);
+    if (next.has(job.id)) next.delete(job.id);
+    else next.add(job.id);
+    lastChecked.current = job.id;
+    setChecked(next);
+  }
+
+  /** A click on a row: shows its details; Ctrl/Cmd-click picks it, Shift-click picks a range. */
+  function onRowClick(e, job) {
+    if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
+      onSelect(job.id);
+      return;
+    }
+    e.preventDefault();
+    const next = new Set(checked);
+    const from = visible.findIndex((j) => j.id === lastChecked.current);
+    if (e.shiftKey && from >= 0) {
+      const to = visible.findIndex((j) => j.id === job.id);
+      const [a, b] = from < to ? [from, to] : [to, from];
+      for (let i = a; i <= b; i++) next.add(visible[i].id);
+    } else if (next.has(job.id)) {
+      next.delete(job.id);
+    } else {
+      next.add(job.id);
+    }
+    lastChecked.current = job.id;
+    setChecked(next);
+  }
+
+  async function removeChecked() {
+    const ok = await dialogs.confirm({
+      title: t('queue.removeDialog.title', { count: removable.length }),
+      message: t('queue.removeDialog.message', { count: removable.length }) + (removable.length < chosen.length ? ` ${t('queue.removeDialog.skipped', { count: chosen.length - removable.length })}` : ''),
+      confirmLabel: t('common.remove'),
+    });
+    if (ok && (await run(() => api.removeJobs(removable.map((j) => j.id))))) setChecked(new Set());
+  }
+
+  async function replaceChecked() {
+    if (await replaceOriginals(replaceable)) setChecked(new Set());
+  }
   const queuedIds = jobs.filter((j) => j.status === 'queued').map((j) => j.id);
   const finishedCount = jobs.filter((j) => ['done', 'failed', 'cancelled'].includes(j.status)).length;
   // "Convert now" on a queued job: only while the queue is stopped and nothing converts.
@@ -125,11 +186,6 @@ export function QueuePanel({
             <ShieldCheck size={14} /> {t('queue.checkAllAgain')}
           </button>
         )}
-        {filter === 'quality' && visible.some(canReplace) && (
-          <button className="btn ghost small" title={t('queue.replaceAllTitle')} onClick={() => replaceOriginals(visible)}>
-            <Replace size={14} /> {t('queue.replaceAll', { count: visible.filter(canReplace).length })}
-          </button>
-        )}
         {filter === 'done' && counts.done > 0 && (
           <button
             className="btn ghost small"
@@ -162,6 +218,29 @@ export function QueuePanel({
         </button>
       </div>
 
+      {visible.length > 0 && (
+        <div className="select-bar queue-select">
+          <label className="check">
+            <input
+              type="checkbox"
+              checked={allChecked}
+              onChange={() => setChecked(allChecked ? new Set() : new Set(visible.map((j) => j.id)))}
+            />
+            {chosen.length ? t('queue.selected', { count: chosen.length }) : t('common.selectAll')}
+          </label>
+          <div className="select-actions">
+            {replaceable.length > 0 && (
+              <button className="btn ghost small" title={t('queue.replaceAllTitle')} onClick={replaceChecked}>
+                <Replace size={14} /> {t('queue.replaceAll', { count: replaceable.length })}
+              </button>
+            )}
+            <button className="btn ghost small danger" disabled={!removable.length} title={t('queue.removeSelectedTitle')} onClick={removeChecked}>
+              <Trash2 size={14} /> {removable.length ? t('queue.removeSelected', { count: removable.length }) : t('common.remove')}
+            </button>
+          </div>
+        </div>
+      )}
+
       <EstimateBar estimate={estimate} queue={queueState} />
 
       <div className="job-list" onDragOver={(e) => dragJob != null && e.preventDefault()} onDrop={() => dragJob != null && reorderDrop(null)}>
@@ -177,7 +256,9 @@ export function QueuePanel({
             job={job}
             settings={settings}
             selected={job.id === selectedId}
-            onSelect={() => onSelect(job.id)}
+            onSelect={(e) => onRowClick(e, job)}
+            checked={checked.has(job.id)}
+            onCheck={() => toggleCheck(job)}
             run={run}
             onRename={onRename}
             queueIndex={queuedIds.indexOf(job.id)}

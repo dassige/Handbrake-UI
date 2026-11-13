@@ -46,5 +46,18 @@
     "guessed": "(alcune durate stimate)"
   },
   "replaceAll": "Sostituisci gli originali ({count})",
-  "replaceAllTitle": "Sostituisci gli originali dei file convertiti elencati qui"
+  "replaceAllTitle": "Sostituisci gli originali dei file convertiti selezionati",
+  "selected_one": "{count} selezionato",
+  "selected_other": "{count} selezionati",
+  "selectJob": "Seleziona {name}",
+  "removeSelected": "Togli ({count})",
+  "removeSelectedTitle": "Togli i lavori selezionati dall’elenco (i file non vengono toccati)",
+  "removeDialog": {
+    "title_one": "Togliere {count} lavoro?",
+    "title_other": "Togliere {count} lavori?",
+    "message_one": "Il lavoro viene tolto dall’elenco. I suoi file non vengono toccati.",
+    "message_other": "I {count} lavori vengono tolti dall’elenco. I loro file non vengono toccati.",
+    "skipped_one": "{count} lavoro in conversione resta.",
+    "skipped_other": "{count} lavori in conversione restano."
+  }
 }

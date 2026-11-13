@@ -46,5 +46,18 @@
     "guessed": "(some lengths guessed)"
   },
   "replaceAll": "Replace originals ({count})",
-  "replaceAllTitle": "Replace the originals of the converted files listed here"
+  "replaceAllTitle": "Replace the originals of the selected converted files",
+  "selected_one": "{count} selected",
+  "selected_other": "{count} selected",
+  "selectJob": "Select {name}",
+  "removeSelected": "Remove ({count})",
+  "removeSelectedTitle": "Take the selected jobs off the list (files are not touched)",
+  "removeDialog": {
+    "title_one": "Remove {count} job?",
+    "title_other": "Remove {count} jobs?",
+    "message_one": "The job is taken off the list. Its files are not touched.",
+    "message_other": "The {count} jobs are taken off the list. Their files are not touched.",
+    "skipped_one": "{count} converting job stays.",
+    "skipped_other": "{count} converting jobs stay."
+  }
 }

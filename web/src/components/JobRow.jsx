@@ -111,8 +111,12 @@ function SubtitleBadge({ job, settings }) {
   );
 }
 
+/**
+ * selected: the job shown in the details. checked/onCheck: picked with its checkbox (several
+ * jobs at once); onSelect gets the click event, so Ctrl/Shift-click can pick instead.
+ */
 export function JobRow({
-  job, settings, selected, onSelect, run, onRename, queueIndex, dropBefore,
+  job, settings, selected, onSelect, checked = false, onCheck, run, onRename, queueIndex, dropBefore,
   onJobDragStart, onJobDragEnd, onJobDragOver, onJobDrop, estimate, canPause, canConvertNow,
 }) {
   const active = job.status === 'running' || job.status === 'paused';
@@ -157,7 +161,7 @@ export function JobRow({
 
   return (
     <div
-      className={`job-row ${job.status} ${selected ? 'selected' : ''} ${dropBefore ? 'drop-before' : ''}`}
+      className={`job-row ${job.status} ${selected ? 'selected' : ''} ${checked ? 'checked' : ''} ${dropBefore ? 'drop-before' : ''}`}
       onClick={onSelect}
       draggable={queued}
       onDragStart={queued ? onJobDragStart : undefined}
@@ -165,6 +169,16 @@ export function JobRow({
       onDragOver={onJobDragOver}
       onDrop={onJobDrop}
     >
+      {onCheck && (
+        <input
+          type="checkbox"
+          className="job-check"
+          checked={checked}
+          onClick={(e) => e.stopPropagation()}
+          onChange={onCheck}
+          aria-label={t('queue.selectJob', { name: fileName(job.sourcePath) })}
+        />
+      )}
       <div className="job-grip" title={queued ? t('job.row.dragToReorder') : undefined}>
         {queued ? <GripVertical size={15} /> : null}
       </div>

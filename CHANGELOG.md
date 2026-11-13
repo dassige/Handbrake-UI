@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.2.5] - 2026/11/13
+
+- feat: Select several jobs in the queue to replace or remove them
+
+Each job in the queue has a checkbox; Ctrl/Cmd-click picks one more,
+Shift-click a range, and "Select all" takes every job the filter shows.
+A plain click still opens the job's details. The bar above the list
+then replaces the originals of the selected quality-check jobs (the
+button replaces the one that only appeared under the Quality filter)
+or removes the selected jobs, after asking; converting jobs stay and
+files are never touched. The queue help explains it in every language.
+
 ## [4.2.4] - 2026/11/13
 
 - chore: Stop tracking server/data

@@ -74,6 +74,7 @@
         "- **Arrastre** un trabajo en cola por su asa (⋮⋮) para cambiar el orden, o use **Mover al principio**.",
         "- Los filtros muestran todos los trabajos, los activos, los convertidos o los fallidos y cancelados. **Renombrar estos** (en Convertidos) abre sus archivos en la vista Renombrar, y **Unir estos** en la vista Unir.",
         "- **Quitar terminados** quita de la lista los trabajos convertidos, fallidos y cancelados. Los archivos no se tocan.",
+        "- **Seleccione** trabajos con sus casillas, o con Ctrl-clic y Mayús-clic (un intervalo); **Seleccionar todo** toma todos los trabajos que muestra el filtro. **Quitar** los quita después de la lista (no los que se están convirtiendo; los archivos no se tocan), y **Reemplazar originales** lo hace para los trabajos seleccionados de la [comprobación de calidad](#quality.replace).",
         "Haga clic en un trabajo para ver sus [detalles](#job.details)."
       ],
       "see": [

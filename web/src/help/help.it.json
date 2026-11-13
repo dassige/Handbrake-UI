@@ -74,6 +74,7 @@
         "- **Trascina** un processo in coda dalla sua maniglia (⋮⋮) per cambiare l’ordine, oppure usa **Sposta in cima**.",
         "- I filtri mostrano tutti i processi, quelli attivi, quelli convertiti o quelli non riusciti e annullati. **Rinomina questi** (sotto Convertiti) apre i loro file nella vista Rinomina, **Unisci questi** nella vista Unisci.",
         "- **Rimuovi i terminati** toglie dall’elenco i processi convertiti, non riusciti e annullati. I file non vengono toccati.",
+        "- **Seleziona** i lavori con le loro caselle, oppure con Ctrl-clic e Maiusc-clic (un intervallo); **Seleziona tutto** prende tutti i lavori mostrati dal filtro. **Togli** li toglie poi dall’elenco (non quelli in conversione; i file non vengono toccati), e **Sostituisci gli originali** lo fa per i lavori selezionati del [controllo qualità](#quality.replace).",
         "Fai clic su un processo per vederne i [dettagli](#job.details)."
       ],
       "see": [
