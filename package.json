@@ -1,12 +1,12 @@
 {
   "name": "encforge",
-  "version": "4.3.0",
+  "version": "4.3.1",
   "private": true,
   "license": "GPL-2.0-only",
   "description": "Project (global) version — managed by DGS AutoVersion",
   "scripts": {
     "release": "node scripts/release.cjs"
   },
-  "versionDate": "2026/11/14 09:52",
-  "git-parentCommit-ID": "6a943506c28905670581409c39c5d1ac7caaf3f1"
+  "versionDate": "2026/11/14 10:19",
+  "git-parentCommit-ID": "f8d237e410e4a75c39df16ee47d44669e2e69be1"
 }

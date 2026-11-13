@@ -15,7 +15,7 @@ import { constants } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { HttpError, badRequest, conflict } from './errors.js';
-import { isInside, rootOf, uniquePath } from './paths.js';
+import { copyBytes, isInside, rootOf, uniquePath } from './paths.js';
 
 export const REPLACE_ORIGIN = 'quality';
 
@@ -41,9 +41,15 @@ export async function normalizeOriginalsFolder(value, sourceRoots) {
   return folder;
 }
 
+const PART = '.encforge-part';
+
+/** The hidden name a file is written under until it is complete: dir/.name.encforge-part */
+export const partName = (to) => path.join(path.dirname(to), `.${path.basename(to)}${PART}`);
+
 /**
- * Moves a file, also between disks: rename, or copy (under a hidden name, then renamed) when
- * rename cannot cross. keepSource: after a copy, leave the source for the caller to remove.
+ * Moves a file, also between disks or shares: rename, or a copy of its bytes (under a hidden
+ * name, then renamed) when rename cannot cross. A `to` that is already a hidden part name is
+ * copied to directly. keepSource: after a copy, leave the source for the caller to remove.
  * Returns { copied }.
  */
 export async function moveFile(from, to, { keepSource = false, rename = fs.rename } = {}) {
@@ -53,10 +59,10 @@ export async function moveFile(from, to, { keepSource = false, rename = fs.renam
   } catch (err) {
     if (err.code !== 'EXDEV') throw err;
   }
-  const part = path.join(path.dirname(to), `.${path.basename(to)}.encforge-part`);
+  const part = to.endsWith(PART) ? to : partName(to);
   try {
-    await fs.copyFile(from, part);
-    await fs.rename(part, to);
+    await copyBytes(from, part);
+    if (part !== to) await fs.rename(part, to);
   } catch (err) {
     await fs.rm(part, { force: true }).catch(() => {});
     throw err;
@@ -126,7 +132,7 @@ export class Replacer {
     const warnings = [];
 
     // 1. The converted file next to the original, under a hidden name.
-    const part = path.join(path.dirname(original), `.${path.basename(dest)}.encforge-part`);
+    const part = partName(dest);
     const moved = await moveFile(converted, part, { keepSource: true, rename: this.rename });
     const undoPart = () => (moved.copied ? fs.rm(part, { force: true }) : fs.rename(part, converted));
 

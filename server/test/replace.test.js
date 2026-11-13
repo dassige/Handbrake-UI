@@ -191,3 +191,30 @@ test('replace: the originals folder must exist and be outside the sources folder
     await t.done();
   }
 });
+
+test('replace: copies between shares never need fs.copyFile (it sets the mode, which mapped NFS shares refuse)', async () => {
+  const fsp = (await import('node:fs/promises')).default;
+  const original = fsp.copyFile;
+  // As on a Synology NFS share mapping users: writing works, setting the mode does not.
+  fsp.copyFile = async () => {
+    throw Object.assign(new Error('EPERM: operation not permitted, copyfile'), { code: 'EPERM' });
+  };
+  const rename = async (from, to) => {
+    if (path.dirname(from) !== path.dirname(to)) throw Object.assign(new Error('cross-device'), { code: 'EXDEV' });
+    return fs.rename(from, to);
+  };
+  const t = await setup({ rename });
+  try {
+    await t.settings.update({ replaceBackupFolder: t.originals });
+    const id = await t.job({ source: path.join(t.src, 'Film.avi'), output: path.join(t.out, 'Film.mkv') });
+    await fs.writeFile(path.join(t.out, 'Film.en.srt'), 'converted en');
+    const job = await t.replacer.replace(id, { backup: true });
+    assert.equal(await t.read(path.join(t.src, 'Film.mkv')), 'converted');
+    assert.equal(await t.read(path.join(t.src, 'Film.en.srt')), 'converted en');
+    assert.equal(await t.read(job.replaced.backup), 'original');
+    assert.deepEqual(job.replaced.warnings, []);
+  } finally {
+    fsp.copyFile = original;
+    await t.done();
+  }
+});

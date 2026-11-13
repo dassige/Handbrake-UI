@@ -1,5 +1,7 @@
+import { createReadStream, createWriteStream } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { pipeline } from 'node:stream/promises';
 import { badRequest } from './errors.js';
 import { parseName, sanitizeFileName, tokenize } from './rename/parse.js';
 
@@ -182,4 +184,13 @@ export async function uniquePath(p) {
     candidate = path.join(dir, `${name} (${i})${ext}`);
   }
   return candidate;
+}
+
+/**
+ * Copies a file's bytes to a new file. Not fs.copyFile: that also gives the copy the source's
+ * mode (fchmod), which NFS shares that map users to another owner (Synology) refuse with
+ * EPERM, so the copy failed although the file could be written.
+ */
+export async function copyBytes(from, to) {
+  await pipeline(createReadStream(from, { highWaterMark: 1 << 20 }), createWriteStream(to));
 }

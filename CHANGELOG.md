@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.3.1] - 2026/11/14
+
+- fix: Replacing originals failed with EPERM between NFS shares
+
+Moving a converted file to its original's folder on another share is
+a copy, and fs.copyFile also gives the copy the source's mode
+(fchmod), which an NFS share that maps users to another owner
+(Synology) refuses with EPERM, although writing works. Files are now
+copied as plain bytes, for "Replace original" and for subtitle copies.
+The temporary file gets a single .encforge-part suffix.
+
 ## [4.3.0] - 2026/11/14
 
 - feat: Play videos in the browser

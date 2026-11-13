@@ -7,7 +7,7 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { badRequest } from '../errors.js';
-import { makeFileMatcher } from '../paths.js';
+import { copyBytes, makeFileMatcher } from '../paths.js';
 import { companionsByVideo, companionsOf, findSidecars, scanFolder } from './detect.js';
 import { langFromWord } from './languages.js';
 import { effectiveModes, handbrakeArgs, planSubtitles, targetName } from './plan.js';
@@ -307,7 +307,7 @@ async function writeAtomic(to, data) {
 
 async function copyAtomic(from, to) {
   const tmp = path.join(path.dirname(to), `.${path.basename(to)}.hbui-tmp`);
-  await fs.copyFile(from, tmp);
+  await copyBytes(from, tmp);
   await fs.rename(tmp, to);
 }
 
