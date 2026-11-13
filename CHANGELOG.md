@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.2.4] - 2026/11/13
+
+- chore: Stop tracking server/data
+
+The database a server started from server/ (without DATA_DIR) creates
+there was committed by mistake. It was empty. server/data/ is now
+ignored like the data/ folder at the top.
+
 ## [4.2.3] - 2026/11/13
 
 - feat: Replace originals with their conversions from the quality check
