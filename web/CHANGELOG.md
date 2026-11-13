@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.3.2] - 2026/11/14
+
+- feat: Replacing an original can keep the converted file in the target folder
+
+The replace dialog has a "Keep the converted file in the target folder
+too" checkbox, remembered per browser. When ticked, the converted file
+and its subtitle copies are copied to the original's folder instead of
+moved (also on one disk), and the job keeps pointing at the copy in
+the target folder; its details show both places. The single and the
+background replace take keepConverted; without it the file is moved,
+as before. The help and the API docs describe it in every language.
+
 ## [4.3.1] - 2026/11/14
 
 - feat: Replace originals in the background, with progress

@@ -164,6 +164,10 @@
     "badgeReplacingPercent": "Remplacement… {percent}",
     "badgeFailed": "Échec du remplacement",
     "waiting": "Attend son tour : les originaux sont remplacés un par un.",
-    "background": "Le serveur les remplace un par un, même avec cette page fermée ; la barre au-dessus de la file montre l’avancement."
+    "background": "Le serveur les remplace un par un, même avec cette page fermée ; la barre au-dessus de la file montre l’avancement.",
+    "keepConverted_one": "Garder aussi le fichier converti dans le dossier cible",
+    "keepConverted_other": "Garder aussi les fichiers convertis dans le dossier cible",
+    "keepConvertedHint": "Il est copié dans le dossier de l’original au lieu d’être déplacé (plus lent ; occupe deux fois la place).",
+    "alsoAt": "Toujours aussi dans"
   }
 }

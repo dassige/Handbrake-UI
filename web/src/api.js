@@ -102,7 +102,7 @@ export const api = {
   downloadUrl: (path) => `/api/download?path=${encodeURIComponent(path)}`,
   // Replacing originals in the background (server/src/replace.js)
   replaceState: () => get('/api/replace'),
-  startReplace: (ids, backup) => post('/api/replace', { ids, backup }),
+  startReplace: (ids, backup, keepConverted) => post('/api/replace', { ids, backup, keepConverted }),
   stopReplace: () => post('/api/replace/stop'),
   clearReplace: () => request('DELETE', '/api/replace'),
   // The player (server/src/media.js)

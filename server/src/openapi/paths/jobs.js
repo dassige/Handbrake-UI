@@ -104,7 +104,8 @@ export const schemas = [
           at: { type: 'integer' },
           original: { type: 'string', description: 'Where the original was.' },
           converted: { type: 'string', description: 'Where the converted file was.' },
-          path: { type: 'string', description: 'Where the converted file is now (also the job’s outputPath).' },
+          path: { type: 'string', description: 'Where the converted file now replaces the original (also the job’s outputPath, unless keptConverted).' },
+          keptConverted: { type: 'boolean', description: 'The converted file was copied: it is also still at `converted`.' },
           backup: { type: ['string', 'null'], description: 'Where the original was kept; null: deleted.' },
           subtitles: { type: 'array', items: { type: 'object', properties: { from: { type: 'string' }, to: { type: 'string' }, backup: { type: ['string', 'null'] } } } },
           warnings: { type: 'array', items: { type: 'string' }, description: 'Steps after the replacement that failed (e.g. a subtitle copy that could not be moved).' },
@@ -195,6 +196,7 @@ schemas.push({
           id: { type: 'integer', description: 'The job.' },
           name: { type: 'string', description: 'The original’s file name.' },
           backup: { type: 'boolean' },
+          keepConverted: { type: 'boolean' },
           status: { type: 'string', enum: ['waiting', 'replacing', 'done', 'failed', 'skipped'] },
           error: { type: ['string', 'null'] },
           code: { type: ['string', 'null'], description: 'Why it failed, when known (as for replace-original).' },
@@ -408,7 +410,13 @@ export const paths = {
     summary: 'Replace the original with the converted file',
     description: 'For a converted job added from the quality check (origin `quality`). The converted file takes the original’s place: the original’s folder and name, the converted file’s extension (Film.avi → Film.mkv). With `backup: true` the original is kept in the originals folder of Settings → Quality check (under the same path as in its sources folder); otherwise it is deleted. Subtitle copies written next to the converted file go with it, named after the original. Refused (409, with a `code`) when the check after conversion failed or is running (`checkFailed`, `checking`), the original is in a protected sources folder (`protected`) or queued again (`pending`), another file already has the new name (`nameTaken`), the converted file is gone (`noOutput`), or it was done already (`alreadyReplaced`). A step that fails undoes the ones before it.',
     params: idParam,
-    body: { type: 'object', properties: { backup: { type: ['boolean', 'null'], description: 'Keep the original in the originals folder (which must be set).' } } },
+    body: {
+      type: 'object',
+      properties: {
+        backup: { type: ['boolean', 'null'], description: 'Keep the original in the originals folder (which must be set).' },
+        keepConverted: { type: ['boolean', 'null'], description: 'Copy the converted file instead of moving it: it stays in the target folder too (the job’s outputPath stays there).' },
+      },
+    },
     response: {
       200: { $ref: 'Job#' },
       400: { description: 'backup without an originals folder in the settings (code noBackupFolder).', $ref: 'Error#' },
@@ -433,6 +441,7 @@ export const paths = {
       properties: {
         ids: { type: 'array', items: { type: 'integer' }, description: 'The jobs.' },
         backup: { type: ['boolean', 'null'], description: 'Keep the originals in the originals folder (which must be set).' },
+        keepConverted: { type: ['boolean', 'null'], description: 'Copy the converted files instead of moving them: they stay in the target folder too.' },
       },
       required: ['ids'],
     },
@@ -605,6 +614,7 @@ export const examples = [
   { method: 'POST', url: '/api/jobs/1/replace-original', body: { backup: true } },
   { method: 'GET', url: '/api/replace' },
   { method: 'POST', url: '/api/replace', body: { ids: [1, 2, 3], backup: true } },
+  { method: 'POST', url: '/api/replace', body: { ids: [1, 2], backup: false, keepConverted: true } },
   { method: 'POST', url: '/api/replace/stop', body: {} },
   { method: 'DELETE', url: '/api/replace' },
   { method: 'POST', url: '/api/jobs/1/replace-original', body: { backup: false } },

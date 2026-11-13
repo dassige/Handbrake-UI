@@ -164,6 +164,10 @@
     "badgeReplacingPercent": "Wird ersetzt… {percent}",
     "badgeFailed": "Ersetzen fehlgeschlagen",
     "waiting": "Wartet, bis es an der Reihe ist: Die Originale werden nacheinander ersetzt.",
-    "background": "Der Server ersetzt sie nacheinander, auch wenn diese Seite geschlossen ist; die Leiste über der Warteschlange zeigt den Fortschritt."
+    "background": "Der Server ersetzt sie nacheinander, auch wenn diese Seite geschlossen ist; die Leiste über der Warteschlange zeigt den Fortschritt.",
+    "keepConverted_one": "Die konvertierte Datei auch im Zielordner behalten",
+    "keepConverted_other": "Die konvertierten Dateien auch im Zielordner behalten",
+    "keepConvertedHint": "Sie wird in den Ordner des Originals kopiert statt verschoben (langsamer; belegt den Platz doppelt).",
+    "alsoAt": "Auch noch in"
   }
 }

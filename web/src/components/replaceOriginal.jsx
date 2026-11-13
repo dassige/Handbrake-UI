@@ -150,9 +150,27 @@ export function ReplaceProgress({ replace, run }) {
   );
 }
 
+// The last choice of "keep the converted file too", per browser.
+const KEEP_KEY = 'encforge.replace.keepConverted';
+const lastKeep = () => {
+  try {
+    return localStorage.getItem(KEEP_KEY) === '1';
+  } catch {
+    return false;
+  }
+};
+const rememberKeep = (v) => {
+  try {
+    localStorage.setItem(KEEP_KEY, v ? '1' : '0');
+  } catch {
+    // private window, storage off: the choice is just not remembered
+  }
+};
+
 /**
- * Returns replace(jobs): asks whether to keep or delete the originals, then hands them to the
- * server, which replaces them in the background. Resolves to the number handed over.
+ * Returns replace(jobs): asks whether to keep or delete the originals, and whether to move or
+ * copy the converted files, then hands them to the server, which replaces them in the
+ * background. Resolves to the number handed over.
  */
 export function useReplaceOriginal({ settings, run, replace = null }) {
   const dialogs = useDialogs();
@@ -162,6 +180,8 @@ export function useReplaceOriginal({ settings, run, replace = null }) {
       if (!list.length) return 0;
       const folder = settings?.replaceBackupFolder || '';
       const one = list.length === 1 ? list[0] : null;
+      // Read when a button is pressed (the dialog's message is not re-rendered).
+      const opts = { keepConverted: lastKeep() };
       const choice = await dialogs.choose({
         title: one ? t('job.replace.title') : t('job.replace.titleMany', { count: list.length }),
         icon: 'warn',
@@ -180,6 +200,13 @@ export function useReplaceOriginal({ settings, run, replace = null }) {
             <p className="muted small">
               {folder ? rich('job.replace.keepNote', { folder: <code>{folder}</code> }) : t('job.replace.noFolder')}
             </p>
+            <label className="set-check">
+              <input type="checkbox" defaultChecked={opts.keepConverted} onChange={(e) => (opts.keepConverted = e.target.checked)} />
+              <span>
+                {t('job.replace.keepConverted', { count: list.length })}
+                <span className="set-hint">{t('job.replace.keepConvertedHint')}</span>
+              </span>
+            </label>
             {list.some((j) => j.verifyStatus === 'warning') && <p className="warn-text">{t('job.replace.warnings')}</p>}
             <p className="muted small">{t('job.replace.background')}</p>
           </>
@@ -191,7 +218,8 @@ export function useReplaceOriginal({ settings, run, replace = null }) {
         ],
       });
       if (!choice) return 0;
-      const r = await run(() => api.startReplace(list.map((j) => j.id), choice === 'keep'));
+      rememberKeep(opts.keepConverted);
+      const r = await run(() => api.startReplace(list.map((j) => j.id), choice === 'keep', opts.keepConverted));
       return r ? list.length : 0;
     },
     [dialogs, run, replace, settings?.replaceBackupFolder],

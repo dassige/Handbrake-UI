@@ -94,6 +94,7 @@ function ReplaceSection({ job, settings, run, replaceState }) {
         <>
           <Row label={t('job.replace.replacedAt')}>{dateTime(r.at)}</Row>
           <Row label={t('job.replace.nowAt')}><code className="path">{r.path}</code></Row>
+          {r.keptConverted && <Row label={t('job.replace.alsoAt')}><code className="path">{r.converted}</code></Row>}
           <Row label={t('job.replace.originalLabel')}>
             {r.backup ? <code className="path">{r.backup}</code> : <span className="muted">{t('job.replace.deleted')}</span>}
           </Row>

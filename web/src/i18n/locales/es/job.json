@@ -164,6 +164,10 @@
     "badgeReplacingPercent": "Reemplazando… {percent}",
     "badgeFailed": "Reemplazo fallido",
     "waiting": "Esperando su turno: los originales se reemplazan de uno en uno.",
-    "background": "El servidor los reemplaza de uno en uno, también con esta página cerrada; la barra sobre la cola muestra el avance."
+    "background": "El servidor los reemplaza de uno en uno, también con esta página cerrada; la barra sobre la cola muestra el avance.",
+    "keepConverted_one": "Conservar también el archivo convertido en la carpeta de destino",
+    "keepConverted_other": "Conservar también los archivos convertidos en la carpeta de destino",
+    "keepConvertedHint": "Se copia a la carpeta del original en lugar de moverse (más lento; ocupa el doble de espacio).",
+    "alsoAt": "También sigue en"
   }
 }

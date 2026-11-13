@@ -164,6 +164,10 @@
     "badgeReplacingPercent": "Sostituzione… {percent}",
     "badgeFailed": "Sostituzione fallita",
     "waiting": "In attesa del suo turno: gli originali vengono sostituiti uno alla volta.",
-    "background": "Il server li sostituisce uno alla volta, anche con questa pagina chiusa; la barra sopra la coda mostra a che punto è."
+    "background": "Il server li sostituisce uno alla volta, anche con questa pagina chiusa; la barra sopra la coda mostra a che punto è.",
+    "keepConverted_one": "Mantieni il file convertito anche nella cartella di destinazione",
+    "keepConverted_other": "Mantieni i file convertiti anche nella cartella di destinazione",
+    "keepConvertedHint": "Viene copiato nella cartella dell’originale invece di essere spostato (più lento; occupa il doppio dello spazio).",
+    "alsoAt": "Ancora anche in"
   }
 }

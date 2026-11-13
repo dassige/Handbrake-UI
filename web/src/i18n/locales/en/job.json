@@ -164,6 +164,10 @@
     "badgeReplacingPercent": "Replacing… {percent}",
     "badgeFailed": "Replace failed",
     "waiting": "Waiting its turn: the originals are replaced one at a time.",
-    "background": "The server replaces them one at a time, also with this page closed; the bar above the queue shows how far it is."
+    "background": "The server replaces them one at a time, also with this page closed; the bar above the queue shows how far it is.",
+    "keepConverted_one": "Keep the converted file in the target folder too",
+    "keepConverted_other": "Keep the converted files in the target folder too",
+    "keepConvertedHint": "It is copied to the original’s folder instead of moved (slower; uses the space twice).",
+    "alsoAt": "Also still at"
   }
 }

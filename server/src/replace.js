@@ -1,7 +1,8 @@
 // Replacing an original with its conversion, for jobs added from the quality check (origin "quality").
 //
 // The converted file takes the original's place: same folder, same name, the converted file's
-// extension (Film.avi → Film.mkv). The original is kept in the originals folder chosen in
+// extension (Film.avi → Film.mkv). It is moved there, or copied (keepConverted: it stays in the
+// target folder too). The original is kept in the originals folder chosen in
 // Settings → Quality check (same path as under its sources folder), or deleted.
 // Subtitle copies written next to the converted file go with it, renamed after the original;
 // an original subtitle file of the same name goes with the original. The original's other
@@ -71,6 +72,19 @@ export async function moveFile(from, to, { keepSource = false, rename = fs.renam
   return { copied: true };
 }
 
+/** Copies a file (never a move, also on one disk): under a hidden name, then renamed. */
+export async function copyFile(from, to, { onProgress = null } = {}) {
+  const part = to.endsWith(PART) ? to : partName(to);
+  try {
+    await copyBytes(from, part, onProgress);
+    if (part !== to) await fs.rename(part, to);
+  } catch (err) {
+    await fs.rm(part, { force: true }).catch(() => {});
+    throw err;
+  }
+  return { copied: true };
+}
+
 /** How often progress goes out to the browsers (ms). */
 const PROGRESS_EVERY = 500;
 
@@ -87,7 +101,7 @@ export class Replacer {
   // ---------------------------------------------------------------- in the background
 
   /**
-   * The list: { running, stopping, startedAt, finishedAt, items: [{ id, name, backup, status, error, code }],
+   * The list: { running, stopping, startedAt, finishedAt, items: [{ id, name, backup, keepConverted, status, error, code }],
    * current: { id, step, done, total } | null }. status: waiting | replacing | done | failed | skipped.
    * null when there is none (never started, or cleared).
    */
@@ -107,7 +121,7 @@ export class Replacer {
    * goes on with no browser open). A job already waiting or being replaced is not added twice.
    * Jobs that turn out not to be replaceable fail one by one, with the reason.
    */
-  add(ids, { backup = false } = {}) {
+  add(ids, { backup = false, keepConverted = false } = {}) {
     if (!Array.isArray(ids) || !ids.length) throw badRequest('Choose the jobs whose originals to replace');
     if (backup === true && !this.settings.get('replaceBackupFolder')) {
       throw badRequest('Choose a folder for the originals first (Settings → Quality check)', 'noBackupFolder');
@@ -120,7 +134,9 @@ export class Replacer {
     for (const job of jobs) {
       if (pending.has(job.id)) continue;
       pending.add(job.id);
-      this.batch.items.push({ id: job.id, name: path.basename(job.sourcePath), backup: backup === true, status: 'waiting', error: null, code: null });
+      this.batch.items.push({
+        id: job.id, name: path.basename(job.sourcePath), backup: backup === true, keepConverted: keepConverted === true, status: 'waiting', error: null, code: null,
+      });
     }
     this.emit();
     this.work();
@@ -154,6 +170,7 @@ export class Replacer {
         try {
           await this.replace(item.id, {
             backup: item.backup,
+            keepConverted: item.keepConverted,
             onProgress: (p) => {
               b.current = { id: item.id, ...p };
               if (p.done === 0 || Date.now() - this.lastProgress >= this.progressEvery) this.emit();
@@ -229,19 +246,20 @@ export class Replacer {
    * Replaces the original of job id. backup: keep it in the originals folder (which must be set).
    * onProgress({ step, done, total }) while files are copied: step 'converted' (the converted file
    * to the original's folder) or 'original' (the original to the originals folder), in bytes.
+   * keepConverted: copy the converted file instead of moving it (it stays in the target folder).
    * Returns the updated job; its `replaced` says what happened.
    */
-  async replace(id, { backup = false, onProgress = null } = {}) {
+  async replace(id, { backup = false, keepConverted = false, onProgress = null } = {}) {
     if (this.busy.has(id)) throw conflict('This original is being replaced already');
     this.busy.add(id);
     try {
-      return await this.run(this.queue.get(id), backup === true, onProgress);
+      return await this.run(this.queue.get(id), backup === true, onProgress, keepConverted === true);
     } finally {
       this.busy.delete(id);
     }
   }
 
-  async run(job, backup, onProgress = null) {
+  async run(job, backup, onProgress = null, keepConverted = false) {
     const sizeOf = (p) => fs.stat(p).then((s) => s.size, () => null);
     const progress = async (step, file) => {
       if (!onProgress) return null;
@@ -266,7 +284,10 @@ export class Replacer {
 
     // 1. The converted file next to the original, under a hidden name.
     const part = partName(dest);
-    const moved = await moveFile(converted, part, { keepSource: true, rename: this.rename, onProgress: await progress('converted', converted) });
+    const onCopy = await progress('converted', converted);
+    const moved = keepConverted
+      ? await copyFile(converted, part, { onProgress: onCopy })
+      : await moveFile(converted, part, { keepSource: true, rename: this.rename, onProgress: onCopy });
     const undoPart = () => (moved.copied ? fs.rm(part, { force: true }) : fs.rename(part, converted));
 
     // 2. The original into the originals folder.
@@ -292,7 +313,7 @@ export class Replacer {
     if (!backupPath && originalThere && dest !== original) {
       await fs.rm(original, { force: true }).catch((err) => warnings.push(`The original could not be deleted: ${err.message}`));
     }
-    if (moved.copied) await fs.rm(converted, { force: true }).catch((err) => warnings.push(`${converted} could not be removed: ${err.message}`));
+    if (moved.copied && !keepConverted) await fs.rm(converted, { force: true }).catch((err) => warnings.push(`${converted} could not be removed: ${err.message}`));
 
     // 4. Subtitle copies follow the converted file, named after the original.
     const subtitles = [];
@@ -309,16 +330,18 @@ export class Replacer {
             await fs.rm(to, { force: true });
           }
         }
-        await moveFile(c.path, to, { rename: this.rename });
+        if (keepConverted) await copyFile(c.path, to);
+        else await moveFile(c.path, to, { rename: this.rename });
         subtitles.push(entry);
       } catch (err) {
         warnings.push(`${path.basename(c.path)}: ${err.message}`);
       }
     }
 
-    const replaced = { at: Date.now(), original, converted, path: dest, backup: backupPath, subtitles, warnings };
-    this.db.prepare('UPDATE jobs SET replaced = ?, output_path = ? WHERE id = ?').run(JSON.stringify(replaced), dest, job.id);
-    this.log?.info(`Job ${job.id}: replaced ${original} with ${dest}${backupPath ? ` (original kept as ${backupPath})` : ''}`);
+    const replaced = { at: Date.now(), original, converted, path: dest, backup: backupPath, keptConverted: keepConverted, subtitles, warnings };
+    // The job's output: the converted file where it now is (the target folder's copy when it was kept).
+    this.db.prepare('UPDATE jobs SET replaced = ?, output_path = ? WHERE id = ?').run(JSON.stringify(replaced), keepConverted ? converted : dest, job.id);
+    this.log?.info(`Job ${job.id}: replaced ${original} with ${dest}${keepConverted ? ' (a copy; the converted file stays)' : ''}${backupPath ? ` (original kept as ${backupPath})` : ''}`);
     this.queue.emitJob(job.id);
     this.events.emit('files');
     return this.queue.get(job.id);

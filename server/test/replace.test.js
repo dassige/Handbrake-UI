@@ -314,3 +314,33 @@ test('replace: after a restart, an unfinished copy is removed, or finishes the r
     await t.done();
   }
 });
+
+test('replace: keeping the converted file copies it (also on one disk), and the job keeps pointing at it', async () => {
+  const t = await setup();
+  try {
+    await t.settings.update({ replaceBackupFolder: t.originals });
+    const output = path.join(t.out, 'Film (2001).mkv');
+    const id = await t.job({ source: path.join(t.src, 'Film.avi'), output });
+    await fs.writeFile(path.join(t.out, 'Film (2001).en.srt'), 'converted en');
+    const job = await t.replacer.replace(id, { backup: true, keepConverted: true });
+    assert.equal(await t.read(path.join(t.src, 'Film.mkv')), 'converted');
+    assert.equal(await t.read(output), 'converted', 'still in the target folder');
+    assert.equal(await t.read(path.join(t.src, 'Film.en.srt')), 'converted en');
+    assert.equal(await t.read(path.join(t.out, 'Film (2001).en.srt')), 'converted en', 'subtitle copy kept too');
+    assert.equal(await t.read(path.join(t.originals, 'Film.avi')), 'original');
+    assert.equal(job.outputPath, output);
+    assert.equal(job.replaced.path, path.join(t.src, 'Film.mkv'));
+    assert.equal(job.replaced.keptConverted, true);
+
+    // The same through the background list.
+    const other = await t.job({ source: path.join(t.src, 'Other.avi'), output: path.join(t.out, 'Other.mkv') });
+    const added = t.replacer.add([other], { keepConverted: true });
+    assert.equal(added.items[0].keepConverted, true);
+    await settled(t);
+    assert.equal(await t.read(path.join(t.src, 'Other.mkv')), 'converted');
+    assert.equal(await t.read(path.join(t.out, 'Other.mkv')), 'converted');
+    assert.equal(await t.there(path.join(t.src, 'Other.avi')), false, 'original deleted (no backup asked)');
+  } finally {
+    await t.done();
+  }
+});
